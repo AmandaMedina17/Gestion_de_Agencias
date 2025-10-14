@@ -32,3 +32,8 @@ export enum ApprenticeTrainingLevel{
     INTERMEDIO = "INTERMEDIO",
     AVANZADO = "AVANZADO"
 }
+
+export enum BillboardListScope{
+    INTERNACIONAL = "INTERNACIONAL",
+    NACIONAL = "NACIONAL"
+}

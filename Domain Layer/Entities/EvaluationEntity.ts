@@ -1,15 +1,11 @@
-import {Evaluation} from "../Enums";
-import { EvaluationID } from "../ValueObjects";
-import { DateValue } from "../ValueObjects";
+import { Evaluation } from "../Enums";
+import { EvaluationID } from "../Value Objects/Values";
+import { DateValue } from "../Value Objects/Values";
 
-export class EvaluationEntity{
-    constructor(
-        private readonly id: EvaluationID,
-        private evaluationDate: DateValue, //esto es con fecha
-        private evaluation: Evaluation
-
-    )
-    {
-        
-    }
+export class EvaluationEntity {
+  constructor(
+    private readonly id: EvaluationID,
+    private evaluationDate: DateValue, //esto es con fecha
+    private evaluation: Evaluation
+  ) {}
 }

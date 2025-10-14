@@ -42,60 +42,6 @@ export class Money{
     }
 }
 
-export class ApprenticeID{
-    private static nextId: number = 1; // cntadoro para auto-incremento
-
-    private constructor(private readonly value: number) {
-        
-    }
-
-    public static create(): ApprenticeID{
-        const newId = new ApprenticeID(ApprenticeID.nextId);
-        ApprenticeID.nextId++;
-        return newId;
-    }
-
-    public getNext(): ApprenticeID {
-        return new ApprenticeID(this.value + 1);
-    }
-
-    public getValue(): number {
-        return this.value;
-    }
-
-    public equals(other: ApprenticeID): boolean {
-        return this.value === other.value;
-    }
-   
-}
-
-export class EvaluationID{
-    private static nextId: number = 1; // cntadoro para auto-incremento
-
-    private constructor(private readonly value: number) {
-        
-    }
-
-    public static create(): EvaluationID{
-        const newId = new EvaluationID(EvaluationID.nextId);
-        EvaluationID.nextId++;
-        return newId;
-    }
-
-    public getNext(): EvaluationID {
-        return new EvaluationID(this.value + 1);
-    }
-
-    public getValue(): number {
-        return this.value;
-    }
-
-    public equals(other: EvaluationID): boolean {
-        return this.value === other.value;
-    }
-   
-}
-
 export class DateValue {
     private constructor(private readonly value: Date) {
         if (isNaN(value.getTime())) {
@@ -288,3 +234,16 @@ export class DateValue {
         return this.value.getTime();
     }
 }
+
+export class Place{
+    constructor(
+        private readonly country: string,
+        private readonly state: string,
+        private readonly namePlace: string
+    ){
+
+    }
+
+
+}
+
