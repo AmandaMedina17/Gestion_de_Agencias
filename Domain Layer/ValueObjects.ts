@@ -459,3 +459,51 @@ export class ContractID {
         return `CONTRACT-${this.value.toString().padStart(3, '0')}`;
     }
 }
+
+export class DateID {
+    private static nextId: number = 1;
+
+    private constructor(private readonly value: number) {}
+
+    public static create():DateID {
+        const newId = new DateID(DateID.nextId);
+        DateID.nextId++;
+        return newId;
+    }
+
+    public getValue(): number {
+        return this.value;
+    }
+
+    public equals(other: DateID): boolean {
+        return this.value === other.value;
+    }
+
+    public toString(): string {
+        return `Date-${this.value.toString().padStart(3, '0')}`;
+    }
+}
+
+export class GroupID {
+    private static nextId: number = 1;
+
+    private constructor(private readonly value: number) {}
+
+    public static create():GroupID {
+        const newId = new GroupID(GroupID.nextId);
+        GroupID.nextId++;
+        return newId;
+    }
+
+    public getValue(): number {
+        return this.value;
+    }
+
+    public equals(other: GroupID): boolean {
+        return this.value === other.value;
+    }
+
+    public toString(): string {
+        return `GroupID-${this.value.toString().padStart(3, '0')}`;
+    }
+}

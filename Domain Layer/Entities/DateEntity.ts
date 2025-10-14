@@ -1,4 +1,4 @@
-import { DateValue } from "../ValueObjects";
+import { DateValue, DateID } from "../ValueObjects";
 
 export class DateEntity {
     constructor(

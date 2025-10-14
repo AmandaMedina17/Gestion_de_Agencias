@@ -61,8 +61,14 @@ export enum ActivityClassification {
 }
 
 export enum ContractStatus {
-    ACTIVE = "ACTIVE",
-    FINISHED = "FINISHED",
-    UNDER_RENEWAL = "UNDER_RENEWAL",
-    TERMINATED = "TERMINATED", //RESCINDIDO
+    ACTIVO = "ACTIVO",
+    FINALIZADO = "FINALIZADO",
+    EN_RENOVACION = "EN_RENOVACION",
+    RESCINDIDO = "RESCINDIDO",
+}
+
+export enum GroupStatus{
+    ACTIVO = "ACTIVO",
+    EN_PAUSA= "EN_PAUSA",
+    DISUELTO = "DISUELTO"
 }

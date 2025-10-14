@@ -1,9 +1,9 @@
 import { ContractStatus } from "../Enums";
-import { ContractID, DateValue,AgencyID,ArtistID } from "../ValueObjects"; //Corroborar con medina
+import { ContractID, DateID,AgencyID,ArtistID } from "../ValueObjects"; //Corroborar con medina
 export class ContractEntity {
     constructor(
         private readonly id: ContractID,
-        private readonly date: DateValue,
+        private readonly date: DateID,
         private readonly agencyId: AgencyID,
         private readonly artistId: ArtistID,
         private distributionPercentage: string,
@@ -37,42 +37,43 @@ export class ContractEntity {
         }
 
         // Validaciones de negocio específicas
-        this.validateContractDate();
+        //this.validateContractDate();
     }
 
-    private validateContractDate(): void {
-        // El contrato no puede ser en el futuro
-        if (this.date.isFuture()) {
-            throw new Error('La fecha del contrato no puede ser en el futuro');
-        }
+    //ARREGLAR
+    // private validateContractDate(): void {
+    //     // El contrato no puede ser en el futuro
+    //     if (this.date.isFuture()) {
+    //         throw new Error('La fecha del contrato no puede ser en el futuro');
+    //     }
 
-        // El contrato no puede ser hace más de 50 años (por ejemplo)
-        const fiftyYearsAgo = DateValue.today().getYear() - 50;
-        if (this.date.getYear() < fiftyYearsAgo) {
-            throw new Error('La fecha del contrato no puede ser hace más de 50 años');
-        }
-    }
+    //     // El contrato no puede ser hace más de 50 años (por ejemplo)
+    //     const fiftyYearsAgo = DateValue.today().getYear() - 50;
+    //     if (this.date.getYear() < fiftyYearsAgo) {
+    //         throw new Error('La fecha del contrato no puede ser hace más de 50 años');
+    //     }
+    // }
 
     // Métodos para modificar el estado del contrato
     public activate(): void {
-        this.status = ContractStatus.ACTIVE;
+        this.status = ContractStatus.ACTIVO;
     }
 
     public expire(): void {
-        this.status = ContractStatus.FINISHED;
+        this.status = ContractStatus.FINALIZADO;
     }
 
     public underRenewal(): void {
-        this.status = ContractStatus.UNDER_RENEWAL;
+        this.status = ContractStatus.EN_RENOVACION;
     }
 
     public terminate(): void {
-        this.status = ContractStatus.TERMINATED;
+        this.status = ContractStatus.RESCINDIDO;
     }
 
     // Método para cambiar el porcentaje de distribución (solo en renovacion)
     public changeDistributionPercentage(newPercentage: string): void {
-        if (this.status !== ContractStatus.UNDER_RENEWAL) {
+        if (this.status !== ContractStatus.EN_RENOVACION) {
             throw new Error('Solo se puede modificar el porcentaje en contratos en negociación');
         }
         this.distributionPercentage = newPercentage;
@@ -80,7 +81,7 @@ export class ContractEntity {
 
     // Método para actualizar las condiciones (solo en renovacion)
     public updateConditions(newConditions: string): void {
-        if (this.status !== ContractStatus.UNDER_RENEWAL) {
+        if (this.status !== ContractStatus.EN_RENOVACION) {
             throw new Error('Solo se pueden actualizar las condiciones en contratos en negociación');
         }
         this.conditions = newConditions;
