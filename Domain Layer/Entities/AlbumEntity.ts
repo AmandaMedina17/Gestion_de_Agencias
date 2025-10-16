@@ -1,12 +1,13 @@
-import { AlbumID, AlbumTitle, DateValue } from "../ValueObjects";
-
+import { AlbumID} from "../Value Objects/IDs";
+import {DateValue} from "../Value Objects/Values";
+         
     //FALTAN LAS CANCIONES Y LO RELACIONADO CON ELLAS
     
 export class AlbumEntity {
     private songs = []
     constructor(
         private readonly id: AlbumID,
-        private title: AlbumTitle,
+        private title: string,
         private releaseDate: DateValue,
         private mainProducer: string,
         private copiesSold: number,
@@ -79,13 +80,11 @@ export class AlbumEntity {
         return this.getAlbumAge() < 1;
     }
 
-    // ✅ GETTERS
-
     public getId(): AlbumID {
         return this.id;
     }
 
-    public getTitle(): AlbumTitle {
+    public getTitle(): string {
         return this.title;
     }
 
@@ -103,19 +102,6 @@ export class AlbumEntity {
 
     public getNumberOfTracks(): number {
         return this.numberOfTracks;
-    }
-
-    // ✅ SETTERS CON VALIDACIÓN
-
-    public setTitle(title: AlbumTitle): void {
-        this.title = title;
-    }
-
-    public setReleaseDate(releaseDate: DateValue): void {
-        if (releaseDate.isFuture()) {
-            throw new Error('La fecha de lanzamiento no puede estar en el futuro');
-        }
-        this.releaseDate = releaseDate;
     }
 
     public setMainProducer(producer: string): void {
@@ -137,29 +123,5 @@ export class AlbumEntity {
             throw new Error('El álbum no puede tener más de 50 canciones');
         }
         this.numberOfTracks = tracks;
-    }
-
-    // ✅ REPRESENTACIÓN
-
-    public toString(): string {
-        return `${this.title.toString()} (${this.releaseDate.getYear()}) - ${this.copiesSold.toLocaleString()} copias`;
-    }
-
-    public toDetailedString(): string {
-        const successLevel = this.getSuccessLevel();
-        const successText = {
-            "SUPER_SUCCESS": "Superéxito",
-            "GREAT_SUCCESS": "Gran éxito", 
-            "SUCCESS": "Éxito",
-            "MODERATE": "Moderado",
-            "NEW": "Nuevo"
-        }[successLevel];
-
-        return `[${this.id.toString()}] ${this.title.toString()} 
-Lanzamiento: ${this.releaseDate.toLocalString()}
-Productor: ${this.mainProducer.toString()}
-Canciones: ${this.numberOfTracks}
-Ventas: ${this.copiesSold.toLocaleString()} copias
-Nivel: ${successText}`;
     }
 }

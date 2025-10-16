@@ -1,5 +1,6 @@
 import { GroupStatus } from "../Enums";
-import {GroupID, DateValue} from "../ValueObjects";
+import {DateValue} from "../Value Objects/Values";
+import {GroupID} from "../Value Objects/IDs";
 
 export class GroupEntity {
     constructor(
@@ -74,11 +75,6 @@ export class GroupEntity {
 
     public getYearsSinceDebut(): number {
         return DateValue.today().getYear() - this.debut_date.getYear();
-    }
-
-    public toString(): string {
-        return `${this.name.toString()}`;
-    }
-    
+    } 
 }
 

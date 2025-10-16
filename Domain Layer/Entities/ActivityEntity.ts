@@ -1,4 +1,4 @@
-import { ActivityID } from "../ValueObjects";
+import { ActivityID } from "../Value Objects/IDs";
 import { ActivityClassification, ActivityType } from "../Enums";
 
 export class ActivityEntity {

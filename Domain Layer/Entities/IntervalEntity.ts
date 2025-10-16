@@ -1,4 +1,5 @@
-import { IntervalID, DateValue } from "../ValueObjects";
+import { DateValue } from "../Value Objects/Values";
+import {IntervalID} from "../Value Objects/IDs";
 
 export class IntervalEntity {
     constructor(
@@ -17,33 +18,8 @@ export class IntervalEntity {
         if (this.startDate.equals(this.endDate)) {
             throw new Error('El intervalo debe tener al menos un día de duración');
         }
-
-        // // Validar duración máxima (2 años por ejemplo)
-        // if (this.getDurationInDays() > 730) {
-        //     throw new Error('El intervalo no puede exceder los 2 años de duración');
-        // }
     }
 
-    //MÉTODOS DE NEGOCIO ESPECÍFICOS
-
-    /**
-     * Verifica si el intervalo es adecuado para un período de entrenamiento
-     */
-    public isSuitableForTraining(): boolean {
-        const durationDays = this.getDurationInDays();
-        
-        // Períodos de entrenamiento típicamente entre 3 meses y 2 años
-        return durationDays >= 90 && durationDays <= 730;
-    }
-
-    /**
-     * Verifica si el intervalo es adecuado para promociones
-     * (generalmente 4-8 semanas)
-     */
-    public isSuitableForPromotion(): boolean {
-        const durationDays = this.getDurationInDays();
-        return durationDays >= 28 && durationDays <= 56;
-    }
 
     /**
      * Verifica si una fecha específica está dentro del intervalo

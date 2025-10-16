@@ -71,7 +71,8 @@ export enum GroupStatus{
     ACTIVO = "ACTIVO",
     EN_PAUSA= "EN_PAUSA",
     DISUELTO = "DISUELTO"
-  
+}
+ 
 export enum BillboardListScope{
     INTERNACIONAL = "INTERNACIONAL",
     NACIONAL = "NACIONAL"

@@ -1,4 +1,5 @@
-import {PrizeID, DateValue} from "../ValueObjects";
+import { DateValue} from "../Value Objects/Values";
+import { PrizeID } from "../Value Objects/IDs";
 export class PrizeEntity {
     constructor(
         private readonly id: PrizeID,
