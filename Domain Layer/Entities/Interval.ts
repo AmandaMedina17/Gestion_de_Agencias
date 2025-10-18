@@ -1,7 +1,7 @@
 import { DateValue } from "../Value Objects/Values";
 import {IntervalID} from "../Value Objects/IDs";
 
-export class IntervalEntity {
+export class Interval {
     constructor(
         private readonly id: IntervalID,
         private startDate: DateValue,
@@ -32,7 +32,7 @@ export class IntervalEntity {
     /**
      * Verifica si este intervalo se superpone con otro
      */
-    public overlapsWith(other: IntervalEntity): boolean {
+    public overlapsWith(other: Interval): boolean {
         return (this.startDate.isBefore(other.endDate) || this.startDate.equals(other.endDate)) &&
                (this.endDate.isAfter(other.startDate) || this.endDate.equals(other.startDate));
     }

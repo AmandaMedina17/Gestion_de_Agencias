@@ -2,7 +2,7 @@ import { GroupStatus } from "../Enums";
 import {DateValue} from "../Value Objects/Values";
 import {GroupID} from "../Value Objects/IDs";
 
-export class GroupEntity {
+export class Group {
     constructor(
         private readonly id: GroupID,
         private name: string,

@@ -3,12 +3,12 @@ import {DateValue} from "../Value Objects/Values";
 import {ContractID} from "../Value Objects/IDs";
 import { AgencyEntity } from "./AgencyEntity";
 import { ArtistEntity } from "./ArtistEntity";
-import { IntervalEntity } from "./IntervalEntity";
+import { Interval } from "./Interval";
 
 export class ContractEntity {
     constructor(
         private readonly id: ContractID,
-        private readonly interval: IntervalEntity,
+        private readonly interval: Interval,
         private readonly agency: AgencyEntity,
         private readonly artist: ArtistEntity,
         private distributionPercentage: string,
@@ -168,7 +168,7 @@ export class ContractEntity {
         return this.id;
     }
 
-    public getInterval(): IntervalEntity {
+    public getInterval(): Interval {
         return this.interval;
     }
 

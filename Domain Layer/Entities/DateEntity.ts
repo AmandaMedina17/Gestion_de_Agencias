@@ -1,7 +1,7 @@
 import { DateValue } from "../Value Objects/Values";
 import { DateID } from "../Value Objects/IDs";
 
-export class DateEntity {
+export class Date {
     constructor(
         private readonly id: DateID, 
         private date: DateValue

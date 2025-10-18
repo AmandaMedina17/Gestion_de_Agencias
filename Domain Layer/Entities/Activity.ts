@@ -1,7 +1,7 @@
 import { ActivityID } from "../Value Objects/IDs";
 import { ActivityClassification, ActivityType } from "../Enums";
 
-export class ActivityEntity {
+export class Activity {
     constructor(
         private readonly id: ActivityID,
         private classification: ActivityClassification,

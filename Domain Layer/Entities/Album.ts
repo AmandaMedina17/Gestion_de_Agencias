@@ -3,7 +3,7 @@ import {DateValue} from "../Value Objects/Values";
          
     //FALTAN LAS CANCIONES Y LO RELACIONADO CON ELLAS
     
-export class AlbumEntity {
+export class Album{
     private songs = []
     constructor(
         private readonly id: AlbumID,
