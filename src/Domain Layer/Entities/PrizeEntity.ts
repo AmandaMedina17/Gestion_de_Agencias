@@ -1,4 +1,6 @@
-import {PrizeID, DateValue} from "../ValueObjects";
+import { DateValue} from "../Value Objects/Values";
+import { PrizeID } from "../Value Objects/IDs";
+
 export class PrizeEntity {
     constructor(
         private readonly id: PrizeID,
@@ -54,9 +56,5 @@ export class PrizeEntity {
 
     public getYearsSincePrize(): number {
         return DateValue.today().getYear() - this.date.getYear();
-    }
-
-    public toString(): string {
-        return `${this.name.toString()} - ${this.date.toISOString()}`;
     }
 }

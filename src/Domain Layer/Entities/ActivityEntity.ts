@@ -20,20 +20,6 @@ export class ActivityEntity {
         
     }
 
-
-    //DUDA
-    public changeClassification(newClassification: ActivityClassification): void {
-        const previousClassification = this.classification;
-        this.classification = newClassification;
-        
-        try {
-            this.validateClassificationType();
-        } catch (error) {
-            this.classification = previousClassification;
-            throw new Error(`Cannot change to ${newClassification} because current type is not compatible`);
-        }
-    }
-
     // Getters
     public getId(): ActivityID {
         return this.id;

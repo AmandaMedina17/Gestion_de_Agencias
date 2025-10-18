@@ -1,8 +1,9 @@
-import { DateValue, DateID } from "../ValueObjects";
+import { DateValue } from "../Value Objects/Values";
+import { DateID } from "../Value Objects/IDs";
 
 export class DateEntity {
     constructor(
-        private readonly id: number, // O puedes crear un DateID similar a los otros
+        private readonly id: DateID,
         private date: DateValue
     )
     {
@@ -33,7 +34,7 @@ export class DateEntity {
 
     // ✅ GETTERS
 
-    public getId(): number {
+    public getId(): DateID {
         return this.id;
     }
 
@@ -45,15 +46,9 @@ export class DateEntity {
         return this.date.getDayOfWeek();
     }
 
-    // ✅ SETTERS
+    //SETTERS
 
     public setDate(date: DateValue): void {
         this.date = date;
-    }
-
-    // ✅ REPRESENTACIÓN
-
-    public toString(): string {
-        return `[${this.id}] ${this.date.toLocalString()}`;
     }
 }

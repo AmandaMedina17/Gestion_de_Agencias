@@ -80,7 +80,7 @@ export class AlbumEntity {
         return this.getAlbumAge() < 1;
     }
 
-    // ✅ GETTERS
+    // GETTERS
 
     public getId(): AlbumID {
         return this.id;
@@ -106,18 +106,7 @@ export class AlbumEntity {
         return this.numberOfTracks;
     }
 
-    // ✅ SETTERS CON VALIDACIÓN
-
-    public setTitle(title: AlbumTitle): void {
-        this.title = title;
-    }
-
-    public setReleaseDate(releaseDate: DateValue): void {
-        if (releaseDate.isFuture()) {
-            throw new Error('La fecha de lanzamiento no puede estar en el futuro');
-        }
-        this.releaseDate = releaseDate;
-    }
+    // SETTERS 
 
     public setMainProducer(producer: string): void {
         this.mainProducer = producer;
@@ -138,29 +127,5 @@ export class AlbumEntity {
             throw new Error('El álbum no puede tener más de 50 canciones');
         }
         this.numberOfTracks = tracks;
-    }
-
-    // ✅ REPRESENTACIÓN
-
-    public toString(): string {
-        return `${this.title.toString()} (${this.releaseDate.getYear()}) - ${this.copiesSold.toLocaleString()} copias`;
-    }
-
-    public toDetailedString(): string {
-        const successLevel = this.getSuccessLevel();
-        const successText = {
-            "SUPER_SUCCESS": "Superéxito",
-            "GREAT_SUCCESS": "Gran éxito", 
-            "SUCCESS": "Éxito",
-            "MODERATE": "Moderado",
-            "NEW": "Nuevo"
-        }[successLevel];
-
-        return `[${this.id.toString()}] ${this.title.toString()} 
-Lanzamiento: ${this.releaseDate.toLocalString()}
-Productor: ${this.mainProducer.toString()}
-Canciones: ${this.numberOfTracks}
-Ventas: ${this.copiesSold.toLocaleString()} copias
-Nivel: ${successText}`;
     }
 }

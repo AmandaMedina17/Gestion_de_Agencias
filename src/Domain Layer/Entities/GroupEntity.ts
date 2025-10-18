@@ -1,5 +1,7 @@
 import { GroupStatus } from "../Enums";
-import {GroupID, DateValue} from "../ValueObjects";
+import {DateValue} from "../Value Objects/Values";
+import {GroupID} from "../Value Objects/IDs";
+
 
 export class GroupEntity {
     constructor(
@@ -21,6 +23,7 @@ export class GroupEntity {
         if (!this.name || this.name.length == 0) {
             throw new Error('El nombre del premio es requerido');
         }
+        //Duda, va aqui?
         if (this.name.length < 2) {
             throw new Error('El nombre del premio debe tener al menos 2 caracteres');
         }
@@ -74,11 +77,6 @@ export class GroupEntity {
 
     public getYearsSinceDebut(): number {
         return DateValue.today().getYear() - this.debut_date.getYear();
-    }
-
-    public toString(): string {
-        return `${this.name.toString()}`;
-    }
-    
+    } 
 }
 
