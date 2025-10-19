@@ -1,17 +1,16 @@
 import { ContractStatus } from "../Enums";
 import {DateValue} from "../Value Objects/Values";
-import { v4 as uuidv4 } from "uuid";
 import { AgencyEntity } from "./AgencyEntity";
 import { ArtistEntity } from "./ArtistEntity";
-import { IntervalEntity } from './IntervalEntity';
+import { Interval } from './Interval';
 
-export class ContractEntity {
+export class Contract{
     constructor(
-        private readonly id: string = uuidv4(),
-        private readonly interval: IntervalEntity,
+        private readonly id: string,
+        private readonly interval: Interval,
         private readonly agency: AgencyEntity,
         private readonly artist: ArtistEntity,
-        private distributionPercentage: string,
+        private distributionPercentage: number,
         private status: ContractStatus,
         private conditions: string
     ) {
@@ -74,7 +73,7 @@ export class ContractEntity {
     }
 
     // Método para cambiar el porcentaje de distribución (solo en renovacion)
-    public changeDistributionPercentage(newPercentage: string): void {
+    public changeDistributionPercentage(newPercentage: number): void {
         if (this.status !== ContractStatus.EN_RENOVACION) {
             throw new Error('Solo se puede modificar el porcentaje en contratos en negociación');
         }
@@ -164,7 +163,7 @@ export class ContractEntity {
         return this.id;
     }
 
-    public getInterval(): IntervalEntity {
+    public getInterval(): Interval {
         return this.interval;
     }
 
@@ -177,7 +176,7 @@ export class ContractEntity {
         return this.artist;
     }
 
-    public getDistributionPercentage(): string {
+    public getDistributionPercentage(): number {
         return this.distributionPercentage;
     }
 

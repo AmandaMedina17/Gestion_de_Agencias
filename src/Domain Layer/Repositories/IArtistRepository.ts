@@ -1,10 +1,10 @@
 import { ApprenticeID } from "../Value Objects/IDs";
 import { ArtistEntity } from "../Entities/ArtistEntity";
-import { GroupEntity } from "../Entities/GroupEntity";
+import { GroupEntity } from "../Entities/Group";
 import { AgencyEntity } from "../Entities/AgencyEntity";
-import {AlbumEntity} from "../Entities/AlbumEntity";
-import {ActivityEntity} from "../Entities/ActivityEntity";
-import { ContractEntity } from "../Entities/ContractEntity";
+import {AlbumEntity} from "../Entities/Album";
+import {ActivityEntity} from "../Entities/Activity";
+import { ContractEntity } from "../Entities/Contract";
 import { IRepository } from "./IRepository";
 
 export interface IArtistRepository extends IRepository<ArtistEntity,ApprenticeID>

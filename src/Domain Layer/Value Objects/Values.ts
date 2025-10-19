@@ -246,29 +246,3 @@ export class Place{
 
 
 }
-
-export class AlbumTitle {
-    constructor(private readonly value: string) {
-        if (!value || value.trim().length === 0) {
-            throw new Error('El título del álbum no puede estar vacío');
-        }
-        if (value.trim().length < 2) {
-            throw new Error('El título del álbum debe tener al menos 2 caracteres');
-        }
-        if (value.trim().length > 200) {
-            throw new Error('El título del álbum no puede exceder 200 caracteres');
-        }
-    }
-
-    public getValue(): string {
-        return this.value;
-    }
-
-    public equals(other: AlbumTitle): boolean {
-        return this.value === other.value;
-    }
-
-    public toString(): string {
-        return this.value;
-    }
-}

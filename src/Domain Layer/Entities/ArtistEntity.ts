@@ -3,8 +3,8 @@ import { DateValue } from "../Value Objects/Values";
 import { ApprenticeStatus, ApprenticeTrainingLevel } from "../Enums";
 import { ArtistRole, ArtistStatus } from "../Enums";
 import { ApprenticeEntity } from "./ApprenticeEntity";
-import { GroupEntity } from "./GroupEntity";
-import { IntervalEntity } from "./IntervalEntity";
+import { GroupEntity } from "./Group";
+import { IntervalEntity } from "./Interval";
 import { AgencyEntity } from "./AgencyEntity";
 
 export class ArtistEntity extends ApprenticeEntity{

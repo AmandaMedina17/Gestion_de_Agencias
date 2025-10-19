@@ -1,22 +1,26 @@
-import { v4 as uuidv4} from 'uuid';
 import { ActivityClassification, ActivityType } from "../Enums";
 
-export class ActivityEntity {
+export class Activity {
     constructor(
-        private readonly id : string = uuidv4(),
+        private readonly id : string,
         private classification: ActivityClassification,
         private type: ActivityType,
-    ) {
+    ){
         this.validate();
     }
 
     private validate(): void {
-        this.validateClassificationType();
-    }
+        if (!this.id || this.id.trim() === '') {
+            throw new Error('ID cannot be null or empty');
+        }
 
-    //AGREGAR VALIDACION
-    private validateClassificationType(): void {
+        if (this.classification === null || this.classification === undefined) {
+            throw new Error('Classification cannot be null');
+        }
 
+        if (this.type === null || this.type === undefined) {
+            throw new Error('Type cannot be null');
+        }
     }
 
     // Getters

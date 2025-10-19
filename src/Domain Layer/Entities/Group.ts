@@ -1,11 +1,9 @@
 import { GroupStatus } from "../Enums";
 import {DateValue} from "../Value Objects/Values";
-import { v4 as uuidv4 } from "uuid";
 
-
-export class GroupEntity {
+export class Group {
     constructor(
-        private readonly id: string = uuidv4(),
+        private readonly id: string,
         private name: string,
         private status: GroupStatus,
         private debut_date: DateValue,
@@ -68,9 +66,8 @@ export class GroupEntity {
         return this.concept;
     }
 
-    // Métodos de negocio específicos para premios K-pop
     public isRecentGroup(): boolean {
-        // Un premio es considerado "reciente" si fue en los últimos 2 años
+        // Un grupo es considerado "reciente" si fue en los últimos 2 años
         const twoYearsAgo = DateValue.today().getYear() - 2;
         return this.debut_date.getYear() >= twoYearsAgo;
     }

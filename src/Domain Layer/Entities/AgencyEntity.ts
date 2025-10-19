@@ -1,8 +1,8 @@
 import { Place, DateValue } from "../Value Objects/Values";
 import { v4 as uuidv4 } from "uuid";
 import { ApprenticeEntity } from "./ApprenticeEntity";
-import { GroupEntity } from "./GroupEntity";
-import { IntervalEntity } from "./IntervalEntity";
+import { GroupEntity } from "./Group";
+import { IntervalEntity } from "./Interval";
 
 export class AgencyEntity {
   constructor(

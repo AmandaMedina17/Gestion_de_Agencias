@@ -1,13 +1,9 @@
-import { v4 as uuidv4 } from "uuid";
-import { AlbumTitle, DateValue } from "../Value Objects/Values";
+import { DateValue } from "../Value Objects/Values";
 
-    //FALTAN LAS CANCIONES Y LO RELACIONADO CON ELLAS
-    
-export class AlbumEntity {
-    private songs = []
+export class Album {
     constructor(
-        private readonly id: string = uuidv4(),
-        private title: AlbumTitle,
+        private readonly id: string,
+        private title: string,
         private releaseDate: DateValue,
         private mainProducer: string,
         private copiesSold: number,
@@ -27,6 +23,15 @@ export class AlbumEntity {
 
         if (this.numberOfTracks > 50) {
             throw new Error('El álbum no puede tener más de 50 canciones');
+        }
+        if (!this.title || this.title.trim().length === 0) {
+            throw new Error('El título del álbum no puede estar vacío');
+        }
+        if (this.title.trim().length < 2) {
+            throw new Error('El título del álbum debe tener al menos 2 caracteres');
+        }
+        if (this.title.trim().length > 200) {
+            throw new Error('El título del álbum no puede exceder 200 caracteres');
         }
 
         if (this.releaseDate.isFuture()) {
@@ -86,7 +91,7 @@ export class AlbumEntity {
         return this.id;
     }
 
-    public getTitle(): AlbumTitle {
+    public getTitle(): string {
         return this.title;
     }
 

@@ -1,5 +1,5 @@
 import {AgencyEntity} from "../Entities/AgencyEntity";
-import {GroupEntity} from "../Entities/GroupEntity";
+import {GroupEntity} from "../Entities/Group";
 import { ApprenticeEntity } from "../Entities/ApprenticeEntity";
 import { ArtistEntity } from "../Entities/ArtistEntity"
 import { AgencyID } from "../Value Objects/IDs";

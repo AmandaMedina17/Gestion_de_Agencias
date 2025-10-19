@@ -1,7 +1,7 @@
-import { ActivityEntity } from "../Entities/ActivityEntity"
-import { AlbumEntity } from "../Entities/AlbumEntity"
+import { ActivityEntity } from "../Entities/Activity"
+import { AlbumEntity } from "../Entities/Album"
 import { ArtistEntity } from "../Entities/ArtistEntity"
-import { GroupEntity } from "../Entities/GroupEntity"
+import { GroupEntity } from "../Entities/Group"
 import { GroupID } from "../Value Objects/IDs"
 import { IRepository } from "./IRepository"
 
