@@ -1,6 +1,6 @@
+import { v4 as uuidv4 } from "uuid";
 import { DateValue } from "../Value Objects/Values";
 import { ApprenticeStatus, ApprenticeTrainingLevel } from "../Enums";
-import { ApprenticeID, GroupID, AgencyID} from "../Value Objects/IDs";
 import { ArtistRole, ArtistStatus } from "../Enums";
 import { ApprenticeEntity } from "./ApprenticeEntity";
 import { GroupEntity } from "./GroupEntity";
@@ -9,15 +9,15 @@ import { AgencyEntity } from "./AgencyEntity";
 
 export class ArtistEntity extends ApprenticeEntity{
   constructor(
-    id: ApprenticeID,
+    id: string = uuidv4(),
     entryDate: DateValue,
-    agency: AgencyID,
+    agencyId: string,
     private statusArtist: ArtistStatus,
     private stageName: string,
     private realName: string,
     private birthDate: DateValue,
     private transitionDate: DateValue | null, //fecha del primer debut con el grupo
-    private Group?: GroupID
+    private groupId?: string
   ) {super(
     id,
     realName,
@@ -25,7 +25,7 @@ export class ArtistEntity extends ApprenticeEntity{
     entryDate,
     ApprenticeTrainingLevel.AVANZADO,
     ApprenticeStatus.PROCESO_DE_SELECCION,
-    agency
+    agencyId
   )
 
   }
@@ -59,8 +59,8 @@ export class ArtistEntity extends ApprenticeEntity{
     return this.birthDate.getAge();
   }
 
-  public debut(groupId: GroupID, debutDate: DateValue): void {
-    this.Group = groupId;
+  public debut(groupId: string, debutDate: DateValue): void {
+    this.groupId = groupId;
     this.transitionDate = debutDate;
     this.statusArtist = ArtistStatus.ACTIVO;
   }

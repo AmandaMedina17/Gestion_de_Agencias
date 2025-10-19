@@ -1,4 +1,4 @@
-import { ApprenticeID } from "../ValueObjects";
+import { ApprenticeID } from "../Value Objects/IDs";
 import { ArtistEntity } from "../Entities/ArtistEntity";
 import { GroupEntity } from "../Entities/GroupEntity";
 import { AgencyEntity } from "../Entities/AgencyEntity";

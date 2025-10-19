@@ -1,13 +1,13 @@
 import { ContractStatus } from "../Enums";
 import {DateValue} from "../Value Objects/Values";
-import {ContractID} from "../Value Objects/IDs";
+import { v4 as uuidv4 } from "uuid";
 import { AgencyEntity } from "./AgencyEntity";
 import { ArtistEntity } from "./ArtistEntity";
 import { IntervalEntity } from './IntervalEntity';
 
 export class ContractEntity {
     constructor(
-        private readonly id: ContractID,
+        private readonly id: string = uuidv4(),
         private readonly interval: IntervalEntity,
         private readonly agency: AgencyEntity,
         private readonly artist: ArtistEntity,
@@ -160,7 +160,7 @@ export class ContractEntity {
     }
 
     // Getters
-    public getId(): ContractID {
+    public getId(): string {
         return this.id;
     }
 

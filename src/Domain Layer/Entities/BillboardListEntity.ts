@@ -1,10 +1,10 @@
 import { DateValue } from "../Value Objects/Values";
 import { BillboardListScope } from "../Enums";
-import { BillboardID } from "../Value Objects/IDs";
+import { v4 as uuidv4 } from "uuid";;
 
 export class BillboardListEntity {
   constructor(
-    private readonly id: BillboardID,
+    private readonly id: string = uuidv4(),
     private publicDate: DateValue,
     private scope: BillboardListScope,
     private nameList: string,

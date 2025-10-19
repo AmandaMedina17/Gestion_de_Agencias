@@ -1,8 +1,8 @@
 // src/test-agencias-corregido.ts
-import { AppDataSource } from './Infraestructure Layer/Entities/config/data-source';
-import { AgencyEntity } from './Infraestructure Layer/Entities/AgencyEntity';
-import { ApprenticeEntity } from './Infraestructure Layer/Entities/ApprenticeEntity';
-import { ArtistEntity } from './Infraestructure Layer/Entities/ArtistEntity';
+import { AppDataSource } from './Infraestructure Layer/database/Entities/config/data-source';
+import { AgencyEntity } from './Infraestructure Layer/database/Entities/AgencyEntity';
+import { ApprenticeEntity } from './Infraestructure Layer/database/Entities/ApprenticeEntity';
+import { ArtistEntity } from './Infraestructure Layer/database/Entities/ArtistEntity';
 
 async function testAgenciesAndRelations() {
   try {

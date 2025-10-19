@@ -1,5 +1,5 @@
 import { DateValue } from "../Value Objects/Values";
-import { ApprenticeID, AgencyID } from "../Value Objects/IDs";
+import { v4 as uuidv4 } from "uuid";
 import { ApprenticeStatus, ApprenticeTrainingLevel } from "../Enums";
 import { EvaluationEntity } from "./EvaluationEntity";
 
@@ -7,13 +7,13 @@ export class ApprenticeEntity {
   private evaluations: EvaluationEntity[] = [];
 
   constructor(
-    private readonly id: ApprenticeID,
+    private readonly id: string = uuidv4(),
     private fullName: string,
     private age: number,
     private entryDate: DateValue,
     private trainingLevel: ApprenticeTrainingLevel,
     private status: ApprenticeStatus,
-    private agency: AgencyID
+    private agencyId: string,
   ) {
     this.validate();
   }
@@ -71,7 +71,7 @@ export class ApprenticeEntity {
     );
   }
 
-  public getId(): ApprenticeID {
+  public getId(): string {
     return this.id;
   }
 

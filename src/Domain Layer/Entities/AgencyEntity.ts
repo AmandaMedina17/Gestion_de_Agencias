@@ -1,18 +1,18 @@
 import { Place, DateValue } from "../Value Objects/Values";
-import { AgencyID } from "../Value Objects/IDs";
+import { v4 as uuidv4 } from "uuid";
 import { ApprenticeEntity } from "./ApprenticeEntity";
 import { GroupEntity } from "./GroupEntity";
 import { IntervalEntity } from "./IntervalEntity";
 
 export class AgencyEntity {
   constructor(
-    private readonly id: AgencyID,
+    private readonly id: string = uuidv4(),
     private place: Place,
     private nameAgency: string,
     private dateFundation: DateValue
   ) {}
 
-  public getId(): AgencyID {
+  public getId(): string {
     return this.id;
   }
 

@@ -1,11 +1,11 @@
-import { SongID, BillboardID, AlbumID } from "../Value Objects/IDs";
+import { v4 as uuidv4 } from "uuid";
 import { BillboardListEntity } from "./BillboardListEntity";
 
 export class SongEntity{
     constructor(
-        private readonly id: SongID,
+        private readonly id: string = uuidv4(),
         private nameSong: string,
-        private album: AlbumID
+        private albumId: string
     )
     {
 
@@ -15,7 +15,7 @@ export class SongEntity{
         return this.nameSong;
     }
 
-    public getId(): SongID{
+    public getId(): string{
         return this.id;
     }
 

@@ -1,9 +1,9 @@
 import { DateValue } from "../Value Objects/Values";
-import { DateID } from "../Value Objects/IDs";
+import { v4 as uuidv4 } from "uuid";
 
 export class DateEntity {
     constructor(
-        private readonly id: DateID,
+        private readonly id: string = uuidv4(),
         private date: DateValue
     )
     {
@@ -34,7 +34,7 @@ export class DateEntity {
 
     // ✅ GETTERS
 
-    public getId(): DateID {
+    public getId(): string{
         return this.id;
     }
 

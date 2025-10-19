@@ -1,9 +1,9 @@
-import { ActivityID } from "../Value Objects/IDs";
+import { v4 as uuidv4} from 'uuid';
 import { ActivityClassification, ActivityType } from "../Enums";
 
 export class ActivityEntity {
     constructor(
-        private readonly id: ActivityID,
+        private readonly id : string = uuidv4(),
         private classification: ActivityClassification,
         private type: ActivityType,
     ) {
@@ -17,11 +17,10 @@ export class ActivityEntity {
     //AGREGAR VALIDACION
     private validateClassificationType(): void {
 
-        
     }
 
     // Getters
-    public getId(): ActivityID {
+    public getId(): string {
         return this.id;
     }
 

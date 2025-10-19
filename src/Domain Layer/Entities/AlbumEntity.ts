@@ -1,4 +1,4 @@
-import { AlbumID } from "../Value Objects/IDs";
+import { v4 as uuidv4 } from "uuid";
 import { AlbumTitle, DateValue } from "../Value Objects/Values";
 
     //FALTAN LAS CANCIONES Y LO RELACIONADO CON ELLAS
@@ -6,7 +6,7 @@ import { AlbumTitle, DateValue } from "../Value Objects/Values";
 export class AlbumEntity {
     private songs = []
     constructor(
-        private readonly id: AlbumID,
+        private readonly id: string = uuidv4(),
         private title: AlbumTitle,
         private releaseDate: DateValue,
         private mainProducer: string,
@@ -82,7 +82,7 @@ export class AlbumEntity {
 
     // GETTERS
 
-    public getId(): AlbumID {
+    public getId(): string {
         return this.id;
     }
 

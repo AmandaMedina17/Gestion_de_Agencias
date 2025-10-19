@@ -1,10 +1,10 @@
-import { IngressID, ActivityID } from "../Value Objects/IDs";
+import { v4 as uuidv4 } from "uuid";
 import { DateValue, Money } from "../Value Objects/Values";
 
 export class IngressEntity{
     constructor(
-        private readonly ingressId: IngressID,
-        private activity: ActivityID,
+        private readonly ingressId: string = uuidv4(),
+        private activityId: string,
         private mount: Money,
         private date: DateValue,
         private responsible: string

@@ -1,11 +1,11 @@
 import { GroupStatus } from "../Enums";
 import {DateValue} from "../Value Objects/Values";
-import {GroupID} from "../Value Objects/IDs";
+import { v4 as uuidv4 } from "uuid";
 
 
 export class GroupEntity {
     constructor(
-        private readonly id: GroupID,
+        private readonly id: string = uuidv4(),
         private name: string,
         private status: GroupStatus,
         private debut_date: DateValue,
@@ -44,7 +44,7 @@ export class GroupEntity {
 
 
     // Getters
-    public getId(): GroupID {
+    public getId(): string {
         return this.id;
     }
 

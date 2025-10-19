@@ -10,7 +10,12 @@ export class IntervalEntity {
     ) {
         this.validate();
     }
-
+    /**
+     * Att: Juanmy 
+     * El metodo de validar deberia ir en el IntervalORM ya que siempre
+     * va a pasar antes por ahi 
+     */
+    
     private validate(): void {
         if (this.endDate.isBefore(this.startDate)) {
             throw new Error('La fecha final no puede ser anterior a la fecha de inicio');

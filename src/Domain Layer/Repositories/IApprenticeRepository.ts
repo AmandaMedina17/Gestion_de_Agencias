@@ -1,4 +1,4 @@
-import { ApprenticeID } from "../ValueObjects";
+import { ApprenticeID } from "../Value Objects/IDs";
 import { ApprenticeEntity } from "../Entities/ApprenticeEntity";
 import { EvaluationEntity } from "../Entities/EvaluationEntity";
 import { IRepository } from "./IRepository";
