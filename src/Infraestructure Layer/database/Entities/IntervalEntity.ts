@@ -1,0 +1,13 @@
+import { Entity, PrimaryColumn, Column } from 'typeorm';
+
+@Entity()
+export class Interval {
+  @PrimaryColumn()
+  id: string;
+
+  @Column({ type: 'date' })
+  startDate: Date;
+
+  @Column({ type: 'date' })
+  endDate: Date;
+}
