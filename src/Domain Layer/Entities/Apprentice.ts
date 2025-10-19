@@ -1,10 +1,10 @@
 import { DateValue } from "../Value Objects/Values";
 import { v4 as uuidv4 } from "uuid";
 import { ApprenticeStatus, ApprenticeTrainingLevel } from "../Enums";
-import { EvaluationEntity } from "./EvaluationEntity";
+import { Evaluation } from "./Evaluation";
 
-export class ApprenticeEntity {
-  private evaluations: EvaluationEntity[] = [];
+export class Apprentice {
+  private evaluations: Evaluation[] = [];
 
   constructor(
     private readonly id: string = uuidv4(),
@@ -13,7 +13,7 @@ export class ApprenticeEntity {
     private entryDate: DateValue,
     private trainingLevel: ApprenticeTrainingLevel,
     private status: ApprenticeStatus,
-    private agencyId: string,
+    private agencyId: string
   ) {
     this.validate();
   }

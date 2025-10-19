@@ -2,12 +2,12 @@ import { v4 as uuidv4 } from "uuid";
 import { DateValue } from "../Value Objects/Values";
 import { ApprenticeStatus, ApprenticeTrainingLevel } from "../Enums";
 import { ArtistRole, ArtistStatus } from "../Enums";
-import { ApprenticeEntity } from "./ApprenticeEntity";
-import { GroupEntity } from "./Group";
-import { IntervalEntity } from "./Interval";
-import { AgencyEntity } from "./AgencyEntity";
+import { Apprentice} from "./Apprentice";
+import { Group} from "./Group";
+import { Interval} from "./Interval";
+import { Agency} from "./Agency";
 
-export class ArtistEntity extends ApprenticeEntity{
+export class Artist extends Apprentice{
   constructor(
     id: string = uuidv4(),
     entryDate: DateValue,
@@ -18,18 +18,17 @@ export class ArtistEntity extends ApprenticeEntity{
     private birthDate: DateValue,
     private transitionDate: DateValue | null, //fecha del primer debut con el grupo
     private groupId?: string
-  ) {super(
-    id,
-    realName,
-    birthDate.getAge(),
-    entryDate,
-    ApprenticeTrainingLevel.AVANZADO,
-    ApprenticeStatus.PROCESO_DE_SELECCION,
-    agencyId
-  )
-
+  ) {
+    super(
+      id,
+      realName,
+      birthDate.getAge(),
+      entryDate,
+      ApprenticeTrainingLevel.AVANZADO,
+      ApprenticeStatus.PROCESO_DE_SELECCION,
+      agencyId
+    );
   }
-
 
   //metdo para conflicto de agenda FALTA
 
@@ -46,9 +45,8 @@ export class ArtistEntity extends ApprenticeEntity{
   }
 
   public getDebutDate(): DateValue {
-    if(this.transitionDate) return this.transitionDate;
+    if (this.transitionDate) return this.transitionDate;
     else throw new Error("No ha debutado");
-    
   }
 
   public getStatusArtist(): ArtistStatus {
@@ -64,5 +62,4 @@ export class ArtistEntity extends ApprenticeEntity{
     this.transitionDate = debutDate;
     this.statusArtist = ArtistStatus.ACTIVO;
   }
-
 }

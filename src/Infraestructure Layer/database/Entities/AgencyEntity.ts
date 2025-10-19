@@ -1,9 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Entity, PrimaryColumn, Column, OneToMany } from 'typeorm';
 import { ApprenticeEntity } from './ApprenticeEntity';
+import { GroupEntity } from './GroupEntity';
+import { group } from 'console';
 
 @Entity('agency')
 export class AgencyEntity{
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryColumn()
     id!: string;
 
     @Column({ name: 'place' })
@@ -18,9 +20,9 @@ export class AgencyEntity{
     @OneToMany(() => ApprenticeEntity, apprentice => apprentice.agency) //pueden ahber muchos aprendices en una agencia
     apprentices!: ApprenticeEntity[]; 
 
+    @OneToMany(() => GroupEntity, group => group.agency) 
+    groups!: GroupEntity[]; 
+
+
 }
 
-// private readonly id: AgencyID,
-//     private place: Place,
-//     private nameAgency: string,
-//     private dateFundation: DateValue

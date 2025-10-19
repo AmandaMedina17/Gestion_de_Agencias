@@ -1,22 +1,22 @@
 import { Entity, PrimaryColumn, Column } from 'typeorm';
 
 @Entity()
-export class Album {
+export class AlbumEntity {
   @PrimaryColumn()
-  id: string;
+  id!: string;
 
   @Column()
-  title: string;
+  title!: string;
 
   @Column()
-  releaseDate: Date;
+  releaseDate!: Date;
 
   @Column()
-  mainProducer: string;
+  mainProducer!: string;
 
   @Column()
-  copiesSold: number;
+  copiesSold!: number;
 
   @Column()
-  numberOfTracks: number;
+  numberOfTracks!: number;
 }

@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { DateValue, Money } from "../Value Objects/Values";
 
-export class IngressEntity{
+export class Income{
     constructor(
         private readonly ingressId: string = uuidv4(),
         private activityId: string,

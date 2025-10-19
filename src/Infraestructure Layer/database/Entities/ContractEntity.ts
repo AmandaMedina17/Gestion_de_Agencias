@@ -1,29 +1,46 @@
-import { Entity, PrimaryColumn, Column } from 'typeorm';
+import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn} from 'typeorm';
+import { IntervalEntity } from './IntervalEntity';
+import { ContractStatus } from 'src/Domain Layer/Enums';
+import { AgencyEntity } from './AgencyEntity';
+import { ArtistEntity } from './ArtistEntity';
 
-export class Contrato {
-  @ManyToOne(() => Interval, { primary: true })
-  @JoinColumn({ name: "intervalID" })
-  interval: Interval;
+@Entity()
+export class ContractEntity {
 
-  @ManyToOne(() => Agency, { primary: true })
-  @JoinColumn({ name: "agencyID" })
-  agency: Agency;
+  @PrimaryColumn()
+  intervalID!: number;
 
-  @ManyToOne(() => Artist, { primary: true })
-  @JoinColumn({ name: "artistID" })
-  artist: Artist;
+  @PrimaryColumn()
+  agencyID!: number;
 
+  @PrimaryColumn()
+  artistID!: number;
+  
   @Column({
     type: 'enum',
     enum: ContractStatus,
     default: ContractStatus.ACTIVO,
     })
-    status: ContractStatus;
+    status!: ContractStatus;
 
   @Column()
-  conditions: string;
+  conditions!: string;
 
   @Column({ type: "decimal" })
-  distributionPercentage: number
+  distributionPercentage!: number
+
+  //Relaciones
+  @ManyToOne(() => IntervalEntity)
+  @JoinColumn({ name: "intervalID" })
+  interval!: IntervalEntity;
+
+  @ManyToOne(() => AgencyEntity)
+  @JoinColumn({ name: "agencyID" })
+  agency!: AgencyEntity;
+
+  @ManyToOne(() => ArtistEntity)
+  @JoinColumn({ name: "artistID" })
+  artist!: ArtistEntity;
+
 
 }

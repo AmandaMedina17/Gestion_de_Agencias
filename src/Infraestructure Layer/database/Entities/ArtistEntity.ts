@@ -1,22 +1,15 @@
 import { ChildEntity, Column } from 'typeorm';
 import { ApprenticeEntity } from './ApprenticeEntity';
+import { ArtistStatus } from 'src/Domain Layer/Enums';
 
 @ChildEntity({ name: 'artist'})
     export class ArtistEntity extends ApprenticeEntity{
         @Column({ name: 'stage_name' })
         stageName!: string;
 
-        // @Column({
-        // type: 'enum',
-        // enum: ['LIDER', 'VOCALISTA', 'RAPERO', 'BAILARIN', 'VISUAL', 'MAKNAE'],
-        // default: 'VISUAL'
-        // })
-        // role!: string;
-
         @Column({
         type: 'enum',
-        enum: ['ACTIVO', 'INACTIVO', 'EN_PAUSA'],
-        default: 'ACTIVO'
+        enum: ArtistStatus
         })
         statusArtist!: string;
 

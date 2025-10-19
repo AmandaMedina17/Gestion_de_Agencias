@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, TableInheritance, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { AgencyEntity } from './AgencyEntity';
+import { ApprenticeStatus, ApprenticeTrainingLevel } from 'src/Domain Layer/Enums';
 
 @Entity('apprentice')
 @TableInheritance({ column: { type: 'varchar', name: 'type' } })
@@ -18,15 +19,13 @@ export class ApprenticeEntity{
 
     @Column({
     type: 'enum',
-    enum: ['EN_ENTRENAMIENTO', 'PROCESO_DE_SELECCION', 'TRANSFERIDO'],
-    default: 'EN_ENTRENAMIENTO'
+    enum: ApprenticeStatus,
     })
     status!: string;
 
     @Column({
     type: 'enum',
-    enum: ['PRINCIPIANTE', 'INTERMEDIO', 'AVANZADO'],
-    default: 'PRINCIPIANTE'
+    enum: ApprenticeTrainingLevel
     })
     trainingLevel!: string;
 

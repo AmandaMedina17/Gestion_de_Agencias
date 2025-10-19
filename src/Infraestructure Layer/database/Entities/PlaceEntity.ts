@@ -1,10 +1,10 @@
 import { Entity, PrimaryColumn, Column } from 'typeorm';
 
 @Entity()
-export class Place {
+export class PlaceEntity {
   @PrimaryColumn()
-  id: string;
+  id!: string;
 
   @Column()
-  place: string;
+  place!: string;
 }

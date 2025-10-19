@@ -1,10 +1,10 @@
 import { Place, DateValue } from "../Value Objects/Values";
 import { v4 as uuidv4 } from "uuid";
-import { ApprenticeEntity } from "./ApprenticeEntity";
-import { GroupEntity } from "./Group";
-import { IntervalEntity } from "./Interval";
+import { ApprenticeEntity } from "./Apprentice";
+import { Group } from "./Group";
+import { Interval } from "./Interval";
 
-export class AgencyEntity {
+export class Agency {
   constructor(
     private readonly id: string = uuidv4(),
     private place: Place,

@@ -1,18 +1,18 @@
 import { Entity, PrimaryColumn, Column } from 'typeorm';
-import {Evaluation} from '';
+import { Evaluation } from 'src/Domain Layer/Enums';
 
 @Entity()
-export class Evaluation {
+export class EvaluationEntity {
   @PrimaryColumn()
-  id: string;
+  id!: string;
 
   @Column({ type: 'date' })
-  date: Date;
+  date!: Date;
 
    @Column({
     type: 'enum',
     enum: Evaluation,
     default: Evaluation.BIEN,
     })
-    evaluation: Evaluation;
+    evaluation!: Evaluation;
 }

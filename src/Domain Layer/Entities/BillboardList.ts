@@ -2,7 +2,7 @@ import { DateValue } from "../Value Objects/Values";
 import { BillboardListScope } from "../Enums";
 import { v4 as uuidv4 } from "uuid";;
 
-export class BillboardListEntity {
+export class BillboardList {
   constructor(
     private readonly id: string = uuidv4(),
     private publicDate: DateValue,

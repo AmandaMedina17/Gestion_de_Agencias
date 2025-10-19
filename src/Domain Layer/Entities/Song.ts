@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
-import { BillboardListEntity } from "./BillboardListEntity";
+import { BillboardList } from "./BillboardList";
 
-export class SongEntity{
+export class Song{
     constructor(
         private readonly id: string = uuidv4(),
         private nameSong: string,
