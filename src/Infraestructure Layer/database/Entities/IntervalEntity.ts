@@ -1,4 +1,5 @@
 import { Entity, PrimaryColumn, Column } from 'typeorm';
+import { ArtistGroupMembershipEntity } from './Many To Many/ArtistGroupMembershipEntity';
 
 @Entity()
 export class IntervalEntity {
@@ -10,4 +11,8 @@ export class IntervalEntity {
 
   @Column({ type: 'date' })
   endDate!: Date;
+
+  //Relación con las membresías de artistas
+  @OneToMany(() => ArtistGroupMembershipEntity, (membership: ArtistGroupMembershipEntity) => membership.interval)
+  artistGroupMemberships!: ArtistGroupMembershipEntity[];
 }

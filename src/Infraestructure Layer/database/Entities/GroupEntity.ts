@@ -1,6 +1,11 @@
 import { Entity, PrimaryColumn, Column, ManyToOne } from 'typeorm';
 import { GroupStatus } from 'src/Domain Layer/Enums';
 import { AgencyEntity } from './AgencyEntity';
+import { AlbumEntity } from './AlbumEntity';
+import { GroupActivityEntity } from './Many To Many/GroupActivity';
+import { ArtistEntity } from './ArtistEntity';
+import { ArtistGroupMembershipEntity } from './Many To Many/ArtistGroupMembershipEntity';
+import { ArtistGroupCollaborationEntity } from './Many To Many/ArtistGroupCollaborationEntity'; 
 
 @Entity('group')
 export class GroupEntity {
@@ -31,4 +36,31 @@ export class GroupEntity {
 
   @ManyToOne(() => AgencyEntity, agency => agency.groups) //Hacer simetrico en agencia
   agency!: AgencyEntity;
+
+  // Un grupo puede tener cero o muchos álbumes
+  @OneToMany(() => AlbumEntity, (album: AlbumEntity) => album.group)
+  albums!: AlbumEntity[];
+
+  // Un grupo puede realizar cero o muchas actividades (a través de groupActivities)
+  @OneToMany(() => GroupActivityEntity, (groupActivity: GroupActivityEntity) => groupActivity.group)
+  groupActivities!: GroupActivityEntity[];
+  
+  //Un grupo puede ser propuesto por 0 o 1 artista
+  @ManyToOne(() => ArtistEntity, (artist: ArtistEntity) => artist.proposedGroups, { 
+    nullable: true, // Permite que sea null (grupo no propuesto por artista)
+    onDelete: 'SET NULL' // Si se elimina el artista, el grupo se mantiene
+  })
+  @JoinColumn({ name: 'proposed_by_artist_id' })
+  proposedByArtist?: ArtistEntity | null;
+
+  @Column({ name: 'proposed_by_artist_id', nullable: true })
+  proposedByArtistId?: string | null;
+
+  // Relación con las membresías de artistas
+  @OneToMany(() => ArtistGroupMembershipEntity, (membership: ArtistGroupMembershipEntity) => membership.group)
+  artistMemberships!: ArtistGroupMembershipEntity[];
+
+  //Colaboraciones con artistas
+  @OneToMany(() => ArtistGroupCollaborationEntity, (collaboration: ArtistGroupCollaborationEntity) => collaboration.group)
+  artistCollaborations!: ArtistGroupCollaborationEntity[];
 }

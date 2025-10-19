@@ -1,6 +1,6 @@
 import { Entity,PrimaryGeneratedColumn, Column , ManyToOne, JoinColumn, ManyToMany} from "typeorm";
 import { AlbumEntity } from "./AlbumEntity";
-import { BillboardListEntity } from "./BillboardListEntity";
+import { SongBillboardEntity } from "./SongBillboardEntity";
 
 @Entity('song')
 export class SongEntity{
@@ -18,7 +18,7 @@ export class SongEntity{
     @JoinColumn({ name: 'album_id' })
     album!: AlbumEntity;
 
-    @ManyToMany(()=> BillboardListEntity, billboardList => billboardList.songs)
-    @JoinColumn({ name: 'list_id' })
-    billboardList!: AlbumEntity;
+    @OneToMany(() => SongBillboardEntity, (songBillboard: SongBillboardEntity) => songBillboard.song)
+    songBillboards!: SongBillboardEntity[];
+
 }

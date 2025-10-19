@@ -1,6 +1,5 @@
 import { Entity,PrimaryGeneratedColumn, Column , ManyToOne, JoinColumn, ManyToMany} from "typeorm";
-import { SongEntity } from "./SongEntity";
-
+import { SongBillboardEntity } from "./Many To Many/SongBillboardEntity";
 
 @Entity('billboardList')
 export class BillboardListEntity{
@@ -13,9 +12,8 @@ export class BillboardListEntity{
     @Column({ name: 'entry_date' })
     entryDate!: Date;
 
-    //relaciones
-    @ManyToMany(() => SongEntity, song => song.billboardList)
-    @JoinColumn({ name: 'song' })
-    songs!: SongEntity;
+    //Relación OneToMany con la entidad de unión
+    @OneToMany(() => SongBillboardEntity, (songBillboard: SongBillboardEntity) => songBillboard.billboardList)
+    songBillboards!: SongBillboardEntity[];
 
 }

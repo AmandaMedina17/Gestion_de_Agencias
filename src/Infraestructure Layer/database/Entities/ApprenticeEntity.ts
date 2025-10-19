@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, TableInheritance, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { AgencyEntity } from './AgencyEntity';
 import { ApprenticeStatus, ApprenticeTrainingLevel } from 'src/Domain Layer/Enums';
+import { ApprenticeEvaluationEntity } from './Many To Many/ApprenticeEvaluationEntity';
 
 @Entity('apprentice')
 @TableInheritance({ column: { type: 'varchar', name: 'type' } })
@@ -36,6 +37,10 @@ export class ApprenticeEntity{
 
     @Column({ name: 'agency_id' })
     agencyId!: string;
+
+    // Dentro de la clase ApprenticeEntity agrega:
+    @OneToMany(() => ApprenticeEvaluationEntity, (apprenticeEvaluation: ApprenticeEvaluationEntity) => apprenticeEvaluation.apprentice)
+    apprenticeEvaluations!: ApprenticeEvaluationEntity[];
 
 }
 
