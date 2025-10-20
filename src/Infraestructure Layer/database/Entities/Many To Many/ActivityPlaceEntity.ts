@@ -11,16 +11,12 @@ export class ActivityPlaceEntity {
     placeId!: string;
 
     // Relación con Activity
-    @ManyToOne(() => Activity, (activity: Activity) => activity.activityPlaces, {
-        primary: true
-    })
+    @ManyToOne(() => Activity, (activity: Activity) => activity.activityPlaces)
     @JoinColumn({ name: 'activity_id' })
     activity!: Activity;
 
     // Relación con Place
-    @ManyToOne(() => PlaceEntity, (place: PlaceEntity) => place.activityPlaces, {
-        primary: true
-    })
+    @ManyToOne(() => PlaceEntity, (place: PlaceEntity) => place.activityPlaces)
     @JoinColumn({ name: 'place_id' })
     place!: PlaceEntity;
 }

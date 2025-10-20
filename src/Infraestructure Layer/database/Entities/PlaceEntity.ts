@@ -1,5 +1,5 @@
-import { Entity, PrimaryColumn, Column } from 'typeorm';
-import { ActivityPlaceEntity } from './ActivityPlaceEntity';
+import { Entity, PrimaryColumn, Column, OneToMany } from 'typeorm';
+import { ActivityPlaceEntity } from './Many To Many/ActivityPlaceEntity';
 @Entity()
 export class PlaceEntity {
   @PrimaryColumn()

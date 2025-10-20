@@ -1,4 +1,4 @@
-import { Entity,PrimaryGeneratedColumn, Column , ManyToOne, JoinColumn, ManyToMany} from "typeorm";
+import { Entity,PrimaryGeneratedColumn, Column ,OneToMany} from "typeorm";
 import { SongBillboardEntity } from "./Many To Many/SongBillboardEntity";
 
 @Entity('billboardList')

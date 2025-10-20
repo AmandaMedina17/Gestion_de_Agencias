@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, TableInheritance, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, TableInheritance, Column, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { AgencyEntity } from './AgencyEntity';
 import { ApprenticeStatus, ApprenticeTrainingLevel } from 'src/Domain Layer/Enums';
 import { ApprenticeEvaluationEntity } from './Many To Many/ApprenticeEvaluationEntity';

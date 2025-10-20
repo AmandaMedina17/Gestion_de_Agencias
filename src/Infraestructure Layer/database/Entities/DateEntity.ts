@@ -1,5 +1,5 @@
-import { Entity, PrimaryColumn, Column } from 'typeorm';
-import { ArtistCollaborationEntity } from './Many To Many/ArtistCollaborationEntity.ts';
+import { Entity, PrimaryColumn, Column, OneToMany } from 'typeorm';
+import { ArtistCollaborationEntity } from './Many To Many/ArtistCollaborationEntity';
 import { ArtistGroupCollaborationEntity } from './Many To Many/ArtistGroupCollaborationEntity';
 import { ActivityDateEntity } from './Many To Many/ActivityDateEntity';
 

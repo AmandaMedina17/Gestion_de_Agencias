@@ -15,16 +15,12 @@ export class SongBillboardEntity {
     puesto!: number;
 
     // Relación con SongEntity
-    @ManyToOne(() => SongEntity, (song: SongEntity) => song.songBillboards, {
-        primary: true
-    })
+    @ManyToOne(() => SongEntity, (song: SongEntity) => song.songBillboards)
     @JoinColumn({ name: 'song_id' })
     song!: SongEntity;
 
     // Relación con BillboardListEntity
-    @ManyToOne(() => BillboardListEntity, (billboardList: BillboardListEntity) => billboardList.songBillboards, {
-        primary: true
-    })
+    @ManyToOne(() => BillboardListEntity, (billboardList: BillboardListEntity) => billboardList.songBillboards)
     @JoinColumn({ name: 'billboard_list_id' })
     billboardList!: BillboardListEntity;
 }

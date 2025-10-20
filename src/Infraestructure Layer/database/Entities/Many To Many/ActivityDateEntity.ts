@@ -11,16 +11,12 @@ export class ActivityDateEntity {
     dateId!: string;
 
     // Relación con Activity
-    @ManyToOne(() => Activity, (activity: Activity) => activity.activityDates, {
-        primary: true
-    })
+    @ManyToOne(() => Activity, (activity: Activity) => activity.activityDates)
     @JoinColumn({ name: 'activity_id' })
     activity!: Activity;
 
     // Relación con Date
-    @ManyToOne(() => Date, (date: Date) => date.activityDates, {
-        primary: true
-    })
+    @ManyToOne(() => Date, (date: Date) => date.activityDates)
     @JoinColumn({ name: 'date_id' })
     date!: Date;
 }

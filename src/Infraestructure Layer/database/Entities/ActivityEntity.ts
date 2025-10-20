@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn, Column } from 'typeorm';
+import { Entity, PrimaryColumn, Column, OneToMany} from 'typeorm';
 import { ActivityClassification, ActivityType } from 'src/Domain Layer/Enums';
 import { GroupActivityEntity } from './Many To Many/GroupActivity'
 import { ArtistActivityEntity } from './Many To Many/ArtistActivityEntity';

@@ -12,16 +12,12 @@ export class ArtistActivityEntity {
     activityId!: string;
 
     // Relación con ArtistEntity
-    @ManyToOne(() => ArtistEntity, (artist: ArtistEntity) => artist.artistActivities, {
-        primary: true // Parte de la clave primaria
-    })
+    @ManyToOne(() => ArtistEntity, (artist: ArtistEntity) => artist.artistActivities)
     @JoinColumn({ name: 'artist_id' })
     artist!: ArtistEntity;
 
     // Relación con ActivityEntity
-    @ManyToOne(() => Activity, (activity: Activity) => activity.artistActivities, {
-        primary: true // Parte de la clave primaria
-    })
+    @ManyToOne(() => Activity, (activity: Activity) => activity.artistActivities)
     @JoinColumn({ name: 'activity_id' })
     activity!: Activity;
 

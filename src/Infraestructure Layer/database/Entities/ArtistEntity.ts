@@ -1,16 +1,13 @@
-import { ChildEntity, Column } from 'typeorm';
+import { ChildEntity, Column, OneToMany } from 'typeorm';
 import { ApprenticeEntity } from './ApprenticeEntity';
 import { ArtistStatus } from 'src/Domain Layer/Enums';
 import { ArtistActivityEntity } from './Many To Many/ArtistActivityEntity';
 import { AlbumEntity } from './AlbumEntity';
 import { GroupEntity } from './GroupEntity';
 import { ArtistGroupMembershipEntity } from './Many To Many/ArtistGroupMembershipEntity';
-import { ArtistCollaborationEntity } from './Many To Many/ArtistCollaborationEntity.ts';
+import { ArtistCollaborationEntity } from './Many To Many/ArtistCollaborationEntity';
 import { ArtistGroupCollaborationEntity } from './Many To Many/ArtistGroupCollaborationEntity';
 import { ArtistAgencyMembershipEntity } from './Many To Many/ArtistAgencyMembershipEntity';
-import { ActivityDateEntity } from './Many To Many/ActivityDateEntity';
-import { ActivityResponsibleEntity } from './Many To Many/ActivityResponsibleEntity';
-import { ActivityPlaceEntity } from './Many To Many/ActivityPlaceEntity';
 
 @ChildEntity({ name: 'artist'})
     export class ArtistEntity extends ApprenticeEntity{
@@ -62,17 +59,6 @@ import { ActivityPlaceEntity } from './Many To Many/ActivityPlaceEntity';
         @OneToMany(() => ArtistAgencyMembershipEntity, (membership: ArtistAgencyMembershipEntity) => membership.artist)
         agencyMemberships!: ArtistAgencyMembershipEntity[];
     
-        //Una actividad puede realizarse en cero o muchas fechas
-        @OneToMany(() => ActivityDateEntity, (activityDate: ActivityDateEntity) => activityDate.activity)
-        activityDates!: ActivityDateEntity[];
-
-        // Una actividad puede tener cero o muchos responsables
-        @OneToMany(() => ActivityResponsibleEntity, (activityResponsible: ActivityResponsibleEntity) => activityResponsible.activity)
-        activityResponsibles!: ActivityResponsibleEntity[];
-
-        // Una actividad puede realizarse en cero o muchos lugares
-        @OneToMany(() => ActivityPlaceEntity, (activityPlace: ActivityPlaceEntity) => activityPlace.activity)
-        activityPlaces!: ActivityPlaceEntity[];
     }  
 
 

@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Column } from 'typeorm';
+import { Entity,PrimaryColumn, ManyToOne, JoinColumn, Column } from 'typeorm';
 import { GroupEntity } from '../GroupEntity';
 import { Activity } from '../ActivityEntity';
 
@@ -11,17 +11,12 @@ export class GroupActivityEntity {
     activityId!: string;
 
     // Relación con GroupEntity
-    @ManyToOne(() => GroupEntity, (group: GroupEntity) => group.groupActivities,
-    {
-        primary: true // Indica que esta relación es parte de la clave primaria
-    })
+    @ManyToOne(() => GroupEntity, (group: GroupEntity) => group.groupActivities)
     @JoinColumn({ name: 'group_id' })
     group!: GroupEntity;
 
     // Relación con ActivityEntity
-    @ManyToOne(() => Activity, (activity: Activity) => activity.groupActivities, {
-        primary: true // Indica que esta relación es parte de la clave primaria
-    })
+    @ManyToOne(() => Activity, (activity: Activity) => activity.groupActivities)
     @JoinColumn({ name: 'activity_id' })
     activity!: Activity;
 

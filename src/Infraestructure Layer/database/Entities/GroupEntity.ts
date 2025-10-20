@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryColumn, Column, ManyToOne, OneToMany, JoinColumn} from 'typeorm';
 import { GroupStatus } from 'src/Domain Layer/Enums';
 import { AgencyEntity } from './AgencyEntity';
 import { AlbumEntity } from './AlbumEntity';

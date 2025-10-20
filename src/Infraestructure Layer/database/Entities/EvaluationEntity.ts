@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn, Column } from 'typeorm';
+import { Entity, PrimaryColumn, Column, OneToMany } from 'typeorm';
 import { Evaluation } from 'src/Domain Layer/Enums';
 import { ApprenticeEvaluationEntity } from './Many To Many/ApprenticeEvaluationEntity';
 
