@@ -96,7 +96,6 @@ export enum BillboardListScope{
 }
 
 @Entity("apprentice")
-@TableInheritance({ column: { type: "varchar", name: "type" } })
 export class ApprenticeEntity {
   @PrimaryColumn()
   id!: string;

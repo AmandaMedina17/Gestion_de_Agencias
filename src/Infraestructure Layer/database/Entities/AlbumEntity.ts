@@ -1,15 +1,9 @@
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  ManyToOne,
-  JoinColumn,
-  OneToMany,
-} from "typeorm";
-import { GroupEntity } from "./GroupEntity";
-import { ArtistEntity } from "./ArtistEntity";
-import { AwardEntity } from "./AwardEntity";
-import { SongEntity } from "./SongEntity";
+
+import { Entity, PrimaryColumn, Column , ManyToOne, JoinColumn, OneToMany} from 'typeorm';
+import { GroupEntity } from './GroupEntity';
+import { ArtistEntity } from './ArtistEntity';
+import { AwardEntity } from './AwardEntity';
+import { SongEntity } from './SongEntity';
 
 @Entity()
 export class AlbumEntity {
@@ -58,6 +52,7 @@ export class AlbumEntity {
   @OneToMany(() => AwardEntity, (award: AwardEntity) => award.album)
   awards!: AwardEntity[];
 
-  @OneToMany(() => SongEntity, (song) => song.album) //pueden ahber muchos aprendices en una agencia
+  @OneToMany(() => SongEntity, (song) => song.album) 
   songs!: SongEntity[];
+
 }
