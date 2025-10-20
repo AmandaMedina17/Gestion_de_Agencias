@@ -1,11 +1,18 @@
-
-import { Entity, PrimaryColumn, Column, ManyToOne, OneToMany, JoinColumn} from 'typeorm';
-import { AgencyEntity } from './AgencyEntity';
-import { AlbumEntity } from './AlbumEntity';
-import { GroupActivityEntity } from './Many To Many/GroupActivity';
-import { ArtistEntity } from './ArtistEntity';
-import { ArtistGroupMembershipEntity } from './Many To Many/ArtistGroupMembershipEntity';
-import { ArtistGroupCollaborationEntity } from './Many To Many/ArtistGroupCollaborationEntity'; 
+import {
+  Entity,
+  PrimaryColumn,
+  Column,
+  ManyToOne,
+  OneToMany,
+  JoinColumn,
+} from "typeorm";
+// import { GroupStatus } from "src/Domain Layer/Enums";
+import { AgencyEntity } from "./AgencyEntity";
+import { AlbumEntity } from "./AlbumEntity";
+import { GroupActivityEntity } from "./Many To Many/GroupActivity";
+import { ArtistEntity } from "./ArtistEntity";
+import { ArtistGroupMembershipEntity } from "./Many To Many/ArtistGroupMembershipEntity";
+import { ArtistGroupCollaborationEntity } from "./Many To Many/ArtistGroupCollaborationEntity";
 
 export enum ApprenticeStatus {
   EN_ENTRENAMIENTO = "EN_ENTRENAMIENTO",

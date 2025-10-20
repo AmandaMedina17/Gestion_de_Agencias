@@ -1,3 +1,6 @@
+import { Entity, PrimaryColumn, Column, OneToMany } from "typeorm";
+//import { Evaluation } from "src/Domain Layer/Enums";
+import { ApprenticeEvaluationEntity } from "./Many To Many/ApprenticeEvaluationEntity";
 
 export enum ApprenticeStatus{
     EN_ENTRENAMIENTO = "EN_ENTRENAMIENTO",
@@ -20,7 +23,7 @@ export enum ArtistStatus{
     INACTIVO = "INACTIVO"
 }
 
-export enum EvaluationType{
+export enum Evaluation{
     EXCELENTE = "EXCELENTE",
     BIEN = "BIEN",
     REGULAR = "REGULAR",
@@ -78,9 +81,6 @@ export enum BillboardListScope{
     INTERNACIONAL = "INTERNACIONAL",
     NACIONAL = "NACIONAL"
 }
-import { Entity, PrimaryColumn, Column, OneToMany } from 'typeorm';
-import { Evaluation } from 'src/Domain Layer/Enums';
-import { ApprenticeEvaluationEntity } from './Many To Many/ApprenticeEvaluationEntity';
 
 @Entity()
 export class EvaluationEntity {
@@ -92,10 +92,10 @@ export class EvaluationEntity {
 
   @Column({
     type: "enum",
-    enum: EvaluationType,
-    default: EvaluationType.BIEN,
+    enum: Evaluation,
+    default: Evaluation.BIEN,
   })
-  evaluation!: EvaluationType;
+  evaluation!: Evaluation;
 
   @OneToMany(
     () => ApprenticeEvaluationEntity,
