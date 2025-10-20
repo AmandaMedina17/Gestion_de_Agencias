@@ -15,23 +15,17 @@ export class ArtistCollaborationEntity {
     dateId!: string;
 
     // Relación con el primer artista
-    @ManyToOne(() => ArtistEntity, (artist: ArtistEntity) => artist.collaborationsAsArtist1, {
-        primary: true
-    })
+    @ManyToOne(() => ArtistEntity, (artist: ArtistEntity) => artist.collaborationsAsArtist1)
     @JoinColumn({ name: 'artist1_id' })
     artist1!: ArtistEntity;
 
     // Relación con el segundo artista
-    @ManyToOne(() => ArtistEntity, (artist: ArtistEntity) => artist.collaborationsAsArtist2, {
-        primary: true
-    })
+    @ManyToOne(() => ArtistEntity, (artist: ArtistEntity) => artist.collaborationsAsArtist2)
     @JoinColumn({ name: 'artist2_id' })
     artist2!: ArtistEntity;
 
     // Relación con la fecha
-    @ManyToOne(() => Date, (date: Date) => date.artistCollaborations, {
-        primary: true
-    })
+    @ManyToOne(() => Date, (date: Date) => date.artistCollaborations)
     @JoinColumn({ name: 'date_id' })
     date!: Date;
 }

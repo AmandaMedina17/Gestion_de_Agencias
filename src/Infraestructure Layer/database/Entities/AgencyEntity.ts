@@ -4,6 +4,8 @@ import { GroupEntity } from './GroupEntity';
 import { group } from 'console';
 import { ArtistAgencyMembershipEntity } from './Many To Many/ArtistAgencyMembershipEntity';
 
+
+
 @Entity('agency')
 export class AgencyEntity{
     @PrimaryColumn()

@@ -12,16 +12,12 @@ export class ApprenticeEvaluationEntity {
     evaluationId!: string;
 
     // Relación con ApprenticeEntity
-    @ManyToOne(() => ApprenticeEntity, (apprentice: ApprenticeEntity) => apprentice.apprenticeEvaluations, {
-        primary: true
-    })
-    @JoinColumn({ name: 'apprentice_id' })
-    apprentice!: ApprenticeEntity;
+    // @ManyToOne(() => ApprenticeEntity, (apprentice: ApprenticeEntity) => apprentice.apprenticeEvaluations)
+    // @JoinColumn({ name: 'apprentice_id' })
+    // apprentice!: ApprenticeEntity;
 
     // Relación con EvaluationEntity
-    @ManyToOne(() => EvaluationEntity, (evaluation: EvaluationEntity) => evaluation.apprenticeEvaluations, {
-        primary: true
-    })
+    @ManyToOne(() => EvaluationEntity, (evaluation: EvaluationEntity) => evaluation.apprenticeEvaluations)
     @JoinColumn({ name: 'evaluation_id' })
     evaluation!: EvaluationEntity;
 }

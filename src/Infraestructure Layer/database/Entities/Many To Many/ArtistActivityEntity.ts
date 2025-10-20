@@ -1,6 +1,6 @@
 import { Entity, ManyToOne, JoinColumn, Column, PrimaryColumn } from 'typeorm';
 import { ArtistEntity } from '../ArtistEntity';
-import { Activity } from '../ActivityEntity';
+import { ActivityEntity } from '../ActivityEntity';
 
 @Entity('artist_activity')
 export class ArtistActivityEntity {
@@ -12,18 +12,14 @@ export class ArtistActivityEntity {
     activityId!: string;
 
     // Relación con ArtistEntity
-    @ManyToOne(() => ArtistEntity, (artist: ArtistEntity) => artist.artistActivities, {
-        primary: true // Parte de la clave primaria
-    })
+    @ManyToOne(() => ArtistEntity, (artist: ArtistEntity) => artist.artistActivities)
     @JoinColumn({ name: 'artist_id' })
     artist!: ArtistEntity;
 
     // Relación con ActivityEntity
-    @ManyToOne(() => Activity, (activity: Activity) => activity.artistActivities, {
-        primary: true // Parte de la clave primaria
-    })
+    @ManyToOne(() => ActivityEntity, (activity: ActivityEntity) => activity.artistActivities)
     @JoinColumn({ name: 'activity_id' })
-    activity!: Activity;
+    activity!: ActivityEntity;
 
     // Campo adicional para la confirmación
     @Column({ name: 'confirmation', type: 'boolean', default: true })

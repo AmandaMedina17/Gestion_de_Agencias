@@ -16,23 +16,17 @@ export class ArtistGroupCollaborationEntity {
     dateId!: string;
 
     // Relación con el artista
-    @ManyToOne(() => ArtistEntity, (artist: ArtistEntity) => artist.groupCollaborations, {
-        primary: true
-    })
+    @ManyToOne(() => ArtistEntity, (artist: ArtistEntity) => artist.groupCollaborations)
     @JoinColumn({ name: 'artist_id' })
     artist!: ArtistEntity;
 
     // Relación con el grupo
-    @ManyToOne(() => GroupEntity, (group: GroupEntity) => group.artistCollaborations, {
-        primary: true
-    })
+    @ManyToOne(() => GroupEntity, (group: GroupEntity) => group.artistCollaborations)
     @JoinColumn({ name: 'group_id' })
     group!: GroupEntity;
 
     // Relación con la fecha
-    @ManyToOne(() => Date, (date: Date) => date.artistGroupCollaborations, {
-        primary: true
-    })
+    @ManyToOne(() => Date, (date: Date) => date.artistGroupCollaborations)
     @JoinColumn({ name: 'date_id' })
     date!: Date;
 }

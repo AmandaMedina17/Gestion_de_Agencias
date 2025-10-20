@@ -6,7 +6,7 @@ import { AgencyID } from "../Value Objects/IDs";
 import { IRepository } from "./IRepository";
 
 export interface IAgencyRepository extends IRepository<AgencyEntity, AgencyID> {
-  findByName(name: string): Promise<AgencyEntity | null>;
+  findByName(name: string): Promise<AgencyEntity>;
 
   getAgencyGroups(id: AgencyID): Promise<GroupEntity[]>;
   getAgencyApprentices(id: AgencyID): Promise<ApprenticeEntity[]>;

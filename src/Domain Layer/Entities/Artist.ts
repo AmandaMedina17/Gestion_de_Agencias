@@ -2,12 +2,12 @@ import { v4 as uuidv4 } from "uuid";
 import { DateValue } from "../Value Objects/Values";
 import { ApprenticeStatus, ApprenticeTrainingLevel } from "../Enums";
 import { ArtistRole, ArtistStatus } from "../Enums";
-import { Apprentice} from "./Apprentice";
-import { Group} from "./Group";
-import { Interval} from "./Interval";
-import { Agency} from "./Agency";
+import { Apprentice } from "./Apprentice";
+import { Group } from "./Group";
+import { Interval } from "./Interval";
+import { Agency } from "./Agency";
 
-export class Artist extends Apprentice{
+export class Artist extends Apprentice {
   constructor(
     id: string = uuidv4(),
     entryDate: DateValue,
@@ -16,7 +16,7 @@ export class Artist extends Apprentice{
     private stageName: string,
     private realName: string,
     private birthDate: DateValue,
-    private transitionDate: DateValue | null, //fecha del primer debut con el grupo
+    private transitionDate: DateValue, //fecha del primer debut con el grupo
     private groupId?: string
   ) {
     super(

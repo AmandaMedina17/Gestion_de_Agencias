@@ -16,23 +16,17 @@ export class ArtistAgencyMembershipEntity {
     intervalId!: string;
 
     // Relación con el artista
-    @ManyToOne(() => ArtistEntity, (artist: ArtistEntity) => artist.agencyMemberships, {
-        primary: true
-    })
+    @ManyToOne(() => ArtistEntity, (artist: ArtistEntity) => artist.agencyMemberships)
     @JoinColumn({ name: 'artist_id' })
     artist!: ArtistEntity;
 
     // Relación con la agencia
-    @ManyToOne(() => AgencyEntity, (agency: AgencyEntity) => agency.artistMemberships, {
-        primary: true
-    })
+    @ManyToOne(() => AgencyEntity, (agency: AgencyEntity) => agency.artistMemberships)
     @JoinColumn({ name: 'agency_id' })
     agency!: AgencyEntity;
 
     // Relación con el intervalo
-    @ManyToOne(() => IntervalEntity, (interval: IntervalEntity) => interval.artistAgencyMemberships, {
-        primary: true
-    })
+    @ManyToOne(() => IntervalEntity, (interval: IntervalEntity) => interval.artistAgencyMemberships)
     @JoinColumn({ name: 'interval_id' })
     interval!: IntervalEntity;
 }

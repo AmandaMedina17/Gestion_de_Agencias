@@ -1,5 +1,5 @@
 import { Entity, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { Activity } from '../ActivityEntity';
+import { ActivityEntity } from '../ActivityEntity';
 import { Date } from '../DateEntity';
 
 @Entity('activity_date')
@@ -11,16 +11,12 @@ export class ActivityDateEntity {
     dateId!: string;
 
     // Relación con Activity
-    @ManyToOne(() => Activity, (activity: Activity) => activity.activityDates, {
-        primary: true
-    })
+    @ManyToOne(() => ActivityEntity, (activity: ActivityEntity) => activity.activityDates)
     @JoinColumn({ name: 'activity_id' })
-    activity!: Activity;
+    activity!: ActivityEntity;
 
     // Relación con Date
-    @ManyToOne(() => Date, (date: Date) => date.activityDates, {
-        primary: true
-    })
+    @ManyToOne(() => Date, (date: Date) => date.activityDates)
     @JoinColumn({ name: 'date_id' })
     date!: Date;
 }

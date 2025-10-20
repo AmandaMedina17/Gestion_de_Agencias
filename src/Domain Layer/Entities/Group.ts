@@ -1,79 +1,76 @@
 import { GroupStatus } from "../Enums";
-import {DateValue} from "../Value Objects/Values";
+import { DateValue } from "../Value Objects/Values";
 
 export class Group {
-    constructor(
-        private readonly id: string,
-        private name: string,
-        private status: GroupStatus,
-        private debut_date: DateValue,
-        private members: number,
-        private concept: string,
-        private is_reated: boolean
-    ) {
-        this.validate();
-    }
+  constructor(
+    private readonly id: string,
+    private name: string,
+    private status: GroupStatus,
+    private debut_date: DateValue,
+    private members: number,
+    private concept: string,
+    private is_reated: boolean
+  ) {
+    this.validate();
+  }
 
-    private validate(): void {
-        if (!this.id) {
-            throw new Error('El ID del premio es requerido');
-        }
-        if (!this.name || this.name.length == 0) {
-            throw new Error('El nombre del premio es requerido');
-        }
-        //Duda, va aqui?
-        if (this.name.length < 2) {
-            throw new Error('El nombre del premio debe tener al menos 2 caracteres');
-        }
-        if (this.name.length > 200) {
-            throw new Error('El nombre del premio no puede exceder 200 caracteres');
-        }
-        if(!this.concept || this.concept.length == 0){
-            throw new Error('El concepto del grupo es requerido')
-        }
-        if(!this.members || this.members < 2)
-        {
-            throw new Error('Tiene que haber al menos dos miembros en el grupo')
-        }
-        if(!this.status){
-            throw new Error('El estado del grupo es requerido')
-        }
+  private validate(): void {
+    if (!this.id) {
+      throw new Error("El ID del premio es requerido");
     }
+    if (!this.name || this.name.length == 0) {
+      throw new Error("El nombre del premio es requerido");
+    }
+    //Duda, va aqui?
+    if (this.name.length < 2) {
+      throw new Error("El nombre del premio debe tener al menos 2 caracteres");
+    }
+    if (this.name.length > 200) {
+      throw new Error("El nombre del premio no puede exceder 200 caracteres");
+    }
+    if (!this.concept || this.concept.length == 0) {
+      throw new Error("El concepto del grupo es requerido");
+    }
+    if (!this.members || this.members < 2) {
+      throw new Error("Tiene que haber al menos dos miembros en el grupo");
+    }
+    if (!this.status) {
+      throw new Error("El estado del grupo es requerido");
+    }
+  }
 
+  // Getters
+  public getId(): string {
+    return this.id;
+  }
 
-    // Getters
-    public getId(): string {
-        return this.id;
-    }
+  public getName(): string {
+    return this.name;
+  }
+  public getNumberOfMember(): number {
+    return this.members;
+  }
 
-    public getName(): string {
-        return this.name;
-    }
-    public getNumberOfMember(): number{
-        return this.members;
-    }
+  public getDebutDate(): DateValue {
+    return this.debut_date;
+  }
+  public getStatus(): GroupStatus {
+    return this.status;
+  }
+  public isCreated(): boolean {
+    return this.is_reated;
+  }
+  public getConcept(): string {
+    return this.concept;
+  }
 
-    public getDebutDate(): DateValue {
-        return this.debut_date;
-    }
-    public getStatus(): GroupStatus{
-        return this.status;
-    }
-    public isCreated(): boolean{
-        return this.is_reated;
-    }
-    public getConcept(): string{
-        return this.concept;
-    }
+  public isRecentGroup(): boolean {
+    // Un grupo es considerado "reciente" si fue en los últimos 2 años
+    const twoYearsAgo = DateValue.today().getYear() - 2;
+    return this.debut_date.getYear() >= twoYearsAgo;
+  }
 
-    public isRecentGroup(): boolean {
-        // Un grupo es considerado "reciente" si fue en los últimos 2 años
-        const twoYearsAgo = DateValue.today().getYear() - 2;
-        return this.debut_date.getYear() >= twoYearsAgo;
-    }
-
-    public getYearsSinceDebut(): number {
-        return DateValue.today().getYear() - this.debut_date.getYear();
-    } 
+  public getYearsSinceDebut(): number {
+    return DateValue.today().getYear() - this.debut_date.getYear();
+  }
 }
-

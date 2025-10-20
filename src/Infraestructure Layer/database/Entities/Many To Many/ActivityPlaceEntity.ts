@@ -1,5 +1,5 @@
 import { Entity, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { Activity } from '../ActivityEntity';
+import { ActivityEntity } from '../ActivityEntity';
 import { PlaceEntity } from '../PlaceEntity';
 
 @Entity('activity_place')
@@ -11,16 +11,12 @@ export class ActivityPlaceEntity {
     placeId!: string;
 
     // Relación con Activity
-    @ManyToOne(() => Activity, (activity: Activity) => activity.activityPlaces, {
-        primary: true
-    })
+    @ManyToOne(() => ActivityEntity, (activity: ActivityEntity) => activity.activityPlaces)
     @JoinColumn({ name: 'activity_id' })
-    activity!: Activity;
+    activity!: ActivityEntity;
 
     // Relación con Place
-    @ManyToOne(() => PlaceEntity, (place: PlaceEntity) => place.activityPlaces, {
-        primary: true
-    })
+    @ManyToOne(() => PlaceEntity, (place: PlaceEntity) => place.activityPlaces)
     @JoinColumn({ name: 'place_id' })
     place!: PlaceEntity;
 }

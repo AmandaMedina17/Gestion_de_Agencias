@@ -1,5 +1,5 @@
-import { Entity, PrimaryColumn, Column } from 'typeorm';
-import { ActivityResponsibleEntity } from './ActivityResponsibleEntity';
+import { Entity, PrimaryColumn, Column, OneToMany } from 'typeorm';
+import { ActivityResponsibleEntity } from './Many To Many/ActivityResponsibleEntity';
 
 @Entity()
 export class ResponsibleEntity {
