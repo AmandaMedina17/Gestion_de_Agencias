@@ -1,8 +1,7 @@
 import { Entity, PrimaryColumn, Column, OneToMany } from 'typeorm';
 import { ApprenticeEntity } from './ApprenticeEntity';
 import { GroupEntity } from './GroupEntity';
-import { group } from 'console';
-import { ArtistAgencyMembershipEntity } from './Many To Many/ArtistAgencyMembershipEntity';
+import { ArtistAgencyMembershipEntity } from "./ArtistAgencyMembershipEntity";
 
 
 

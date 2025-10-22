@@ -1,6 +1,6 @@
 import { Entity, PrimaryColumn, ManyToOne, JoinColumn, Column } from 'typeorm';
-import { SongEntity } from '../SongEntity';
-import { BillboardListEntity } from '../BillboardListEntity';
+import { SongEntity } from './SongEntity';
+import { BillboardListEntity } from './BillboardListEntity';
 
 @Entity('song_billboard')
 export class SongBillboardEntity {

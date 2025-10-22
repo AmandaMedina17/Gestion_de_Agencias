@@ -1,7 +1,7 @@
 import { Entity, PrimaryColumn, ManyToOne, JoinColumn, Column } from 'typeorm';
-import { GroupEntity } from '../GroupEntity';
-import { IntervalEntity } from '../IntervalEntity';
-import { ArtistEntity } from '../ArtistEntity';
+import { GroupEntity } from './GroupEntity';
+import { IntervalEntity } from './IntervalEntity';
+import { ArtistEntity } from './ArtistEntity';
 
 @Entity('artist_group_membership')
 export class ArtistGroupMembershipEntity {

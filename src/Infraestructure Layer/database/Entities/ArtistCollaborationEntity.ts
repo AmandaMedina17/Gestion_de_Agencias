@@ -1,6 +1,6 @@
 import { Entity, PrimaryColumn, ManyToOne, JoinColumn, Column } from 'typeorm';
-import { ArtistEntity } from '../ArtistEntity';
-import { Date } from '../DateEntity';
+import { ArtistEntity } from './ArtistEntity';
+import { Date } from './DateEntity';
 
 @Entity('artist_collaboration')
 export class ArtistCollaborationEntity {

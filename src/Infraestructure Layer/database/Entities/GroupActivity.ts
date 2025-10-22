@@ -1,6 +1,6 @@
 import { Entity, PrimaryColumn, ManyToOne, JoinColumn, Column } from 'typeorm';
-import { GroupEntity } from '../GroupEntity';
-import { ActivityEntity } from '../ActivityEntity';
+import { GroupEntity } from './GroupEntity';
+import { ActivityEntity } from './ActivityEntity';
 
 @Entity('group_activity')
 export class GroupActivityEntity {

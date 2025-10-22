@@ -1,6 +1,6 @@
 import { Entity, ManyToOne, JoinColumn, Column, PrimaryColumn } from 'typeorm';
-import { ArtistEntity } from '../ArtistEntity';
-import { ActivityEntity } from '../ActivityEntity';
+import { ArtistEntity } from './ArtistEntity';
+import { ActivityEntity } from './ActivityEntity';
 
 @Entity('artist_activity')
 export class ArtistActivityEntity {

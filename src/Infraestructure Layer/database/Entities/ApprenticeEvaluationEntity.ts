@@ -1,6 +1,6 @@
 import { Entity, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { ApprenticeEntity } from '../ApprenticeEntity';
-import { EvaluationEntity } from '../EvaluationEntity';
+import { ApprenticeEntity } from './ApprenticeEntity';
+import { EvaluationEntity } from './EvaluationEntity';
 
 @Entity('apprentice_evaluation')
 export class ApprenticeEvaluationEntity {
@@ -12,9 +12,9 @@ export class ApprenticeEvaluationEntity {
     evaluationId!: string;
 
     // Relación con ApprenticeEntity
-    // @ManyToOne(() => ApprenticeEntity, (apprentice: ApprenticeEntity) => apprentice.apprenticeEvaluations)
-    // @JoinColumn({ name: 'apprentice_id' })
-    // apprentice!: ApprenticeEntity;
+    @ManyToOne(() => ApprenticeEntity, (apprentice: ApprenticeEntity) => apprentice.apprenticeEvaluations)
+    @JoinColumn({ name: 'apprentice_id' })
+    apprentice!: ApprenticeEntity;
 
     // Relación con EvaluationEntity
     @ManyToOne(() => EvaluationEntity, (evaluation: EvaluationEntity) => evaluation.apprenticeEvaluations)

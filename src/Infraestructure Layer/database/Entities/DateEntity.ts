@@ -1,7 +1,7 @@
 import { Entity, PrimaryColumn, Column, OneToMany } from 'typeorm';
-import { ArtistCollaborationEntity } from './Many To Many/ArtistCollaborationEntity';
-import { ArtistGroupCollaborationEntity } from './Many To Many/ArtistGroupCollaborationEntity';
-import { ActivityDateEntity } from './Many To Many/ActivityDateEntity';
+import { ArtistCollaborationEntity } from './ArtistCollaborationEntity';
+import { ArtistGroupCollaborationEntity } from './ArtistGroupCollaborationEntity';
+import { ActivityDateEntity } from './ActivityDateEntity';
 
 @Entity()
 export class Date {

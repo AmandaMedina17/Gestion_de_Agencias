@@ -1,6 +1,4 @@
-import {
-  Entity,
-  PrimaryColumn,
+import { Entity, PrimaryColumn,
   Column,
   ManyToOne,
   JoinColumn,

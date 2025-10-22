@@ -1,6 +1,6 @@
 import { Entity, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { ActivityEntity } from '../ActivityEntity';
-import { Date } from '../DateEntity';
+import { ActivityEntity } from './ActivityEntity';
+import { Date } from './DateEntity';
 
 @Entity('activity_date')
 export class ActivityDateEntity {

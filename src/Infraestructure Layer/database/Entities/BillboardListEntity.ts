@@ -1,5 +1,5 @@
 import { Entity,PrimaryGeneratedColumn, Column , ManyToOne, JoinColumn, OneToMany} from "typeorm";
-import { SongBillboardEntity } from "./Many To Many/SongBillboardEntity";
+import { SongBillboardEntity } from "./SongBillboardEntity";
 
 @Entity('billboardList')
 export class BillboardListEntity{

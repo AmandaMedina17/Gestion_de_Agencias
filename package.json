@@ -8,9 +8,9 @@
     "build": "tsc",
     "start": "node dist/app.js",
     "typeorm": "typeorm-ts-node-commonjs",
-    "migration:generate": "npm run typeorm -- migration:generate -d src/infrastructure/config/data-source.ts",
-    "migration:run": "npm run typeorm -- migration:run -d src/infrastructure/config/data-source.ts",
-    "migration:revert": "npm run typeorm -- migration:revert -d src/infrastructure/config/data-source.ts",
+    "migration:generate": "npm run typeorm -- migration:generate",
+    "migration:run": "npm run typeorm -- migration:run",
+    "migration:revert": "npm run typeorm -- migration:revert",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
@@ -25,6 +25,7 @@
     "@types/node": "^20.19.22",
     "@types/pg": "^8.15.5",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3"
   },
   "keywords": [

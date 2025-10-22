@@ -13,12 +13,13 @@
     "emitDecoratorMetadata": true,
     "resolveJsonModule": true,
     "moduleResolution": "node",
-    "baseUrl": "./",
+    "baseUrl": ".",
     "paths": {
-      "@domain/*": ["src/domain/*"],
-      "@application/*": ["src/application/*"],
-      "@infrastructure/*": ["src/infrastructure/*"],
-      "@presentation/*": ["src/presentation/*"]
+      "@domain/*": ["src/Domain Layer/*"],
+      "@application/*": ["src/Application Layer/*"],
+      "@infrastructure/*": ["src/Infrastructure Layer/*"],
+      "@presentation/*": ["src/Presentation Layer/*"],
+      "@entities/*": ["src/Infraestructure Layer/database/Entities/*"]
     }
   },
   "include": ["src/**/*"],

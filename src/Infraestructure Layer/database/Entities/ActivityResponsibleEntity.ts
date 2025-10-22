@@ -1,6 +1,6 @@
 import { Entity, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { ActivityEntity } from '../ActivityEntity';
-import { ResponsibleEntity } from '../ResponsibleEntity';
+import { ActivityEntity } from './ActivityEntity';
+import { ResponsibleEntity } from './ResponsibleEntity';
 
 @Entity('activity_responsible')
 export class ActivityResponsibleEntity {

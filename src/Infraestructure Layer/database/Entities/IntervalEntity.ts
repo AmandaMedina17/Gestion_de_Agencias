@@ -1,6 +1,6 @@
 import { Entity, PrimaryColumn, Column, OneToMany } from 'typeorm';
-import { ArtistGroupMembershipEntity } from './Many To Many/ArtistGroupMembershipEntity';
-import { ArtistAgencyMembershipEntity } from './Many To Many/ArtistAgencyMembershipEntity';
+import { ArtistGroupMembershipEntity } from './ArtistGroupMembershipEntity';
+import { ArtistAgencyMembershipEntity } from './ArtistAgencyMembershipEntity';
 
 @Entity()
 export class IntervalEntity {

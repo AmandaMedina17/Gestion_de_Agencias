@@ -1,96 +1,16 @@
 import { Entity, Column, OneToMany , OneToOne, JoinColumn, PrimaryColumn} from "typeorm";
 import { ApprenticeEntity } from "./ApprenticeEntity";
-//import { ArtistStatus } from "src/Domain Layer/Enums";
-import { ArtistActivityEntity } from "./Many To Many/ArtistActivityEntity";
+import { ArtistStatus } from "@domain/Enums";
+import { ArtistActivityEntity } from "./ArtistActivityEntity";
 import { AlbumEntity } from "./AlbumEntity";
 import { GroupEntity } from "./GroupEntity";
-import { ArtistGroupMembershipEntity } from "./Many To Many/ArtistGroupMembershipEntity";
-import { ArtistCollaborationEntity } from "./Many To Many/ArtistCollaborationEntity";
-import { ArtistGroupCollaborationEntity } from "./Many To Many/ArtistGroupCollaborationEntity";
-import { ArtistAgencyMembershipEntity } from "./Many To Many/ArtistAgencyMembershipEntity";
-import { ActivityDateEntity } from "./Many To Many/ActivityDateEntity";
-import { ActivityResponsibleEntity } from "./Many To Many/ActivityResponsibleEntity";
-import { ActivityPlaceEntity } from "./Many To Many/ActivityPlaceEntity";
-
-export enum ApprenticeStatus{
-    EN_ENTRENAMIENTO = "EN_ENTRENAMIENTO",
-    PROCESO_DE_SELECCION = "PROCESO_DE_SELECCION",
-    TRANSFERIDO = "TRANSFERIDO"
-}
-
-export enum ArtistRole{
-    LIDER = "LIDER",
-    VOCALISTA = "VOCALISTA", 
-    RAPERO = "RAPERO",
-    BAILARIN = "BAILARIN",
-    VISUAL = "VISUAL",
-    MAKNAE = "MAKNAE"
-}
-
-export enum ArtistStatus{
-    ACTIVO = "ACTIVO",
-    EN_PAUSA = "EN_PAUSA",
-    INACTIVO = "INACTIVO"
-}
-
-export enum Evaluation{
-    EXCELENTE = "EXCELENTE",
-    BIEN = "BIEN",
-    REGULAR = "REGULAR",
-    MAL = "MAL",
-    INSUFICIENTE = "INSUFICIENTE"
-}
-
-export enum ApprenticeTrainingLevel{
-    PRINCIPIANTE = "PRINCIPIANTE",
-    INTERMEDIO = "INTERMEDIO",
-    AVANZADO = "AVANZADO"
-}
-
-export enum ActivityType{
-    INDIVIDUAL = "INDIVIDUAL",
-    GRUPAL = "GRUPAL"
-}
-
-export enum ActivityClassification {
-    // Training
-    VOCAL_CLASS = "VOCAL_CLASS",
-    DANCE_CLASS = "DANCE_CLASS",
-    RAP_CLASS = "RAP_CLASS",
-    PHYSICAL_TRAINING = "PHYSICAL_TRAINING",
-    // Performance
-    SHOWCASE = "SHOWCASE",
-    PRACTICE_CONCERT = "PRACTICE_CONCERT",
-    VIDEO_RECORDING = "VIDEO_RECORDING",
-    
-    // Production
-    AUDIO_RECORDING = "AUDIO_RECORDING",
-    PHOTO_SHOOT = "PHOTO_SHOOT",
-    CHOREOGRAPHY_REHEARSAL = "CHOREOGRAPHY_REHEARSAL",
-    
-    // Promotion
-    INTERVIEW = "INTERVIEW",
-    FAN_MEETING = "FAN_MEETING",
-    PROMOTIONAL_EVENT = "PROMOTIONAL_EVENT"
-}
-
-export enum ContractStatus {
-    ACTIVO = "ACTIVO",
-    FINALIZADO = "FINALIZADO",
-    EN_RENOVACION = "EN_RENOVACION",
-    RESCINDIDO = "RESCINDIDO",
-}
-
-export enum GroupStatus{
-    ACTIVO = "ACTIVO",
-    EN_PAUSA= "EN_PAUSA",
-    DISUELTO = "DISUELTO"
-}
-  
-export enum BillboardListScope{
-    INTERNACIONAL = "INTERNACIONAL",
-    NACIONAL = "NACIONAL"
-}
+import { ArtistGroupMembershipEntity } from "./ArtistGroupMembershipEntity";
+import { ArtistCollaborationEntity } from "./ArtistCollaborationEntity";
+import { ArtistGroupCollaborationEntity } from "./ArtistGroupCollaborationEntity";
+import { ArtistAgencyMembershipEntity } from "./ArtistAgencyMembershipEntity";
+import { ActivityDateEntity } from "./ActivityDateEntity";
+import { ActivityResponsibleEntity } from "./ActivityResponsibleEntity";
+import { ActivityPlaceEntity } from "./ActivityPlaceEntity";
 
 @Entity({ name: "artist" })
 export class ArtistEntity{

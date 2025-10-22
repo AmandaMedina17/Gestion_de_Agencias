@@ -1,25 +1,27 @@
-import { AppDataSource } from './Infraestructure Layer/database/Entities/config/data-source';
+import 'tsconfig-paths/register';
+import { AppDataSource } from './Config/data-source';
 import { AgencyEntity } from './Infraestructure Layer/database/Entities/AgencyEntity';
 import { ApprenticeEntity } from './Infraestructure Layer/database/Entities/ApprenticeEntity';
 import { ArtistEntity } from './Infraestructure Layer/database/Entities/ArtistEntity';
 import { GroupEntity } from './Infraestructure Layer/database/Entities/GroupEntity';
 import { AlbumEntity } from './Infraestructure Layer/database/Entities/AlbumEntity';
 import { ActivityEntity } from './Infraestructure Layer/database/Entities/ActivityEntity';
-import { ActivityDateEntity } from './Infraestructure Layer/database/Entities/Many To Many/ActivityDateEntity';
-import { ActivityPlaceEntity } from './Infraestructure Layer/database/Entities/Many To Many/ActivityPlaceEntity';
-import { ActivityResponsibleEntity } from './Infraestructure Layer/database/Entities/Many To Many/ActivityResponsibleEntity';
-import { ArtistActivityEntity } from './Infraestructure Layer/database/Entities/Many To Many/ArtistActivityEntity';
-import { GroupActivityEntity} from './Infraestructure Layer/database/Entities/Many To Many/GroupActivity';
-import { ApprenticeEvaluationEntity } from './Infraestructure Layer/database/Entities/Many To Many/ApprenticeEvaluationEntity';
-import { ArtistAgencyMembershipEntity } from './Infraestructure Layer/database/Entities/Many To Many/ArtistAgencyMembershipEntity';
-import { ArtistCollaborationEntity } from './Infraestructure Layer/database/Entities/Many To Many/ArtistCollaborationEntity';
-import { ArtistGroupCollaborationEntity } from './Infraestructure Layer/database/Entities/Many To Many/ArtistGroupCollaborationEntity';
-import { ArtistGroupMembershipEntity } from './Infraestructure Layer/database/Entities/Many To Many/ArtistGroupMembershipEntity';
+import { ActivityDateEntity } from './Infraestructure Layer/database/Entities/ActivityDateEntity';
+import { ActivityPlaceEntity } from './Infraestructure Layer/database/Entities/ActivityPlaceEntity';
+import { ActivityResponsibleEntity } from './Infraestructure Layer/database/Entities/ActivityResponsibleEntity';
+import { ArtistActivityEntity } from './Infraestructure Layer/database/Entities/ArtistActivityEntity';
+import { GroupActivityEntity } from './Infraestructure Layer/database/Entities/GroupActivity';
+import { ApprenticeEvaluationEntity } from './Infraestructure Layer/database/Entities/ApprenticeEvaluationEntity';
+import { ArtistCollaborationEntity } from './Infraestructure Layer/database/Entities/ArtistCollaborationEntity';
+import { ArtistGroupCollaborationEntity } from './Infraestructure Layer/database/Entities/ArtistGroupCollaborationEntity';
+import { ArtistGroupMembershipEntity } from './Infraestructure Layer/database/Entities/ArtistGroupMembershipEntity';
 import { ContractEntity } from './Infraestructure Layer/database/Entities/ContractEntity';
 import { IntervalEntity } from './Infraestructure Layer/database/Entities/IntervalEntity';
 import { BillboardListEntity } from './Infraestructure Layer/database/Entities/BillboardListEntity';
 import { SongEntity } from './Infraestructure Layer/database/Entities/SongEntity';
 import { EvaluationEntity } from './Infraestructure Layer/database/Entities/EvaluationEntity';
+import { ArtistAgencyMembershipEntity } from './Infraestructure Layer/database/Entities/ArtistAgencyMembershipEntity';
+
 
 export enum ApprenticeStatus{
     EN_ENTRENAMIENTO = "EN_ENTRENAMIENTO",
