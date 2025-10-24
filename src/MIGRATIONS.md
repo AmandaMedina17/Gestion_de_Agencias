@@ -1,21 +1,34 @@
 # 📘 Guía de Migraciones 
 
+Este documento explica cómo funcionan las **migraciones** en nuestro proyecto, cómo generarlas, ejecutarlas y revertirlas utilizando los comandos configurados en el archivo `package.json`.
+
+## 🧩 ¿Qué son las migraciones?
+
+Las **migraciones** son una forma controlada de **versionar los cambios en la base de datos**.  
+Cada vez que se modifica una entidad o el esquema de la base de datos, una migración registra esos cambios en un archivo de código para poder:
+
+- Aplicarlos automáticamente (`run`)
+- Revertirlos si algo sale mal (`revert`)
+- Mantener sincronizadas las estructuras de la base de datos entre entornos (desarrollo, pruebas, producción)
+
+---
+
 ## 🧩 Comando para Crear una Migración
 
-Una vez que se modifica o crea una entidad dentro del proyecto (por ejemplo, en `src/entities`), y se agregan las configuraciones, se debe generar la migración para reflejar esos cambios en la base de datos.
+Una vez que se modifica o crea una entidad dentro del proyecto, y se agregan las configuraciones, se debe generar la migración para reflejar esos cambios en la base de datos.
 
 ```bash
-npm run migration:generate -- ./src/migrations/NombreDeLaMigracion
+npm run migration:generate -- src/InfraestructureLayer/database/Migrations/NombreDeLaMigracion
 ```
 
 📘 **Ejemplo:**
 ```bash
-npm run migration:generate -- ./src/migrations/AddUserTable
+npm run migration:generate -- src/InfraestructureLayer/database/Migrations/AddUserTable
 ```
 
 👉 Este comando:
 - Detecta los cambios realizados en las entidades.
-- Crea un archivo de migración en la carpeta `src/migrations/`.
+- Crea un archivo de migración en la carpeta `src/InfraestructureLayer/database/Migrations`.
 - Registra las operaciones necesarias para actualizar el esquema de la base de datos.
 
 ---
@@ -75,10 +88,10 @@ npm run migration:show
 
 ## 🧭 Flujo Recomendado de Uso
 
-1. Modificar o agregar entidades en `src/entities/`.
+1. Modificar o agregar entidades en `src/InfraestructureLayer/database/Entities`.
 2. Generar una nueva migración:
    ```bash
-   npm run migration:generate -- ./src/migrations/NombreDeLaMigracion
+   npm run migration:generate -- src/InfraestructureLayer/database/Migrations/NombreDeLaMigracion
    ```
 3. Verificar el contenido del archivo generado.
 4. Aplicar las migraciones:
@@ -90,4 +103,5 @@ npm run migration:show
    ```bash
    npm run migration:revert
    ```
+
 
