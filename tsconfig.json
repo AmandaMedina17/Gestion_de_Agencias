@@ -15,11 +15,11 @@
     "moduleResolution": "node",
     "baseUrl": ".",
     "paths": {
-      "@domain/*": ["src/Domain Layer/*"],
-      "@application/*": ["src/Application Layer/*"],
-      "@infrastructure/*": ["src/Infrastructure Layer/*"],
-      "@presentation/*": ["src/Presentation Layer/*"],
-      "@entities/*": ["src/Infraestructure Layer/database/Entities/*"]
+      "@domain/*": ["src/DomainLayer/*"],
+      "@application/*": ["src/ApplicationLayer/*"],
+      "@infrastructure/*": ["src/InfrastructureLayer/*"],
+      "@presentation/*": ["src/PresentationLayer/*"],
+      "@entities/*": ["src/InfraestructureLayer/database/Entities/*"]
     }
   },
   "include": ["src/**/*"],
