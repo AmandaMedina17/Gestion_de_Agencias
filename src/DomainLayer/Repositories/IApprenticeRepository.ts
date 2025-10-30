@@ -1,9 +1,8 @@
-import { ApprenticeID } from "../Value Objects/IDs";
-import { ApprenticeEntity } from "../Entities/Apprentice";
-import { EvaluationEntity } from "../Entities/Evaluation";
+import { Apprentice } from "../Entities/Apprentice";
+import { Evaluation } from "../Entities/Evaluation";
 import { IRepository } from "./IRepository";
 
 export interface IApprenticeRepository
-  extends IRepository<ApprenticeEntity, ApprenticeID> {
-  getApprenticeEvaluations(id: ApprenticeID): Promise<EvaluationEntity[]>;
+  extends IRepository<Apprentice, string> {
+  getApprenticeEvaluations(id: string): Promise<Evaluation[]>;
 }

@@ -1,16 +1,14 @@
-import { AgencyEntity } from "../Entities/Agency";
-import { GroupEntity } from "../Entities/Group";
-import { ApprenticeEntity } from "../Entities/Apprentice";
-import { ArtistEntity } from "../Entities/Artist";
+import { Agency } from "../Entities/Agency";
+import { Group } from "../Entities/Group";
+import { Apprentice } from "../Entities/Apprentice";
+import { Artist } from "../Entities/Artist";
 import { AgencyID } from "../Value Objects/IDs";
 import { IRepository } from "./IRepository";
 
-export interface IAgencyRepository extends IRepository<AgencyEntity, AgencyID> {
-  findByName(name: string): Promise<AgencyEntity>;
-
-  getAgencyGroups(id: AgencyID): Promise<GroupEntity[]>;
-  getAgencyApprentices(id: AgencyID): Promise<ApprenticeEntity[]>;
-  getAgencyArtists(id: AgencyID): Promise<ArtistEntity[]>;
-
-  findActiveArtistsByAgency(agencyId: AgencyID): Promise<ArtistEntity[]>;
+export interface IAgencyRepository extends IRepository<Agency, string> {
+  findByName(name: string): Promise<Agency>;
+  getAgencyGroups(id: string): Promise<Group[]>;
+  getAgencyApprentices(id: string): Promise<Apprentice[]>;
+  getAgencyArtists(id: string): Promise<Artist[]>;
+  findActiveArtistsByAgency(agencyId: AgencyID): Promise<Artist[]>;
 }
