@@ -9,7 +9,7 @@ import { AgencyEntity } from "./AgencyEntity";
 
 export class ArtistEntity extends ApprenticeEntity{
   constructor(
-    id: string = uuidv4(),
+    id: string,
     entryDate: DateValue,
     agencyId: string,
     private statusArtist: ArtistStatus,

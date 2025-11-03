@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 
 export class GroupEntity {
     constructor(
-        private readonly id: string = uuidv4(),
+        private readonly id: string,
         private name: string,
         private status: GroupStatus,
         private debut_date: DateValue,

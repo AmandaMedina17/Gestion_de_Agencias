@@ -6,7 +6,7 @@ import { AlbumTitle, DateValue } from "../Value Objects/Values";
 export class AlbumEntity {
     private songs = []
     constructor(
-        private readonly id: string = uuidv4(),
+        private readonly id: string,
         private title: AlbumTitle,
         private releaseDate: DateValue,
         private mainProducer: string,

@@ -3,7 +3,7 @@ import { BillboardListEntity } from "./BillboardListEntity";
 
 export class SongEntity{
     constructor(
-        private readonly id: string = uuidv4(),
+        private readonly id: string,
         private nameSong: string,
         private albumId: string
     )

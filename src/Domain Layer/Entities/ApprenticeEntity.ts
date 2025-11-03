@@ -7,7 +7,7 @@ export class ApprenticeEntity {
   private evaluations: EvaluationEntity[] = [];
 
   constructor(
-    private readonly id: string = uuidv4(),
+    private readonly id: string,
     private fullName: string,
     private age: number,
     private entryDate: DateValue,

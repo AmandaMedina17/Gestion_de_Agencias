@@ -3,7 +3,7 @@ import { DateValue, Money } from "../Value Objects/Values";
 
 export class IngressEntity{
     constructor(
-        private readonly ingressId: string = uuidv4(),
+        private readonly ingressId: string,
         private activityId: string,
         private mount: Money,
         private date: DateValue,

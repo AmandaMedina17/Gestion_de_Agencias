@@ -2,13 +2,13 @@ import { ResponsibleID } from "../Value Objects/IDs";
 
 export class ResponsibleEntity{
     constructor(
-        private readonly id:ResponsibleID,
+        private readonly id: string,
         private name: string
     ){
 
     }
 
-    public getId(): ResponsibleID{
+    public getId(): string{
         return this.id;
     }
 

@@ -4,7 +4,7 @@ import {IntervalID} from "../Value Objects/IDs";
 
 export class IntervalEntity {
     constructor(
-        private readonly id: IntervalID,
+        private readonly id: string,
         private startDate: DateValue,
         private endDate: DateValue,
     ) {
@@ -15,7 +15,7 @@ export class IntervalEntity {
      * El metodo de validar deberia ir en el IntervalORM ya que siempre
      * va a pasar antes por ahi 
      */
-    
+
     private validate(): void {
         if (this.endDate.isBefore(this.startDate)) {
             throw new Error('La fecha final no puede ser anterior a la fecha de inicio');
@@ -135,7 +135,7 @@ export class IntervalEntity {
 
     //GETTERS
 
-    public getId(): IntervalID {
+    public getId(): string {
         return this.id;
     }
 

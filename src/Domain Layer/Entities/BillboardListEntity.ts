@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";;
 
 export class BillboardListEntity {
   constructor(
-    private readonly id: string = uuidv4(),
+    private readonly id: string,
     private publicDate: DateValue,
     private scope: BillboardListScope,
     private nameList: string,

@@ -6,7 +6,7 @@ import { IntervalEntity } from "./IntervalEntity";
 
 export class AgencyEntity {
   constructor(
-    private readonly id: string = uuidv4(),
+    private readonly id: string,
     private place: Place,
     private nameAgency: string,
     private dateFundation: DateValue

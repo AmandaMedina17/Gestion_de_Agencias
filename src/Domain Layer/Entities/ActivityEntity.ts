@@ -3,7 +3,7 @@ import { ActivityClassification, ActivityType } from "../Enums";
 
 export class ActivityEntity {
     constructor(
-        private readonly id : string = uuidv4(),
+        private readonly id : string,
         private classification: ActivityClassification,
         private type: ActivityType,
     ) {

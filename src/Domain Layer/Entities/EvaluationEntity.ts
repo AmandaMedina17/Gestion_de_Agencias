@@ -4,7 +4,7 @@ import { DateValue } from "../Value Objects/Values";
 
 export class EvaluationEntity {
   constructor(
-    private readonly id: string = uuidv4(),
+    private readonly id: string,
     private evaluationDate: DateValue, //esto es con fecha
     private evaluation: Evaluation
   ) {}

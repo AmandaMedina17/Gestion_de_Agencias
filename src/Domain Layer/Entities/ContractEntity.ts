@@ -7,7 +7,7 @@ import { IntervalEntity } from './IntervalEntity';
 
 export class ContractEntity {
     constructor(
-        private readonly id: string = uuidv4(),
+        private readonly id: string,
         private readonly interval: IntervalEntity,
         private readonly agency: AgencyEntity,
         private readonly artist: ArtistEntity,

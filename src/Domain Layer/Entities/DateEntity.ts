@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 
 export class DateEntity {
     constructor(
-        private readonly id: string = uuidv4(),
+        private readonly id: string,
         private date: DateValue
     )
     {

@@ -3,7 +3,7 @@ import { PrizeID } from "../Value Objects/IDs";
 
 export class PrizeEntity {
     constructor(
-        private readonly id: PrizeID,
+        private readonly id: string,
         private name: string,
         private date: DateValue
     ) {
@@ -35,7 +35,7 @@ export class PrizeEntity {
 
 
     // Getters
-    public getId(): PrizeID {
+    public getId(): string {
         return this.id;
     }
 
