@@ -49,6 +49,9 @@ export class DateValue {
         }
     }
 
+    public getValue(): Date{
+        return this.value;
+    }
 
     // Crea una DateValue a partir de un string en formato (YYYY-MM-DD)
     public static fromString(dateString: string): DateValue {

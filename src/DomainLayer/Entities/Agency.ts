@@ -21,6 +21,10 @@ export class Agency {
     return this.nameAgency;
   }
 
+  public getDateFundation(): DateValue {
+    return this.dateFundation;
+  }
+
   static create( place: Place, nameAgency: string, dateFundation: DateValue): Agency {
     const id = uuidv4();
     return new Agency(id, place, nameAgency, dateFundation);
