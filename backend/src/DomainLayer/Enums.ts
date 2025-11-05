@@ -19,7 +19,7 @@ export enum ArtistStatus{
     INACTIVO = "INACTIVO"
 }
 
-export enum EvaluationValue{
+export enum Evaluation{
     EXCELENTE = "EXCELENTE",
     BIEN = "BIEN",
     REGULAR = "REGULAR",
@@ -76,4 +76,10 @@ export enum GroupStatus{
 export enum BillboardListScope{
     INTERNACIONAL = "INTERNACIONAL",
     NACIONAL = "NACIONAL"
+}
+
+export enum UserRole {
+  AGENCY_MANAGER = 'AGENCY_MANAGER',
+  ARTIST = 'ARTIST',
+  ADMIN = 'ADMIN',
 }
