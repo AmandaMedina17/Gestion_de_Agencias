@@ -1,11 +1,11 @@
 import { v4 as uuidv4 } from 'uuid';
 
-export class Responsible{
+export class Place{
     constructor(
-        private readonly id: string,
-        private name: string
+      private readonly id: string,
+      private readonly name: string
     ){
-        this.validate();
+      this.validate();
     }
 
     private validate(): void {
@@ -18,16 +18,13 @@ export class Responsible{
       }
     }
 
-    static create( name: string): Responsible {
+    static create( name: string): Place {
       const id = uuidv4();
-      return new Responsible(id, name);
+      return new Place(id, name);
     }
 
-    public getId(): string{
-        return this.id;
-    }
+    public getId(): string { return this.id; }
+    
+    public getName(): string { return this.name; }
 
-    public getName(): string{
-        return this.name;
-    }
 }

@@ -235,14 +235,3 @@ export class DateValue {
     }
 }
 
-export class Place{
-    constructor(
-        private readonly country: string,
-        private readonly state: string,
-        private readonly namePlace: string
-    ){
-
-    }
-
-
-}

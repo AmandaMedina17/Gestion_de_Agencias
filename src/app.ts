@@ -1,6 +1,6 @@
 import 'tsconfig-paths/register';
 import 'reflect-metadata';
-import { connectDatabase } from './InfraestructureLayer/database/Config/data-source'
+import { connectDatabase } from './Config/ormconfig';
 
 const startApp = async () => {
   try {
