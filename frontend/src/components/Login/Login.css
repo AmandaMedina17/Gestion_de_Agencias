@@ -208,8 +208,6 @@
 }
 
 
-
-/* 🆕 Estilos para mensajes de error */
 .error-message {
   background-color: rgba(255, 0, 0, 0.1);
   color: #d32f2f;
@@ -221,7 +219,6 @@
   font-weight: bold;
 }
 
-/* 🆕 Estilos para cuentas de demo */
 .demo-accounts {
   margin-top: 20px;
   padding: 15px;
@@ -246,13 +243,11 @@
   color: white;
 }
 
-/* 🆕 Estilo para campos deshabilitados */
 .label_style:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-/* 🆕 Estilo para botón deshabilitado */
 .button_check:disabled {
   opacity: 0.6;
   cursor: not-allowed;

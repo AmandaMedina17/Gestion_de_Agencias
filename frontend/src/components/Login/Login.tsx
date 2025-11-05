@@ -1,46 +1,43 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext'; 
+import { authService } from '../../services/AuthService';
 import './Login.css';
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState(''); // Estado para errores
-  const [loading, setLoading] = useState(false); //  Estado para loading
-
-  const { login } = useAuth();
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    
     try {
-        // 🆕 LLAMADA REAL AL BACKEND
-        await login({ 
-          username: username,      // Cambiamos username por email
-          password: password 
-        });
-        
-        // 🆕 Redirigir según el rol del usuario (viene del backend)
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-        if (user.role === 'manager') {
-          navigate('/manager');
-        } else if (user.role === 'artist') {
-          navigate('/artist');
-        } else if (user.role === 'admin') {
-          navigate('/admin');
-        } else {
-          navigate('/dashboard');
-        }
-      } catch (err: any) {
-        // 🆕 Manejar errores del backend
-        setError(err.message || 'Error al iniciar sesión');
-      } finally {
-        setLoading(false);
+      // 🎯 Llamar al servicio de autenticación
+      const result = await authService.login({ username, password });
+      
+      // 🎯 Redirigir según el rol del usuario
+      if (result.user.role === 'manager') {
+        navigate('/manager');
+      } else if (result.user.role === 'artist') {
+        navigate('/artist');
+      } else if (result.user.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
       }
+
+      console.log('✅ Login exitoso:', result.user);
+    } catch (err: any) {
+      setError(err.message || 'Error al iniciar sesión');
+      console.error('❌ Error en login:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -63,7 +60,7 @@ const Login: React.FC = () => {
                 {error}
               </div>
             )}
-
+            
             <div className="input-container">
               <input
                 type="text"
@@ -103,14 +100,14 @@ const Login: React.FC = () => {
               <label htmlFor="show-password">Mostrar contraseña</label>
             </div>
 
+
             <button 
               type="submit" 
               className="button_check"
               disabled={loading}
             >
-              {loading ? 'Ingresando...' : 'Ingresar'} 
+              {loading ? 'Ingresando...' : 'Ingresar'}
             </button>
-
           </form>
         </div>
       </div>
