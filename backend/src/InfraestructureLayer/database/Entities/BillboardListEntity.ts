@@ -3,7 +3,7 @@ import { SongBillboardEntity } from "./SongBillboardEntity";
 
 @Entity('billboardList')
 export class BillboardListEntity{
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryGeneratedColumn()
     id!: string;
 
     @Column({ name: 'name' })
