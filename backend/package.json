@@ -1,0 +1,43 @@
+{
+  "name": "kpop-management",
+  "version": "1.0.0",
+  "description": "Sistema de gestión de agencias y grupos de K-pop",
+  "main": "dist/app.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/app.ts",
+    "migration:generate": "typeorm-ts-node-commonjs migration:generate -d src/Config/ormconfig.ts",
+    "migration:run": "typeorm-ts-node-commonjs migration:run -d src/Config/ormconfig.ts",
+    "migration:revert": "typeorm-ts-node-commonjs migration:revert -d src/Config/ormconfig.ts",
+    "migration:show": "typeorm-ts-node-commonjs migration:show -d src/Config/ormconfig.ts"
+  },
+  "dependencies": {
+    "@nestjs/jwt": "^11.0.1",
+    "@nestjs/passport": "^11.0.5",
+    "bcrypt": "^6.0.0",
+    "dotenv": "^16.3.0",
+    "express": "^5.1.0",
+    "passport": "^0.7.0",
+    "passport-jwt": "^4.0.1",
+    "pg": "^8.16.3",
+    "reflect-metadata": "^0.1.14",
+    "typeorm": "^0.3.27",
+    "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/node": "^20.19.22",
+    "@types/passport-jwt": "^4.0.1",
+    "@types/pg": "^8.15.5",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.9.3"
+  },
+  "keywords": [
+    "kpop",
+    "management",
+    "typeorm",
+    "typescript"
+  ],
+  "author": "Tu Nombre",
+  "license": "MIT"
+}
