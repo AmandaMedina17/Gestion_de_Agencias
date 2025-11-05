@@ -1,21 +1,14 @@
 import { DateValue } from "../Value Objects/Values";
-import {IntervalID} from "../Value Objects/IDs";
-
+import { v4 as uuidv4 } from "uuid";
 
 export class Interval {
     constructor(
-        private readonly id: IntervalID,
+        private readonly id: string,
         private startDate: DateValue,
         private endDate: DateValue,
     ) {
         this.validate();
     }
-    /**
-     * Att: Juanmy 
-     * El metodo de validar deberia ir en el IntervalORM ya que siempre
-     * va a pasar antes por ahi 
-     */
-    
     private validate(): void {
         if (this.endDate.isBefore(this.startDate)) {
             throw new Error('La fecha final no puede ser anterior a la fecha de inicio');
@@ -26,32 +19,30 @@ export class Interval {
         }
     }
 
-    /**
-     * Verifica si una fecha específica está dentro del intervalo
-     */
+    static create( startDate: DateValue, endDate: DateValue): Interval
+    {
+        const id = uuidv4();
+        return new Interval(id, startDate,endDate );
+    }
+
+    //Verifica si una fecha específica está dentro del intervalo   
     public containsDate(date: DateValue): boolean {
         return (date.equals(this.startDate) || date.isAfter(this.startDate)) &&
                (date.equals(this.endDate) || date.isBefore(this.endDate));
     }
 
-    /**
-     * Verifica si este intervalo se superpone con otro
-     */
+    //Verifica si este intervalo se superpone con otro
     public overlapsWith(other: Interval): boolean {
         return (this.startDate.isBefore(other.endDate) || this.startDate.equals(other.endDate)) &&
                (this.endDate.isAfter(other.startDate) || this.endDate.equals(other.startDate));
     }
 
-    /**
-     * Calcula la duración en días
-     */
+    //Calcula la duración en días
     public getDurationInDays(): number {
         return this.startDate.differenceInDays(this.endDate);
     }
 
-    /**
-     * Calcula la duración en meses
-     */
+    //Calcula la duración en meses
     public getDurationInMonths(): number {
         const startYear = this.startDate.getYear();
         const startMonth = this.startDate.getMonth();
@@ -61,9 +52,7 @@ export class Interval {
         return (endYear - startYear) * 12 + (endMonth - startMonth);
     }
 
-    /**
-     * Obtiene todas las fechas dentro del intervalo
-     */
+    //Obtiene todas las fechas dentro del intervalo
     public getAllDatesInInterval(): DateValue[] {
         const dates: DateValue[] = [];
         let currentDate = new Date(this.startDate.valueOf());
@@ -76,9 +65,7 @@ export class Interval {
         return dates;
     }
 
-    /**
-     * Extiende el intervalo en una cantidad específica de días
-     */
+    //Extiende el intervalo en una cantidad específica de días
     public extendInterval(days: number): void {
         if (days <= 0) {
             throw new Error('Los días de extensión deben ser positivos');
@@ -91,9 +78,7 @@ export class Interval {
         this.validate();
     }
 
-    /**
-     * Acorta el intervalo en una cantidad específica de días
-     */
+    //Acorta el intervalo en una cantidad específica de días
     public shortenInterval(days: number): void {
         if (days <= 0) {
             throw new Error('Los días de acortamiento deben ser positivos');
@@ -110,8 +95,7 @@ export class Interval {
         this.validate();
     }
 
-    // MÉTODOS DE ESTADO
-
+    // Metodos de estados
     public isActive(): boolean {
         const today = DateValue.today();
         return this.containsDate(today);
@@ -133,9 +117,8 @@ export class Interval {
         return DateValue.today().differenceInDays(this.endDate);
     }
 
-    //GETTERS
-
-    public getId(): IntervalID {
+    //Getters
+    public getId(): string {
         return this.id;
     }
 
@@ -147,8 +130,7 @@ export class Interval {
         return this.endDate;
     }
 
-    //SETTERS CON VALIDACIÓN
-
+    //Setters con validacion
     public setStartDate(newStartDate: DateValue): void {
         if (newStartDate.isAfter(this.endDate)) {
             throw new Error('La fecha de inicio no puede ser posterior a la fecha final');

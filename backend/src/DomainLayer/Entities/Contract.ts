@@ -1,15 +1,16 @@
 import { ContractStatus } from "../Enums";
 import { DateValue } from "../Value Objects/Values";
-import { AgencyEntity } from "./Agency";
-import { ArtistEntity } from "./Artist";
+import { Agency } from "./Agency";
+import { Artist } from "./Artist";
 import { Interval } from "./Interval";
+import { v4 as uuidv4 } from "uuid";
 
 export class Contract {
   constructor(
     private readonly id: string,
     private readonly interval: Interval,
-    private readonly agency: AgencyEntity,
-    private readonly artist: ArtistEntity,
+    private readonly agency: Agency,
+    private readonly artist: Artist,
     private distributionPercentage: number,
     private status: ContractStatus,
     private conditions: string
@@ -39,22 +40,22 @@ export class Contract {
     if (!this.conditions || this.conditions.length == 0) {
       throw new Error("Las condiciones del contrato son requeridas");
     }
-    this.validateContractDates();
+    // this.validateContractDates();
   }
 
-  private validateContractDates(): void {
-    // El contrato no puede empezar antes del debut del artista
-    if (this.interval.getStartDate().isBefore(this.artist.getDebutDate())) {
-      throw new Error(
-        "El contrato no puede empezar antes del debut del artista"
-      );
-    }
-    //Decirle a medina
-    // // El contrato no puede empezar antes de la fundación de la agencia
-    // if (this.interval.getStartDate().isBefore(this.agency.getDateFundation())) {
-    //     throw new Error('El contrato no puede empezar antes de la fundación de la agencia');
-    // }
+  static create( interval: Interval, agency: Agency, artist: Artist, distributionPercentage: number, status: ContractStatus, conditions: string): Contract {
+    const id = uuidv4();
+    return new Contract(id, interval, agency, artist, distributionPercentage,status,conditions);
   }
+  
+  // private validateContractDates(): void {
+  //   // El contrato no puede empezar antes del debut del artista
+  //   if (this.interval.getStartDate().isBefore(this.artist.getDebutDate())) {
+  //     throw new Error(
+  //       "El contrato no puede empezar antes del debut del artista"
+  //     );
+  //   }
+  // }
 
   // Métodos para modificar el estado del contrato
   public activate(): void {
@@ -177,11 +178,11 @@ export class Contract {
     return this.interval;
   }
 
-  public getAgencyId(): AgencyEntity {
+  public getAgencyId(): Agency {
     return this.agency;
   }
 
-  public getArtistId(): ArtistEntity {
+  public getArtistId(): Artist {
     return this.artist;
   }
 

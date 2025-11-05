@@ -1,8 +1,6 @@
-import { Place, DateValue } from "../Value Objects/Values";
+import { DateValue } from "../Value Objects/Values";
+import { Place } from "./Place";
 import { v4 as uuidv4 } from "uuid";
-import { ApprenticeEntity } from "./Apprentice";
-import { Group } from "./Group";
-import { Interval } from "./Interval";
 
 export class Agency {
   constructor(
@@ -24,9 +22,13 @@ export class Agency {
     return this.nameAgency;
   }
 
-  // public recruitApprentice(apprentice: ApprenticeEntity): void {
-  //   if (!this.recruitedApprentices.includes(apprentice)) {
-  //     this.recruitedApprentices.push(apprentice);
-  //   }
-  // }
+  public getDateFundation(): DateValue {
+    return this.dateFundation;
+  }
+
+  static create( place: Place, nameAgency: string, dateFundation: DateValue): Agency {
+    const id = uuidv4();
+    return new Agency(id, place, nameAgency, dateFundation);
+  }
+
 }
