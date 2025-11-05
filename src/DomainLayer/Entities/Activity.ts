@@ -1,4 +1,5 @@
 import { ActivityClassification, ActivityType } from "../Enums";
+import { v4 as uuidv4 } from 'uuid';
 
 export class Activity {
   constructor(
@@ -21,6 +22,11 @@ export class Activity {
     if (this.type === null || this.type === undefined) {
       throw new Error("Type cannot be null");
     }
+  }
+
+  static create( classification: ActivityClassification, type: ActivityType): Activity {
+    const id = uuidv4();
+    return new Activity(id, classification, type);
   }
 
   // Getters

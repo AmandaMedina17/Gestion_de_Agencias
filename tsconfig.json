@@ -19,9 +19,9 @@
       "@application/*": ["src/ApplicationLayer/*"],
       "@infrastructure/*": ["src/InfrastructureLayer/*"],
       "@presentation/*": ["src/PresentationLayer/*"],
-      "@entities/*": ["src/InfraestructureLayer/database/Entities/*"]
+      "@entities/*": ["src/InfraestructureLayer/database/Entities/*"],
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "src/Config/environment.ts"],
   "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }
