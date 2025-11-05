@@ -9,20 +9,23 @@ import { Agency } from "./Agency";
 
 export class Artist extends Apprentice {
   constructor(
-    id: string = uuidv4(),
-    entryDate: DateValue,
+    id: string,
+    entryDate: Date,
     agencyId: string,
     private statusArtist: ArtistStatus,
     private stageName: string,
     private realName: string,
-    private birthDate: DateValue,
-    private transitionDate: DateValue, //fecha del primer debut con el grupo
-    private groupId?: string
+    private birthDate: Date,
+    private transitionDate: Date, //fecha del primer debut con el grupo
+    private groupId?: string,
+    
   ) {
+
+    const age = Artist.calcularAnosTranscurridos(birthDate);
     super(
       id,
       realName,
-      birthDate.getAge(),
+      age,
       entryDate,
       ApprenticeTrainingLevel.AVANZADO,
       ApprenticeStatus.PROCESO_DE_SELECCION,
@@ -40,11 +43,11 @@ export class Artist extends Apprentice {
     return this.realName;
   }
 
-  public getBirthDate(): DateValue {
+  public getBirthDate(): Date {
     return this.birthDate;
   }
 
-  public getDebutDate(): DateValue {
+  public getDebutDate(): Date {
     if (this.transitionDate) return this.transitionDate;
     else throw new Error("No ha debutado");
   }
@@ -54,12 +57,25 @@ export class Artist extends Apprentice {
   }
 
   public getAge(): number {
-    return this.birthDate.getAge();
+    return this.getAge();
   }
 
-  public debut(groupId: string, debutDate: DateValue): void {
+  public debut(groupId: string, debutDate: Date): void {
     this.groupId = groupId;
     this.transitionDate = debutDate;
     this.statusArtist = ArtistStatus.ACTIVO;
+  }
+
+  private static calcularAnosTranscurridos(fecha: Date): number {
+    const hoy = new Date();
+    let anios = hoy.getFullYear() - fecha.getFullYear();
+    
+    // Ajustar si el cumpleaños no ha ocurrido este año
+    const cumpleaniosEsteAnio = new Date(hoy.getFullYear(), fecha.getMonth(), fecha.getDate());
+    if (hoy < cumpleaniosEsteAnio) {
+      anios--;
+    }
+    
+    return anios;
   }
 }

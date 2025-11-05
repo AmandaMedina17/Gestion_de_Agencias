@@ -1,5 +1,5 @@
 import { Entity, PrimaryColumn, Column, OneToMany } from "typeorm";
-import { Evaluation } from "@domain/Enums";
+import { EvaluationValue } from "@domain/Enums";
 import { ApprenticeEvaluationEntity } from "./ApprenticeEvaluationEntity";
 
 @Entity()
@@ -12,10 +12,10 @@ export class EvaluationEntity {
 
   @Column({
     type: "enum",
-    enum: Evaluation,
-    default: Evaluation.BIEN,
+    enum: EvaluationValue,
+    default: EvaluationValue.BIEN,
   })
-  evaluation!: Evaluation;
+  evaluation!: EvaluationValue;
 
   @OneToMany(
     () => ApprenticeEvaluationEntity,

@@ -19,7 +19,7 @@ export enum ArtistStatus{
     INACTIVO = "INACTIVO"
 }
 
-export enum Evaluation{
+export enum EvaluationValue{
     EXCELENTE = "EXCELENTE",
     BIEN = "BIEN",
     REGULAR = "REGULAR",

@@ -24,7 +24,7 @@ export class ArtistEntity{
     type: "enum",
     enum: ArtistStatus,
   })
-  statusArtist!: string;
+  statusArtist!: ArtistStatus;
 
   @Column({ name: "birth_date" })
   birthDate!: Date;
@@ -43,7 +43,7 @@ export class ArtistEntity{
   @OneToMany(() => AlbumEntity, (album: AlbumEntity) => album.artist)
   albums!: AlbumEntity[];
 
- // Un artista puede proponer cero o muchos grupos
+  // Un artista puede proponer cero o muchos grupos
   @OneToMany(() => GroupEntity, (group: GroupEntity) => group.proposedByArtist)
   proposedGroups!: GroupEntity[];
 

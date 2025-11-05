@@ -7,10 +7,10 @@ export class Apprentice {
   private evaluations: Evaluation[] = [];
 
   constructor(
-    private readonly id: string = uuidv4(),
+    private readonly id: string,
     private fullName: string,
     private age: number,
-    private entryDate: DateValue,
+    private entryDate: Date,
     private trainingLevel: ApprenticeTrainingLevel,
     private status: ApprenticeStatus,
     private agencyId: string
@@ -23,7 +23,7 @@ export class Apprentice {
       throw new Error("El nombre completo es requerido");
     }
 
-    if (this.entryDate.isFuture()) {
+    if (this.entryDate > new Date()) {
       throw new Error("La fecha de ingreso no puede ser en el futuro");
     }
   }
@@ -45,7 +45,7 @@ export class Apprentice {
   }
 
   //annadir evaluacion
-  public addEvaluation(evaluation: EvaluationEntity): void {
+  public addEvaluation(evaluation: Evaluation): void {
     this.evaluations.push(evaluation);
   }
 
@@ -79,7 +79,7 @@ export class Apprentice {
     return this.fullName;
   }
 
-  public getJoinDate(): DateValue {
+  public getJoinDate(): Date {
     return this.entryDate;
   }
 

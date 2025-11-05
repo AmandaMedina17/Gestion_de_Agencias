@@ -31,14 +31,16 @@ export class ApprenticeEntity {
   @Column({
     type: "enum",
     enum: ApprenticeStatus,
+    default: ApprenticeStatus.EN_ENTRENAMIENTO
   })
-  status!: string;
+  status!: ApprenticeStatus;
 
   @Column({
     type: "enum",
     enum: ApprenticeTrainingLevel,
+    default: ApprenticeTrainingLevel.PRINCIPIANTE
   })
-  trainingLevel!: string;
+  trainingLevel!: ApprenticeTrainingLevel;
 
   //Relaciones
   @ManyToOne(() => AgencyEntity, (agency) => agency.apprentices) //en una agencia pueden haber muchos aprendices
