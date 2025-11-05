@@ -77,3 +77,9 @@ export enum BillboardListScope{
     INTERNACIONAL = "INTERNACIONAL",
     NACIONAL = "NACIONAL"
 }
+
+export enum UserRole {
+  AGENCY_MANAGER = 'AGENCY_MANAGER',
+  ARTIST = 'ARTIST',
+  ADMIN = 'ADMIN',
+}
