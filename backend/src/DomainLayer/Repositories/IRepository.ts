@@ -1,7 +1,7 @@
-export abstract class IRepository<T> {
-  abstract findById(id: string): Promise<T | null>;
-  abstract findAll(): Promise<T[]>;
-  abstract save(entity: T): Promise<T>;
-  abstract update(entity: T): Promise<T>;
-  abstract delete(id: string): Promise<void>;
+export interface IRepository<T> {
+  findById(id: string): Promise<T | null>;
+  findAll(): Promise<T[]>;
+  save(entity: T): Promise<T>;
+  update(entity: T): Promise<T>;
+  delete(id: string): Promise<void>;
 }
