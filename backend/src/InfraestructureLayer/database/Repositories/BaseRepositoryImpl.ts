@@ -11,7 +11,7 @@ export class BaseRepository<
   
   constructor(
     protected readonly repository: Repository<DataBaseEntity>,
-    private readonly mapper: IMapper<DomainEntity, DataBaseEntity>
+    protected readonly mapper: IMapper<DomainEntity, DataBaseEntity>
   ) {}
 
   async findById(id: string): Promise<DomainEntity | null> {

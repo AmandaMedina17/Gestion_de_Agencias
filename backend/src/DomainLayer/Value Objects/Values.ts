@@ -142,7 +142,9 @@ export class DateValue {
                (this.equals(end) || this.isBefore(end));
     }
 
-
+    public getValue(): Date {
+        return new Date(this.value);
+    }
 
     //Calcula la edad en una fecha específica
     public getAgeAt(atDate: DateValue): number {

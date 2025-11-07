@@ -7,6 +7,7 @@ import { Group } from "./Group";
 import { Interval } from "./Interval";
 import { Agency } from "./Agency";
 
+
 export class Artist extends Apprentice {
   constructor(
     id: string,
