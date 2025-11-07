@@ -42,8 +42,9 @@ export class Contract {
     this.validateContractDates();
   }
 
-  private validateContractDates(): void {
+  //private validateContractDates(): void {
     // El contrato no puede empezar antes del debut del artista
+    // // El contrato no puede empezar antes del debut del artista
     // if (this.interval.getStartDate().isBefore(this.artist.getDebutDate())) {
     //   throw new Error(
     //     "El contrato no puede empezar antes del debut del artista"
@@ -54,7 +55,7 @@ export class Contract {
     // if (this.interval.getStartDate().isBefore(this.agency.getDateFundation())) {
     //     throw new Error('El contrato no puede empezar antes de la fundación de la agencia');
     // }
-  }
+  //}
 
   // Métodos para modificar el estado del contrato
   public activate(): void {
@@ -177,7 +178,8 @@ export class Contract {
     return this.interval;
   }
 
-  public getAgencyId(): Agency {
+
+  public getAgencyId(): Agency{
     return this.agency;
   }
 

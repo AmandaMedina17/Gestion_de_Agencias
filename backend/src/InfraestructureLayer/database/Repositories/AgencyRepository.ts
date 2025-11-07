@@ -1,139 +1,108 @@
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, In } from 'typeorm';
+import { BaseRepository } from './BaseRepositoryImpl';
 import { IAgencyRepository } from '@domain/Repositories/IAgencyRepository';
 import { Agency } from '@domain/Entities/Agency';
 import { Apprentice } from '@domain/Entities/Apprentice';
 import { Artist } from '@domain/Entities/Artist';
 import { Group } from '@domain/Entities/Group';
-import { AgencyMapper } from '../Mappers/AgencyMapper';
 import { ApprenticeMapper } from '../Mappers/ApprenticeMapper';
 import { ArtistMapper } from '../Mappers/ArtistMapper';
+import { AgencyMapper } from '../Mappers/AgencyMapper';
 import { GroupMapper } from '../Mappers/GroupMapper';
 import { AgencyEntity } from '../Entities/AgencyEntity';
-import { ApprenticeEntity } from '../Entities/ApprenticeEntity';
-import { ArtistAgencyMembershipEntity } from '../Entities/ArtistAgencyMembershipEntity';
-import { GroupEntity } from '../Entities/GroupEntity';
-import { ArtistStatus } from '@domain/Enums';
-import { AppDataSource } from 'src/Config/ormconfig';
 
-class AgencyRepository implements IAgencyRepository{
-    private agencyRepository = AppDataSource.getRepository(AgencyEntity);
-    private agencyMapper = new AgencyMapper();
-    private apprenticeMapper = new ApprenticeMapper();
-    private artistMapper = new ArtistMapper();
-    private groupMapper = new GroupMapper();
+@Injectable()
+export class AgencyRepositoryImpl 
+  extends BaseRepository<Agency, AgencyEntity>
+  implements IAgencyRepository 
+{
+  constructor(
+    @InjectRepository(AgencyEntity)
+    repository: Repository<AgencyEntity>,
+    mapper: AgencyMapper,
+    private readonly groupMapper: GroupMapper,
+    private readonly apprenticeMapper: ApprenticeMapper,
+    private readonly artistMapper: ArtistMapper
+  ) {
+    super(repository, mapper);
+  }
 
-    async findByName(name: string): Promise<Agency> {
-        const agencyEntity = await this.agencyRepository.findOne({
-        where: { name },
-        relations: ['apprentices', 'groups', 'artistMemberships']
-        });
+  async findByName(name: string): Promise<Agency> {
+    const entity = await this.repository.findOne({ 
+      where: { name } 
+    });
+    if (!entity) {
+      throw new Error('Agency not found');
+    }
+    return this.mapper.toDomainEntity(entity);
+  }
 
-        if (!agencyEntity) {
-        throw new Error('Agency not found');
-        }
+  async getAgencyGroups(id: string): Promise<Group[]> {
+    const agencyEntity = await this.repository.findOne({
+      where: { id },
+      relations: ['groups']
+    });
 
-        return this.agencyMapper.toDomainEntity(agencyEntity);
+    if (!agencyEntity || !agencyEntity.groups) {
+      return [];
     }
 
+    return this.groupMapper.toDomainEntities(agencyEntity.groups);
+  }
 
-    async getAgencyGroups(id: string): Promise<Group[]> {
-        const agencyEntity = await this.agencyRepository.findOne({
-        where: { id },
-        relations: ['groups']
-        });
+  async getAgencyApprentices(id: string): Promise<Apprentice[]> {
+    const agencyEntity = await this.repository.findOne({
+      where: { id },
+      relations: ['apprentices']
+    });
 
-        if (!agencyEntity) {
-        throw new Error('Agency not found');
-        }
-
-        return agencyEntity.groups.map((groupEntity : GroupEntity) => 
-        this.groupMapper.toDomainEntity(groupEntity)
-        );
-        
-    }
-    async getAgencyApprentices(id: string): Promise<Apprentice[]> {
-        const agencyEntity = await this.agencyRepository.findOne({
-        where: { id },
-        relations: ['apprentices']
-        });
-
-        if (!agencyEntity) {
-        throw new Error('Agency not found');
-        }
-
-        return agencyEntity.apprentices.map((apprenticeEntity: ApprenticeEntity) => 
-        this.apprenticeMapper.toDomainEntity(apprenticeEntity)
-        );
-    }
-    
-    async getAgencyArtists(id: string): Promise<Artist[]> {
-        const agencyEntity = await this.agencyRepository.findOne({
-        where: { id },
-        relations: ['artistMemberships', 'artistMemberships.artist']
-        });
-
-        if (!agencyEntity) {
-        throw new Error('Agency not found');
-        }
-
-        return agencyEntity.artistMemberships.map((membership: ArtistAgencyMembershipEntity) => 
-        this.artistMapper.toDomainEntity(membership.artist)
-        );
-    }
-    
-    async findActiveArtistsByAgency(agencyId: string): Promise<Artist[]> {
-        const agencyEntity = await this.agencyRepository.findOne({
-            where: { id: agencyId },
-            relations: ['artistMemberships', 'artistMemberships.artist']
-        });
-
-        if (!agencyEntity) {
-            throw new Error('Agency not found');
-        }
-
-        const activeMemberships = agencyEntity.artistMemberships.filter(
-            (membership: ArtistAgencyMembershipEntity) => 
-                membership.artist && 
-                membership.artist.statusArtist === ArtistStatus.ACTIVO // Usando el enum
-        );
-
-        return activeMemberships.map((membership:ArtistAgencyMembershipEntity) => 
-            this.artistMapper.toDomainEntity(membership.artist)
-        );
+    if (!agencyEntity || !agencyEntity.apprentices) {
+      return [];
     }
 
-    async findById(id: string): Promise<Agency> {
-        const agencyEntity = await this.agencyRepository.findOne({
-        where: { id },
-        relations: ['apprentices', 'groups', 'artistMemberships']
-        });
+    return this.apprenticeMapper.toDomainEntities(agencyEntity.apprentices);
+  }
 
-        if (!agencyEntity) {
-        throw new Error('Agency not found');
-        }
+  async getAgencyArtists(id: string): Promise<Artist[]> {
+    // Para artistas, necesitamos cargar las membresías
+    const agencyEntity = await this.repository.findOne({
+      where: { id },
+      relations: ['artistMemberships', 'artistMemberships.artist']
+    });
 
-        return this.agencyMapper.toDomainEntity(agencyEntity);
-    }
-    async findAll(): Promise<Agency[]> {
-        const agencyEntities = await this.agencyRepository.find({
-        relations: ['apprentices', 'groups', 'artistMemberships']
-        });
-
-        return agencyEntities.map((entity : AgencyEntity) => 
-        this.agencyMapper.toDomainEntity(entity)
-        );
+    if (!agencyEntity || !agencyEntity.artistMemberships) {
+      return [];
     }
 
-    async save(domainEntity: Agency): Promise<Agency> {
-        const agencyEntity = this.agencyMapper.toDataBaseEntity(domainEntity);
-        const savedEntity = await this.agencyRepository.save(agencyEntity);
-        return this.agencyMapper.toDomainEntity(savedEntity);
-    }
-    async delete(id: string): Promise<void> {
-        const result = await this.agencyRepository.delete(id);
-        
-        if (result.affected === 0) {
-        throw new Error('Agency not found for deletion');
-        }
+    // Extraer los artistas de las membresías
+    const artistEntities = agencyEntity.artistMemberships
+      .map(membership => membership.artist)
+      .filter(artist => artist !== undefined);
+
+    return this.artistMapper.toDomainEntities(artistEntities);
+  }
+
+  async findActiveArtistsByAgency(agencyId: string): Promise<Artist[]> {
+    const agencyEntity = await this.repository.findOne({
+      where: { id: agencyId },
+      relations: [
+        'artistMemberships', 
+        'artistMemberships.artist',
+        'artistMemberships.artist.apprenticeId'
+      ]
+    });
+
+    if (!agencyEntity || !agencyEntity.artistMemberships) {
+      return [];
     }
 
+    // Filtrar artistas activos
+    const activeArtistEntities = agencyEntity.artistMemberships
+      .map(membership => membership.artist)
+      .filter(artist => artist && artist.statusArtist === 'ACTIVO');
+
+    return this.artistMapper.toDomainEntities(activeArtistEntities);
+  }
 }

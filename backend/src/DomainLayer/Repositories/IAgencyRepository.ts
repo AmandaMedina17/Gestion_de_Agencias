@@ -4,10 +4,10 @@ import { Apprentice } from "../Entities/Apprentice";
 import { Artist } from "../Entities/Artist";
 import { IRepository } from "./IRepository";
 
-export interface IAgencyRepository extends IRepository<Agency, string> {
-  findByName(name: string): Promise<Agency>;
-  getAgencyGroups(id: string): Promise<Group[]>;
-  getAgencyApprentices(id: string): Promise<Apprentice[]>;
-  getAgencyArtists(id: string): Promise<Artist[]>;
-  findActiveArtistsByAgency(agencyId: string): Promise<Artist[]>;
+export abstract class IAgencyRepository extends IRepository<Agency> {
+  abstract findByName(name: string): Promise<Agency>;
+  abstract getAgencyGroups(id: string): Promise<Group[]>;
+  abstract getAgencyApprentices(id: string): Promise<Apprentice[]>;
+  abstract getAgencyArtists(id: string): Promise<Artist[]>;
+  abstract findActiveArtistsByAgency(agencyId: string): Promise<Artist[]>;
 }

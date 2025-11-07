@@ -5,7 +5,7 @@ import { Album } from "../Entities/Album";
 import { Contract } from "../Entities/Contract";
 import { IRepository } from "./IRepository";
 
-export interface IArtistRepository extends IRepository<Artist, string> {
+export interface IArtistRepository extends IRepository<Artist> {
   findArtistsWithScheduleConflicts(
     startDate: Date,
     endDate: Date

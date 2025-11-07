@@ -5,10 +5,10 @@ import { IMapper } from "./IMapper";
 
 export class IntervalMapper implements IMapper<Interval, IntervalEntity> {
     toDomainEntities(entities: IntervalEntity[]): Interval[] {
-        throw new Error('Method not implemented.');
+        return entities.map(entity => this.toDomainEntity(entity));
     }
     toDataBaseEntities(domains: Interval[]): IntervalEntity[] {
-        throw new Error('Method not implemented.');
+         return domains.map(domain => this.toDataBaseEntity(domain));
     }
     toDomainEntity(dataBaseEntity: IntervalEntity): Interval {
         
@@ -36,8 +36,6 @@ export class IntervalMapper implements IMapper<Interval, IntervalEntity> {
 
         const endDate = domainEntity.getStartDate();
         //intervalEntity.endDate= endDate.getValue();
-
-        //Manejar lo de las cosas complejas
 
         return intervalEntity;
     }

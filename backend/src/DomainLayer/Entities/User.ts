@@ -8,6 +8,10 @@ export class User {
     public password: string,
     private role : UserRole,
     public isActive: boolean
+    private readonly id: string,
+    private username: string,
+    private password: string,
+    private role : UserRole
   ) {
     this.validate();
   }
@@ -20,6 +24,7 @@ export class User {
   static create(username: string, password: string, role : UserRole): User {
     const id = uuidv4();
     return new User(id, username, password, role, true);
+
   }
 
   // Getters

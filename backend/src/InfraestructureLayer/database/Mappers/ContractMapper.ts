@@ -7,10 +7,10 @@ import { Interval } from '@domain/Entities/Interval';
 
 export class ContractMapper implements IMapper<Contract, ContractEntity> {
     toDomainEntities(entities: ContractEntity[]): Contract[] {
-        throw new Error('Method not implemented.');
+        return entities.map(entity => this.toDomainEntity(entity));
     }
     toDataBaseEntities(domains: Contract[]): ContractEntity[] {
-        throw new Error('Method not implemented.');
+        return domains.map(domain => this.toDataBaseEntity(domain));
     }
     toDomainEntity(dataBaseEntity: ContractEntity): Contract {
         // Método base - solo para la estructura simple
