@@ -1,6 +1,7 @@
 import { DateValue } from "../Value Objects/Values";
 import { v4 as uuidv4 } from "uuid";
 
+
 export class Interval {
     constructor(
         private readonly id: string,
@@ -117,7 +118,8 @@ export class Interval {
         return DateValue.today().differenceInDays(this.endDate);
     }
 
-    //Getters
+    //GETTERS
+
     public getId(): string {
         return this.id;
     }

@@ -1,4 +1,3 @@
-import { ApprenticeID } from "../Value Objects/IDs";
 import { Artist } from "../Entities/Artist";
 import { Group } from "../Entities/Group";
 import { Agency } from "../Entities/Agency";
@@ -6,24 +5,24 @@ import { Album } from "../Entities/Album";
 import { Contract } from "../Entities/Contract";
 import { IRepository } from "./IRepository";
 
-export interface IArtistRepository extends IRepository<Artist, ApprenticeID> {
+export interface IArtistRepository extends IRepository<Artist, string> {
   findArtistsWithScheduleConflicts(
     startDate: Date,
     endDate: Date
   ): Promise<Artist[]>;
 
-  getArtistAgencies(id: ApprenticeID): Promise<Agency[]>;
+  getArtistAgencies(id: string): Promise<Agency[]>;
 
-  getArtistAlbums(id: ApprenticeID): Promise<Album[]>;
+  getArtistAlbums(id: string): Promise<Album[]>;
 
   // Historial profesional de un artista:
-  getCurrentArtistContracts(id: ApprenticeID): Promise<Contract[]>;
+  getCurrentArtistContracts(id: string): Promise<Contract[]>;
 
-  getArtistGroups(id: ApprenticeID): Promise<Group[]>;
+  getArtistGroups(id: string): Promise<Group[]>;
 
-  getArtistDebutsInOrders(id: ApprenticeID): Promise<null>; //Que hay que devolver??
+  getArtistDebutsInOrders(id: string): Promise<null>; //Que hay que devolver??
 
-  getArtist_ArtistColaborations(id: ApprenticeID): Promise<Artist[]>;
+  getArtist_ArtistColaborations(id: string): Promise<Artist[]>;
 
-  getArtist_GroupsColaborations(id: ApprenticeID): Promise<Group[]>;
+  getArtist_GroupsColaborations(id: string): Promise<Group[]>;
 }

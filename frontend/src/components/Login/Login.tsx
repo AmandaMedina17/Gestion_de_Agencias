@@ -1,27 +1,49 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import './Login.css';
+
+export enum UserRole {
+  AGENCY_MANAGER = 'AGENCY_MANAGER',
+  ARTIST = 'ARTIST',
+  ADMIN = 'ADMIN',
+}
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState(''); // Estado para errores
+  const [loading, setLoading] = useState(false); //  Estado para loading
+
+  const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (username && password) {
-      if (username.includes('admin')) {
-        navigate('/admin');
-      } else if (username.includes('manager')) {
-        navigate('/manager');
-      } else {
-        alert('Usuario no reconocido. Use "admin" o "manager" en el nombre.');
+    setLoading(true);
+    setError('');
+    try {
+        // 🆕 LLAMADA REAL AL BACKEND
+        await login({ username, password });
+        
+        // 🆕 Redirigir según el rol del usuario (viene del backend)
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        if (user.role === UserRole.AGENCY_MANAGER) {
+          navigate('/manager');
+        } else if (user.role === UserRole.ARTIST) {
+          navigate('/artist');
+        } else if (user.role === UserRole.ADMIN) {
+          navigate('/admin');
+        } else {
+          navigate('/dashboard');
+        }
+      } catch (err: any) {
+        // 🆕 Manejar errores del backend
+        setError(err.message || 'Error al iniciar sesión');
+      } finally {
+        setLoading(false);
       }
-    } else {
-      alert('Por favor complete ambos campos');
-    }
   };
 
   return (
@@ -39,6 +61,12 @@ const Login: React.FC = () => {
           <form className="login-form" onSubmit={handleLogin}>
             <h2 className='sign_in'>SIGN IN</h2>
 
+            {error && (
+              <div className="error-message">
+                {error}
+              </div>
+            )}
+
             <div className="input-container">
               <input
                 type="text"
@@ -48,6 +76,7 @@ const Login: React.FC = () => {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
+                disabled={loading}
               />
               <span className="input-icon">👤</span>
             </div>
@@ -61,6 +90,7 @@ const Login: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                disabled={loading}
               />
               <span className="input-icon">🔒</span>
             </div>
@@ -71,14 +101,19 @@ const Login: React.FC = () => {
                 id="show-password"
                 checked={showPassword}
                 onChange={() => setShowPassword(!showPassword)}
+                disabled={loading}
               />
               <label htmlFor="show-password">Mostrar contraseña</label>
             </div>
 
-
-            <button type="submit" className="button_check">
-              Ingresar
+            <button 
+              type="submit" 
+              className="button_check"
+              disabled={loading}
+            >
+              {loading ? 'Ingresando...' : 'Ingresar'} 
             </button>
+
           </form>
         </div>
       </div>

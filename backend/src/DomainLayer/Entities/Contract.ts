@@ -43,10 +43,22 @@ export class Contract {
     // this.validateContractDates();
   }
 
-  static create( interval: Interval, agency: Agency, artist: Artist, distributionPercentage: number, status: ContractStatus, conditions: string): Contract {
-    const id = uuidv4();
-    return new Contract(id, interval, agency, artist, distributionPercentage,status,conditions);
-  }
+  // static create( interval: Interval, agency: Agency, artist: Artist, distributionPercentage: number, status: ContractStatus, conditions: string): Contract {
+  //   const id = uuidv4();
+  //   return new Contract(id, interval, agency, artist, distributionPercentage,status,conditions);
+  // private validateContractDates(): void {
+  //   // El contrato no puede empezar antes del debut del artista
+  //   // if (this.interval.getStartDate().isBefore(this.artist.getDebutDate())) {
+  //   //   throw new Error(
+  //   //     "El contrato no puede empezar antes del debut del artista"
+  //   //   );
+  //   // }
+  //   //Decirle a medina
+  //   // // El contrato no puede empezar antes de la fundación de la agencia
+  //   // if (this.interval.getStartDate().isBefore(this.agency.getDateFundation())) {
+  //   //     throw new Error('El contrato no puede empezar antes de la fundación de la agencia');
+  //   // }
+  // }
   
   // private validateContractDates(): void {
   //   // El contrato no puede empezar antes del debut del artista
