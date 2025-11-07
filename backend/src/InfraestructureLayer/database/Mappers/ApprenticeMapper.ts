@@ -1,10 +1,16 @@
-import { IMapper } from "../database/IMapper";
+import { IMapper } from "./IMapper";
 import { Apprentice } from "@domain/Entities/Apprentice";
 import { ApprenticeEntity } from "@entities/ApprenticeEntity";
 import { ApprenticeTrainingLevel } from "@domain/Enums";
 import { ApprenticeStatus } from "@domain/Enums";
 
-class ApprenticeMapper implements IMapper<Apprentice, ApprenticeEntity>{
+export class ApprenticeMapper implements IMapper<Apprentice, ApprenticeEntity>{
+    toDomainEntities(entities: ApprenticeEntity[]): Apprentice[] {
+        throw new Error("Method not implemented.");
+    }
+    toDataBaseEntities(domains: Apprentice[]): ApprenticeEntity[] {
+        throw new Error("Method not implemented.");
+    }
     toDomainEntity(dataBaseEntity: ApprenticeEntity): Apprentice {
         return new Apprentice(
             dataBaseEntity.id,

@@ -1,28 +1,41 @@
-import { Controller, Post, Body, Get, UseGuards, Request } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { LoginDto } from '@presentation/dtos/request/LoginDto';
-import { JwtAuthGuard } from '../guards/jwt-auth.guard';
+// import { Controller, Post, Body, Get, UseGuards, Request } from '@nestjs/common';
+// import { LoginUseCase } from '../../ApplicationLayer/uses_cases/LoginUseCase';
+// import { LoginDto } from '../../PresentationLayer/dtos/request/LoginDto';
+// import { JwtStrategy } from '../../InfraestructureLayer/database/Security/JWTStrategy';
 
-@Controller('auth')
-export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+// interface AuthenticatedUser {
+//   id: string;
+//   username: string;
+//   role: string;
+//   name: string;
+// }
 
-  @Post('login')
-  async login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
-  }
+// interface RequestWithUser extends Request {
+//   user: AuthenticatedUser;
+// }
 
-  @Get('profile')
-  @UseGuards(JwtAuthGuard)
-  getProfile(@Request() req) {
-    // 🎯 Endpoint protegido - solo accesible con token válido
-    return req.user;
-  }
+// @Controller('auth')
+// export class AuthController {
+//   constructor(private readonly loginUseCase: LoginUseCase) {}
 
-  @Post('validate')
-  @UseGuards(JwtAuthGuard)
-  validateToken() {
-    // 🎯 Endpoint para validar token
-    return { valid: true, message: 'Token válido' };
-  }
-}
+//   @Post('login')
+//   async login(@Body() loginDto: LoginDto) {
+//     return this.loginUseCase.execute(loginDto);
+//   }
+
+//   @Get('profile')
+//   @UseGuards(JwtStrategy)
+//   getProfile(@Request() req: RequestWithUser) { // ✅ Tipo explícito
+//     return req.user;
+//   }
+
+//   @Post('validate')
+//   @UseGuards(JwtStrategy)
+//   validateToken(@Request() req: RequestWithUser) { // ✅ También tipado
+//     return { 
+//       valid: true, 
+//       message: 'Token válido',
+//       user: req.user // ✅ Acceso seguro al usuario
+//     };
+//   }
+// }

@@ -1,10 +1,9 @@
 import { DateValue } from "../Value Objects/Values";
-import {IntervalID} from "../Value Objects/IDs";
 
 
 export class Interval {
     constructor(
-        private readonly id: IntervalID,
+        private readonly id: string,
         private startDate: DateValue,
         private endDate: DateValue,
     ) {
@@ -135,7 +134,7 @@ export class Interval {
 
     //GETTERS
 
-    public getId(): IntervalID {
+    public getId(): string {
         return this.id;
     }
 

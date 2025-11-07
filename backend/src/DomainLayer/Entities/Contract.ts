@@ -1,15 +1,15 @@
 import { ContractStatus } from "../Enums";
 import { DateValue } from "../Value Objects/Values";
-import { AgencyEntity } from "./Agency";
-import { ArtistEntity } from "./Artist";
+import { Agency } from "./Agency";
+import { Artist } from "./Artist";
 import { Interval } from "./Interval";
 
 export class Contract {
   constructor(
     private readonly id: string,
     private readonly interval: Interval,
-    private readonly agency: AgencyEntity,
-    private readonly artist: ArtistEntity,
+    private readonly agency: Agency,
+    private readonly artist: Artist,
     private distributionPercentage: number,
     private status: ContractStatus,
     private conditions: string
@@ -44,11 +44,11 @@ export class Contract {
 
   private validateContractDates(): void {
     // El contrato no puede empezar antes del debut del artista
-    if (this.interval.getStartDate().isBefore(this.artist.getDebutDate())) {
-      throw new Error(
-        "El contrato no puede empezar antes del debut del artista"
-      );
-    }
+    // if (this.interval.getStartDate().isBefore(this.artist.getDebutDate())) {
+    //   throw new Error(
+    //     "El contrato no puede empezar antes del debut del artista"
+    //   );
+    // }
     //Decirle a medina
     // // El contrato no puede empezar antes de la fundación de la agencia
     // if (this.interval.getStartDate().isBefore(this.agency.getDateFundation())) {
@@ -177,11 +177,11 @@ export class Contract {
     return this.interval;
   }
 
-  public getAgencyId(): AgencyEntity {
+  public getAgencyId(): Agency {
     return this.agency;
   }
 
-  public getArtistId(): ArtistEntity {
+  public getArtistId(): Artist {
     return this.artist;
   }
 

@@ -1,9 +1,16 @@
 import { Agency } from "@domain/Entities/Agency";
 import { AgencyEntity } from "../Entities/AgencyEntity";
-import { Place, DateValue } from "@domain/Value Objects/Values";
+import { DateValue } from "@domain/Value Objects/Values";
+import { Place } from "@domain/Entities/Place";
 import { IMapper } from "./IMapper";
 
 export class AgencyMapper implements IMapper<Agency, AgencyEntity> {
+  toDomainEntities(entities: AgencyEntity[]): Agency[] {
+    throw new Error("Method not implemented.");
+  }
+  toDataBaseEntities(domains: Agency[]): AgencyEntity[] {
+    throw new Error("Method not implemented.");
+  }
   
   toDomainEntity(dataBaseEntity: AgencyEntity): Agency {
     try {
@@ -12,7 +19,7 @@ export class AgencyMapper implements IMapper<Agency, AgencyEntity> {
       const place = new Place(
         placeData.country,
         placeData.state, 
-        placeData.namePlace
+        //placeData.namePlace
       );
 
       // Reconstruir el Value Object DateValue desde la fecha almacenada
@@ -42,14 +49,14 @@ export class AgencyMapper implements IMapper<Agency, AgencyEntity> {
     // Serializar el Value Object Place a JSON string
     const place = domainEntity.getPlace();
     agencyEntity.place = JSON.stringify({
-      country: place['country'], // Accediendo a la propiedad privada
-      state: place['state'],
-      namePlace: place['namePlace']
+      // country: place['country'], // Accediendo a la propiedad privada
+      // state: place['state'],
+      // namePlace: place['namePlace']
     });
 
     // Convertir DateValue a Date
-    const dateFundation = domainEntity.getDateFundation();
-    agencyEntity.dateFundation = dateFundation.getValue();
+    // const dateFundation = domainEntity.getDateFundation();
+    // agencyEntity.dateFundation = dateFundation.getValue();
 
     // Las relaciones se manejan en el repositorio
     agencyEntity.apprentices = [];

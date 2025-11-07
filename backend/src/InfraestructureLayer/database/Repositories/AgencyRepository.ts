@@ -12,7 +12,7 @@ import { ApprenticeEntity } from '../Entities/ApprenticeEntity';
 import { ArtistAgencyMembershipEntity } from '../Entities/ArtistAgencyMembershipEntity';
 import { GroupEntity } from '../Entities/GroupEntity';
 import { ArtistStatus } from '@domain/Enums';
-import { AppDataSource } from "src/";
+import { AppDataSource } from 'src/Config/ormconfig';
 
 class AgencyRepository implements IAgencyRepository{
     private agencyRepository = AppDataSource.getRepository(AgencyEntity);

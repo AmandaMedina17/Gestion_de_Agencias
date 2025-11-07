@@ -4,7 +4,7 @@ import { SongBillboardEntity } from "./SongBillboardEntity";
 
 @Entity('song')
 export class SongEntity{
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryGeneratedColumn()
     id!: string;
 
     @Column({ name: 'name' })

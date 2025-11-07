@@ -1,43 +1,49 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authService } from '../../services/AuthService';
+import { useAuth } from '../../context/AuthContext';
 import './Login.css';
+
+export enum UserRole {
+  AGENCY_MANAGER = 'AGENCY_MANAGER',
+  ARTIST = 'ARTIST',
+  ADMIN = 'ADMIN',
+}
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(''); // Estado para errores
+  const [loading, setLoading] = useState(false); //  Estado para loading
+
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-    
     try {
-      // 🎯 Llamar al servicio de autenticación
-      const result = await authService.login({ username, password });
-      
-      // 🎯 Redirigir según el rol del usuario
-      if (result.user.role === 'manager') {
-        navigate('/manager');
-      } else if (result.user.role === 'artist') {
-        navigate('/artist');
-      } else if (result.user.role === 'admin') {
-        navigate('/admin');
-      } else {
-        navigate('/dashboard');
+        // 🆕 LLAMADA REAL AL BACKEND
+        await login({ username, password });
+        
+        // 🆕 Redirigir según el rol del usuario (viene del backend)
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        if (user.role === UserRole.AGENCY_MANAGER) {
+          navigate('/manager');
+        } else if (user.role === UserRole.ARTIST) {
+          navigate('/artist');
+        } else if (user.role === UserRole.ADMIN) {
+          navigate('/admin');
+        } else {
+          navigate('/dashboard');
+        }
+      } catch (err: any) {
+        // 🆕 Manejar errores del backend
+        setError(err.message || 'Error al iniciar sesión');
+      } finally {
+        setLoading(false);
       }
-
-      console.log('✅ Login exitoso:', result.user);
-    } catch (err: any) {
-      setError(err.message || 'Error al iniciar sesión');
-      console.error('❌ Error en login:', err);
-    } finally {
-      setLoading(false);
-    }
   };
 
   return (
@@ -60,7 +66,7 @@ const Login: React.FC = () => {
                 {error}
               </div>
             )}
-            
+
             <div className="input-container">
               <input
                 type="text"
@@ -100,14 +106,14 @@ const Login: React.FC = () => {
               <label htmlFor="show-password">Mostrar contraseña</label>
             </div>
 
-
             <button 
               type="submit" 
               className="button_check"
               disabled={loading}
             >
-              {loading ? 'Ingresando...' : 'Ingresar'}
+              {loading ? 'Ingresando...' : 'Ingresar'} 
             </button>
+
           </form>
         </div>
       </div>

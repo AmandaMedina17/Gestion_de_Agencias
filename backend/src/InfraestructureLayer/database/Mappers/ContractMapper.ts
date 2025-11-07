@@ -6,6 +6,12 @@ import { Artist } from '@domain/Entities/Artist';
 import { Interval } from '@domain/Entities/Interval';
 
 export class ContractMapper implements IMapper<Contract, ContractEntity> {
+    toDomainEntities(entities: ContractEntity[]): Contract[] {
+        throw new Error('Method not implemented.');
+    }
+    toDataBaseEntities(domains: Contract[]): ContractEntity[] {
+        throw new Error('Method not implemented.');
+    }
     toDomainEntity(dataBaseEntity: ContractEntity): Contract {
         // Método base - solo para la estructura simple
         return new Contract(
