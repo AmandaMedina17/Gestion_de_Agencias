@@ -32,10 +32,10 @@ export class IntervalMapper implements IMapper<Interval, IntervalEntity> {
 
         intervalEntity.id = domainEntity.getId();
         const startDate = domainEntity.getStartDate();
-        intervalEntity.startDate= startDate.getValue();
+        //intervalEntity.startDate= startDate.;
 
         const endDate = domainEntity.getStartDate();
-        intervalEntity.endDate= endDate.getValue();
+        //intervalEntity.endDate= endDate.getValue();
 
         return intervalEntity;
     }

@@ -1,8 +1,14 @@
-import { IMapper } from "../database/IMapper";
+import { IMapper } from "./IMapper";
 import { Evaluation } from "@domain/Entities/Evaluation";
 import { EvaluationEntity } from "@entities/EvaluationEntity";
 
 class EvaluationMapper implements IMapper<Evaluation, EvaluationEntity>{
+    toDomainEntities(entities: EvaluationEntity[]): Evaluation[] {
+        throw new Error("Method not implemented.");
+    }
+    toDataBaseEntities(domains: Evaluation[]): EvaluationEntity[] {
+        throw new Error("Method not implemented.");
+    }
     toDomainEntity(dataBaseEntity: EvaluationEntity): Evaluation {
         return new Evaluation(
             dataBaseEntity.id,

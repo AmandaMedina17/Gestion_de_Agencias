@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext'; 
+import { useAuth } from '../../context/AuthContext';
 import './Login.css';
+
+export enum UserRole {
+  AGENCY_MANAGER = 'AGENCY_MANAGER',
+  ARTIST = 'ARTIST',
+  ADMIN = 'ADMIN',
+}
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -19,18 +25,15 @@ const Login: React.FC = () => {
     setError('');
     try {
         // 🆕 LLAMADA REAL AL BACKEND
-        await login({ 
-          username: username,      // Cambiamos username por email
-          password: password 
-        });
+        await login({ username, password });
         
         // 🆕 Redirigir según el rol del usuario (viene del backend)
         const user = JSON.parse(localStorage.getItem('user') || '{}');
-        if (user.role === 'manager') {
+        if (user.role === UserRole.AGENCY_MANAGER) {
           navigate('/manager');
-        } else if (user.role === 'artist') {
+        } else if (user.role === UserRole.ARTIST) {
           navigate('/artist');
-        } else if (user.role === 'admin') {
+        } else if (user.role === UserRole.ADMIN) {
           navigate('/admin');
         } else {
           navigate('/dashboard');

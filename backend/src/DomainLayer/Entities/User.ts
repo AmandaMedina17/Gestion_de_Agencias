@@ -3,6 +3,11 @@ import { v4 as uuidv4 } from 'uuid';
 
 export class User {
   constructor(
+    public readonly id: string,
+    public username: string,
+    public password: string,
+    private role : UserRole,
+    public isActive: boolean
     private readonly id: string,
     private username: string,
     private password: string,
@@ -18,7 +23,8 @@ export class User {
 
   static create(username: string, password: string, role : UserRole): User {
     const id = uuidv4();
-    return new User(id, username, password, role);
+    return new User(id, username, password, role, true);
+
   }
 
   // Getters

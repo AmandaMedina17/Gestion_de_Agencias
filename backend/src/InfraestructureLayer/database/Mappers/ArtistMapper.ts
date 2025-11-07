@@ -1,9 +1,15 @@
-import { IMapper } from "../database/IMapper";
+import { IMapper } from "./IMapper";
 import { Artist } from "@domain/Entities/Artist";
 import { ArtistEntity } from "@entities/ArtistEntity";
 import { ArtistStatus } from "@domain/Enums";
 
-class ArtistMapper implements IMapper<Artist, ArtistEntity>{
+export class ArtistMapper implements IMapper<Artist, ArtistEntity>{
+    toDomainEntities(entities: ArtistEntity[]): Artist[] {
+        throw new Error("Method not implemented.");
+    }
+    toDataBaseEntities(domains: Artist[]): ArtistEntity[] {
+        throw new Error("Method not implemented.");
+    }
     toDomainEntity(dataBaseEntity: ArtistEntity): Artist {
         return new Artist(
             dataBaseEntity.id,

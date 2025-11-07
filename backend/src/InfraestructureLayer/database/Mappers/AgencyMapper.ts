@@ -40,8 +40,8 @@ export class AgencyMapper implements IMapper<Agency, AgencyEntity> {
     agencyEntity.place = domainEntity.getPlace();
 
     // Convertir DateValue a Date
-    const dateFundation = domainEntity.getDateFundation();
-    agencyEntity.dateFundation = dateFundation.getValue();
+    // const dateFundation = domainEntity.getDateFundation();
+    // agencyEntity.dateFundation = dateFundation.getValue();
 
     // Las relaciones se manejan en el repositorio
     agencyEntity.apprentices = [];
