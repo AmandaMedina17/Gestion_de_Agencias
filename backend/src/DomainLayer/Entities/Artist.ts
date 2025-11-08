@@ -1,36 +1,31 @@
 import { v4 as uuidv4 } from "uuid";
 import { DateValue } from "../Value Objects/Values";
 import { ApprenticeStatus, ApprenticeTrainingLevel } from "../Enums";
-import { ArtistRole, ArtistStatus } from "../Enums";
+import { ArtistStatus } from "../Enums";
 import { Apprentice } from "./Apprentice";
-import { Group } from "./Group";
-import { Interval } from "./Interval";
-import { Agency } from "./Agency";
 
 
 export class Artist extends Apprentice {
   constructor(
     id: string,
-    entryDate: Date,
-    agencyId: string,
+    entryDate: DateValue,
     private statusArtist: ArtistStatus,
     private stageName: string,
     private realName: string,
-    private birthDate: Date,
-    private transitionDate: Date, //fecha del primer debut con el grupo
+    private birthDate: DateValue,
+    private transitionDate: DateValue, //fecha del primer debut con el grupo
     private groupId?: string,
     
   ) {
 
-    const age = Artist.calcularAnosTranscurridos(birthDate);
+    const age = Artist.calculateElapsedYears(birthDate);
     super(
       id,
       realName,
       age,
       entryDate,
       ApprenticeTrainingLevel.AVANZADO,
-      ApprenticeStatus.PROCESO_DE_SELECCION,
-      agencyId
+      ApprenticeStatus.PROCESO_DE_SELECCION
     );
   }
 
@@ -44,11 +39,11 @@ export class Artist extends Apprentice {
     return this.realName;
   }
 
-  public getBirthDate(): Date {
+  public getBirthDate(): DateValue {
     return this.birthDate;
   }
 
-  public getDebutDate(): Date {
+  public getDebutDate(): DateValue {
     if (this.transitionDate) return this.transitionDate;
     else throw new Error("No ha debutado");
   }
@@ -58,25 +53,35 @@ export class Artist extends Apprentice {
   }
 
   public getAge(): number {
-    return this.getAge();
-  }
+  return Artist.calculateElapsedYears(this.birthDate);
+}
 
-  public debut(groupId: string, debutDate: Date): void {
+  public debut(groupId: string, debutDate: DateValue): void {
     this.groupId = groupId;
     this.transitionDate = debutDate;
     this.statusArtist = ArtistStatus.ACTIVO;
   }
 
-  private static calcularAnosTranscurridos(fecha: Date): number {
-    const hoy = new Date();
-    let anios = hoy.getFullYear() - fecha.getFullYear();
+  private static calculateElapsedYears(date: DateValue): number {
+    const today = DateValue.today();
+    let years = today.getYear() - date.getYear();
     
     // Ajustar si el cumpleaños no ha ocurrido este año
-    const cumpleaniosEsteAnio = new Date(hoy.getFullYear(), fecha.getMonth(), fecha.getDate());
-    if (hoy < cumpleaniosEsteAnio) {
-      anios--;
+    const birthdayThisYear = DateValue.fromNumber(
+        today.getYear(), 
+        date.getMonth(), 
+        date.getDay()
+    );
+    
+    if (today.isBefore(birthdayThisYear)) {
+        years--;
     }
     
-    return anios;
-  }
+    return years;
+}
+
+  // public create(entryDate: Date, statusArtist: ArtistStatus, stageName: string, realName: string, birthDate: Date, transitionDate: Date, groupId?: string,): Artist {
+  //   const id = uuidv4();
+  //   return new Artist(id, entryDate, statusArtist, stageName, realName, birthDate, transitionDate, groupId);
+  // }
 }

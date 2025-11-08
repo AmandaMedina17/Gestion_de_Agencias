@@ -1,5 +1,6 @@
 import { GroupStatus } from "../Enums";
 import { DateValue } from "../Value Objects/Values";
+import { v4 as uuidv4 } from 'uuid';
 
 export class Group {
   constructor(
@@ -72,5 +73,10 @@ export class Group {
 
   public getYearsSinceDebut(): number {
     return DateValue.today().getYear() - this.debut_date.getYear();
+  }
+
+  public create( name: string, status: GroupStatus, debut_date: DateValue, members: number, concept: string, is_reated: boolean) : Group {
+    const id = uuidv4();
+    return new Group(id, name, status, debut_date, members, concept, is_reated);
   }
 }
