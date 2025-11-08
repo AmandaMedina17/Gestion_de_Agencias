@@ -1,6 +1,6 @@
-export interface IMapper <DomainEntity, DataBaseEntity> {
-    toDomainEntity(dataBaseEntity : DataBaseEntity) : DomainEntity;
-    toDataBaseEntity(domainEntity : DomainEntity) : DataBaseEntity;
-    toDomainEntities(entities: DataBaseEntity[]): DomainEntity[];
-    toDataBaseEntities(domains: DomainEntity[]): DataBaseEntity[]
+export abstract class IMapper <DomainEntity, DataBaseEntity> {
+    abstract toDomainEntity(dataBaseEntity : DataBaseEntity) : DomainEntity;
+    abstract toDataBaseEntity(domainEntity : DomainEntity) : DataBaseEntity;
+    abstract toDomainEntities(entities: DataBaseEntity[]): DomainEntity[];
+    abstract toDataBaseEntities(domains: DomainEntity[]): DataBaseEntity[]
 }

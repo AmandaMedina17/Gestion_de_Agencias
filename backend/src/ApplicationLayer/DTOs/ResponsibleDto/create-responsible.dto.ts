@@ -1,5 +1,11 @@
+import { IsNotEmpty, IsString } from "class-validator";
+
 export class CreateResponsibleDto {
-    constructor(
-    public readonly name: string, 
-  ) {}
+    @IsNotEmpty()
+    @IsString()
+    name!: string;
+}
+
+export class ResponsibleResponseDto {
+  name!: string;
 }
