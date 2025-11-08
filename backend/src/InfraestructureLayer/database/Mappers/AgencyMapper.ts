@@ -24,7 +24,7 @@ export class AgencyMapper implements IMapper<Agency, AgencyEntity> {
         dataBaseEntity.id,
         place,
         dataBaseEntity.name,
-        dateFundation
+        dataBaseEntity.dateFundation
       );
     } catch (error) {
       throw new Error(`Error mapping database entity to domain: ${error}`);
@@ -38,11 +38,8 @@ export class AgencyMapper implements IMapper<Agency, AgencyEntity> {
     agencyEntity.id = domainEntity.getId();
     agencyEntity.name = domainEntity.getName();
     agencyEntity.place = domainEntity.getPlace();
-
-    // Convertir DateValue a Date
-    // const dateFundation = domainEntity.getDateFundation();
-    // agencyEntity.dateFundation = dateFundation.getValue();
-
+    agencyEntity.dateFundation = domainEntity.getDateFundation();
+    
     // Las relaciones se manejan en el repositorio
     agencyEntity.apprentices = [];
     agencyEntity.groups = [];
