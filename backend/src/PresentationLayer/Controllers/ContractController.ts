@@ -1,7 +1,7 @@
-// // presentation/controllers/AgencyController.ts
+// // presentation/controllers/ContractController.ts
 import { Controller, Get, Post, Put, Delete, Body, Param, Query, Inject } from '@nestjs/common';
-// import { ContractService } from '../../../application/agency/services/ContractService';
-// import { CreateContractUseCase } from '../../../application/agency/use-cases/CreateAgencyUseCase';
+// import { ContractService } from '../../../application/contract/services/ContractService';
+// import { CreateContractUseCase } from '../../../application/contract/use-cases/CreateContractUseCase';
 import { Contract } from '../../DomainLayer/Entities/Contract';
 
 @Controller('contracts')

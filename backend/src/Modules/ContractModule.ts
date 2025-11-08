@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AgencyEntity } from '@entities/AgencyEntity';
+import { ContractEntity } from '@entities/ContractEntity';
 import { IMapper } from 'src/InfraestructureLayer/database/Mappers/IMapper';
 import { ContractMapper } from 'src/InfraestructureLayer/database/Mappers/ContractMapper';
 import { IContractRepository } from '@domain/Repositories/IContractRepository';
@@ -10,7 +10,7 @@ import { Contract } from '../DomainLayer/Entities/Contract';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([AgencyEntity])
+    TypeOrmModule.forFeature([ContractEntity])
   ],
   controllers: [ContractController],
   providers: [
