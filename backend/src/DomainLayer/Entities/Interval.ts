@@ -1,5 +1,5 @@
 import { DateValue } from "../Value Objects/Values";
-
+import { v4 as uuidv4 } from 'uuid';
 
 export class Interval {
     constructor(
@@ -9,12 +9,11 @@ export class Interval {
     ) {
         this.validate();
     }
-    /**
-     * Att: Juanmy 
-     * El metodo de validar deberia ir en el IntervalORM ya que siempre
-     * va a pasar antes por ahi 
-     */
     
+    public create(startDate: DateValue, endDate: DateValue) : Interval {
+        const id =  uuidv4();
+        return new Interval(id, startDate, endDate);
+    }
     private validate(): void {
         if (this.endDate.isBefore(this.startDate)) {
             throw new Error('La fecha final no puede ser anterior a la fecha de inicio');

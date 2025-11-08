@@ -1,4 +1,5 @@
 import { DateValue} from "../Value Objects/Values";
+import { v4 as uuidv4 } from 'uuid';
 
 export class Prize {
     constructor(
@@ -32,7 +33,10 @@ export class Prize {
         }
     }
 
-
+    public create(name: string, date: DateValue): Prize {
+        const id = uuidv4();
+        return new Prize(id, name,date);
+    }
     // Getters
     public getId(): string {
         return this.id;

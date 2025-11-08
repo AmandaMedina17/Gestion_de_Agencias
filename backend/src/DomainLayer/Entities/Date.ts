@@ -1,4 +1,5 @@
 import { DateValue } from "../Value Objects/Values";
+import { v4 as uuidv4 } from 'uuid';
 
 export class Date {
     constructor(
@@ -7,6 +8,10 @@ export class Date {
     )
     {
     }
+    public create(date : DateValue) : Date {
+        const id = uuidv4();
+        return new Date(id, date);
+    } 
 
     // ✅ MÉTODOS DE ESTADO
 

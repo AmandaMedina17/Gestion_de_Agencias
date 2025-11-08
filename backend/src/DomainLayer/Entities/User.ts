@@ -4,14 +4,10 @@ import { v4 as uuidv4 } from 'uuid';
 export class User {
   constructor(
     public readonly id: string,
-    public username: string,
-    public password: string,
-    private role : UserRole,
-    public isActive: boolean
-    private readonly id: string,
     private username: string,
     private password: string,
-    private role : UserRole
+    private role : UserRole,
+    private isActive: boolean
   ) {
     this.validate();
   }

@@ -10,10 +10,9 @@ export class Apprentice {
     private readonly id: string,
     private fullName: string,
     private age: number,
-    private entryDate: Date,
+    private entryDate: DateValue,
     private trainingLevel: ApprenticeTrainingLevel,
     private status: ApprenticeStatus,
-    private agencyId: string
   ) {
     this.validate();
   }
@@ -23,7 +22,7 @@ export class Apprentice {
       throw new Error("El nombre completo es requerido");
     }
 
-    if (this.entryDate > new Date()) {
+    if (this.entryDate.isFuture()) {
       throw new Error("La fecha de ingreso no puede ser en el futuro");
     }
   }
@@ -79,7 +78,7 @@ export class Apprentice {
     return this.fullName;
   }
 
-  public getJoinDate(): Date {
+  public getJoinDate(): DateValue {
     return this.entryDate;
   }
 
@@ -93,5 +92,10 @@ export class Apprentice {
 
   public getAge(): number {
     return this.age;
+  }
+
+  public create(fullName: string, age: number, entryDate: DateValue, trainingLevel: ApprenticeTrainingLevel, status: ApprenticeStatus){
+    const id = uuidv4();
+    return new Apprentice(id, fullName, age, entryDate, trainingLevel, status);
   }
 }

@@ -1,10 +1,4 @@
 import { DateValue } from "../Value Objects/Values";
-import { Place } from "./Place";
-import { v4 as uuidv4 } from "uuid";
-import { Apprentice } from "./Apprentice";
-import { Group } from "./Group";
-import { Interval } from "./Interval";
-import {DateValue } from "../Value Objects/Values";
 import { v4 as uuidv4 } from "uuid";
 
 export class Agency {
