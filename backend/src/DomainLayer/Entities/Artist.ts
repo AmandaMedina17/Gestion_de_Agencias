@@ -8,12 +8,12 @@ import { Apprentice } from "./Apprentice";
 export class Artist extends Apprentice {
   constructor(
     id: string,
-    entryDate: DateValue,
+    entryDate: Date,
     private statusArtist: ArtistStatus,
     private stageName: string,
     private realName: string,
-    private birthDate: DateValue,
-    private transitionDate: DateValue, //fecha del primer debut con el grupo
+    private birthDate: Date,
+    private transitionDate: Date, //fecha del primer debut con el grupo
     private groupId?: string,
     
   ) {
@@ -39,11 +39,11 @@ export class Artist extends Apprentice {
     return this.realName;
   }
 
-  public getBirthDate(): DateValue {
+  public getBirthDate(): Date {
     return this.birthDate;
   }
 
-  public getDebutDate(): DateValue {
+  public getDebutDate(): Date {
     if (this.transitionDate) return this.transitionDate;
     else throw new Error("No ha debutado");
   }
@@ -56,29 +56,24 @@ export class Artist extends Apprentice {
   return Artist.calculateElapsedYears(this.birthDate);
 }
 
-  public debut(groupId: string, debutDate: DateValue): void {
+  public debut(groupId: string, debutDate: Date): void {
     this.groupId = groupId;
     this.transitionDate = debutDate;
     this.statusArtist = ArtistStatus.ACTIVO;
   }
 
-  private static calculateElapsedYears(date: DateValue): number {
-    const today = DateValue.today();
-    let years = today.getYear() - date.getYear();
+  private static calculateElapsedYears(date: Date): number {
+    const today = new Date();
+    let years = today.getFullYear() - date.getFullYear();
     
     // Ajustar si el cumpleaños no ha ocurrido este año
-    const birthdayThisYear = DateValue.fromNumber(
-        today.getYear(), 
-        date.getMonth(), 
-        date.getDay()
-    );
-    
-    if (today.isBefore(birthdayThisYear)) {
-        years--;
+    const birthdayThisYear = new Date(today.getFullYear(), date.getMonth(), date.getDate());
+    if (today < birthdayThisYear) {
+      years--;
     }
     
     return years;
-}
+  }
 
   // public create(entryDate: Date, statusArtist: ArtistStatus, stageName: string, realName: string, birthDate: Date, transitionDate: Date, groupId?: string,): Artist {
   //   const id = uuidv4();

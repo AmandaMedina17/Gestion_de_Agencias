@@ -4,22 +4,25 @@ import { v4 as uuidv4 } from 'uuid';
 export class Interval {
     constructor(
         private readonly id: string,
-        private startDate: DateValue,
-        private endDate: DateValue,
+        private startDate: Date,
+        private endDate: Date,
     ) {
         this.validate();
     }
     
-    public create(startDate: DateValue, endDate: DateValue) : Interval {
+    public create(startDate: Date, endDate: Date) : Interval {
         const id =  uuidv4();
         return new Interval(id, startDate, endDate);
     }
     private validate(): void {
-        if (this.endDate.isBefore(this.startDate)) {
+        if (this.endDate < this.startDate) {
             throw new Error('La fecha final no puede ser anterior a la fecha de inicio');
         }
 
-        if (this.startDate.equals(this.endDate)) {
+        const startWithoutTime = new Date(this.startDate.getFullYear(), this.startDate.getMonth(), this.startDate.getDate());
+        const endWithoutTime = new Date(this.endDate.getFullYear(), this.endDate.getMonth(), this.endDate.getDate());
+        
+        if (startWithoutTime.getTime() === endWithoutTime.getTime()) {
             throw new Error('El intervalo debe tener al menos un día de duración');
         }
     }
@@ -27,33 +30,40 @@ export class Interval {
     /**
      * Verifica si una fecha específica está dentro del intervalo
      */
-    public containsDate(date: DateValue): boolean {
-        return (date.equals(this.startDate) || date.isAfter(this.startDate)) &&
-               (date.equals(this.endDate) || date.isBefore(this.endDate));
+    public containsDate(date: Date): boolean {
+        const dateWithoutTime = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        const startWithoutTime = new Date(this.startDate.getFullYear(), this.startDate.getMonth(), this.startDate.getDate());
+        const endWithoutTime = new Date(this.endDate.getFullYear(), this.endDate.getMonth(), this.endDate.getDate());
+        
+        return dateWithoutTime >= startWithoutTime && dateWithoutTime <= endWithoutTime;
     }
 
     /**
      * Verifica si este intervalo se superpone con otro
      */
     public overlapsWith(other: Interval): boolean {
-        return (this.startDate.isBefore(other.endDate) || this.startDate.equals(other.endDate)) &&
-               (this.endDate.isAfter(other.startDate) || this.endDate.equals(other.startDate));
+        return (this.startDate < other.endDate || this.startDate == other.endDate) &&
+               (this.endDate < other.startDate || this.endDate == other.startDate);
     }
 
     /**
      * Calcula la duración en días
      */
     public getDurationInDays(): number {
-        return this.startDate.differenceInDays(this.endDate);
+        const start = new Date(this.startDate.getFullYear(), this.startDate.getMonth(), this.startDate.getDate());
+        const end = new Date(this.endDate.getFullYear(), this.endDate.getMonth(), this.endDate.getDate());
+        
+        const diffTime = Math.abs(end.getTime() - start.getTime());
+        return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     }
 
     /**
      * Calcula la duración en meses
      */
     public getDurationInMonths(): number {
-        const startYear = this.startDate.getYear();
+        const startYear = this.startDate.getFullYear();
         const startMonth = this.startDate.getMonth();
-        const endYear = this.endDate.getYear();
+        const endYear = this.endDate.getFullYear();
         const endMonth = this.endDate.getMonth();
         
         return (endYear - startYear) * 12 + (endMonth - startMonth);
@@ -62,12 +72,17 @@ export class Interval {
     /**
      * Obtiene todas las fechas dentro del intervalo
      */
-    public getAllDatesInInterval(): DateValue[] {
-        const dates: DateValue[] = [];
-        let currentDate = new Date(this.startDate.valueOf());
+    public getAllDatesInInterval(): Date[] {
+        const dates: Date[] = [];
+        const currentDate = new Date(this.startDate);
         
-        while (currentDate <= new Date(this.endDate.valueOf())) {
-            dates.push(DateValue.fromString(currentDate.toISOString().split('T')[0]));
+        // Normalizar a medianoche para evitar problemas de hora
+        currentDate.setHours(0, 0, 0, 0);
+        const endDateNormalized = new Date(this.endDate);
+        endDateNormalized.setHours(0, 0, 0, 0);
+        
+        while (currentDate <= endDateNormalized) {
+            dates.push(new Date(currentDate));
             currentDate.setDate(currentDate.getDate() + 1);
         }
         
@@ -82,10 +97,10 @@ export class Interval {
             throw new Error('Los días de extensión deben ser positivos');
         }
         
-        const newEndDate = new Date(this.endDate.valueOf());
+        const newEndDate = new Date(this.endDate);
         newEndDate.setDate(newEndDate.getDate() + days);
         
-        this.endDate = DateValue.fromString(newEndDate.toISOString().split('T')[0]);
+        this.endDate = newEndDate;
         this.validate();
     }
 
@@ -97,38 +112,49 @@ export class Interval {
             throw new Error('Los días de acortamiento deben ser positivos');
         }
         
-        const newEndDate = new Date(this.endDate.valueOf());
+        const newEndDate = new Date(this.endDate);
         newEndDate.setDate(newEndDate.getDate() - days);
         
-        if (newEndDate <= new Date(this.startDate.valueOf())) {
+        if (newEndDate <= this.startDate) {
             throw new Error('No se puede acortar el intervalo por debajo de un día de duración');
         }
         
-        this.endDate = DateValue.fromString(newEndDate.toISOString().split('T')[0]);
+        this.endDate = newEndDate;
         this.validate();
     }
 
     // MÉTODOS DE ESTADO
 
     public isActive(): boolean {
-        const today = DateValue.today();
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Normalizar a medianoche
         return this.containsDate(today);
     }
 
     public isFuture(): boolean {
-        return this.startDate.isFuture();
+        return this.startDate > new Date();
     }
 
     public isPast(): boolean {
-        return this.endDate.isPast();
+        return this.endDate < new Date();
     }
 
     public daysUntilStart(): number {
-        return DateValue.today().differenceInDays(this.startDate);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const startWithoutTime = new Date(this.startDate.getFullYear(), this.startDate.getMonth(), this.startDate.getDate());
+        
+        const diffTime = Math.abs(startWithoutTime.getTime() - today.getTime());
+        return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     }
 
     public daysUntilEnd(): number {
-        return DateValue.today().differenceInDays(this.endDate);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const endWithoutTime = new Date(this.endDate.getFullYear(), this.endDate.getMonth(), this.endDate.getDate());
+        
+        const diffTime = Math.abs(endWithoutTime.getTime() - today.getTime());
+        return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     }
 
     //GETTERS
@@ -137,18 +163,18 @@ export class Interval {
         return this.id;
     }
 
-    public getStartDate(): DateValue {
+    public getStartDate(): Date {
         return this.startDate;
     }
 
-    public getEndDate(): DateValue {
+    public getEndDate(): Date {
         return this.endDate;
     }
 
     //SETTERS CON VALIDACIÓN
 
-    public setStartDate(newStartDate: DateValue): void {
-        if (newStartDate.isAfter(this.endDate)) {
+    public setStartDate(newStartDate: Date): void {
+        if (newStartDate > this.endDate) {
             throw new Error('La fecha de inicio no puede ser posterior a la fecha final');
         }
         
@@ -156,8 +182,8 @@ export class Interval {
         this.validate();
     }
 
-    public setEndDate(newEndDate: DateValue): void {
-        if (newEndDate.isBefore(this.startDate)) {
+    public setEndDate(newEndDate: Date): void {
+        if (newEndDate < this.startDate) {
             throw new Error('La fecha final no puede ser anterior a la fecha de inicio');
         }
         
