@@ -40,7 +40,7 @@ export class Contract {
     if (!this.conditions || this.conditions.length == 0) {
       throw new Error("Las condiciones del contrato son requeridas");
     }
-    this.validateContractDates();
+    //this.validateContractDates();
   }
 
   public create( interval: Interval, agency: Agency, artist: Artist, distributionPercentage: number, status: ContractStatus, conditions: string) : Contract {
@@ -48,14 +48,14 @@ export class Contract {
     return new Contract(id, interval, agency, artist, distributionPercentage, status, conditions);
   }
 
-  private validateContractDates(): void {
-    // El contrato no puede empezar antes del debut del artista
-    if (this.interval.getStartDate().isBefore(this.artist.getDebutDate())) {
-      throw new Error(
-        "El contrato no puede empezar antes del debut del artista"
-      );
-    }
-  }
+  // private validateContractDates(): void {
+  //   // El contrato no puede empezar antes del debut del artista
+  //   if (this.interval.getStartDate().isBefore(this.artist.getDebutDate())) {
+  //     throw new Error(
+  //       "El contrato no puede empezar antes del debut del artista"
+  //     );
+  //   }
+  // }
 
   // Métodos para modificar el estado del contrato
   public activate(): void {

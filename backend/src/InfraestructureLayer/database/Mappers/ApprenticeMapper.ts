@@ -18,8 +18,7 @@ export class ApprenticeMapper implements IMapper<Apprentice, ApprenticeEntity>{
             dataBaseEntity.age,
             new Date(dataBaseEntity.entryDate),
             dataBaseEntity.trainingLevel ,
-            dataBaseEntity.status,
-            dataBaseEntity.agencyId
+            dataBaseEntity.status
         )
     }
     toDataBaseEntity(domainEntity: Apprentice): ApprenticeEntity {

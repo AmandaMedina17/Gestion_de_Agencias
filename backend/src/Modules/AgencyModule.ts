@@ -5,7 +5,7 @@ import { IMapper } from 'src/InfraestructureLayer/database/Mappers/IMapper';
 import { AgencyMapper } from 'src/InfraestructureLayer/database/Mappers/AgencyMapper';
 import { IAgencyRepository } from '@domain/Repositories/IAgencyRepository';
 import { AgencyRepositoryImpl} from 'src/InfraestructureLayer/database/Repositories/AgencyRepository';
-import { AgencyController } from '@presentation/Controllers/AgencyController';
+import { AgencyController } from '../PresentationLayer/controllers/AgencyController';
 
 @Module({
   imports: [

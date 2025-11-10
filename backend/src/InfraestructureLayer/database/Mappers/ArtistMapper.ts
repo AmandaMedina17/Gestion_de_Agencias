@@ -14,7 +14,7 @@ export class ArtistMapper implements IMapper<Artist, ArtistEntity>{
         return new Artist(
             dataBaseEntity.id,
             dataBaseEntity.apprenticeId.entryDate,
-            dataBaseEntity.apprenticeId.agencyId,
+            //dataBaseEntity.apprenticeId.agencyId,
             dataBaseEntity.statusArtist,
             dataBaseEntity.stageName,
             dataBaseEntity.apprenticeId.fullName,

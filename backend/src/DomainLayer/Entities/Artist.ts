@@ -1,5 +1,4 @@
 import { v4 as uuidv4 } from "uuid";
-import { DateValue } from "../Value Objects/Values";
 import { ApprenticeStatus, ApprenticeTrainingLevel } from "../Enums";
 import { ArtistStatus } from "../Enums";
 import { Apprentice } from "./Apprentice";
@@ -8,17 +7,17 @@ import { Apprentice } from "./Apprentice";
 export class Artist extends Apprentice {
   constructor(
     id: string,
-    entryDate: DateValue,
+    entryDate: Date,
     private statusArtist: ArtistStatus,
     private stageName: string,
     private realName: string,
-    private birthDate: DateValue,
-    private transitionDate: DateValue, //fecha del primer debut con el grupo
+    private birthDate: Date,
+    private transitionDate: Date, //fecha del primer debut con el grupo
     private groupId?: string,
     
   ) {
 
-    const age = Artist.calculateElapsedYears(birthDate);
+    const age = Artist.calcularAnosTranscurridos(birthDate);
     super(
       id,
       realName,
@@ -39,11 +38,11 @@ export class Artist extends Apprentice {
     return this.realName;
   }
 
-  public getBirthDate(): DateValue {
+  public getBirthDate(): Date {
     return this.birthDate;
   }
 
-  public getDebutDate(): DateValue {
+  public getDebutDate(): Date {
     if (this.transitionDate) return this.transitionDate;
     else throw new Error("No ha debutado");
   }
@@ -52,33 +51,30 @@ export class Artist extends Apprentice {
     return this.statusArtist;
   }
 
-  public getAge(): number {
-  return Artist.calculateElapsedYears(this.birthDate);
-}
+//   public getAge(): number {
+//   return Artist.calculateElapsedYears(this.birthDate);
+// }
 
-  public debut(groupId: string, debutDate: DateValue): void {
+  public debut(groupId: string, debutDate: Date): void {
     this.groupId = groupId;
     this.transitionDate = debutDate;
     this.statusArtist = ArtistStatus.ACTIVO;
   }
 
-  private static calculateElapsedYears(date: DateValue): number {
-    const today = DateValue.today();
-    let years = today.getYear() - date.getYear();
+  
+
+private static calcularAnosTranscurridos(fecha: Date): number {
+    const hoy = new Date();
+    let anios = hoy.getFullYear() - fecha.getFullYear();
     
     // Ajustar si el cumpleaños no ha ocurrido este año
-    const birthdayThisYear = DateValue.fromNumber(
-        today.getYear(), 
-        date.getMonth(), 
-        date.getDay()
-    );
-    
-    if (today.isBefore(birthdayThisYear)) {
-        years--;
+    const cumpleaniosEsteAnio = new Date(hoy.getFullYear(), fecha.getMonth(), fecha.getDate());
+    if (hoy < cumpleaniosEsteAnio) {
+      anios--;
     }
     
-    return years;
-}
+    return anios;
+  }
 
   // public create(entryDate: Date, statusArtist: ArtistStatus, stageName: string, realName: string, birthDate: Date, transitionDate: Date, groupId?: string,): Artist {
   //   const id = uuidv4();
