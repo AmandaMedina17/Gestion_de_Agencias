@@ -1,15 +1,17 @@
 import { Module } from '@nestjs/common';
 import { DatabaseModule } from './DataBaseModule';
 import { ResponsibleModule } from './ResponsibleModule';
-import { AppController } from '@presentation/controllers/app.controller';
+import { AppController } from '@presentation/Controllers/app.controller';
 import { AppService } from '@application/services/app.service';
 import { AuthModule } from './auth.module';
+import { PlaceModule } from './PlaceModule';
 
 @Module({
   imports: [
     DatabaseModule,
     ResponsibleModule,
-    AuthModule
+    AuthModule,
+    PlaceModule
   ],
   controllers: [AppController],
   providers: [AppService],
