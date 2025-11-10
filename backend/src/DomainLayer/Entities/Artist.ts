@@ -17,11 +17,11 @@ export class Artist extends Apprentice {
     
   ) {
 
-    const age = Artist.calcularAnosTranscurridos(birthDate);
+    //const age = Artist.calcularAnosTranscurridos(birthDate);
     super(
       id,
       realName,
-      age,
+      0,
       entryDate,
       ApprenticeTrainingLevel.AVANZADO,
       ApprenticeStatus.PROCESO_DE_SELECCION
