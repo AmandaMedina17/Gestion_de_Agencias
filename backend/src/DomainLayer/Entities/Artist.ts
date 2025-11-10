@@ -1,5 +1,4 @@
 import { v4 as uuidv4 } from "uuid";
-import { DateValue } from "../Value Objects/Values";
 import { ApprenticeStatus, ApprenticeTrainingLevel } from "../Enums";
 import { ArtistStatus } from "../Enums";
 import { Apprentice } from "./Apprentice";
@@ -18,7 +17,7 @@ export class Artist extends Apprentice {
     
   ) {
 
-    const age = Artist.calculateElapsedYears(birthDate);
+    const age = Artist.calcularAnosTranscurridos(birthDate);
     super(
       id,
       realName,
@@ -52,9 +51,9 @@ export class Artist extends Apprentice {
     return this.statusArtist;
   }
 
-  public getAge(): number {
-  return Artist.calculateElapsedYears(this.birthDate);
-}
+//   public getAge(): number {
+//   return Artist.calculateElapsedYears(this.birthDate);
+// }
 
   public debut(groupId: string, debutDate: Date): void {
     this.groupId = groupId;

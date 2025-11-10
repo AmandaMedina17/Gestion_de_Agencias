@@ -39,7 +39,7 @@ export class Contract {
     if (!this.conditions || this.conditions.length == 0) {
       throw new Error("Las condiciones del contrato son requeridas");
     }
-    this.validateContractDates();
+    //this.validateContractDates();
   }
 
   public create( interval: Interval, agency: Agency, artist: Artist, distributionPercentage: number, status: ContractStatus, conditions: string) : Contract {
