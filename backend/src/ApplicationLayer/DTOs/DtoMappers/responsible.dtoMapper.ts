@@ -1,5 +1,5 @@
-import { CreateResponsibleDto } from '../ResponsibleDto/create-responsible.dto';
-import { ResponsibleResponseDto } from '../ResponsibleDto/create-responsible.dto';
+import { CreateResponsibleDto } from '../responsibleDto/create-responsible.dto';
+import { ResponsibleResponseDto } from '../responsibleDto/create-responsible.dto';
 import { Responsible } from '@domain/Entities/Responsible';
 import { BaseDtoMapper } from './DtoMapper';
 

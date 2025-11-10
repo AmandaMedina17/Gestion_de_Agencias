@@ -11,12 +11,20 @@ export const AppDataSource = new DataSource({
   database: databaseConfig.database,
   
   // Entidades 
-  entities: ['src/InfraestructureLayer/database/Entities/*.ts'],
-  
-  // Migraciones 
-  migrations: ['src/InfraestructureLayer/database/Migrations/*.ts'],
-  
+  entities: [
+  // Desarrollo
+  './InfraestructureLayer/database/Entities/*.ts',
+  // Produccion
+  'dist/InfraestructureLayer/database/Entities/*.js'
+],
 
+  migrations: [
+  // Desarrollo
+  './InfraestructureLayer/database/Migrations/*.ts',
+  // Produccion
+  'dist/InfraestructureLayer/database/Migrations/*.js'
+],
+  
   synchronize: false,
   
   // Logs de SQL (útil en desarrollo)
