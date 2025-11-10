@@ -1,5 +1,5 @@
 import { Module } from "@nestjs/common";
-import { AuthController } from "../ApplicationLayer/controllers/auth.controller";
+import { AuthController } from "@presentation/Controllers/auth.controller";
 import { AuthService } from "../ApplicationLayer/services/auth.service";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";

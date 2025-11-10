@@ -5,7 +5,7 @@ import { IMapper } from 'src/InfraestructureLayer/database/Mappers/IMapper';
 import { ApprenticeMapper } from 'src/InfraestructureLayer/database/Mappers/ApprenticeMapper';
 import { IApprenticeRepository } from '@domain/Repositories/IApprenticeRepository';
 import { ApprenticeRepositoryImpl} from 'src/InfraestructureLayer/database/Repositories/ApprenticeRepository';
-import {ApprenticeController } from '@presentation/Controllers/ApprenticeController';
+import {ApprenticeController } from '@presentation/Controllers/apprentice.controller';
 
 @Module({
   imports: [

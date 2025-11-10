@@ -1,5 +1,5 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { BaseDtoMapper } from '@application/DTOs/DtoMappers/DtoMapper';
+import { BaseDtoMapper } from '@application/DTOs/dtoMappers/DtoMapper';
 import { IRepository } from '@domain/Repositories/IRepository';
 import { NotFoundException } from '@nestjs/common';
 
