@@ -4,12 +4,15 @@ import { v4 as uuidv4 } from "uuid";
 
 export class BillboardList {
   constructor(
-    private readonly id: string = uuidv4(),
+    private readonly id: string,
     private publicDate: DateValue,
     private scope: BillboardListScope,
     private nameList: string,
     private endList: number //cuantos puesto abarca la lista
   ) {}
+  public getId(): string {
+    return this.id;
+  }
 
   public getEndList(): number {
     return this.endList;
@@ -18,4 +21,18 @@ export class BillboardList {
   public getNameList(): string {
     return this.nameList;
   }
+ 
+  public getPublicDate() : DateValue {
+    return this.publicDate;
+  }
+
+  public getScope(): BillboardListScope {
+    return this.scope;
+  }
+
+  public create( publicDate: DateValue, scope: BillboardListScope, nameList: string, endList: number ) :BillboardList {
+    const id = uuidv4();
+    return new BillboardList(id, publicDate, scope, nameList, endList);
+  }
+   
 }

@@ -10,7 +10,8 @@ export class ResponsibleDtoMapper extends BaseDtoMapper<Responsible, CreateRespo
 
   toResponse(domain: Responsible): ResponsibleResponseDto {
     return {
-      name: domain.getName()
+        id: domain.getId(),
+        name: domain.getName()
     };
   }
 }

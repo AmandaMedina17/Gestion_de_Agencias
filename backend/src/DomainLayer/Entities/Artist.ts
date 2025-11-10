@@ -1,17 +1,13 @@
 import { v4 as uuidv4 } from "uuid";
-import { DateValue } from "../Value Objects/Values";
 import { ApprenticeStatus, ApprenticeTrainingLevel } from "../Enums";
-import { ArtistRole, ArtistStatus } from "../Enums";
+import { ArtistStatus } from "../Enums";
 import { Apprentice } from "./Apprentice";
-import { Group } from "./Group";
-import { Interval } from "./Interval";
-import { Agency } from "./Agency";
+
 
 export class Artist extends Apprentice {
   constructor(
     id: string,
     entryDate: Date,
-    agencyId: string,
     private statusArtist: ArtistStatus,
     private stageName: string,
     private realName: string,
@@ -28,8 +24,7 @@ export class Artist extends Apprentice {
       age,
       entryDate,
       ApprenticeTrainingLevel.AVANZADO,
-      ApprenticeStatus.PROCESO_DE_SELECCION,
-      agencyId
+      ApprenticeStatus.PROCESO_DE_SELECCION
     );
   }
 
@@ -56,9 +51,9 @@ export class Artist extends Apprentice {
     return this.statusArtist;
   }
 
-  public getAge(): number {
-    return this.getAge();
-  }
+//   public getAge(): number {
+//   return Artist.calculateElapsedYears(this.birthDate);
+// }
 
   public debut(groupId: string, debutDate: Date): void {
     this.groupId = groupId;
@@ -66,16 +61,21 @@ export class Artist extends Apprentice {
     this.statusArtist = ArtistStatus.ACTIVO;
   }
 
-  private static calcularAnosTranscurridos(fecha: Date): number {
-    const hoy = new Date();
-    let anios = hoy.getFullYear() - fecha.getFullYear();
+  private static calculateElapsedYears(date: Date): number {
+    const today = new Date();
+    let years = today.getFullYear() - date.getFullYear();
     
     // Ajustar si el cumpleaños no ha ocurrido este año
-    const cumpleaniosEsteAnio = new Date(hoy.getFullYear(), fecha.getMonth(), fecha.getDate());
-    if (hoy < cumpleaniosEsteAnio) {
-      anios--;
+    const birthdayThisYear = new Date(today.getFullYear(), date.getMonth(), date.getDate());
+    if (today < birthdayThisYear) {
+      years--;
     }
     
-    return anios;
+    return years;
   }
+
+  // public create(entryDate: Date, statusArtist: ArtistStatus, stageName: string, realName: string, birthDate: Date, transitionDate: Date, groupId?: string,): Artist {
+  //   const id = uuidv4();
+  //   return new Artist(id, entryDate, statusArtist, stageName, realName, birthDate, transitionDate, groupId);
+  // }
 }

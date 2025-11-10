@@ -7,5 +7,6 @@ export class CreateResponsibleDto {
 }
 
 export class ResponsibleResponseDto {
-  name!: string;
+    id!: string; 
+    name!: string;
 }

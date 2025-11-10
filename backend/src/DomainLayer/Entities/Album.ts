@@ -1,4 +1,5 @@
 import { DateValue } from "../Value Objects/Values";
+import { v4 as uuidv4 } from "uuid";
 
 export class Album {
     constructor(
@@ -132,5 +133,10 @@ export class Album {
             throw new Error('El álbum no puede tener más de 50 canciones');
         }
         this.numberOfTracks = tracks;
+    }
+
+    public create(title: string, releaseDate: DateValue, mainProducer: string, copiesSold: number, numberOfTracks: number) : Album{
+        const id = uuidv4();
+        return new Album(id, title, releaseDate, mainProducer, copiesSold, numberOfTracks);
     }
 }

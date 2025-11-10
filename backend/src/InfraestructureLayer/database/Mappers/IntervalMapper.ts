@@ -4,6 +4,12 @@ import { DateValue } from "@domain/Value Objects/Values";
 import { IMapper } from "./IMapper";
 
 export class IntervalMapper implements IMapper<Interval, IntervalEntity> {
+    toDomainEntities(entities: IntervalEntity[]): Interval[] {
+        return entities.map(entity => this.toDomainEntity(entity));
+    }
+    toDataBaseEntities(domains: Interval[]): IntervalEntity[] {
+         return domains.map(domain => this.toDataBaseEntity(domain));
+    }
     toDomainEntity(dataBaseEntity: IntervalEntity): Interval {
         
         // Reconstruir el Value Object DateValue desde la fecha almacenada
@@ -26,12 +32,10 @@ export class IntervalMapper implements IMapper<Interval, IntervalEntity> {
 
         intervalEntity.id = domainEntity.getId();
         const startDate = domainEntity.getStartDate();
-        intervalEntity.startDate= startDate.getValue();
+        //intervalEntity.startDate= startDate.;
 
         const endDate = domainEntity.getStartDate();
-        intervalEntity.endDate= endDate.getValue();
-
-        //Manejar lo de las cosas complejas
+        //intervalEntity.endDate= endDate.getValue();
 
         return intervalEntity;
     }

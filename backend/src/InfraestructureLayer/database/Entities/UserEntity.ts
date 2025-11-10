@@ -1,9 +1,9 @@
-import { Entity, PrimaryColumn, Column } from 'typeorm';
-import { UserRole } from '@domain/Enums';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { UserRole } from '../../../DomainLayer/Enums';
 
 @Entity('users')
 export class UserOrmEntity {
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn()
   id!: string;
 
   @Column({ unique: true })
@@ -14,4 +14,8 @@ export class UserOrmEntity {
 
   @Column({ type: 'enum', enum: UserRole })
   role!: UserRole;
+
+  @Column()
+  isActive!: boolean;
+
 }

@@ -1,20 +1,19 @@
 import { Agency } from "@domain/Entities/Agency";
 import { AgencyEntity } from "../Entities/AgencyEntity";
-import { Place, DateValue } from "@domain/Value Objects/Values";
+import { DateValue } from "@domain/Value Objects/Values";
 import { IMapper } from "./IMapper";
 
 export class AgencyMapper implements IMapper<Agency, AgencyEntity> {
+  toDomainEntities(entities: AgencyEntity[]): Agency[] {
+    return entities.map(entity => this.toDomainEntity(entity));
+  }
+  toDataBaseEntities(domains: Agency[]): AgencyEntity[] {
+    return domains.map(domain => this.toDataBaseEntity(domain));
+  }
   
   toDomainEntity(dataBaseEntity: AgencyEntity): Agency {
     try {
-      // Reconstruir el Value Object Place desde el string almacenado
-      const placeData = JSON.parse(dataBaseEntity.place);
-      const place = new Place(
-        placeData.country,
-        placeData.state, 
-        placeData.namePlace
-      );
-
+      const place = dataBaseEntity.place;
       // Reconstruir el Value Object DateValue desde la fecha almacenada
       const dateFundation = DateValue.fromString(
         dataBaseEntity.dateFundation.toISOString().split('T')[0] // Formato YYYY-MM-DD
@@ -25,7 +24,7 @@ export class AgencyMapper implements IMapper<Agency, AgencyEntity> {
         dataBaseEntity.id,
         place,
         dataBaseEntity.name,
-        dateFundation
+        dataBaseEntity.dateFundation
       );
     } catch (error) {
       throw new Error(`Error mapping database entity to domain: ${error}`);
@@ -38,19 +37,9 @@ export class AgencyMapper implements IMapper<Agency, AgencyEntity> {
     // Mapear propiedades simples
     agencyEntity.id = domainEntity.getId();
     agencyEntity.name = domainEntity.getName();
+    agencyEntity.place = domainEntity.getPlace();
+    agencyEntity.dateFundation = domainEntity.getDateFundation();
     
-    // Serializar el Value Object Place a JSON string
-    const place = domainEntity.getPlace();
-    agencyEntity.place = JSON.stringify({
-      country: place['country'], // Accediendo a la propiedad privada
-      state: place['state'],
-      namePlace: place['namePlace']
-    });
-
-    // Convertir DateValue a Date
-    const dateFundation = domainEntity.getDateFundation();
-    agencyEntity.dateFundation = dateFundation.getValue();
-
     // Las relaciones se manejan en el repositorio
     agencyEntity.apprentices = [];
     agencyEntity.groups = [];

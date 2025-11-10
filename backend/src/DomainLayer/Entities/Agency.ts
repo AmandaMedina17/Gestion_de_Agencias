@@ -1,22 +1,19 @@
-import { Place, DateValue } from "../Value Objects/Values";
+import { DateValue } from "../Value Objects/Values";
 import { v4 as uuidv4 } from "uuid";
-import { ApprenticeEntity } from "./Apprentice";
-import { Group } from "./Group";
-import { Interval } from "./Interval";
 
 export class Agency {
   constructor(
-    private readonly id: string = uuidv4(),
-    private place: Place,
+    private readonly id: string,
+    private place: string,
     private nameAgency: string,
-    private dateFundation: DateValue
+    private dateFundation: Date
   ) {}
 
   public getId(): string {
     return this.id;
   }
 
-  public getPlace(): Place {
+  public getPlace(): string {
     return this.place;
   }
 
@@ -24,9 +21,12 @@ export class Agency {
     return this.nameAgency;
   }
 
-  // public recruitApprentice(apprentice: ApprenticeEntity): void {
-  //   if (!this.recruitedApprentices.includes(apprentice)) {
-  //     this.recruitedApprentices.push(apprentice);
-  //   }
-  // }
+  public getDateFundation() : Date{
+    return this.dateFundation;
+  }
+
+  public create(place: string, nameAgency: string, dateFundation: Date) : Agency{
+    const id = uuidv4();
+    return new Agency(id,place,nameAgency,dateFundation);
+  }
 }

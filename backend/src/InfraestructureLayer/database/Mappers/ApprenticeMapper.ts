@@ -1,10 +1,16 @@
-import { IMapper } from "../database/IMapper";
+import { IMapper } from "./IMapper";
 import { Apprentice } from "@domain/Entities/Apprentice";
 import { ApprenticeEntity } from "@entities/ApprenticeEntity";
 import { ApprenticeTrainingLevel } from "@domain/Enums";
 import { ApprenticeStatus } from "@domain/Enums";
 
-class ApprenticeMapper implements IMapper<Apprentice, ApprenticeEntity>{
+export class ApprenticeMapper implements IMapper<Apprentice, ApprenticeEntity>{
+    toDomainEntities(entities: ApprenticeEntity[]): Apprentice[] {
+        return entities.map(entity => this.toDomainEntity(entity));
+    }
+    toDataBaseEntities(domains: Apprentice[]): ApprenticeEntity[] {
+        return domains.map(domain => this.toDataBaseEntity(domain));
+    }
     toDomainEntity(dataBaseEntity: ApprenticeEntity): Apprentice {
         return new Apprentice(
             dataBaseEntity.id,
@@ -12,8 +18,7 @@ class ApprenticeMapper implements IMapper<Apprentice, ApprenticeEntity>{
             dataBaseEntity.age,
             new Date(dataBaseEntity.entryDate),
             dataBaseEntity.trainingLevel ,
-            dataBaseEntity.status,
-            dataBaseEntity.agencyId
+            dataBaseEntity.status
         )
     }
     toDataBaseEntity(domainEntity: Apprentice): ApprenticeEntity {

@@ -1,14 +1,19 @@
-import { IMapper } from "../database/IMapper";
+import { IMapper } from "./IMapper";
 import { Artist } from "@domain/Entities/Artist";
 import { ArtistEntity } from "@entities/ArtistEntity";
 import { ArtistStatus } from "@domain/Enums";
 
-class ArtistMapper implements IMapper<Artist, ArtistEntity>{
+export class ArtistMapper implements IMapper<Artist, ArtistEntity>{
+    toDomainEntities(entities: ArtistEntity[]): Artist[] {
+        return entities.map(entity => this.toDomainEntity(entity));
+    }
+    toDataBaseEntities(domains: Artist[]): ArtistEntity[] {
+        return domains.map(domain => this.toDataBaseEntity(domain));
+    }
     toDomainEntity(dataBaseEntity: ArtistEntity): Artist {
         return new Artist(
             dataBaseEntity.id,
             dataBaseEntity.apprenticeId.entryDate,
-            dataBaseEntity.apprenticeId.agencyId,
             dataBaseEntity.statusArtist,
             dataBaseEntity.stageName,
             dataBaseEntity.apprenticeId.fullName,

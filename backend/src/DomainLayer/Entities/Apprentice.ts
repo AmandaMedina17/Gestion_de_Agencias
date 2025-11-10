@@ -13,7 +13,6 @@ export class Apprentice {
     private entryDate: Date,
     private trainingLevel: ApprenticeTrainingLevel,
     private status: ApprenticeStatus,
-    private agencyId: string
   ) {
     this.validate();
   }
@@ -93,5 +92,10 @@ export class Apprentice {
 
   public getAge(): number {
     return this.age;
+  }
+
+  public create(fullName: string, age: number, entryDate: Date, trainingLevel: ApprenticeTrainingLevel, status: ApprenticeStatus){
+    const id = uuidv4();
+    return new Apprentice(id, fullName, age, entryDate, trainingLevel, status);
   }
 }
