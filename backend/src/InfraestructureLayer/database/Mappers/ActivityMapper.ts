@@ -2,7 +2,7 @@ import { IMapper } from "./IMapper";
 import { Activity } from "@domain/Entities/Activity";
 import { ActivityEntity } from "@entities/ActivityEntity";
 
-class ActivityMapper implements IMapper<Activity, ActivityEntity>{
+export class ActivityMapper extends IMapper<Activity, ActivityEntity>{
 
     toDomainEntity(dataBaseEntity: ActivityEntity): Activity {
         if (!dataBaseEntity) {
@@ -24,13 +24,5 @@ class ActivityMapper implements IMapper<Activity, ActivityEntity>{
         entity.type = domainEntity.getType();
         
         return entity;
-    }
-
-    toDomainEntities(entities: ActivityEntity[]): Activity[] {
-        return entities.map(entity => this.toDomainEntity(entity));
-    }
-
-    toDataBaseEntities(domains: Activity[]):ActivityEntity[] {
-        return domains.map(domain => this.toDataBaseEntity(domain));
     }
 }

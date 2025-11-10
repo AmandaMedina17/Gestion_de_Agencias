@@ -7,8 +7,8 @@ import {
   Req,
   UseGuards,
 } from "@nestjs/common";
-import { AuthPayloadDto } from "../../PresentationLayer/dtos/request/LoginDto";
-import { AuthService } from "../services/auth.service";
+import { AuthPayloadDto } from "../../ApplicationLayer/DTOs/userDto/LoginDto";
+import { AuthService } from "@application/services/auth.service";
 import { LocalGuard } from "../../InfraestructureLayer/guards/local_guard";
 import { JwtAuthGuard } from "../../InfraestructureLayer/guards/jwt_guard";
 import { Request } from "express";

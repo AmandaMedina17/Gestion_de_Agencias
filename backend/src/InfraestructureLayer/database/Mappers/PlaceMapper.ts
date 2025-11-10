@@ -2,7 +2,7 @@ import { IMapper } from "./IMapper";
 import { Place } from "@domain/Entities/Place";
 import { PlaceEntity } from "@entities/PlaceEntity";
 
-class PlaceMapper implements IMapper<Place, PlaceEntity>{
+export class PlaceMapper extends IMapper<Place, PlaceEntity>{
 
     toDomainEntity(dataBaseEntity: PlaceEntity): Place {
         if (!dataBaseEntity) {
@@ -23,12 +23,4 @@ class PlaceMapper implements IMapper<Place, PlaceEntity>{
 
         return entity;
     }
-
-    toDomainEntities(entities: PlaceEntity[]): Place[] {
-            return entities.map(entity => this.toDomainEntity(entity));
-        }
-    
-        toDataBaseEntities(domains: Place[]): PlaceEntity[] {
-            return domains.map(domain => this.toDataBaseEntity(domain));
-        }
 }

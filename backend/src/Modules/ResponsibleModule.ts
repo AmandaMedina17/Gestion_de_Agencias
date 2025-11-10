@@ -7,8 +7,8 @@ import { IResponsibleRepository } from '@domain/Repositories/IResponsibleReposit
 import { ResponsibleRepository } from 'src/InfraestructureLayer/database/Repositories/ResponsibleRepository';
 import { ResponsibleController } from '@presentation/controllers/responsible.controller';
 import { ResponsibleService } from '@application/services/responsible.service';
-import { BaseDtoMapper } from '@application/DTOs/DtoMappers/DtoMapper';
-import { ResponsibleDtoMapper } from '@application/DTOs/DtoMappers/responsible.dtoMapper';
+import { BaseDtoMapper } from '@application/DTOs/dtoMappers/DtoMapper';
+import { ResponsibleDtoMapper } from '@application/DTOs/dtoMappers/responsible.dtoMapper';
 
 @Module({
   imports: [

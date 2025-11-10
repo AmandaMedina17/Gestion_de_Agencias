@@ -3,13 +3,7 @@ import { AgencyEntity } from "../Entities/AgencyEntity";
 import { DateValue } from "@domain/Value Objects/Values";
 import { IMapper } from "./IMapper";
 
-export class AgencyMapper implements IMapper<Agency, AgencyEntity> {
-  toDomainEntities(entities: AgencyEntity[]): Agency[] {
-    return entities.map(entity => this.toDomainEntity(entity));
-  }
-  toDataBaseEntities(domains: Agency[]): AgencyEntity[] {
-    return domains.map(domain => this.toDataBaseEntity(domain));
-  }
+export class AgencyMapper extends IMapper<Agency, AgencyEntity> {
   
   toDomainEntity(dataBaseEntity: AgencyEntity): Agency {
     try {

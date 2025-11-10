@@ -12,7 +12,7 @@
 // import { Contract } from '@domain/Entities/Contract';
 // import { Group } from '@domain/Entities/Group';
 // import { AgencyMapper } from '../Mappers/AgencyMapper';
-// //import { AlbumMapper } from '../Mappers/AlbumMapper';
+// import { AlbumMapper } from '../Mappers/AlbumMapper';
 // import { GroupMapper } from '../Mappers/GroupMapper';
 // import { IntervalMapper } from '../Mappers/IntervalMapper';
 
@@ -26,7 +26,7 @@
 //     repository: Repository<ArtistEntity>,
 //     mapper: ArtistMapper,
 //     private readonly agencyMapper: AgencyMapper,
-//     //private readonly albumMapper: AlbumMapper,
+//     private readonly albumMapper: AlbumMapper,
 //     private readonly groupMapper: GroupMapper,
 //     private readonly intervalMapper : IntervalMapper,
 //     //duda en si esto es una buena idea
@@ -75,8 +75,7 @@
 //             return [];
 //         }
 
-//         // return this.albumMapper.toDomainEntities(artistEntity.albums);
-
+//         return this.albumMapper.toDomainEntities(artistEntity.albums);
 //     }
     
 //     async getCurrentArtistContracts(id: string): Promise<Contract[]> {

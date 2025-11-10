@@ -5,8 +5,3 @@ export class CreateResponsibleDto {
     @IsString()
     name!: string;
 }
-
-export class ResponsibleResponseDto {
-    id!: string; 
-    name!: string;
-}
