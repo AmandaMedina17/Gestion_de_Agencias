@@ -23,8 +23,8 @@ export class IntervalMapper implements IMapper<Interval, IntervalEntity> {
     
         return new Interval(
                 dataBaseEntity.id,
-                startDate,
-                endDate
+                dataBaseEntity.startDate,
+                dataBaseEntity.startDate
               );
     }
     toDataBaseEntity(domainEntity: Interval): IntervalEntity {

@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ValidationPipe } from '@nestjs/common';
 import { ResponsibleService } from '@application/services/responsible.service';
-import { CreateResponsibleDto } from '@application/DTOs/ResponsibleDto/create-responsible.dto';
-import { UpdateResponsibleDto } from '@application/DTOs/ResponsibleDto/update-responsible.dto';
+import { CreateResponsibleDto } from '../../ApplicationLayer/DTOs/responsibleDto/create-responsible.dto';
+import { UpdateResponsibleDto } from '@application/DTOs/responsibleDto/update-responsible.dto';
 
 @Controller('responsible')
 export class ResponsibleController {

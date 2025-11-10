@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { IResponsibleRepository } from '@domain/Repositories/IResponsibleRepository';
 import { Responsible } from '@domain/Entities/Responsible';
-import { CreateResponsibleDto, ResponsibleResponseDto } from '../DTOs/ResponsibleDto/create-responsible.dto';
+import { CreateResponsibleDto, ResponsibleResponseDto } from '../DTOs/responsibleDto/create-responsible.dto';
 import { BaseService } from './base.service';
 import { BaseDtoMapper } from '@application/DTOs/DtoMappers/DtoMapper';
 

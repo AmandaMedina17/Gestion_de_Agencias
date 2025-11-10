@@ -19,7 +19,7 @@ const AgencyCreation: React.FC = () => {
     }
 
     try {
-      await createAgency({ name: name.trim(), ubication: ubication.trim(), fundationDate: fundationDate});
+      //await createAgency({ name: name.trim(), ubication: ubication.trim(), fundationDate: fundationDate});
       setName(''); // Limpiar el campo después de éxito
     } catch (err) {
       console.error('Error en el componente:', err);
