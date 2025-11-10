@@ -4,13 +4,8 @@ import { ApprenticeEntity } from "@entities/ApprenticeEntity";
 import { ApprenticeTrainingLevel } from "@domain/Enums";
 import { ApprenticeStatus } from "@domain/Enums";
 
-export class ApprenticeMapper implements IMapper<Apprentice, ApprenticeEntity>{
-    toDomainEntities(entities: ApprenticeEntity[]): Apprentice[] {
-        return entities.map(entity => this.toDomainEntity(entity));
-    }
-    toDataBaseEntities(domains: Apprentice[]): ApprenticeEntity[] {
-        return domains.map(domain => this.toDataBaseEntity(domain));
-    }
+export class ApprenticeMapper extends IMapper<Apprentice, ApprenticeEntity>{
+    
     toDomainEntity(dataBaseEntity: ApprenticeEntity): Apprentice {
         return new Apprentice(
             dataBaseEntity.id,
@@ -21,6 +16,7 @@ export class ApprenticeMapper implements IMapper<Apprentice, ApprenticeEntity>{
             dataBaseEntity.status
         )
     }
+    
     toDataBaseEntity(domainEntity: Apprentice): ApprenticeEntity {
         const entity = new ApprenticeEntity();
         entity.id = domainEntity.getId();

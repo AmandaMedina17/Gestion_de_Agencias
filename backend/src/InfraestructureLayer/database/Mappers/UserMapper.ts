@@ -2,7 +2,8 @@ import { User } from "../../../DomainLayer/Entities/User";
 import { IMapper } from "./IMapper";
 import { UserOrmEntity } from "../Entities/UserEntity";
 
-export class UserMapper implements IMapper<User, UserOrmEntity>{
+export class UserMapper extends IMapper<User, UserOrmEntity>{
+
     toDomainEntity(dataBaseEntity: UserOrmEntity): User {
         return new User(
         dataBaseEntity.id,
@@ -21,12 +22,4 @@ export class UserMapper implements IMapper<User, UserOrmEntity>{
     
     return userOrm;
     }
-    toDomainEntities(entities: UserOrmEntity[]): User[] {
-        throw new Error("Method not implemented.");
-    }
-    toDataBaseEntities(domains: User[]): UserOrmEntity[] {
-        throw new Error("Method not implemented.");
-    }
-    
-
 }
