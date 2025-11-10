@@ -6,10 +6,10 @@ import { ApprenticeStatus } from "@domain/Enums";
 
 export class ApprenticeMapper implements IMapper<Apprentice, ApprenticeEntity>{
     toDomainEntities(entities: ApprenticeEntity[]): Apprentice[] {
-        throw new Error("Method not implemented.");
+        return entities.map(entity => this.toDomainEntity(entity));
     }
     toDataBaseEntities(domains: Apprentice[]): ApprenticeEntity[] {
-        throw new Error("Method not implemented.");
+        return domains.map(domain => this.toDataBaseEntity(domain));
     }
     toDomainEntity(dataBaseEntity: ApprenticeEntity): Apprentice {
         return new Apprentice(

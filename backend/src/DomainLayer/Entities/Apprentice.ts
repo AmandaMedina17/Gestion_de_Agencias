@@ -22,9 +22,9 @@ export class Apprentice {
       throw new Error("El nombre completo es requerido");
     }
 
-    // if (this.entryDate.isFuture()) {
-    //   throw new Error("La fecha de ingreso no puede ser en el futuro");
-    // }
+    if (this.entryDate > new Date()) {
+      throw new Error("La fecha de ingreso no puede ser en el futuro");
+    }
   }
 
   //promueve al aprendiz al siguiente nivel de entrenamiento

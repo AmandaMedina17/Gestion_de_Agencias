@@ -2,7 +2,7 @@ import { Apprentice } from "../Entities/Apprentice";
 import { Evaluation } from "../Entities/Evaluation";
 import { IRepository } from "./IRepository";
 
-export interface IApprenticeRepository
+export abstract class IApprenticeRepository
   extends IRepository<Apprentice> {
-  getApprenticeEvaluations(id: string): Promise<Evaluation[]>;
+  abstract getApprenticeEvaluations(id: string): Promise<Evaluation[]>;
 }

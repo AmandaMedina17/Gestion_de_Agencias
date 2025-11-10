@@ -6,7 +6,7 @@ export class Agency {
     private readonly id: string,
     private place: string,
     private nameAgency: string,
-    private dateFundation: DateValue
+    private dateFundation: Date
   ) {}
 
   public getId(): string {
@@ -21,11 +21,11 @@ export class Agency {
     return this.nameAgency;
   }
 
-  public getDateFundation() : DateValue{
+  public getDateFundation() : Date{
     return this.dateFundation;
   }
 
-  public create(place: string, nameAgency: string, dateFundation: DateValue) : Agency{
+  public create(place: string, nameAgency: string, dateFundation: Date) : Agency{
     const id = uuidv4();
     return new Agency(id,place,nameAgency,dateFundation);
   }

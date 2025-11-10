@@ -61,19 +61,17 @@ export class Artist extends Apprentice {
     this.statusArtist = ArtistStatus.ACTIVO;
   }
 
-  
-
-private static calcularAnosTranscurridos(fecha: Date): number {
-    const hoy = new Date();
-    let anios = hoy.getFullYear() - fecha.getFullYear();
+  private static calculateElapsedYears(date: Date): number {
+    const today = new Date();
+    let years = today.getFullYear() - date.getFullYear();
     
     // Ajustar si el cumpleaños no ha ocurrido este año
-    const cumpleaniosEsteAnio = new Date(hoy.getFullYear(), fecha.getMonth(), fecha.getDate());
-    if (hoy < cumpleaniosEsteAnio) {
-      anios--;
+    const birthdayThisYear = new Date(today.getFullYear(), date.getMonth(), date.getDate());
+    if (today < birthdayThisYear) {
+      years--;
     }
     
-    return anios;
+    return years;
   }
 
   // public create(entryDate: Date, statusArtist: ArtistStatus, stageName: string, realName: string, birthDate: Date, transitionDate: Date, groupId?: string,): Artist {

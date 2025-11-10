@@ -5,16 +5,15 @@ import { ArtistStatus } from "@domain/Enums";
 
 export class ArtistMapper implements IMapper<Artist, ArtistEntity>{
     toDomainEntities(entities: ArtistEntity[]): Artist[] {
-        throw new Error("Method not implemented.");
+        return entities.map(entity => this.toDomainEntity(entity));
     }
     toDataBaseEntities(domains: Artist[]): ArtistEntity[] {
-        throw new Error("Method not implemented.");
+        return domains.map(domain => this.toDataBaseEntity(domain));
     }
     toDomainEntity(dataBaseEntity: ArtistEntity): Artist {
         return new Artist(
             dataBaseEntity.id,
             dataBaseEntity.apprenticeId.entryDate,
-            //dataBaseEntity.apprenticeId.agencyId,
             dataBaseEntity.statusArtist,
             dataBaseEntity.stageName,
             dataBaseEntity.apprenticeId.fullName,

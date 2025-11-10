@@ -1,5 +1,4 @@
 import { ContractStatus } from "../Enums";
-import { DateValue } from "../Value Objects/Values";
 import { Agency } from "./Agency";
 import { Artist } from "./Artist";
 import { Interval } from "./Interval";
@@ -48,14 +47,14 @@ export class Contract {
     return new Contract(id, interval, agency, artist, distributionPercentage, status, conditions);
   }
 
-  // private validateContractDates(): void {
-  //   // El contrato no puede empezar antes del debut del artista
-  //   if (this.interval.getStartDate().isBefore(this.artist.getDebutDate())) {
-  //     throw new Error(
-  //       "El contrato no puede empezar antes del debut del artista"
-  //     );
-  //   }
-  // }
+  private validateContractDates(): void {
+    // El contrato no puede empezar antes del debut del artista
+    if (this.interval.getStartDate() < this.artist.getDebutDate()) {
+      throw new Error(
+        "El contrato no puede empezar antes del debut del artista"
+      );
+    }
+  }
 
   // Métodos para modificar el estado del contrato
   public activate(): void {
@@ -152,7 +151,7 @@ export class Contract {
     return this.interval.daysUntilEnd();
   }
 
-  public isActiveOnDate(date: DateValue): boolean {
+  public isActiveOnDate(date: Date): boolean {
     return this.isActive() && this.interval.containsDate(date);
   }
 

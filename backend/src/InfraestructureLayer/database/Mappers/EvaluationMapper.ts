@@ -2,12 +2,12 @@ import { IMapper } from "./IMapper";
 import { Evaluation } from "@domain/Entities/Evaluation";
 import { EvaluationEntity } from "@entities/EvaluationEntity";
 
-class EvaluationMapper implements IMapper<Evaluation, EvaluationEntity>{
+export class EvaluationMapper implements IMapper<Evaluation, EvaluationEntity>{
     toDomainEntities(entities: EvaluationEntity[]): Evaluation[] {
-        throw new Error("Method not implemented.");
+        return entities.map(entity => this.toDomainEntity(entity));
     }
     toDataBaseEntities(domains: Evaluation[]): EvaluationEntity[] {
-        throw new Error("Method not implemented.");
+        return domains.map(domain => this.toDataBaseEntity(domain));
     }
     toDomainEntity(dataBaseEntity: EvaluationEntity): Evaluation {
         return new Evaluation(
