@@ -5,9 +5,10 @@ import { CreateResponsibleDto} from '../DTOs/responsibleDto/create-responsible.d
 import { ResponsibleResponseDto } from '@application/DTOs/responsibleDto/response-responsible.dto';
 import { BaseService } from './base.service';
 import { BaseDtoMapper } from '@application/DTOs/dtoMappers/DtoMapper';
+import { UpdateResponsibleDto } from '@application/DTOs/responsibleDto/update-responsible.dto';
 
 @Injectable()
-export class ResponsibleService extends BaseService<Responsible, CreateResponsibleDto, ResponsibleResponseDto> {
+export class ResponsibleService extends BaseService<Responsible, CreateResponsibleDto, ResponsibleResponseDto, UpdateResponsibleDto> {
   constructor(
     @Inject(IResponsibleRepository)
     private readonly responsibleRepository: IResponsibleRepository,

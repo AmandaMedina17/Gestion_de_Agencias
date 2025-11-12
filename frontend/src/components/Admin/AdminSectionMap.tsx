@@ -2,9 +2,11 @@ import ApprenticesCreation from './sections/ApprenticesCreation';
 import ResponsibleCreation from './sections/ResponsibleCreation';
 import ResponsibleUpdate from './sections/ResponsibleUpdate';
 import ResponsibleDeletion from './sections/ResponsibleDeletion';
+import ResponsibleFindAll from './sections/ResponsibleFindAll';
 import PlaceCreation from './sections/PlaceCreation';
 import PlaceDeletion from './sections/PlaceDeletion';
 import PlaceUpdate from './sections/PlaceUpdate';
+import PlaceFindAll from './sections/PlaceFindAll';
 
 export const sectionComponents = {
   apprentices_creation: ApprenticesCreation,
@@ -31,9 +33,11 @@ export const sectionComponents = {
   responsible_creation: ResponsibleCreation,
   responsible_update: ResponsibleUpdate,
   responsible_deletion: ResponsibleDeletion,
+  responsible_findall: ResponsibleFindAll,
   place_creation: PlaceCreation,
   place_update: PlaceUpdate,
   place_deletion: PlaceDeletion,
+  place_findall: PlaceFindAll,
 //   contract_creation: ContractCreation,
 //   contract_update: ContractUpdate,
 //   contract_deletion: ContractDeletion,

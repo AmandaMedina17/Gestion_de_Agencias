@@ -1,4 +1,5 @@
-import { CreateResponsibleDto, ResponsibleResponseDto } from '../../../backend/src/ApplicationLayer/DTOs/ResponsibleDto/create-responsible.dto';
+import { CreateResponsibleDto } from '../../../backend/src/ApplicationLayer/DTOs/responsibleDto/create-responsible.dto';
+import { ResponsibleResponseDto } from './dtos/ResponsibleDto';
 
 const API_BASE_URL = 'http://localhost:3000'; // Puerto del backend NestJS
 
@@ -67,5 +68,28 @@ export const responsibleService = {
       console.error('Error deleting responsible:', error);
       throw error;
     }
-  }
+  },
+
+   // Actualizar un responsable
+  async update(id: string, updateResponsibleDto: { name: string }): Promise<ResponsibleResponseDto> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/responsible/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateResponsibleDto),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Error: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error updating responsible:', error);
+      throw error;
+    }
+  },
 };

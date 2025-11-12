@@ -1,4 +1,4 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { CreateResponsibleDto } from '../responsibleDto/create-responsible.dto';
+import { CreatePlaceDto } from './create-place.dto';
 
-export class UpdateResponsibleDto extends PartialType(CreateResponsibleDto) {}
+export class UpdatePlaceDto extends PartialType(CreatePlaceDto) {}

@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ValidationPipe } from '@nestjs/common';
 import { CreatePlaceDto } from '@application/DTOs/placeDto/create-place.dto';
 import { PlaceService } from '@application/services/place.service';
+import { UpdatePlaceDto } from '@application/DTOs/placeDto/update-place.dto';
 
 @Controller('place')
 export class PlaceController {
@@ -22,10 +23,10 @@ export class PlaceController {
     return this.placeService.findOne(id);
   }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body(ValidationPipe) updateplaceDto: UpdateplaceDto) {
-  //   return this.placeService.update(id, updateplaceDto);
-  // }
+  @Patch(':id')
+  update(@Param('id') id: string, @Body(ValidationPipe) updateplaceDto: UpdatePlaceDto) {
+    return this.placeService.update(id, updateplaceDto);
+  }
 
   @Delete(':id')
   remove(@Param('id') id: string) {

@@ -5,7 +5,7 @@ import { IMapper } from 'src/InfraestructureLayer/database/Mappers/IMapper';
 import { EvaluationMapper } from 'src/InfraestructureLayer/database/Mappers/EvaluationMapper';
 import { IEvaluationRepository } from '@domain/Repositories/IEvaluationRepository';
 import { EvaluationRepositoryImpl} from 'src/InfraestructureLayer/database/Repositories/EvaluationRepository';
-import { EvaluationController } from '@presentation/Controllers/evaluation.controller';
+import { EvaluationController } from '@presentation/controllers/evaluation.controller';
 
 @Module({
   imports: [

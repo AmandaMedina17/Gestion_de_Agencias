@@ -13,6 +13,7 @@ interface ResponsibleContextType {
   fetchResponsibles: () => Promise<void>;
   fetchResponsible: (id: string) => Promise<ResponsibleResponseDto | null>;
   deleteResponsible: (id: string) => Promise<void>;
+  updateResponsible: (id: string, updateData: { name: string }) => Promise<void>;
   clearError: () => void;
 }
 
@@ -89,6 +90,20 @@ export const ResponsibleProvider: React.FC<ResponsibleProviderProps> = ({ childr
     }
   };
 
+  const updateResponsible = async (id: string, updateData: { name: string }) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await responsibleService.update(id, updateData);
+      await fetchResponsibles(); // Recargar la lista
+    } catch (err: any) {
+      setError(err.message || 'Error al actualizar el responsable');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const clearError = () => setError(null);
 
   return (
@@ -100,9 +115,10 @@ export const ResponsibleProvider: React.FC<ResponsibleProviderProps> = ({ childr
       fetchResponsibles,
       fetchResponsible,
       deleteResponsible,
+      updateResponsible,
       clearError,
     }}>
       {children}
     </ResponsibleContext.Provider>
   );
-};
+}; 
