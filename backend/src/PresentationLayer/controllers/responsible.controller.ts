@@ -22,10 +22,10 @@ export class ResponsibleController {
     return this.responsibleService.findOne(id);
   }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body(ValidationPipe) updateResponsibleDto: UpdateResponsibleDto) {
-  //   return this.responsibleService.update(id, updateResponsibleDto);
-  // }
+  @Patch(':id')
+  update(@Param('id') id: string, @Body(ValidationPipe) updateResponsibleDto: UpdateResponsibleDto) {
+    return this.responsibleService.update(id, updateResponsibleDto);
+  }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
