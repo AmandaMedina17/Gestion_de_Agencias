@@ -41,6 +41,13 @@ export class BaseService<DomainEntity extends IUpdatable<UpdateDto>, CreateDto, 
       domainEntity.update(updateDto);
 
       await this.repository.update(domainEntity);
+
+      const updatedEntity = await this.repository.findById(id);
+       if (!updatedEntity) {
+          throw new NotFoundException(`Entity with ID ${id} not found after update`);
+        }
+    
+    return this.mapper.toResponse(updatedEntity);
   }
 
   remove(id: string): Promise<void> {

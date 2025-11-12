@@ -1,10 +1,10 @@
-// components/Admin/sections/ResponsibleCreation.tsx
 import React, { useState, useEffect } from 'react';
 import { useResponsible } from '../../../context/ResponsibleContext';
 
 const ResponsibleCreation: React.FC = () => {
   const [name, setName] = useState('');
   const { createResponsible, loading, error, clearError } = useResponsible();
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     clearError();
@@ -19,7 +19,14 @@ const ResponsibleCreation: React.FC = () => {
 
     try {
       await createResponsible({ name: name.trim() });
+      // Mostrar mensaje de éxito con el nombre del responsable
+      setSuccessMessage(`Responsable "${name.trim()}" creado exitosamente`);
       setName(''); // Limpiar el campo después de éxito
+      
+      // Limpiar el mensaje de éxito después de 5 segundos
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 5000);
     } catch (err) {
       // El error ya está manejado en el contexto
       console.error('Error en el componente:', err);
@@ -35,6 +42,13 @@ const ResponsibleCreation: React.FC = () => {
       </div>
       
       <div className="detail-card">
+        {/* Mostrar mensaje de éxito */}
+        {successMessage && (
+          <div className="message success">
+            {successMessage}
+          </div>
+        )}
+
         {/* Mostrar error del contexto */}
         {error && (
           <div className="message error">

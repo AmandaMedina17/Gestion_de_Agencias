@@ -8,7 +8,7 @@ import { PlaceMapper } from '@infrastructure/database/Mappers/PlaceMapper';
 import { PlaceRepository } from '@infrastructure/database/Repositories/PlaceRepository';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PlaceController } from '@presentation/Controllers/place.controller';
+import { PlaceController } from '@presentation/controllers/place.controller';
 
 @Module({
   imports: [

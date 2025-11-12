@@ -1,3 +1,10 @@
+body {
+    background-image: url('/public/images/nubes.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed; /* Esto fija el fondo */
+}
+
 .content-section {
     display: none;
     animation: fadeIn 0.5s ease-in-out;
@@ -14,7 +21,6 @@
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
-
 
 .profile-header {
     display: flex;
@@ -146,12 +152,8 @@
 }
 
 
-
 #admins_interface {
-    /*background-color: rgba(153, 192, 247, 0.899);*/
-    background-image: url('/public/images/nubes.jpg');
-    background-repeat: no-repeat;
-    background-size: cover;
+    
     min-height: 100vh;
     margin: 0;
     padding: 0;
@@ -761,4 +763,83 @@ body.sidebar-open {
 .result-item.selected .select-hint {
   color: #17a2b8;
   font-weight: bold;
+}
+
+
+/* Estilos para ResponsibleFindAll */
+.load-section {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.load-placeholder {
+  padding: 40px 20px;
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.load-button {
+  margin-top: 20px;
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+}
+
+.load-button:hover:not(:disabled) {
+  background-color: #138496;
+  border-color: #117a8b;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  justify-content: center;
+}
+
+.reload-button {
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+}
+
+.reload-button:hover:not(:disabled) {
+  background-color: #138496;
+  border-color: #117a8b;
+}
+
+.load-placeholder .placeholder-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+/* Responsive para los botones de acción */
+@media (max-width: 768px) {
+  .action-buttons {
+    flex-direction: column;
+  }
+  
+  .action-buttons button {
+    width: 100%;
+  }
+}
+
+/*seccion de creacion*/
+.message.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+  border-left: 4px solid #28a745;
+  padding: 12px 15px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  border-left: 4px solid #dc3545;
+  padding: 12px 15px;
+  border-radius: 4px;
+  margin-bottom: 20px;
 }
