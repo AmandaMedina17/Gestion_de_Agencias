@@ -8,7 +8,7 @@ import { ApprenticeMapper } from '../Mappers/ApprenticeMapper';
 import { ApprenticeEntity } from '../Entities/ApprenticeEntity';
 import { Evaluation } from '@domain/Entities/Evaluation';
 @Injectable()
-export class ApprenticeRepositoryImpl 
+export class ApprenticeRepository
   extends BaseRepository<Apprentice, ApprenticeEntity>
   implements IApprenticeRepository 
 {

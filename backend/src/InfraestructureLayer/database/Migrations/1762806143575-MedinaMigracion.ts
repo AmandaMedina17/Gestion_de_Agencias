@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class InitialSetup1761324488636 implements MigrationInterface {
-    name = 'InitialSetup1761324488636'
+export class MedinaMigracion1762806143575 implements MigrationInterface {
+    name = 'MedinaMigracion1762806143575'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TYPE "public"."evaluation_entity_evaluation_enum" AS ENUM('EXCELENTE', 'BIEN', 'REGULAR', 'MAL', 'INSUFICIENTE')`);
@@ -27,16 +27,19 @@ export class InitialSetup1761324488636 implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE "artist" ("id" character varying NOT NULL, "stage_name" character varying NOT NULL, "statusArtist" "public"."artist_statusartist_enum" NOT NULL, "birth_date" TIMESTAMP NOT NULL, "transition_date" TIMESTAMP NOT NULL, "apprentice_id" character varying, CONSTRAINT "REL_3d65c831523a46b258854bc470" UNIQUE ("apprentice_id"), CONSTRAINT "PK_55b76e71568b5db4d01d3e394ed" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TYPE "public"."apprentice_status_enum" AS ENUM('EN_ENTRENAMIENTO', 'PROCESO_DE_SELECCION', 'TRANSFERIDO')`);
         await queryRunner.query(`CREATE TYPE "public"."apprentice_traininglevel_enum" AS ENUM('PRINCIPIANTE', 'INTERMEDIO', 'AVANZADO')`);
-        await queryRunner.query(`CREATE TABLE "apprentice" ("id" character varying NOT NULL, "full_name" character varying NOT NULL, "entry_date" TIMESTAMP NOT NULL, "age" integer NOT NULL, "status" "public"."apprentice_status_enum" NOT NULL, "trainingLevel" "public"."apprentice_traininglevel_enum" NOT NULL, "agency_id" character varying NOT NULL, "type" character varying NOT NULL, "apprentice_id" character varying, CONSTRAINT "REL_0bf4ac157d2ba6831ecbd6a88b" UNIQUE ("apprentice_id"), CONSTRAINT "PK_b27a0b1a290b9d3fa27c7251e10" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "apprentice" ("id" character varying NOT NULL, "full_name" character varying NOT NULL, "entry_date" TIMESTAMP NOT NULL, "age" integer NOT NULL, "status" "public"."apprentice_status_enum" NOT NULL DEFAULT 'EN_ENTRENAMIENTO', "trainingLevel" "public"."apprentice_traininglevel_enum" NOT NULL DEFAULT 'PRINCIPIANTE', "agency_id" character varying NOT NULL, "type" character varying NOT NULL, "apprentice_id" character varying, CONSTRAINT "REL_0bf4ac157d2ba6831ecbd6a88b" UNIQUE ("apprentice_id"), CONSTRAINT "PK_b27a0b1a290b9d3fa27c7251e10" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE INDEX "IDX_a78705714138d98c2a98605356" ON "apprentice" ("type") `);
         await queryRunner.query(`CREATE TABLE "agency" ("id" character varying NOT NULL, "place" character varying NOT NULL, "date_fundation" TIMESTAMP NOT NULL, "name" character varying NOT NULL, CONSTRAINT "PK_ab1244724d1c216e9720635a2e5" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TYPE "public"."group_status_enum" AS ENUM('ACTIVO', 'EN_PAUSA', 'DISUELTO')`);
         await queryRunner.query(`CREATE TABLE "group" ("id" character varying NOT NULL, "name" character varying NOT NULL, "status" "public"."group_status_enum" NOT NULL DEFAULT 'EN_PAUSA', "concept" character varying NOT NULL, "debutDate" date NOT NULL, "memberNumber" integer NOT NULL, "is_created" boolean NOT NULL, "proposed_by_artist_id" character varying, "agencyId" character varying, CONSTRAINT "PK_256aa0fda9b1de1a73ee0b7106b" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "award_entity" ("id" character varying NOT NULL, "name" character varying NOT NULL, "date" date NOT NULL, "album_id" character varying NOT NULL, CONSTRAINT "PK_80bc0e716eba2a7b5ccf14d281a" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "album_entity" ("id" character varying NOT NULL, "title" character varying NOT NULL, "releaseDate" TIMESTAMP NOT NULL, "mainProducer" character varying NOT NULL, "copiesSold" integer NOT NULL, "numberOfTracks" integer NOT NULL, "group_id" character varying, "artist_id" character varying, CONSTRAINT "PK_319a74c2085b42849b15412a3bf" PRIMARY KEY ("id"))`);
-        await queryRunner.query(`CREATE TABLE "billboardList" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying NOT NULL, "entry_date" TIMESTAMP NOT NULL, CONSTRAINT "PK_5b4576e51aef7706a66fb729c22" PRIMARY KEY ("id"))`);
-        await queryRunner.query(`CREATE TABLE "song_billboard" ("song_id" uuid NOT NULL, "billboard_list_id" uuid NOT NULL, "puesto" integer NOT NULL, CONSTRAINT "PK_695c061c9603f167b33e6d188eb" PRIMARY KEY ("song_id", "billboard_list_id"))`);
-        await queryRunner.query(`CREATE TABLE "song" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying NOT NULL, "entry_date" TIMESTAMP NOT NULL, "album_id" character varying, CONSTRAINT "PK_baaa977f861cce6ff954ccee285" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "billboardList" ("id" SERIAL NOT NULL, "name" character varying NOT NULL, "entry_date" TIMESTAMP NOT NULL, CONSTRAINT "PK_5b4576e51aef7706a66fb729c22" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "song_billboard" ("song_id" integer NOT NULL, "billboard_list_id" integer NOT NULL, "puesto" integer NOT NULL, CONSTRAINT "PK_695c061c9603f167b33e6d188eb" PRIMARY KEY ("song_id", "billboard_list_id"))`);
+        await queryRunner.query(`CREATE TABLE "song" ("id" SERIAL NOT NULL, "name" character varying NOT NULL, "entry_date" TIMESTAMP NOT NULL, "album_id" character varying, CONSTRAINT "PK_baaa977f861cce6ff954ccee285" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TYPE "public"."users_role_enum" AS ENUM('AGENCY_MANAGER', 'ARTIST', 'ADMIN')`);
+        await queryRunner.query(`CREATE TABLE "users" ("id" SERIAL NOT NULL, "username" character varying NOT NULL, "password" character varying NOT NULL, "role" "public"."users_role_enum" NOT NULL, "isActive" boolean NOT NULL, CONSTRAINT "UQ_fe0bb3f6520ee0469504521e710" UNIQUE ("username"), CONSTRAINT "PK_a3ffb1c0c8416b9fc6f907b7433" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "income_entity" ("id" character varying NOT NULL, "activityID" character varying NOT NULL, "mount" numeric(10,2) NOT NULL, "date" date NOT NULL, "responsible" character varying NOT NULL, CONSTRAINT "PK_bf14d077265256e2762f9e86a77" PRIMARY KEY ("id", "activityID"))`);
         await queryRunner.query(`CREATE TYPE "public"."contract_entity_status_enum" AS ENUM('ACTIVO', 'FINALIZADO', 'EN_RENOVACION', 'RESCINDIDO')`);
         await queryRunner.query(`CREATE TABLE "contract_entity" ("intervalID" character varying NOT NULL, "agencyID" character varying NOT NULL, "artistID" character varying NOT NULL, "status" "public"."contract_entity_status_enum" NOT NULL DEFAULT 'ACTIVO', "conditions" character varying NOT NULL, "distributionPercentage" numeric NOT NULL, CONSTRAINT "PK_f2d4b4a097313fa5932508156e3" PRIMARY KEY ("intervalID", "agencyID", "artistID"))`);
         await queryRunner.query(`ALTER TABLE "apprentice_evaluation" ADD CONSTRAINT "FK_16c854b5a70d3a2e3d16b01dd91" FOREIGN KEY ("apprentice_id") REFERENCES "apprentice"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
@@ -74,6 +77,7 @@ export class InitialSetup1761324488636 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "song_billboard" ADD CONSTRAINT "FK_f86489de1eda21a0e1ad2a987b0" FOREIGN KEY ("song_id") REFERENCES "song"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "song_billboard" ADD CONSTRAINT "FK_b742d8c0dfb486f96f1eb711834" FOREIGN KEY ("billboard_list_id") REFERENCES "billboardList"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "song" ADD CONSTRAINT "FK_c1b6644942ac9914001543107d5" FOREIGN KEY ("album_id") REFERENCES "album_entity"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "income_entity" ADD CONSTRAINT "FK_b30dfa79fb31c8b32255ee7c8d8" FOREIGN KEY ("activityID") REFERENCES "activity_entity"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "contract_entity" ADD CONSTRAINT "FK_eaf2b143b534a09274a9e29fc5a" FOREIGN KEY ("intervalID") REFERENCES "interval_entity"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "contract_entity" ADD CONSTRAINT "FK_7660b02f35c634a23d7ded1c6a0" FOREIGN KEY ("agencyID") REFERENCES "agency"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "contract_entity" ADD CONSTRAINT "FK_3a49e460a30517dfe027ab50d04" FOREIGN KEY ("artistID") REFERENCES "artist"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
@@ -83,6 +87,7 @@ export class InitialSetup1761324488636 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "contract_entity" DROP CONSTRAINT "FK_3a49e460a30517dfe027ab50d04"`);
         await queryRunner.query(`ALTER TABLE "contract_entity" DROP CONSTRAINT "FK_7660b02f35c634a23d7ded1c6a0"`);
         await queryRunner.query(`ALTER TABLE "contract_entity" DROP CONSTRAINT "FK_eaf2b143b534a09274a9e29fc5a"`);
+        await queryRunner.query(`ALTER TABLE "income_entity" DROP CONSTRAINT "FK_b30dfa79fb31c8b32255ee7c8d8"`);
         await queryRunner.query(`ALTER TABLE "song" DROP CONSTRAINT "FK_c1b6644942ac9914001543107d5"`);
         await queryRunner.query(`ALTER TABLE "song_billboard" DROP CONSTRAINT "FK_b742d8c0dfb486f96f1eb711834"`);
         await queryRunner.query(`ALTER TABLE "song_billboard" DROP CONSTRAINT "FK_f86489de1eda21a0e1ad2a987b0"`);
@@ -120,6 +125,9 @@ export class InitialSetup1761324488636 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE "apprentice_evaluation" DROP CONSTRAINT "FK_16c854b5a70d3a2e3d16b01dd91"`);
         await queryRunner.query(`DROP TABLE "contract_entity"`);
         await queryRunner.query(`DROP TYPE "public"."contract_entity_status_enum"`);
+        await queryRunner.query(`DROP TABLE "income_entity"`);
+        await queryRunner.query(`DROP TABLE "users"`);
+        await queryRunner.query(`DROP TYPE "public"."users_role_enum"`);
         await queryRunner.query(`DROP TABLE "song"`);
         await queryRunner.query(`DROP TABLE "song_billboard"`);
         await queryRunner.query(`DROP TABLE "billboardList"`);
