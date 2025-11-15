@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import AdminSidebar from './AdminSidebar';
-// import SectionLoader from './SectionLoader';
 import { sectionComponents } from './AdminSectionMap';
 import '../../components/Admin/AdminDashboard.css';
 

@@ -4,7 +4,7 @@ import { ApprenticeEntity } from '@entities/ApprenticeEntity';
 import { IMapper } from 'src/InfraestructureLayer/database/Mappers/IMapper';
 import { ApprenticeMapper } from 'src/InfraestructureLayer/database/Mappers/ApprenticeMapper';
 import { IApprenticeRepository } from '@domain/Repositories/IApprenticeRepository';
-import { ApprenticeRepositoryImpl} from 'src/InfraestructureLayer/database/Repositories/ApprenticeRepository';
+import { ApprenticeRepository} from 'src/InfraestructureLayer/database/Repositories/ApprenticeRepository';
 import { ApprenticeController } from '@presentation/controllers/apprentice.controller';
 
 @Module({
@@ -14,12 +14,12 @@ import { ApprenticeController } from '@presentation/controllers/apprentice.contr
   controllers: [ApprenticeController],
   providers: [
     {
-      provide: IMapper,      // ✅ Interfaz como token
-      useClass: ApprenticeMapper   // ✅ Implementación concreta
+      provide: IMapper,      
+      useClass: ApprenticeMapper   
     },
     {
-      provide: IApprenticeRepository,      // ✅ Interfaz como token
-      useClass: ApprenticeRepositoryImpl   // ✅ Implementación concreta
+      provide: IApprenticeRepository,      
+      useClass: ApprenticeRepository  
     }
   ],
   exports: [
