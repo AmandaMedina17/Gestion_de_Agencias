@@ -1,3 +1,5 @@
-interface IUpdatable<UpdateDto> {
-  update(updateDto: UpdateDto): void;
+import { UpdateData } from "./UpdateData";
+
+export interface IUpdatable {
+  update(updateDto: UpdateData): void;
 }
