@@ -2,9 +2,10 @@ import { DateValue } from "../Value Objects/Values";
 import { v4 as uuidv4 } from "uuid";
 import { ApprenticeStatus, ApprenticeTrainingLevel } from "../Enums";
 import { Evaluation } from "./Evaluation";
-import { UpdateApprenticeDto } from "@application/DTOs/apprenticeDto/update-apprentice.dto";
+import { IUpdatable } from "../UpdatableInterface";
+import { UpdateData } from "../UpdateData";
 
-export class Apprentice implements IUpdatable<UpdateApprenticeDto> {
+export class Apprentice implements IUpdatable {
   private evaluations: Evaluation[] = [];
 
   constructor(
@@ -18,7 +19,7 @@ export class Apprentice implements IUpdatable<UpdateApprenticeDto> {
     this.validate();
   }
 
-  update(updateDto: UpdateApprenticeDto): void {
+  update(updateDto: UpdateData): void {
     if(updateDto.fullName)
     {
       this.validate_name(updateDto.fullName);

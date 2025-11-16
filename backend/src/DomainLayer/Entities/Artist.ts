@@ -2,10 +2,10 @@ import { v4 as uuidv4 } from "uuid";
 import { ApprenticeStatus, ApprenticeTrainingLevel } from "../Enums";
 import { ArtistStatus } from "../Enums";
 import { Apprentice } from "./Apprentice";
-import { UpdateArtistDto } from "@application/DTOs/artistDto/update-artist.dto";
+import { IUpdatable } from "../UpdatableInterface";
+import { UpdateData } from "../UpdateData";
 
-
-export class Artist implements IUpdatable<UpdateArtistDto>{
+export class Artist implements IUpdatable{
   constructor(
     private id: string,    
     private transitionDate: Date, //fecha del primer debut con el grupo
@@ -24,7 +24,7 @@ export class Artist implements IUpdatable<UpdateArtistDto>{
     return new Artist(id, transitionDate, status, stageName, birthDate, groupId, apprenticeId);
   }
 
-  update(updateDto: UpdateArtistDto): void{
+  update(updateDto: UpdateData): void{
     if(updateDto.stageName)
     {
       this.stageName = updateDto.stageName;
