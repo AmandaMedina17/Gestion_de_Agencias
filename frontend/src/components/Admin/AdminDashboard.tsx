@@ -4,7 +4,7 @@ import { sectionComponents } from './AdminSectionMap';
 import '../../components/Admin/AdminDashboard.css';
 
 const AdminDashboard: React.FC = () => {
-  const [activeSection, setActiveSection] = useState('apprentices_creation');
+  const [activeSection, setActiveSection] = useState('apprentices_management');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const closeSidebar = useCallback(() => {

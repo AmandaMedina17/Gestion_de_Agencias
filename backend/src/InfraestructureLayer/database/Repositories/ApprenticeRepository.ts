@@ -7,6 +7,8 @@ import { Apprentice } from '@domain/Entities/Apprentice';
 import { ApprenticeMapper } from '../Mappers/ApprenticeMapper';
 import { ApprenticeEntity } from '../Entities/ApprenticeEntity';
 import { Evaluation } from '@domain/Entities/Evaluation';
+import { IMapper } from '../Mappers/IMapper';
+
 @Injectable()
 export class ApprenticeRepository
   extends BaseRepository<Apprentice, ApprenticeEntity>
@@ -15,7 +17,7 @@ export class ApprenticeRepository
   constructor(
     @InjectRepository(ApprenticeEntity)
     repository: Repository<ApprenticeEntity>,
-    mapper: ApprenticeMapper,
+    mapper: IMapper<Apprentice, ApprenticeEntity>,
   ) {
     super(repository, mapper);
   }

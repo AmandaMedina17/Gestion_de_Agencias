@@ -6,6 +6,9 @@ import { ApprenticeMapper } from 'src/InfraestructureLayer/database/Mappers/Appr
 import { IApprenticeRepository } from '@domain/Repositories/IApprenticeRepository';
 import { ApprenticeRepository} from 'src/InfraestructureLayer/database/Repositories/ApprenticeRepository';
 import { ApprenticeController } from '@presentation/controllers/apprentice.controller';
+import { BaseDtoMapper } from '@application/DTOs/dtoMappers/DtoMapper';
+import { ApprenticeDtoMapper } from '@application/DTOs/dtoMappers/apprentice.dtoMapper';
+import { ApprenticeService } from '@application/services/apprentice.service';
 
 @Module({
   imports: [
@@ -20,7 +23,12 @@ import { ApprenticeController } from '@presentation/controllers/apprentice.contr
     {
       provide: IApprenticeRepository,      
       useClass: ApprenticeRepository  
-    }
+    },
+    {
+      provide: BaseDtoMapper,
+      useClass: ApprenticeDtoMapper
+    },
+    ApprenticeService
   ],
   exports: [
     IApprenticeRepository 

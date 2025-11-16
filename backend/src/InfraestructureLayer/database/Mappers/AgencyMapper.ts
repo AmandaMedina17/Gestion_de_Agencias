@@ -35,7 +35,7 @@ export class AgencyMapper extends IMapper<Agency, AgencyEntity> {
     agencyEntity.dateFundation = domainEntity.getDateFundation();
     
     // Las relaciones se manejan en el repositorio
-    agencyEntity.apprentices = [];
+    //agencyEntity.apprentices = [];
     agencyEntity.groups = [];
     agencyEntity.artistMemberships = [];
 

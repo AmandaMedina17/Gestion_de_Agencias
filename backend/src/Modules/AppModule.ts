@@ -5,13 +5,15 @@ import { AppController } from '@presentation/controllers/app.controller';
 import { AppService } from '@application/services/app.service';
 import { AuthModule } from './auth.module';
 import { PlaceModule } from './PlaceModule';
+import { ApprenticeModule } from './ApprenticeModule';
 
 @Module({
   imports: [
     DatabaseModule,
     ResponsibleModule,
     AuthModule,
-    PlaceModule
+    PlaceModule,
+    ApprenticeModule
   ],
   controllers: [AppController],
   providers: [AppService],
