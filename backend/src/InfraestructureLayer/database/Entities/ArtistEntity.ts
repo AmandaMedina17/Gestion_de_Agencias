@@ -105,6 +105,5 @@ export class ArtistEntity{
   activityPlaces!: ActivityPlaceEntity[];
 
   @OneToOne(() => ApprenticeEntity, (artist) => artist.artistId) //en una agencia pueden haber muchos aprendices
-    @JoinColumn({ name: "apprentice_id" })
-    apprenticeId!: ApprenticeEntity;
+  apprenticeId!: ApprenticeEntity;
 }

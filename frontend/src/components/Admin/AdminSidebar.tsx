@@ -18,7 +18,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const menuItems = [
-        {   id: 'apprentices_creation', 
+        {   id: 'apprentices_management', 
             label: 'Gestión de Aprendices', 
             tooltip: 'Registrar, modificar y eliminar aprendices',
         },

@@ -36,6 +36,8 @@ body {
     border-radius: 15px;
     box-shadow: 0 5px 20px rgba(0,0,0,0.1);
     justify-content: center;
+    width: 120%; /* Aumentar el ancho */
+    max-width: 1500px; /* Aumentar el máximo ancho */
 }
 
 .detail-card {
@@ -48,6 +50,8 @@ body {
     box-shadow: 0 5px 20px rgba(0,0,0,0.1);
     margin-bottom: 40px;
     border: 5px solid white;
+    width: 120%; /* Aumentar el ancho */
+    max-width: 1400px; /* Aumentar el máximo ancho */
     
 }
 

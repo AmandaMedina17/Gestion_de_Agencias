@@ -14,7 +14,6 @@ import { ApprenticeEvaluationEntity } from "./ApprenticeEvaluationEntity";
 import { ArtistEntity } from "./ArtistEntity";
 
 @Entity("apprentice")
-@TableInheritance({ column: { type: "varchar", name: "type" } })
 export class ApprenticeEntity {
   @PrimaryColumn()
   id!: string;
@@ -43,17 +42,13 @@ export class ApprenticeEntity {
   trainingLevel!: ApprenticeTrainingLevel;
 
   //Relaciones
-  @ManyToOne(() => AgencyEntity, (agency) => agency.apprentices) //en una agencia pueden haber muchos aprendices
+  @ManyToOne(() => AgencyEntity,(agency) => agency.apprentices) //en una agencia pueden haber muchos aprendices
   @JoinColumn({ name: "agency_id" })
   agency!: AgencyEntity;
 
-  @Column({ name: "agency_id" })
-  agencyId!: string;
-
 
   @OneToOne(() => ArtistEntity, (artist) => artist.apprenticeId) //en una agencia pueden haber muchos aprendices
-  @JoinColumn({ name: "apprentice_id" })
-  artistId!: AgencyEntity;
+  artistId!: ArtistEntity;
 
   @OneToMany(
     () => ApprenticeEvaluationEntity,
