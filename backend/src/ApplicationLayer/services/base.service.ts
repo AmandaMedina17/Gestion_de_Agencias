@@ -2,9 +2,10 @@ import { Injectable, Inject } from '@nestjs/common';
 import { BaseDtoMapper } from '@application/DTOs/dtoMappers/DtoMapper';
 import { IRepository } from '@domain/Repositories/IRepository';
 import { NotFoundException } from '@nestjs/common';
+import { IUpdatable } from '@domain/UpdatableInterface';
 
 @Injectable()
-export class BaseService<DomainEntity extends IUpdatable<UpdateDto>, CreateDto, ResponseDto, UpdateDto> {
+export class BaseService<DomainEntity extends IUpdatable, CreateDto, ResponseDto, UpdateDto> {
 
   constructor(
      @Inject(IRepository)
@@ -38,7 +39,8 @@ export class BaseService<DomainEntity extends IUpdatable<UpdateDto>, CreateDto, 
         throw new NotFoundException(`Entity with ID ${id} not found`);
       }
 
-      domainEntity.update(updateDto);
+      const updateDomain = this.mapper.toDomainUpdate(updateDto)
+      domainEntity.update(updateDomain);
 
       await this.repository.update(domainEntity);
 

@@ -1,7 +1,8 @@
-import { UpdatePlaceDto } from '@application/DTOs/placeDto/update-place.dto';
+import { IUpdatable } from '@domain/UpdatableInterface';
+import { UpdateData } from '@domain/UpdateData';
 import { v4 as uuidv4 } from 'uuid';
 
-export class Place implements IUpdatable<UpdatePlaceDto>{
+export class Place implements IUpdatable{
     constructor(
       private readonly id: string,
       private name: string
@@ -21,7 +22,7 @@ export class Place implements IUpdatable<UpdatePlaceDto>{
       return new Place(id, name);
     }
 
-    update(updateDto: UpdatePlaceDto){
+    update(updateDto: UpdateData){
       if(updateDto.name)
       {
         this.validate_name(updateDto.name);
