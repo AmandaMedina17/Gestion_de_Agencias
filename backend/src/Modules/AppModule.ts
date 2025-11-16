@@ -6,6 +6,7 @@ import { AppService } from '@application/services/app.service';
 import { AuthModule } from './auth.module';
 import { PlaceModule } from './PlaceModule';
 import { ApprenticeModule } from './ApprenticeModule';
+import { ArtistModule } from './ArtistModule';
 
 @Module({
   imports: [
@@ -13,7 +14,8 @@ import { ApprenticeModule } from './ApprenticeModule';
     ResponsibleModule,
     AuthModule,
     PlaceModule,
-    ApprenticeModule
+    ApprenticeModule,
+    ArtistModule
   ],
   controllers: [AppController],
   providers: [AppService],

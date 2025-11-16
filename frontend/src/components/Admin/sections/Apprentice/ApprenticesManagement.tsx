@@ -349,7 +349,7 @@ const ApprenticeManagement: React.FC = () => {
         <div className="profile-info">
           <h1>Gestión de Aprendices</h1>
           <p className="section-description">
-            Administre todos los aprendices del sistema en una sola vista
+            Administre todos los aprendices del sistema
           </p>
         </div>
       </div>

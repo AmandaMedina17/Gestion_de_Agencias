@@ -91,7 +91,7 @@ export const ApprenticeProvider: React.FC<ApprenticeProviderProps> = ({ children
     }
   };
 
-  const updateApprentice = async (id: string, updateData: { name: string }) => {
+  const updateApprentice = async (id: string, updateData: { name: string, age:number, status:ApprenticeStatus, trainingLevel:ApprenticeTrainingLevel, entryDate:Date}) => {
     setLoading(true);
     setError(null);
     try {

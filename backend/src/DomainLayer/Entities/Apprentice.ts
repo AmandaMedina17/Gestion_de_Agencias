@@ -31,12 +31,10 @@ export class Apprentice implements IUpdatable<UpdateApprenticeDto> {
     }
     if(updateDto.status)
     {
-      this.validate_status(updateDto.status);
       this.status = updateDto.status;
     }
     if(updateDto.trainingLevel)
     {
-      this.validate_trainingLevel(updateDto.trainingLevel);
       this.trainingLevel = updateDto.trainingLevel;
     }
     if(updateDto.entryDate)

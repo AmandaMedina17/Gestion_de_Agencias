@@ -21,6 +21,7 @@ export class ArtistEntity{
   stageName!: string;
 
   @Column({
+    name: "status",
     type: "enum",
     enum: ArtistStatus,
   })
@@ -31,6 +32,9 @@ export class ArtistEntity{
 
   @Column({ name: "transition_date" })
   transitionDate!: Date;
+
+  @Column({name: "group_id"})
+  groupId!: string;
 
   // Un artista puede realizar cero o muchas actividades
   @OneToMany(
@@ -105,5 +109,9 @@ export class ArtistEntity{
   activityPlaces!: ActivityPlaceEntity[];
 
   @OneToOne(() => ApprenticeEntity, (artist) => artist.artistId) //en una agencia pueden haber muchos aprendices
-  apprenticeId!: ApprenticeEntity;
+  @JoinColumn({ name: "apprentice_id" })
+  apprentice!: ApprenticeEntity;
+
+  @Column({ name: "apprentice_id" })
+  apprenticeId!: string;
 }
