@@ -5,7 +5,7 @@ import { IMapper } from 'src/InfraestructureLayer/database/Mappers/IMapper';
 import { ApprenticeMapper } from 'src/InfraestructureLayer/database/Mappers/ApprenticeMapper';
 import { IApprenticeRepository } from '@domain/Repositories/IApprenticeRepository';
 import { ApprenticeRepository} from 'src/InfraestructureLayer/database/Repositories/ApprenticeRepository';
-import { ApprenticeController } from '@presentation/controllers/apprentice.controller';
+import { ApprenticeController } from '@presentation/Controllers/apprentice.controller';
 import { BaseDtoMapper } from '@application/DTOs/dtoMappers/DtoMapper';
 import { ApprenticeDtoMapper } from '@application/DTOs/dtoMappers/apprentice.dtoMapper';
 import { ApprenticeService } from '@application/services/apprentice.service';
