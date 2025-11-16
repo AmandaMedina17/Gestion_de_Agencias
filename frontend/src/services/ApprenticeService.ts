@@ -1,4 +1,5 @@
 import { CreateApprenticeDto } from '../../../backend/src/ApplicationLayer/DTOs/apprenticeDto/create-apprentice.dto';
+import { ApprenticeStatus, ApprenticeTrainingLevel } from '../components/Admin/sections/Apprentice/ApprenticesManagement';
 import { ApprenticeResponseDto } from './dtos/ApprenticeDto';
 
 const API_BASE_URL = 'http://localhost:3000'; // Puerto del backend NestJS
@@ -71,7 +72,7 @@ export const apprenticeService = {
   },
 
    // Actualizar un aprendiz
-  async update(id: string, updateApprenticeDto: { name: string }): Promise<ApprenticeResponseDto> {
+  async update(id: string, updateApprenticeDto: { name: string, age:number, status:ApprenticeStatus, trainingLevel:ApprenticeTrainingLevel, entryDate:Date }): Promise<ApprenticeResponseDto> {
     try {
       const response = await fetch(`${API_BASE_URL}/apprentices/${id}`, {
         method: 'PATCH',
