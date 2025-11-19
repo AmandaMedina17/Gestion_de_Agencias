@@ -13,12 +13,13 @@ export class SongEntity{
     @Column({ name: 'entry_date' })
     entryDate!: Date;
 
-    //relaciones
     @ManyToOne(() => AlbumEntity, album => album.songs)
     @JoinColumn({ name: 'album_id' })
     album!: AlbumEntity;
 
-    @OneToMany(() => SongBillboardEntity, (songBillboard: SongBillboardEntity) => songBillboard.song)
-    songBillboards!: SongBillboardEntity[];
+    @OneToMany(() => SongBillboardEntity, (songBillboardNat: SongBillboardEntity) => songBillboardNat.song)
+    songBillboardsNat!: SongBillboardEntity[];
 
+    @OneToMany(() => SongBillboardEntity, (songBillboardsInt: SongBillboardEntity) => songBillboardsInt.song)
+    songBillboardsInt!: SongBillboardEntity[];
 }

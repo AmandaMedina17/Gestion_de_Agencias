@@ -15,7 +15,7 @@ export class SongBillboardEntity {
     puesto!: number;
 
     // Relación con SongEntity
-    @ManyToOne(() => SongEntity, (song: SongEntity) => song.songBillboards)
+    @ManyToOne(() => SongEntity, (song: SongEntity) => song.songBillboardsNat)
     @JoinColumn({ name: 'song_id' })
     song!: SongEntity;
 

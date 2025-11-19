@@ -8,7 +8,7 @@ export class BillboardList {
     private publicDate: DateValue,
     private scope: BillboardListScope,
     private nameList: string,
-    private endList: number //cuantos puesto abarca la lista
+    private endList: number 
   ) {}
   public getId(): string {
     return this.id;
