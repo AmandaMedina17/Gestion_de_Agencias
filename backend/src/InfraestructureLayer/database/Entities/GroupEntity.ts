@@ -32,6 +32,9 @@ export class GroupEntity {
   @Column()
   concept!: string;
 
+  @Column()
+  visualconcept!: string;
+
   @Column({ type: "date" })
   debutDate!: Date;
 

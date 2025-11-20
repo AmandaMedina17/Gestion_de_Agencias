@@ -51,10 +51,8 @@ export class ApprenticeEntity {
   artistId!: ArtistEntity;
 
   @OneToMany(
-    () => ApprenticeEvaluationEntity,
-    (apprenticeEvaluation: ApprenticeEvaluationEntity) =>
-      apprenticeEvaluation.apprentice
+  () => ApprenticeEvaluationEntity,(evaluation) => evaluation.apprentice
   )
-  apprenticeEvaluations!: ApprenticeEvaluationEntity[];
+  evaluations!: ApprenticeEvaluationEntity[];
 }
 
