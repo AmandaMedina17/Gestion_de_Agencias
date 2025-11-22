@@ -1,6 +1,6 @@
 import { Entity, Column, OneToMany , OneToOne, JoinColumn, PrimaryColumn} from "typeorm";
 import { ApprenticeEntity } from "./ApprenticeEntity";
-import { ArtistStatus } from "@domain/Enums";
+import { ArtistStatus } from "../../../DomainLayer/Enums";
 import { ArtistActivityEntity } from "./ArtistActivityEntity";
 import { AlbumEntity } from "./AlbumEntity";
 import { GroupEntity } from "./GroupEntity";

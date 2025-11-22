@@ -15,6 +15,7 @@
     "migration:show": "typeorm-ts-node-commonjs migration:show -d src/Config/ormconfig.ts"
   },
   "dependencies": {
+    "@faker-js/faker": "^10.1.0",
     "@nestjs/common": "^11.1.8",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.1.8",
