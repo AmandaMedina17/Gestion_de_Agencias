@@ -1,25 +1,23 @@
-// src/app.module.ts
 import { Module } from "@nestjs/common";
-import { TypeOrmModule } from "@nestjs/typeorm";
-import { ConfigModule } from "@nestjs/config";
+import { DatabaseModule } from "./DataBaseModule";
+import { ResponsibleModule } from "./ResponsibleModule";
+import { AppController } from "../PresentationLayer/Controllers/app.controller";
+import { AppService } from "../ApplicationLayer/services/app.service";
 import { AuthModule } from "./auth.module";
-import { UserOrmEntity } from "../InfraestructureLayer/database/Entities/UserEntity";
+import { PlaceModule } from "./PlaceModule";
+import { ApprenticeModule } from "./ApprenticeModule";
+import { ArtistModule } from "./ArtistModule";
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
-    TypeOrmModule.forRoot({
-      type: "postgres",
-      host: "localhost",
-      port: 5432,
-      username: "postgres",
-      password: "amsasc17",
-      database: "kpop_management",
-      entities: [UserOrmEntity],
-      synchronize: true, // Solo en desarrollo
-      logging: true,
-    }),
+    DatabaseModule,
+    ResponsibleModule,
     AuthModule,
+    PlaceModule,
+    ApprenticeModule,
+    ArtistModule,
   ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

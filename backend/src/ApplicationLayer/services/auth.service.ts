@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { AuthPayloadDto } from "@presentation/dtos/request/LoginDto";
+import { AuthPayloadDto } from "@application/DTOs/userDto/LoginDto";
 import { JwtService } from "@nestjs/jwt";
 import * as bcrypt from "bcrypt";
 import { UserRepository } from "../../InfraestructureLayer/database/Repositories/UserRepository";

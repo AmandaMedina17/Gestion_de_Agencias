@@ -1,0 +1,1 @@
+export type UpdateData = Record<string, any>;

@@ -1,4 +1,5 @@
-import React, { useState }  from 'react';
+import React, { useState, useRef } from 'react';
+import ReactDOM from 'react-dom';
 
 interface AdminSidebarProps {
   isOpen: boolean;
@@ -13,118 +14,128 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
   onSectionChange, 
   onClose 
 }) => {
-    const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
+    const [tooltipData, setTooltipData] = useState<{text: string, top: number} | null>(null);
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const menuItems = [
         {   id: 'apprentices_management', 
             label: 'Gestión de Aprendices', 
-            icon: '👤', 
             tooltip: 'Registrar, modificar y eliminar aprendices',
-            submenu:[
-                { id: 'apprentices_creation', label: 'Creación' },
-                { id: 'apprentices_deletion', label: 'Eliminación' }
-            ]
         },
-        {   
-            id: 'artists_management', 
+        {   id: 'artist_management', 
             label: 'Gestión de Artistas', 
             tooltip: 'Registrar, modificar y eliminar artistas',
-            submenu:[
-                { id: 'artists_creation', label: 'Creación' },
-                { id: 'artists_deletion', label: 'Eliminación' }
-            ]
         },
-        {   
-            id: 'groups_management',    
+        {   id: 'groups_management',    
             label: 'Gestión de Grupos', 
             tooltip: 'Registrar, modificar y eliminar grupos',
-            submenu:[
-                { id: 'groups_creation', label: 'Creación' },
-                { id: 'groups_deletion', label: 'Eliminación' }
-            ] 
         },
-        {   
-            id: 'songs_management', 
+        {   id: 'songs_management', 
             label: 'Gestión de Canciones', 
             tooltip: 'Registrar, modificar y eliminar canciones',
-            submenu:[
-                { id: 'songs_creation', label: 'Creación' },
-                { id: 'songs_deletion', label: 'Eliminación' }
-            ]
         },
-        {   
-            id: 'albums_management', 
+        {   id: 'albums_management', 
             label: 'Gestión de Albumes', 
             tooltip: 'Registrar, modificar y eliminar albumes',
-            submenu:[
-                { id: 'albumes_creation', label: 'Creación' },
-                { id: 'albumes_deletion', label: 'Eliminación' }
-            ]
         },
-        {   
-            id: 'activities_management', 
+        {   id: 'activities_management', 
             label: 'Gestión de Actividades', 
             tooltip: 'Registrar, modificar y eliminar actividades',
-            submenu:[
-                { id: 'activities_creation', label: 'Creación' },
-                { id: 'activities_deletion', label: 'Eliminación' }
-            ] 
         },
-        { 
-            id: 'incomes_management', 
+        {   id: 'incomes_management', 
             label: 'Gestión de Ingresos', 
             tooltip: 'Registrar, modificar y eliminar ingresos',
-            submenu:[
-                { id: 'incomes_creation', label: 'Creación' },
-                { id: 'incomes_deletion', label: 'Eliminación' }
-            ] 
-        }
+        },
+        {   id: 'responsible_management', 
+            label: 'Gestión de Responsables', 
+            tooltip: 'Registrar, modificar y eliminar responsables',
+        },
+        {   id: 'place_management', 
+            label: 'Gestión de Lugares', 
+            tooltip: 'Registrar, modificar y eliminar lugares',
+        },
+        {   id: 'contract_management', 
+            label: 'Gestión de Contratos', 
+            tooltip: 'Registrar, modificar y eliminar contratos',
+        },
+        {   id: 'evaluation_management', 
+            label: 'Gestión de Evaluaciones', 
+            tooltip: 'Registrar, modificar y eliminar evaluaciones',
+        },
     ];
 
-    const handleMainItemClick = (itemId: string) => {
-        if (openSubmenu === itemId) {
-        setOpenSubmenu(null);
-        } else {
-        setOpenSubmenu(itemId);
+    const handleItemClick = (itemId: string) => {
+        onSectionChange(itemId);
+        // Cerrar el sidebar en dispositivos móviles después de seleccionar una opción
+        if (window.innerWidth <= 768) {
+            onClose();
         }
     };
 
-    const handleSubItemClick = (subItemId: string) => {
-        onSectionChange(subItemId);
-        setOpenSubmenu(null); // Cerrar submenú después de seleccionar
+    const handleMouseEnter = (e: React.MouseEvent, tooltip: string) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        }
+        
+        timeoutRef.current = setTimeout(() => {
+            setTooltipData({
+                text: tooltip,
+                top: rect.top + rect.height / 2
+            });
+        }, 1100);
+    };
+
+    const handleMouseLeave = () => {
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+            timeoutRef.current = null;
+        }
+        setTooltipData(null);
+    };
+
+    // Función para crear portal de tooltip
+    const TooltipPortal = () => {
+        if (!tooltipData) return null;
+
+        return ReactDOM.createPortal(
+            <div 
+                className="external-tooltip"
+                style={{
+                    top: `${tooltipData.top}px`,
+                    left: '300px'
+                }}
+            >
+                {tooltipData.text}
+            </div>,
+            document.body
+        );
     };
 
     return (
-        <div className={`sidebar ${isOpen ? 'show' : ''}`} id="drop">
-        <nav className="sidebar-nav">
-            {menuItems.map((item) => (
-            <div key={item.id} className="nav-item-container">
-                <button
-                className={`nav-item main-item ${activeSection.startsWith(item.id) ? 'active' : ''} ${openSubmenu === item.id ? 'submenu-open' : ''}`}
-                onClick={() => handleMainItemClick(item.id)}
-                >
-                {item.label}
-                <span className="dropdown-arrow">▼</span>
-                <span className="tooltip">{item.tooltip}</span>
-                </button>
-                
-                {openSubmenu === item.id && (
-                <div className="submenu">
-                    {item.submenu.map((subItem) => (
-                    <button
-                        key={subItem.id}
-                        className={`submenu-item ${activeSection === subItem.id ? 'active' : ''}`}
-                        onClick={() => handleSubItemClick(subItem.id)}
-                    >
-                        {subItem.label}
-                    </button>
-                    ))}
-                </div>
-                )}
+        <>
+            <div className={`sidebar ${isOpen ? 'show' : ''}`} id="drop">
+                <nav className="sidebar-nav">
+                    <div className="nav-items-container">
+                        {menuItems.map((item) => (
+                        <div key={item.id} className="nav-item-container">
+                            <button
+                                className={`nav-item main-item ${activeSection === item.id ? 'active' : ''}`}
+                                onClick={() => handleItemClick(item.id)}
+                                onMouseEnter={(e) => handleMouseEnter(e, item.tooltip)}
+                                onMouseLeave={handleMouseLeave}
+                            >
+                                {item.label}
+                            </button>
+                        </div>
+                        ))}
+                    </div>
+                </nav>
             </div>
-            ))}
-        </nav>
-        </div>
+
+            {/* Renderizar el portal del tooltip */}
+            <TooltipPortal />
+        </>
     );
 };
 

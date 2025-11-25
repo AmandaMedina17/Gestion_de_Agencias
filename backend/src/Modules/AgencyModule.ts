@@ -1,30 +1,26 @@
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { AgencyEntity } from '@entities/AgencyEntity';
-import { IMapper } from 'src/InfraestructureLayer/database/Mappers/IMapper';
-import { AgencyMapper } from 'src/InfraestructureLayer/database/Mappers/AgencyMapper';
-import { IAgencyRepository } from '@domain/Repositories/IAgencyRepository';
-import { AgencyRepositoryImpl} from 'src/InfraestructureLayer/database/Repositories/AgencyRepository';
-import { AgencyController } from '@presentation/Controllers/AgencyController';
+import { Module } from "@nestjs/common";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { AgencyEntity } from "../InfraestructureLayer/database/Entities/AgencyEntity";
+import { IMapper } from "../InfraestructureLayer/database/Mappers/IMapper";
+import { AgencyMapper } from "../InfraestructureLayer/database/Mappers/AgencyMapper";
+import { IAgencyRepository } from "../DomainLayer/Repositories/IAgencyRepository";
+import { AgencyRepositoryImpl } from "../InfraestructureLayer/database/Repositories/AgencyRepository";
+import { AgencyController } from "../PresentationLayer/Controllers/agency.controller";
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([AgencyEntity])
-  ],
+  imports: [TypeOrmModule.forFeature([AgencyEntity])],
   controllers: [AgencyController],
   providers: [
     {
-      provide: IMapper,      // ✅ Interfaz como token
-      useClass: AgencyMapper   // ✅ Implementación concreta
+      provide: IMapper, // ✅ Interfaz como token
+      useClass: AgencyMapper, // ✅ Implementación concreta
     },
     {
-      provide: IAgencyRepository,      // ✅ Interfaz como token
-      useClass: AgencyRepositoryImpl   // ✅ Implementación concreta
-    }
+      provide: IAgencyRepository, // ✅ Interfaz como token
+      useClass: AgencyRepositoryImpl, // ✅ Implementación concreta
+    },
   ],
-  exports: [
-    IAgencyRepository 
-  ]
+  exports: [IAgencyRepository],
 })
 export class AgencyModule {}
 

@@ -1,24 +1,22 @@
 import { IMapper } from "./IMapper";
 import { Artist } from "@domain/Entities/Artist";
 import { ArtistEntity } from "@entities/ArtistEntity";
-import { ArtistStatus } from "@domain/Enums";
+import { Injectable } from "@nestjs/common";
+import { ApprenticeEntity } from "../Entities/ApprenticeEntity";
 
-export class ArtistMapper implements IMapper<Artist, ArtistEntity>{
-    toDomainEntities(entities: ArtistEntity[]): Artist[] {
-        return entities.map(entity => this.toDomainEntity(entity));
-    }
-    toDataBaseEntities(domains: Artist[]): ArtistEntity[] {
-        return domains.map(domain => this.toDataBaseEntity(domain));
-    }
+@Injectable()
+export class ArtistMapper extends IMapper<Artist, ArtistEntity>{
+    
     toDomainEntity(dataBaseEntity: ArtistEntity): Artist {
         return new Artist(
             dataBaseEntity.id,
-            dataBaseEntity.apprenticeId.entryDate,
+            dataBaseEntity.transitionDate,
             dataBaseEntity.statusArtist,
             dataBaseEntity.stageName,
-            dataBaseEntity.apprenticeId.fullName,
             dataBaseEntity.birthDate,
-            dataBaseEntity.transitionDate
+            dataBaseEntity.groupId,
+            dataBaseEntity.apprenticeId
+            
         );
     }
     toDataBaseEntity(domainEntity: Artist): ArtistEntity {
@@ -28,6 +26,9 @@ export class ArtistMapper implements IMapper<Artist, ArtistEntity>{
         entity.statusArtist = domainEntity.getStatusArtist();
         entity.birthDate = domainEntity.getBirthDate();
         entity.transitionDate = domainEntity.getDebutDate();
+        entity.groupId = domainEntity.getGroup();
+        entity.apprenticeId = domainEntity.getApprenticeId();
+        
         return entity;
     }
     

@@ -1,6 +1,8 @@
+import { IUpdatable } from '../UpdatableInterface'
+import { UpdateData } from '../UpdateData';
 import { v4 as uuidv4 } from 'uuid';
 
-export class Responsible{
+export class Responsible implements IUpdatable{
     constructor(
         private readonly id: string,
         private name: string
@@ -13,14 +15,26 @@ export class Responsible{
         throw new Error("ID cannot be null or empty");
       }
 
-      if (this.name === null) {
-        throw new Error("Name cannot be null");
-      }
+      this.validate_name(this.name)
     }
 
     static create( name: string): Responsible {
       const id = uuidv4();
       return new Responsible(id, name);
+    }
+
+    update(updateDto: UpdateData){
+      if(updateDto.name)
+      {
+        this.validate_name(updateDto.name);
+        this.name = updateDto.name;
+      }
+    }
+    
+    private validate_name(name:string): void{
+      if (name === null || name.trim() === "") {
+        throw new Error("Name cannot be null or empty");
+      }
     }
 
     public getId(): string{

@@ -2,7 +2,7 @@ import { IMapper } from "./IMapper";
 import { Income } from "@domain/Entities/Income";
 import { IncomeEntity } from "@entities/IncomeEntity";
 
-class IncomeMapper implements IMapper<Income, IncomeEntity>{
+export class IncomeMapper extends IMapper<Income, IncomeEntity>{
 
     toDomainEntity(dataBaseEntity: IncomeEntity): Income {
         if (!dataBaseEntity) {
@@ -28,13 +28,5 @@ class IncomeMapper implements IMapper<Income, IncomeEntity>{
         entity.responsible = domainEntity.getResponsible();
 
         return entity;
-    }
-
-    toDomainEntities(entities: IncomeEntity[]): Income[] {
-        return entities.map(entity => this.toDomainEntity(entity));
-    }
-    
-    toDataBaseEntities(domains: Income[]): IncomeEntity[] {
-        return domains.map(domain => this.toDataBaseEntity(domain));
     }
 }

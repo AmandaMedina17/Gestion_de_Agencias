@@ -5,7 +5,7 @@ import { IMapper } from 'src/InfraestructureLayer/database/Mappers/IMapper';
 import { ContractMapper } from 'src/InfraestructureLayer/database/Mappers/ContractMapper';
 import { IContractRepository } from '@domain/Repositories/IContractRepository';
 import { ContractRepositoryImpl} from 'src/InfraestructureLayer/database/Repositories/ContractRepository';
-import { ContractController } from '@presentation/Controllers/ContractController';
+import { ContractController } from '@presentation/Controllers/contract.controller';
 import { Contract } from '../DomainLayer/Entities/Contract';
 
 @Module({

@@ -1,8 +1,10 @@
 import { IMapper } from "./IMapper";
 import { ResponsibleEntity } from "@entities/ResponsibleEntity";
 import { Responsible } from "@domain/Entities/Responsible";
+import { Injectable } from '@nestjs/common';
 
-class ResponsibleMapper implements IMapper<Responsible, ResponsibleEntity>{
+@Injectable()
+export class ResponsibleMapper extends IMapper<Responsible, ResponsibleEntity>{
     toDomainEntity(dataBaseEntity: ResponsibleEntity): Responsible {
         if(!dataBaseEntity)
         {
@@ -22,13 +24,5 @@ class ResponsibleMapper implements IMapper<Responsible, ResponsibleEntity>{
         entity.name = domainEntity.getName();
 
         return entity;
-    }
-
-    toDataBaseEntities(domains: Responsible[]): ResponsibleEntity[] {
-        return domains.map(domain => this.toDataBaseEntity(domain));
-    }
-
-    toDomainEntities(entities: ResponsibleEntity[]): Responsible[] {
-        return entities.map(entity => this.toDomainEntity(entity));
     }
 }

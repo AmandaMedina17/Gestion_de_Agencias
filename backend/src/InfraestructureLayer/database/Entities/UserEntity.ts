@@ -4,7 +4,7 @@ import { UserRole } from '../../../DomainLayer/Enums';
 @Entity('users')
 export class UserOrmEntity {
   @PrimaryGeneratedColumn()
-  id!:string;
+  id!: string;
 
   @Column({ unique: true })
   username!: string;

@@ -1,4 +1,3 @@
-// AuthContext.tsx
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import axios from 'axios';
 
@@ -27,13 +26,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (credentials: { username: string, password: string }) => {
     try {
-      console.log('Intentando login con:', credentials); // 🆕 Debug
+      console.log('Intentando login con:', credentials);
       
       const response = await axios.post('http://localhost:3000/auth/login', credentials, {
-        timeout: 5000, // 🆕 Timeout de 5 segundos
+        timeout: 5000,
       });
       
-      console.log('Respuesta del servidor:', response); // 🆕 Debug
+      console.log('Respuesta del servidor:', response);
       
       const { token, user } = response.data;
       

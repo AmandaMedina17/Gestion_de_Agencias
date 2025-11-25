@@ -9,19 +9,19 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
     "resolveJsonModule": true,
     "moduleResolution": "node",
     "baseUrl": ".",
     "paths": {
       "@domain/*": ["src/DomainLayer/*"],
       "@application/*": ["src/ApplicationLayer/*"],
-      "@infrastructure/*": ["src/InfrastructureLayer/*"],
+      "@infrastructure/*": ["src/InfraestructureLayer/*"],
       "@presentation/*": ["src/PresentationLayer/*"],
       "@entities/*": ["src/InfraestructureLayer/database/Entities/*"],
     }
   },
-  "include": ["src/**/*", "src/Config/environment.ts"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }
