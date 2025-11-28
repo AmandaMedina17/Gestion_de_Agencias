@@ -1,7 +1,8 @@
-import { UpdateResponsibleDto } from '@application/DTOs/responsibleDto/update-responsible.dto';
+import { IUpdatable } from '../UpdatableInterface'
+import { UpdateData } from '../UpdateData';
 import { v4 as uuidv4 } from 'uuid';
 
-export class Responsible{
+export class Responsible implements IUpdatable{
     constructor(
         private readonly id: string,
         private name: string
@@ -22,7 +23,7 @@ export class Responsible{
       return new Responsible(id, name);
     }
 
-    update(updateDto: UpdateResponsibleDto){
+    update(updateDto: UpdateData){
       if(updateDto.name)
       {
         this.validate_name(updateDto.name);

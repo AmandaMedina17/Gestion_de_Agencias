@@ -1,6 +1,6 @@
 import { Entity, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { ActivityEntity } from './ActivityEntity';
-import { Date } from './DateEntity';
+import { DateEntity } from './DateEntity';
 
 @Entity('activity_date')
 export class ActivityDateEntity {
@@ -16,7 +16,7 @@ export class ActivityDateEntity {
     activity!: ActivityEntity;
 
     // Relación con Date
-    @ManyToOne(() => Date, (date: Date) => date.activityDates)
+    @ManyToOne(() => DateEntity, (date: DateEntity) => date.activityDates)
     @JoinColumn({ name: 'date_id' })
-    date!: Date;
+    date!: DateEntity;
 }

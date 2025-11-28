@@ -4,7 +4,7 @@ import { ArtistGroupCollaborationEntity } from './ArtistGroupCollaborationEntity
 import { ActivityDateEntity } from './ActivityDateEntity';
 
 @Entity()
-export class Date {
+export class DateEntity {
   @PrimaryColumn()
   id!: string;
 

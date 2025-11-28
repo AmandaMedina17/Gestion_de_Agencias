@@ -3,7 +3,9 @@ import { Apprentice } from "@domain/Entities/Apprentice";
 import { ApprenticeEntity } from "@entities/ApprenticeEntity";
 import { ApprenticeTrainingLevel } from "@domain/Enums";
 import { ApprenticeStatus } from "@domain/Enums";
+import { Injectable } from "@nestjs/common";
 
+@Injectable()
 export class ApprenticeMapper extends IMapper<Apprentice, ApprenticeEntity>{
     
     toDomainEntity(dataBaseEntity: ApprenticeEntity): Apprentice {
