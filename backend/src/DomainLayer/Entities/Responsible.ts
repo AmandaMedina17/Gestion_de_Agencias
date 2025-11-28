@@ -1,5 +1,5 @@
-import { IUpdatable } from '@domain/UpdatableInterface';
-import { UpdateData } from '@domain/UpdateData';
+import { IUpdatable } from '../UpdatableInterface'
+import { UpdateData } from '../UpdateData';
 import { v4 as uuidv4 } from 'uuid';
 
 export class Responsible implements IUpdatable{

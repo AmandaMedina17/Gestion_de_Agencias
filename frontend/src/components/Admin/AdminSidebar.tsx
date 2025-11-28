@@ -22,7 +22,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
             label: 'Gestión de Aprendices', 
             tooltip: 'Registrar, modificar y eliminar aprendices',
         },
-        {   id: 'artists_management', 
+        {   id: 'artist_management', 
             label: 'Gestión de Artistas', 
             tooltip: 'Registrar, modificar y eliminar artistas',
         },

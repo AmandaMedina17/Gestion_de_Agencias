@@ -1,6 +1,6 @@
 import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from "typeorm";
 import { IntervalEntity } from "./IntervalEntity";
-import { ContractStatus } from "@domain/Enums";
+import { ContractStatus } from "../../../DomainLayer/Enums";
 import { AgencyEntity } from "./AgencyEntity";
 import { ArtistEntity } from "./ArtistEntity";
 

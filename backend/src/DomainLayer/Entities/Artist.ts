@@ -2,40 +2,60 @@ import { v4 as uuidv4 } from "uuid";
 import { ApprenticeStatus, ApprenticeTrainingLevel } from "../Enums";
 import { ArtistStatus } from "../Enums";
 import { Apprentice } from "./Apprentice";
+import { IUpdatable } from "../UpdatableInterface";
+import { UpdateData } from "../UpdateData";
 
-
-export class Artist extends Apprentice {
+export class Artist implements IUpdatable{
   constructor(
-    id: string,
-    entryDate: Date,
-    private statusArtist: ArtistStatus,
-    private stageName: string,
-    private realName: string,
-    private birthDate: Date,
+    private id: string,    
     private transitionDate: Date, //fecha del primer debut con el grupo
-    private groupId?: string,
+    private status: ArtistStatus,
+    private stageName: string,
+    private birthDate: Date,
+    private groupId: string,
+    public apprenticeId: string
     
   ) {
 
-    //const age = Artist.calcularAnosTranscurridos(birthDate);
-    super(
-      id,
-      realName,
-      0,
-      entryDate,
-      ApprenticeTrainingLevel.AVANZADO,
-      ApprenticeStatus.PROCESO_DE_SELECCION
-    );
   }
 
+  static create(transitionDate: Date, status: ArtistStatus, stageName: string, birthDate: Date, groupId: string, apprenticeId: string): Artist {
+    const id = uuidv4();
+    return new Artist(id, transitionDate, status, stageName, birthDate, groupId, apprenticeId);
+  }
+
+  update(updateDto: UpdateData): void{
+    if(updateDto.stageName)
+    {
+      this.stageName = updateDto.stageName;
+    }
+    if(updateDto.transitionDate)
+    {
+      this.transitionDate = updateDto.transitionDate;
+    }
+    if(updateDto.status)
+    {
+      this.status = updateDto.status;
+    }
+    if(updateDto.birthday)
+    {
+      this.birthDate = updateDto.birthday;
+    }
+    if(updateDto.groupId)
+    {
+      this.groupId = updateDto.groupId;
+    }
+  }
+
+  
+
   //metdo para conflicto de agenda FALTA
+  public getId():string{
+    return this.id;
+  }
 
   public getStageName(): string {
     return this.stageName;
-  }
-
-  public getRealName(): string {
-    return this.realName;
   }
 
   public getBirthDate(): Date {
@@ -48,17 +68,22 @@ export class Artist extends Apprentice {
   }
 
   public getStatusArtist(): ArtistStatus {
-    return this.statusArtist;
+    return this.status;
   }
 
-//   public getAge(): number {
-//   return Artist.calculateElapsedYears(this.birthDate);
-// }
+  public getGroup(): string{
+    return this.groupId;
+  }
+
+   public getApprenticeId(): string {
+    return this.apprenticeId;
+  }
+
 
   public debut(groupId: string, debutDate: Date): void {
     this.groupId = groupId;
     this.transitionDate = debutDate;
-    this.statusArtist = ArtistStatus.ACTIVO;
+    this.status = ArtistStatus.ACTIVO;
   }
 
   private static calculateElapsedYears(date: Date): number {
@@ -74,8 +99,5 @@ export class Artist extends Apprentice {
     return years;
   }
 
-  // public create(entryDate: Date, statusArtist: ArtistStatus, stageName: string, realName: string, birthDate: Date, transitionDate: Date, groupId?: string,): Artist {
-  //   const id = uuidv4();
-  //   return new Artist(id, entryDate, statusArtist, stageName, realName, birthDate, transitionDate, groupId);
-  // }
+  
 }

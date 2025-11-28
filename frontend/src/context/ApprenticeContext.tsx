@@ -14,7 +14,7 @@ interface ApprenticeContextType {
   fetchApprentices: () => Promise<void>;
   fetchApprentice: (id: string) => Promise<ApprenticeResponseDto | null>;
   deleteApprentice: (id: string) => Promise<void>;
-  updateApprentice: (id: string, updateData: { name: string, age:number, status:ApprenticeStatus, trainingLevel:ApprenticeTrainingLevel, entryDate:Date }) => Promise<void>;
+  updateApprentice: (id: string, updateData: { fullName: string, age:number, status:ApprenticeStatus, trainingLevel:ApprenticeTrainingLevel, entryDate:Date }) => Promise<void>;
   clearError: () => void;
 }
 
@@ -91,7 +91,7 @@ export const ApprenticeProvider: React.FC<ApprenticeProviderProps> = ({ children
     }
   };
 
-  const updateApprentice = async (id: string, updateData: { name: string }) => {
+  const updateApprentice = async (id: string, updateData: { fullName: string, age:number, status:ApprenticeStatus, trainingLevel:ApprenticeTrainingLevel, entryDate:Date}) => {
     setLoading(true);
     setError(null);
     try {

@@ -1,23 +1,28 @@
-import { Entity, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { ApprenticeEntity } from './ApprenticeEntity';
-import { EvaluationEntity } from './EvaluationEntity';
+import { Entity, ManyToOne, Column, JoinColumn, PrimaryColumn } from "typeorm";
+import { ApprenticeEntity } from "./ApprenticeEntity";
+import { DateEntity } from "./DateEntity";
+import { EvaluationValue } from "../../../DomainLayer/Enums";
 
-@Entity('apprentice_evaluation')
+@Entity("apprentice_evaluation")
 export class ApprenticeEvaluationEntity {
-    // Llave primaria compuesta - usando apprenticeId y evaluationId
-    @PrimaryColumn({ name: 'apprentice_id' })
-    apprenticeId!: string;
+  
+  @PrimaryColumn("uuid", { name: "apprentice_id" })
+  apprenticeId!: string;
 
-    @PrimaryColumn({ name: 'evaluation_id' })
-    evaluationId!: string;
+  @PrimaryColumn("uuid", { name: "date_id" })
+  dateId!: string;
 
-    // Relación con ApprenticeEntity
-    @ManyToOne(() => ApprenticeEntity, (apprentice: ApprenticeEntity) => apprentice.apprenticeEvaluations)
-    @JoinColumn({ name: 'apprentice_id' })
-    apprentice!: ApprenticeEntity;
+  @ManyToOne(() => ApprenticeEntity, apprentice => apprentice.evaluations, { eager: false })
+  @JoinColumn({ name: "apprentice_id" })
+  apprentice!: ApprenticeEntity;
 
-    // Relación con EvaluationEntity
-    @ManyToOne(() => EvaluationEntity, (evaluation: EvaluationEntity) => evaluation.apprenticeEvaluations)
-    @JoinColumn({ name: 'evaluation_id' })
-    evaluation!: EvaluationEntity;
+  @ManyToOne(() => DateEntity, { eager: false })
+  @JoinColumn({ name: "date_id" })
+  date!: DateEntity;
+
+  @Column({
+    type: "enum",
+    enum: EvaluationValue,
+  })
+  evaluation!: EvaluationValue;
 }
