@@ -3,8 +3,9 @@ import { v4 as uuidv4 } from "uuid";
 import { ApprenticeStatus, ApprenticeTrainingLevel } from "../Enums";
 import { Evaluation } from "./Evaluation";
 import { UpdateApprenticeDto } from "@application/DTOs/apprenticeDto/update-apprentice.dto";
+import { IUpdatable } from "@domain/UpdatableInterface";
 
-export class Apprentice implements IUpdatable<UpdateApprenticeDto> {
+export class Apprentice implements IUpdatable{
   private evaluations: Evaluation[] = [];
 
   constructor(

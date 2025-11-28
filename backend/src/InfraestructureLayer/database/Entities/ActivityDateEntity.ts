@@ -1,22 +1,22 @@
-import { Entity, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { ActivityEntity } from './ActivityEntity';
-import { Date } from './DateEntity';
 
 @Entity('activity_date')
 export class ActivityDateEntity {
     @PrimaryColumn({ name: 'activity_id' })
     activityId!: string;
 
-    @PrimaryColumn({ name: 'date_id' })
-    dateId!: string;
+    @PrimaryColumn({ type: 'timestamp' })
+    date!: Date; 
 
     // Relación con Activity
-    @ManyToOne(() => ActivityEntity, (activity: ActivityEntity) => activity.activityDates)
+    @ManyToOne(
+        () => ActivityEntity, 
+        (activity: ActivityEntity) => activity.activityDates, 
+        { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'activity_id' })
     activity!: ActivityEntity;
-
-    // Relación con Date
-    @ManyToOne(() => Date, (date: Date) => date.activityDates)
-    @JoinColumn({ name: 'date_id' })
-    date!: Date;
 }
+
+
+

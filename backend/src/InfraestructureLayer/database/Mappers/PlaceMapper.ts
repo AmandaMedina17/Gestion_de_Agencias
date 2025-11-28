@@ -1,7 +1,9 @@
 import { IMapper } from "./IMapper";
 import { Place } from "@domain/Entities/Place";
 import { PlaceEntity } from "@entities/PlaceEntity";
+import { Injectable } from "@nestjs/common";
 
+@Injectable()
 export class PlaceMapper extends IMapper<Place, PlaceEntity>{
 
     toDomainEntity(dataBaseEntity: PlaceEntity): Place {

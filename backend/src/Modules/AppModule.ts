@@ -5,6 +5,7 @@ import { AppController } from '@presentation/Controllers/app.controller';
 import { AppService } from '@application/services/app.service';
 import { AuthModule } from './auth.module';
 import { PlaceModule } from './PlaceModule';
+import { ActivityModule } from './ActivityModule';
 import { ApprenticeModule } from './ApprenticeModule';
 
 @Module({
@@ -13,6 +14,7 @@ import { ApprenticeModule } from './ApprenticeModule';
     ResponsibleModule,
     AuthModule,
     PlaceModule,
+    ActivityModule,
     ApprenticeModule
   ],
   controllers: [AppController],

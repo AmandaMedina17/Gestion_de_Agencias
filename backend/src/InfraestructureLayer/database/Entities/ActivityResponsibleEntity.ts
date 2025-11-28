@@ -11,12 +11,18 @@ export class ActivityResponsibleEntity {
     responsibleId!: string;
 
     // Relación con Activity
-    @ManyToOne(() => ActivityEntity, (activity: ActivityEntity) => activity.activityResponsibles)
+    @ManyToOne(
+        () => ActivityEntity, 
+        (activity: ActivityEntity) => activity.activityResponsibles,
+        { onDelete: 'CASCADE' })
     @JoinColumn({ name: 'activity_id' })
     activity!: ActivityEntity;
 
     // Relación con Responsible
-    @ManyToOne(() => ResponsibleEntity, (responsible: ResponsibleEntity) => responsible.activityResponsibles)
+    @ManyToOne(
+        () => ResponsibleEntity, 
+        (responsible: ResponsibleEntity) => responsible.activityResponsibles,
+        { onDelete: 'RESTRICT' })
     @JoinColumn({ name: 'responsible_id' })
     responsible!: ResponsibleEntity;
 }
