@@ -15,23 +15,19 @@ import { PlaceController } from '@presentation/Controllers/place.controller';
     TypeOrmModule.forFeature([PlaceEntity])
   ],
   controllers: [PlaceController],
-  providers: [
-    {
-      provide: IMapper,      
-      useClass: PlaceMapper 
-    },
+  providers: [      
+    PlaceMapper,
     {
       provide: IPlaceRepository,    
       useClass: PlaceRepository
-    },
-    {
-      provide: BaseDtoMapper,    
-      useClass: PlaceDtoMapper
-    },
+    },    
+    PlaceDtoMapper,
     PlaceService
   ],
   exports: [
-    IPlaceRepository
+    IPlaceRepository,
+    PlaceDtoMapper,
+    PlaceMapper
   ]
 })
 export class PlaceModule {}
