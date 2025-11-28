@@ -42,6 +42,10 @@ const ApprenticeManagement: React.FC = () => {
   } | null>(null);
   const [dataLoaded, setDataLoaded] = useState(false);
 
+  // PAGINACIÓN
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 30;
+
   // Estados del formulario
   const [newApprentice, setNewApprentice] = useState({
     fullName: "",
@@ -77,6 +81,11 @@ const ApprenticeManagement: React.FC = () => {
 
     loadInitialData();
   }, [dataLoaded]);
+
+  // Resetear página cuando cambien filtro u orden
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filter, sortBy, sortOrder]);
 
   // Filtrar y ordenar aprendices
   const filteredAndSortedApprentices = React.useMemo(() => {
@@ -126,6 +135,11 @@ const ApprenticeManagement: React.FC = () => {
 
     return sorted;
   }, [apprentices, filter, sortBy, sortOrder, dataLoaded]);
+
+  // PAGINACIÓN: calcular páginas y slice
+  const totalPages = Math.ceil(filteredAndSortedApprentices.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedApprentices = filteredAndSortedApprentices.slice(startIndex, startIndex + itemsPerPage);
 
   // Manejar creación de aprendiz
   const handleCreate = async (e: React.FormEvent) => {
@@ -210,7 +224,7 @@ const ApprenticeManagement: React.FC = () => {
     try {
       await updateApprentice(editingApprentice.id, {
         ...editApprentice,
-        name: editApprentice.fullName.trim(),
+        fullName: editApprentice.fullName.trim(),
         age: parseInt(editApprentice.age),
         status: editApprentice.status,
         trainingLevel: editApprentice.trainingLevel,
@@ -435,18 +449,18 @@ const ApprenticeManagement: React.FC = () => {
         {dataLoaded && (
           <div className="results-info">
             <span className="results-count">
-              {filteredAndSortedApprentices.length} de {apprentices.length}{" "}
+              {filteredAndSortedApprentices.length} de {apprentices.length} {" "}
               aprendices
             </span>
             <span className="sort-info">
-              Orden:{" "}
+              Orden: {" "}
               {sortBy === "name"
                 ? "Nombre"
                 : sortBy === "age"
                 ? "Edad"
                 : sortBy === "entryDate"
                 ? "Fecha Ingreso"
-                : "Estado"}{" "}
+                : "Estado"} {" "}
               •{sortOrder === "asc" ? " Ascendente" : " Descendente"}
             </span>
           </div>
@@ -505,7 +519,7 @@ const ApprenticeManagement: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredAndSortedApprentices.map((apprentice) => (
+                  {paginatedApprentices.map((apprentice) => (
                     <tr key={apprentice.id} className="apprentice-row">
                       <td className="apprentice-name-cell">
                         <div className="apprentice-name">{apprentice.fullName}</div>
@@ -559,10 +573,34 @@ const ApprenticeManagement: React.FC = () => {
                   ))}
                 </tbody>
               </table>
+              {/* PAGINACIÓN */}
+              {totalPages > 1 && (
+                <div className="pagination-container">
+                  <button
+                    className="pagination-btn"
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                  >
+                    ◀ Anterior
+                  </button>
+
+                  <span className="pagination-info">
+                    Página {currentPage} de {totalPages}
+                  </span>
+
+                  <button
+                    className="pagination-btn"
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                  >
+                    Siguiente ▶
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
-
+        </div>
         {/* Modal de creación */}
         {showCreateForm && (
           <div className="modal-overlay apprentice-modal">
@@ -911,20 +949,16 @@ const ApprenticeManagement: React.FC = () => {
                     <strong>Edad:</strong> {deletingApprentice.age} años
                   </div>
                   <div className="detail-item">
-                    <strong>Fecha de ingreso:</strong>{" "}
-                    {formatDate(deletingApprentice.entryDate)}
+                    <strong>Fecha de ingreso:</strong> {formatDate(deletingApprentice.entryDate)}
                   </div>
                   <div className="detail-item">
-                    <strong>Estado:</strong>{" "}
-                    {getStatusText(deletingApprentice.status)}
+                    <strong>Estado:</strong> {getStatusText(deletingApprentice.status)}
                   </div>
                   <div className="detail-item">
-                    <strong>Nivel Entrenamiento:</strong>{" "}
-                    {getTrainingLevelText(deletingApprentice.trainingLevel)}
+                    <strong>Nivel Entrenamiento:</strong> {getTrainingLevelText(deletingApprentice.trainingLevel)}
                   </div>
                   <div className="detail-item">
-                    <strong>Agencia:</strong>{" "}
-                    {deletingApprentice.Agencia}
+                    <strong>Agencia:</strong> {deletingApprentice.Agencia}
                   </div>
                 </div>
                 <p className="warning-text">
@@ -950,8 +984,7 @@ const ApprenticeManagement: React.FC = () => {
             </div>
           </div>
         )}
-      </div>
-    </section>
+\    </section>
   );
 };
 
