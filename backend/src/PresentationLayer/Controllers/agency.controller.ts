@@ -1,19 +1,42 @@
-// presentation/Controllers/AgencyController.ts
 import { 
   Controller, 
   Get, 
   Post, 
-  Put, 
+  Patch, 
   Delete, 
   Body, 
   Param, 
-  HttpStatus, 
-  HttpException,
-  ParseUUIDPipe 
+  ValidationPipe
 } from '@nestjs/common';
+import { AgencyService } from '@application/services/agency.service';
+import {UpdateAgencyDto } from '@application/DTOs/agencyDto/update-agency.dto';
+import { CreateAgencyDto } from '@application/DTOs/agencyDto/create-agency.dto';
 
 @Controller('agencies')
 export class AgencyController {
-  constructor() {}
+  constructor(private readonly agencyService: AgencyService) {}
 
+  @Post()
+    create(@Body(ValidationPipe) createAgencyDto: CreateAgencyDto){
+      return this.agencyService.create(createAgencyDto);
+    }
+  @Get()
+    findAll() {
+    return this.agencyService.findAll();
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.agencyService.findOne(id);
+  }
+
+  @Patch(':id')
+  update(@Param('id') id: string, @Body(ValidationPipe) updateagencyDto: UpdateAgencyDto) {
+    return this.agencyService.update(id, updateagencyDto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.agencyService.remove(id);
+  }
 }
