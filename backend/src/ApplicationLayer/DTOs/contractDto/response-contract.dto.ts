@@ -1,12 +1,12 @@
 import { ContractStatus } from "../../../DomainLayer/Enums";
 import { CreateArtistDto } from "../artistDto/create-artist.dto";
-import { CreateContractDto } from "./create-contract.dto";
+import { CreateAgencyDto } from "../agencyDto/create-agency.dto";
 
 export class ContractResponseDto{
     id!:string;
     startDate!: Date;
     endDate!: Date;
-    agency!: CreateContractDto;
+    agency!: CreateAgencyDto;
     artist!: CreateArtistDto;
     distributionPercentage!: number;
     status!: ContractStatus;
