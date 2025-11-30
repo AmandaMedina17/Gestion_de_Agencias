@@ -5,7 +5,7 @@ import { BaseRepository } from './BaseRepositoryImpl';
 import { Place } from '@domain/Entities/Place';
 import { PlaceEntity } from '../Entities/PlaceEntity';
 import { IPlaceRepository } from '@domain/Repositories/IPlaceRepository';
-import { PlaceMapper } from '../Mappers/PlaceMapper';
+import { IMapper } from '../Mappers/IMapper';
 
 @Injectable()
 export class PlaceRepository extends BaseRepository<Place,PlaceEntity> 
@@ -13,7 +13,7 @@ implements IPlaceRepository{
   constructor(
     @InjectRepository(PlaceEntity)
     repository: Repository<PlaceEntity>,
-    mapper: PlaceMapper,
+    mapper: IMapper<Place,PlaceEntity>,
   ) {
     super(repository, mapper);
   }

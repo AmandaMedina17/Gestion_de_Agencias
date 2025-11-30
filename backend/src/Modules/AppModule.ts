@@ -8,6 +8,7 @@ import { PlaceModule } from './PlaceModule';
 import { ActivityModule } from './ActivityModule';
 import { ApprenticeModule } from './ApprenticeModule';
 import { ArtistModule } from "./ArtistModule";
+import { AgencyModule } from './AgencyModule';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { ArtistModule } from "./ArtistModule";
     ActivityModule,
     ApprenticeModule,
     ArtistModule,
+    AgencyModule
   ],
   controllers: [AppController],
   providers: [AppService],

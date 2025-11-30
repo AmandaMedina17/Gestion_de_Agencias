@@ -6,7 +6,7 @@ import { Injectable, Inject } from "@nestjs/common";
 import { BaseService } from "./base.service";
 import { IArtistRepository } from "@domain/Repositories/IArtistRepository";
 import { BaseDtoMapper } from "@application/DTOs/dtoMappers/DtoMapper";
-import { ApprenticeRepository } from "@infrastructure/database/Repositories/ApprenticeRepository";
+import { ApprenticeRepository } from "../../InfraestructureLayer/database/Repositories/ApprenticeRepository";
 
 @Injectable()
 export class ArtistService extends BaseService<Artist, CreateArtistDto, ArtistResponseDto, UpdateArtistDto>{
