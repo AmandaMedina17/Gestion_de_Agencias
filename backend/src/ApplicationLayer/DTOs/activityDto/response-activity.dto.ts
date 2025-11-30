@@ -1,4 +1,4 @@
-import { ActivityClassification, ActivityType } from "@domain/Enums";
+import { ActivityClassification, ActivityType } from "../../../DomainLayer/Enums";
 import { CreateResponsibleDto } from "../responsibleDto/create-responsible.dto";
 import { CreatePlaceDto } from "../placeDto/create-place.dto";
 

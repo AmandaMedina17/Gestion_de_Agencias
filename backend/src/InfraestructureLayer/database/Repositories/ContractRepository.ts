@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { BaseRepository } from './BaseRepositoryImpl';
@@ -15,6 +15,7 @@ export class ContractRepositoryImpl
   constructor(
     @InjectRepository(ContractEntity)
     repository: Repository<ContractEntity>,
+    @Inject(ContractMapper)
     mapper: ContractMapper
   ) {
     super(repository, mapper);

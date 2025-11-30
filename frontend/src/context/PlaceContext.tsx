@@ -1,9 +1,9 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { placeService } from '../services/PlaceService';
-import { CreatePlaceDto, PlaceResponseDto } from '../services/dtos/PlaceDto';
+import { CreatePlaceDto } from '../../../backend/src/ApplicationLayer/DTOs/placeDto/create-place.dto';
+import { PlaceResponseDto } from '../../../backend/src/ApplicationLayer/DTOs/placeDto/response-place.dto';
 
 interface PlaceContextType {
-  // Estado - CORREGIDO: usa "places" en lugar de "responsibles"
   places: PlaceResponseDto[];
   loading: boolean;
   error: string | null;
@@ -32,7 +32,6 @@ export const usePlace = () => {
 };
 
 export const PlaceProvider: React.FC<PlaceProviderProps> = ({ children }) => {
-  // CORREGIDO: usa "places" y "setPlaces"
   const [places, setPlaces] = useState<PlaceResponseDto[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

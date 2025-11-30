@@ -1,4 +1,4 @@
-import { ApprenticeStatus, ApprenticeTrainingLevel } from "@domain/Enums";
+import { ApprenticeStatus, ApprenticeTrainingLevel } from "../../../DomainLayer/Enums";
 
 export class ApprenticeResponseDto{
     id!:string;

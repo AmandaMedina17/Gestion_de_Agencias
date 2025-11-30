@@ -15,6 +15,7 @@
     "migration:show": "typeorm-ts-node-commonjs migration:show -d src/Config/ormconfig.ts"
   },
   "dependencies": {
+    "@faker-js/faker": "^10.1.0",
     "@nestjs/common": "^11.1.8",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.1.8",
@@ -23,7 +24,6 @@
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.1.8",
     "@nestjs/swagger": "^11.2.1",
-    "@nestjs/testing": "^11.1.8",
     "@nestjs/typeorm": "^11.0.0",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
@@ -39,6 +39,7 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
+    "@nestjs/testing": "^11.1.9",
     "@types/bcrypt": "^6.0.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^20.19.24",
