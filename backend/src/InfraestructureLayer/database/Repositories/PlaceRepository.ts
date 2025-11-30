@@ -5,6 +5,7 @@ import { BaseRepository } from './BaseRepositoryImpl';
 import { Place } from '@domain/Entities/Place';
 import { PlaceEntity } from '../Entities/PlaceEntity';
 import { IPlaceRepository } from '@domain/Repositories/IPlaceRepository';
+import { IMapper } from '../Mappers/IMapper';
 import { PlaceMapper } from '../Mappers/PlaceMapper';
 
 @Injectable()

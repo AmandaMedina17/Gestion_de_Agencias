@@ -5,6 +5,7 @@ import { BaseRepository } from './BaseRepositoryImpl';
 import { Responsible } from '@domain/Entities/Responsible';
 import { ResponsibleEntity } from '@entities/ResponsibleEntity';
 import { IResponsibleRepository } from '@domain/Repositories/IResponsibleRepository';
+import { IMapper } from '../Mappers/IMapper';
 import { ResponsibleMapper } from '../Mappers/ResponsibleMapper';
 
 @Injectable()
