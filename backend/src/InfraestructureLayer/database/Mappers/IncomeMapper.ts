@@ -1,7 +1,9 @@
 import { IMapper } from "./IMapper";
 import { Income } from "@domain/Entities/Income";
 import { IncomeEntity } from "@entities/IncomeEntity";
+import { Injectable } from "@nestjs/common";
 
+@Injectable()
 export class IncomeMapper extends IMapper<Income, IncomeEntity>{
 
     toDomainEntity(dataBaseEntity: IncomeEntity): Income {
@@ -12,6 +14,7 @@ export class IncomeMapper extends IMapper<Income, IncomeEntity>{
         return new Income(
             dataBaseEntity.id,
             dataBaseEntity.activityID,
+            dataBaseEntity.incomeType,
             dataBaseEntity.mount,
             dataBaseEntity.date,
             dataBaseEntity.responsible
@@ -23,10 +26,11 @@ export class IncomeMapper extends IMapper<Income, IncomeEntity>{
 
         entity.id = domainEntity.getID();
         entity.activityID = domainEntity.GetActivityID();
+        entity.incomeType = domainEntity.GetType()
         entity.mount = domainEntity.getMount();
         entity.date = domainEntity.getDate();
         entity.responsible = domainEntity.getResponsible();
-
+        
         return entity;
     }
 }

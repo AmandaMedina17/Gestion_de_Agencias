@@ -7,9 +7,11 @@ import { AuthModule } from './auth.module';
 import { PlaceModule } from './PlaceModule';
 import { ActivityModule } from './ActivityModule';
 import { ApprenticeModule } from './ApprenticeModule';
+import { IncomeModule } from './IncomeModule';
 import { ArtistModule } from "./ArtistModule";
 import { AgencyModule } from './AgencyModule';
 import { ContractModule } from './ContractModule';
+
 @Module({
   imports: [
     DatabaseModule,
@@ -18,6 +20,7 @@ import { ContractModule } from './ContractModule';
     PlaceModule,
     ActivityModule,
     ApprenticeModule,
+    IncomeModule
     ArtistModule,
     AgencyModule,
     ContractModule

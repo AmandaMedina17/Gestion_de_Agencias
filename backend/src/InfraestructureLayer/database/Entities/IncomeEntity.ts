@@ -1,13 +1,21 @@
 import { Entity, PrimaryColumn, Column, JoinColumn, OneToOne } from 'typeorm';
 import { ActivityEntity } from './ActivityEntity';
+import { IncomeType } from '@domain/Enums';
 
-@Entity()
+@Entity('income')
 export class IncomeEntity {
   @PrimaryColumn()
   id!: string;
 
-  @PrimaryColumn()
+  @PrimaryColumn({ name: 'activity_id' })
   activityID!: string;
+
+  @Column({
+    type: 'enum',
+    enum: IncomeType,
+    default: IncomeType.EFECTIVO
+  })
+  incomeType!: IncomeType;
 
   @Column({type: 'decimal', precision: 10, scale:2})
   mount!: number;  
@@ -18,7 +26,7 @@ export class IncomeEntity {
   @Column()
   responsible!: string; 
 
-  @OneToOne(() => ActivityEntity) //Revisar one to one
-    @JoinColumn({ name: "activityID" })
-    agency!: ActivityEntity;
+  @OneToOne(() => ActivityEntity, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'activity_id' }) 
+  activity!: ActivityEntity;
 }
