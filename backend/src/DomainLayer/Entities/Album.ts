@@ -5,7 +5,7 @@ export class Album {
     constructor(
         private readonly id: string,
         private title: string,
-        private releaseDate: DateValue,
+        private releaseDate: Date,
         private mainProducer: string,
         private copiesSold: number,
         private numberOfTracks: number,
@@ -35,7 +35,7 @@ export class Album {
             throw new Error('El título del álbum no puede exceder 200 caracteres');
         }
 
-        if (this.releaseDate.isFuture()) {
+        if (this.releaseDate.getTime() > new Date().getTime()) {
             throw new Error('La fecha de lanzamiento no puede estar en el futuro');
         }
         if (!this.mainProducer || this.mainProducer.length === 0) {
@@ -76,7 +76,7 @@ export class Album {
      * Calcula la antigüedad del álbum en años
      */
     public getAlbumAge(): number {
-        return this.releaseDate.getAge();
+        return new Date().getTime() - this.releaseDate.getTime();
     }
 
     /**
@@ -96,7 +96,7 @@ export class Album {
         return this.title;
     }
 
-    public getReleaseDate(): DateValue {
+    public getReleaseDate(): Date{
         return this.releaseDate;
     }
 
@@ -114,6 +114,7 @@ export class Album {
 
     // SETTERS 
 
+    //Estor viola el principio de inmutabilidad dejar asi temporalmente, para despues arreglarlo 
     public setMainProducer(producer: string): void {
         this.mainProducer = producer;
     }
@@ -135,8 +136,7 @@ export class Album {
         this.numberOfTracks = tracks;
     }
 
-    public create(title: string, releaseDate: DateValue, mainProducer: string, copiesSold: number, numberOfTracks: number) : Album{
-        const id = uuidv4();
-        return new Album(id, title, releaseDate, mainProducer, copiesSold, numberOfTracks);
+    public create(title: string, releaseDate: Date, mainProducer: string, copiesSold: number, numberOfTracks: number) : Album{
+        return new Album(uuidv4(), title, releaseDate, mainProducer, copiesSold, numberOfTracks);
     }
 }

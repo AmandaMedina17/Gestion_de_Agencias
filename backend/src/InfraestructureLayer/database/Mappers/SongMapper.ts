@@ -1,8 +1,10 @@
 import { Song } from "@domain/Entities/Song";
 import { IMapper } from "./IMapper";
 import { SongEntity } from "@entities/SongEntity";
+import { Injectable } from "@nestjs/common";
 
-class SongMapper implements IMapper<Song,SongEntity>{
+@Injectable()
+export class SongMapper implements IMapper<Song,SongEntity>{
     toDomainEntities(entities: SongEntity[]): Song[] {
         throw new Error("Method not implemented.");
     }
@@ -11,7 +13,7 @@ class SongMapper implements IMapper<Song,SongEntity>{
     }
     toDomainEntity(dataBaseEntity: SongEntity): Song {
       return new Song(dataBaseEntity.id,dataBaseEntity.name, 
-        dataBaseEntity.album,dataBaseEntity.entryDate,dataBaseEntity.)
+        dataBaseEntity.album,dataBaseEntity.entryDate)
     }
     toDataBaseEntity(domainEntity: Song): SongEntity {
         throw new Error("Method not implemented.");

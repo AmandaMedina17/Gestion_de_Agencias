@@ -4,7 +4,7 @@ import { BillboardListEntity } from './BillboardListEntity';
 
 @Entity('song_billboard')
 export class SongBillboardEntity {
-    // Llave primaria compuesta - usando songId y billboardListId
+    //Llave primaria utiliando ambos ids
     @PrimaryColumn({ name: 'song_id' })
     songId!: string;
 

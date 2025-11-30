@@ -8,14 +8,9 @@ export class BillboardList {
     private publicDate: DateValue,
     private scope: BillboardListScope,
     private nameList: string,
-    private endList: number 
   ) {}
   public getId(): string {
     return this.id;
-  }
-
-  public getEndList(): number {
-    return this.endList;
   }
 
   public getNameList(): string {
@@ -32,7 +27,7 @@ export class BillboardList {
 
   public create( publicDate: DateValue, scope: BillboardListScope, nameList: string, endList: number ) :BillboardList {
     const id = uuidv4();
-    return new BillboardList(id, publicDate, scope, nameList, endList);
+    return new BillboardList(id, publicDate, scope, nameList);
   }
    
 }
