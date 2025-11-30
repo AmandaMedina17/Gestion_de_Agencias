@@ -16,22 +16,18 @@ import { ResponsibleDtoMapper } from '@application/DTOs/dtoMappers/responsible.d
   ],
   controllers: [ResponsibleController],
   providers: [
-    {
-      provide: IMapper,      
-      useClass: ResponsibleMapper  
-    },
+    ResponsibleMapper,
     {
       provide: IResponsibleRepository,    
       useClass: ResponsibleRepository 
     },
-    {
-      provide: BaseDtoMapper,    
-      useClass: ResponsibleDtoMapper 
-    },
+    ResponsibleDtoMapper,
     ResponsibleService
   ],
   exports: [
-    IResponsibleRepository 
+    IResponsibleRepository,
+    ResponsibleDtoMapper,
+    ResponsibleMapper
   ]
 })
 export class ResponsibleModule {}

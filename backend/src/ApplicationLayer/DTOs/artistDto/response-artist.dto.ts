@@ -1,4 +1,4 @@
-import { ArtistStatus } from "@domain/Enums";
+import { ArtistStatus } from "../../../DomainLayer/Enums";
 
 export class ArtistResponseDto{
     id!:string;

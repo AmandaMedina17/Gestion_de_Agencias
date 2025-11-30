@@ -1,24 +1,20 @@
-import { Entity, ManyToOne, Column, JoinColumn, PrimaryColumn } from "typeorm";
-import { ApprenticeEntity } from "./ApprenticeEntity";
-import { DateEntity } from "./DateEntity";
-import { EvaluationValue } from "../../../DomainLayer/Enums";
+import { Entity, Column,PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { ApprenticeEntity } from './ApprenticeEntity';
+import { EvaluationValue} from '../../../DomainLayer/Enums';
 
-@Entity("apprentice_evaluation")
+@Entity('apprentice_evaluation')
 export class ApprenticeEvaluationEntity {
-  
-  @PrimaryColumn("uuid", { name: "apprentice_id" })
-  apprenticeId!: string;
+    @PrimaryColumn({ name: 'apprentice_id' })
+    apprenticeId!: string;
 
-  @PrimaryColumn("uuid", { name: "date_id" })
-  dateId!: string;
+    @PrimaryColumn({ name: "date", type: "date" })
+    dateId!: Date;
 
-  @ManyToOne(() => ApprenticeEntity, apprentice => apprentice.evaluations, { eager: false })
-  @JoinColumn({ name: "apprentice_id" })
-  apprentice!: ApprenticeEntity;
+    // Relación con ApprenticeEntity
+    @ManyToOne(() => ApprenticeEntity, (apprentice: ApprenticeEntity) => apprentice.evaluations)
+    @JoinColumn({ name: 'apprentice_id' })
+    apprentice!: ApprenticeEntity;
 
-  @ManyToOne(() => DateEntity, { eager: false })
-  @JoinColumn({ name: "date_id" })
-  date!: DateEntity;
 
   @Column({
     type: "enum",

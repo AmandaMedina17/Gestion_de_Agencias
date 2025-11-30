@@ -1,5 +1,6 @@
 import { BaseService } from "./BaseService";
-import { CreateArtistDto, ArtistResponseDto } from "./dtos/ArtistDto";
+import { ArtistResponseDto } from '../../../backend/src/ApplicationLayer/DTOs/artistDto/response-artist.dto';
+import { CreateArtistDto } from '../../../backend/src/ApplicationLayer/DTOs/artistDto/create-artist.dto';
 
 export const artistService = new BaseService<
   CreateArtistDto,

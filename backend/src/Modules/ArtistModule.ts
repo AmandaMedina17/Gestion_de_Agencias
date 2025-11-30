@@ -4,7 +4,7 @@ import { ArtistEntity } from "@entities/ArtistEntity";
 import { IMapper } from "src/InfraestructureLayer/database/Mappers/IMapper";
 import { ArtistMapper } from "src/InfraestructureLayer/database/Mappers/ArtistMapper";
 import { IArtistRepository } from "@domain/Repositories/IArtistRepository";
-import { ArtistRepository } from "src/InfraestructureLayer/database/Repositories/ArtistRepository";
+import { ArtistRepository } from "../InfraestructureLayer/database/Repositories/ArtistRepository";
 import { BaseDtoMapper } from "@application/DTOs/dtoMappers/DtoMapper";
 import { ArtistDtoMapper } from "@application/DTOs/dtoMappers/artist.dto";
 import { ArtistController } from "@presentation/Controllers/artist.controller";

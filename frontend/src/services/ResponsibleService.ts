@@ -1,5 +1,6 @@
 import { BaseService } from "./BaseService";
-import { CreateResponsibleDto, ResponsibleResponseDto } from "./dtos/ResponsibleDto";
+import { CreateResponsibleDto } from "../../../backend/src/ApplicationLayer/DTOs/responsibleDto/create-responsible.dto";
+import { ResponsibleResponseDto } from "../../../backend/src/ApplicationLayer/DTOs/responsibleDto/response-responsible.dto";
 
 export const responsibleService = new BaseService<
   CreateResponsibleDto,

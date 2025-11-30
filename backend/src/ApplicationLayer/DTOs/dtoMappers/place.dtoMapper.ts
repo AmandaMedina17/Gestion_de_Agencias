@@ -2,7 +2,9 @@ import { Place } from '@domain/Entities/Place';
 import { BaseDtoMapper } from './DtoMapper';
 import { CreatePlaceDto } from '../placeDto/create-place.dto';
 import { PlaceResponseDto } from '../placeDto/response-place.dto';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class PlaceDtoMapper extends BaseDtoMapper<Place, CreatePlaceDto, PlaceResponseDto>{
     
   fromDto(dto: CreatePlaceDto): Place {
