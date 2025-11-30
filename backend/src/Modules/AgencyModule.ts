@@ -1,16 +1,17 @@
 // src/PresentationLayer/Modules/AgencyModule.ts
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { AgencyEntity } from "@infrastructure/database/Entities/AgencyEntity";
-import { AgencyMapper } from "@infrastructure/database/Mappers/AgencyMapper";
-import { GroupMapper } from "@infrastructure/database/Mappers/GroupMapper";
+import { AgencyEntity } from "../InfraestructureLayer/database/Entities/AgencyEntity";
+import { IMapper } from "../InfraestructureLayer/database/Mappers/IMapper";
+import { AgencyMapper } from "../InfraestructureLayer/database/Mappers/AgencyMapper";
+import { IAgencyRepository } from "../DomainLayer/Repositories/IAgencyRepository";
+import { AgencyRepositoryImpl } from "../InfraestructureLayer/database/Repositories/AgencyRepository";
+import { AgencyController } from "../PresentationLayer/Controllers/agency.controller";
+import { AgencyService } from '@application/services/agency.service';
+import { AgencyDtoMapper } from "@application/DTOs/dtoMappers/agency.dtoMapper";
 import { ApprenticeMapper } from "@infrastructure/database/Mappers/ApprenticeMapper";
 import { ArtistMapper } from "@infrastructure/database/Mappers/ArtistMapper";
-import { IAgencyRepository } from "@domain/Repositories/IAgencyRepository";
-import { AgencyRepositoryImpl } from "@infrastructure/database/Repositories/AgencyRepository";
-import { AgencyController } from "@presentation/Controllers/agency.controller";
-import { AgencyService } from "@application/services/agency.service";
-import { AgencyDtoMapper } from "@application/DTOs/dtoMappers/agency.dtoMapper";
+import { GroupMapper } from "@infrastructure/database/Mappers/GroupMapper";
 
 @Module({
   imports: [TypeOrmModule.forFeature([AgencyEntity])],

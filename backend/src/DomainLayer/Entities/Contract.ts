@@ -1,13 +1,15 @@
+import { IUpdatable } from "@domain/UpdatableInterface";
 import { ContractStatus } from "../Enums";
 import { Agency } from "./Agency";
 import { Artist } from "./Artist";
-import { Interval } from "./Interval";
 import { v4 as uuidv4 } from 'uuid';
+import { UpdateData } from "@domain/UpdateData";
 
-export class Contract {
+export class Contract implements IUpdatable{
   constructor(
     private readonly id: string,
-    private readonly interval: Interval,
+    private startDate: Date,
+    private endDate: Date,
     private readonly agency: Agency,
     private readonly artist: Artist,
     private distributionPercentage: number,
@@ -16,43 +18,81 @@ export class Contract {
   ) {
     this.validate();
   }
+  update(updateDto: UpdateData): void {
+    if(updateDto.distributionPercentage)
+      {
+        this.validate_ditributionPercentage(updateDto.distributionPercentage);
+        this.changeDistributionPercentage(updateDto.distributionPercentage);
+      }
+      if(updateDto.conditions)
+      {
+        this.validate_conditions(updateDto.conditions);
+        this.updateConditions(updateDto.conditions);
+      }
+      if(updateDto.endDate && updateDto.startDate)
+      {
+        this.validateContractDates(updateDto.startDate,updateDto.endDate);
+        this.startDate = updateDto.startDate;
+        this.endDate = updateDto.endDate; 
+      }
+      if(updateDto.status)
+      {
+        this.status = updateDto.status;
+      }
+  }
+  validate_ditributionPercentage(distributionPercentage: number) {
+    if (!distributionPercentage) {
+      throw new Error("The distribution percentage is requerid");
+    }
+    if (distributionPercentage <= 0)
+    {
+      throw new Error("The distribution percentage must be greater than zero")
+    }
+
+  }
+  validate_conditions(conditions: string) {
+    if (!conditions || conditions.length == 0) {
+      throw new Error("The contract conditions are required");
+    }
+  }
 
   private validate(): void {
     if (!this.id) {
-      throw new Error("El ID del contrato es requerido");
-    }
-    if (!this.interval) {
-      throw new Error("El intervalo del contrato es requerido");
+      throw new Error("The contract ID is required");
     }
     if (!this.agency) {
-      throw new Error("La agencia es requerida");
+      throw new Error("The agency is required");
     }
     if (!this.artist) {
-      throw new Error("El artista es requerido");
-    }
-    if (!this.distributionPercentage) {
-      throw new Error("El porcentaje de distribución es requerido");
+      throw new Error("The artist is required");
     }
     if (!this.status) {
-      throw new Error("El estado del contrato es requerido");
+      throw new Error("The contract status is required");
     }
-    if (!this.conditions || this.conditions.length == 0) {
-      throw new Error("Las condiciones del contrato son requeridas");
-    }
-    //this.validateContractDates();
+    this.validate_ditributionPercentage(this.distributionPercentage);
+    this.validate_conditions(this.conditions);
+    this.validateContractDates(this.startDate,this.endDate);
   }
 
-  public create( interval: Interval, agency: Agency, artist: Artist, distributionPercentage: number, status: ContractStatus, conditions: string) : Contract {
+  public static create( startDate: Date, endDate: Date, agency: Agency, artist: Artist, distributionPercentage: number, status: ContractStatus, conditions: string) : Contract {
     const id = uuidv4();
-    return new Contract(id, interval, agency, artist, distributionPercentage, status, conditions);
+    return new Contract(id, startDate, endDate, agency, artist, distributionPercentage, status, conditions);
   }
 
-  private validateContractDates(): void {
+  private validateContractDates(startDate: Date, endDate: Date): void {
+    if (!endDate || !startDate) {
+      throw new Error("The start date and the end date are required");
+    }
+    if (startDate >= endDate) {
+      throw new Error("The start date cannot be before the end date ");
+    }
     // El contrato no puede empezar antes del debut del artista
-    if (this.interval.getStartDate() < this.artist.getDebutDate()) {
+    if (startDate < this.artist.getDebutDate()) {
       throw new Error(
-        "El contrato no puede empezar antes del debut del artista"
-      );
+        "The contract cannot start before the artist debut");
+    }
+    if(startDate < this.agency.getDateFundation()) {
+      throw new Error("The contract cannot start before the agency creation")
     }
   }
 
@@ -77,7 +117,7 @@ export class Contract {
   public changeDistributionPercentage(newPercentage: number): void {
     if (this.status !== ContractStatus.EN_RENOVACION) {
       throw new Error(
-        "Solo se puede modificar el porcentaje en contratos en negociación"
+        "The percentage can only be modified in contracts under negotiation."
       );
     }
     this.distributionPercentage = newPercentage;
@@ -87,7 +127,7 @@ export class Contract {
   public updateConditions(newConditions: string): void {
     if (this.status !== ContractStatus.EN_RENOVACION) {
       throw new Error(
-        "Solo se pueden actualizar las condiciones en contratos en negociación"
+        "Conditions can only be updated in contracts under negotiation."
       );
     }
     this.conditions = newConditions;
@@ -116,56 +156,91 @@ export class Contract {
       this.status !== ContractStatus.ACTIVO
     ) {
       throw new Error(
-        "Solo se puede extender contratos activos o en renovación"
+        "Only active or renewal contracts can be extended"
       );
     }
-    this.interval.extendInterval(extensionDays);
+    // Crear nueva fecha extendida
+    const newEndDate = new Date(this.endDate.getDate() + extensionDays);
+    (this as any).endDate = newEndDate; //para poder modificar ya que es readonly
     this.underRenewal();
   }
 
   public shortenContract(reductionDays: number): void {
     if (this.status !== ContractStatus.EN_RENOVACION) {
-      throw new Error("Solo se puede acortar contratos en renovación");
+      throw new Error("Contracts can only be shortened during renewal.");
     }
-    this.interval.shortenInterval(reductionDays);
+    
+    const newEndDate = new Date(this.endDate.getDate() - reductionDays);
+
+    // Verificar que la nueva fecha no sea anterior a la fecha de inicio
+    if (newEndDate <= this.startDate) {
+      throw new Error("The completion date cannot be earlier than the start date");
+    }
+    
+    (this as any).endDate = newEndDate;
   }
 
   // MÉTODOS DE VIGENCIA TEMPORAL
-  public isCurrentlyActive(): boolean {
-    return this.isActive() && this.interval.isActive();
+    public isCurrentlyActive(): boolean {
+    const now = new Date();
+    return this.isActive() && now >= this.startDate && now <= this.endDate;
   }
 
   public willStartInFuture(): boolean {
-    return this.interval.isFuture();
+    return new Date() < this.startDate;
   }
 
   public hasEnded(): boolean {
-    return this.interval.isPast() || this.isExpired() || this.isTerminated();
+    const now = new Date();
+    return now > this.endDate || this.isExpired() || this.isTerminated();
   }
 
   public daysUntilStart(): number {
-    return this.interval.daysUntilStart();
+    const now = new Date();
+    const diffTime = this.startDate.getTime() - now.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   }
 
   public daysUntilEnd(): number {
-    return this.interval.daysUntilEnd();
+    const now = new Date();
+    const diffTime = this.endDate.getTime() - now.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   }
 
   public isActiveOnDate(date: Date): boolean {
-    return this.isActive() && this.interval.containsDate(date);
+    return this.isActive() && date >= this.startDate && date <= this.endDate;
   }
-
   // MÉTODOS DE DURACIÓN
   public getContractDurationInDays(): number {
-    return this.interval.getDurationInDays();
+    const diffTime = this.endDate.getTime() - this.startDate.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   }
 
   public getContractDurationInMonths(): number {
-    return this.interval.getDurationInMonths();
+    const startYear = this.startDate.getFullYear();
+    const startMonth = this.startDate.getMonth();
+    const endYear = this.endDate.getFullYear();
+    const endMonth = this.endDate.getMonth();
+    
+    return (endYear - startYear) * 12 + (endMonth - startMonth);
   }
 
   public getContractDurationInYears(): number {
-    return Math.floor(this.interval.getDurationInMonths() / 12);
+    const startYear = this.startDate.getFullYear();
+    const endYear = this.endDate.getFullYear();
+    const yearDiff = endYear - startYear;
+    
+    // Ajustar si el mes/dura del endDate es anterior al del startDate en el mismo año
+    const startMonth = this.startDate.getMonth();
+    const endMonth = this.endDate.getMonth();
+    const startDay = this.startDate.getDate();
+    const endDay = this.endDate.getDate();
+    
+    if (endMonth < startMonth || (endMonth === startMonth && endDay < startDay)) {
+      return yearDiff - 1;
+    }
+    
+    return yearDiff;
   }
 
   // Getters
@@ -173,8 +248,12 @@ export class Contract {
     return this.id;
   }
 
-  public getInterval(): Interval {
-    return this.interval;
+  public getStartDate(): Date {
+    return this.startDate;
+  }
+
+  public getEndDate(): Date {
+    return this.endDate;
   }
 
   public getAgencyId(): Agency{
