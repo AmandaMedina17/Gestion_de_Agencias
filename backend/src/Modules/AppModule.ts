@@ -9,7 +9,7 @@ import { ActivityModule } from './ActivityModule';
 import { ApprenticeModule } from './ApprenticeModule';
 import { ArtistModule } from "./ArtistModule";
 import { AgencyModule } from './AgencyModule';
-
+import { ContractModule } from './ContractModule';
 @Module({
   imports: [
     DatabaseModule,
@@ -19,7 +19,8 @@ import { AgencyModule } from './AgencyModule';
     ActivityModule,
     ApprenticeModule,
     ArtistModule,
-    //AgencyModule
+    AgencyModule,
+    ContractModule
   ],
   controllers: [AppController],
   providers: [AppService],
