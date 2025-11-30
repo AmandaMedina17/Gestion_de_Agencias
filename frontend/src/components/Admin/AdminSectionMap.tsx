@@ -1,4 +1,5 @@
 import ActivityManagement from "./sections/Activity/ActivityManagement";
+import AgencyManagement from "./sections/Agency/AgencyManagement";
 import ApprenticesManagement from "./sections/Apprentice/ApprenticesManagement";
 import ArtistManagement from "./sections/Artist/ArtistManagement";
 import EvaluationManagement from "./sections/Evaluation/EvaluationsManagement";
@@ -11,5 +12,6 @@ export const sectionComponents = {
   place_management: PlaceManagement,
   artists_management: ArtistManagement,
   evaluation_management: EvaluationManagement,
-  activities_management: ActivityManagement
+  activities_management: ActivityManagement,
+  agencies_management: AgencyManagement
 };

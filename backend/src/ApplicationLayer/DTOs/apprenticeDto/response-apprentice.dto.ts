@@ -7,4 +7,5 @@ export class ApprenticeResponseDto{
     status!: ApprenticeStatus
     trainingLevel!: ApprenticeTrainingLevel;
     entryDate!: Date;
+    agency!: string;
 }

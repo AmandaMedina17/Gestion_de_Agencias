@@ -46,6 +46,9 @@ export class ApprenticeEntity {
   @JoinColumn({ name: "agency_id" })
   agency!: AgencyEntity;
 
+  @Column({ name: "agency_id" })
+  agencyId!: string;
+
 
   @OneToOne(() => ArtistEntity, (artist) => artist.apprenticeId) //en una agencia pueden haber muchos aprendices
   artistId!: ArtistEntity;
@@ -54,5 +57,7 @@ export class ApprenticeEntity {
   () => ApprenticeEvaluationEntity,(evaluation) => evaluation.apprentice
   )
   evaluations!: ApprenticeEvaluationEntity[];
+
+  
 }
 

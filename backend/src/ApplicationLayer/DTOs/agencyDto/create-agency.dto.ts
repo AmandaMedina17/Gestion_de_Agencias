@@ -13,5 +13,7 @@ export class CreateAgencyDto{
     @IsDate()
     @Transform(({ value }) => new Date(value)) //Convierte string a Date automáticamente
     dateFundation!: Date;
+
+    
     
 }
