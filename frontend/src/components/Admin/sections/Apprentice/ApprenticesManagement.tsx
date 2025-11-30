@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useApprentice } from "../../../../context/ApprenticeContext";
+import { useAgency } from "../../../../context/AgencyContext"; // Importar el contexto de agencias
 import { Icon } from "../../../icons";
 import './ApprenticeStyle.css'
 
@@ -27,6 +28,9 @@ const ApprenticeManagement: React.FC = () => {
     clearError,
   } = useApprentice();
 
+  // Obtener agencias del contexto
+  const { agencies, fetchAgencies } = useAgency();
+
   // Estados principales
   const [filter, setFilter] = useState("");
   const [sortBy, setSortBy] = useState<"name" | "age" | "entryDate" | "status">(
@@ -41,6 +45,14 @@ const ApprenticeManagement: React.FC = () => {
     text: string;
   } | null>(null);
   const [dataLoaded, setDataLoaded] = useState(false);
+
+  // Estados para búsqueda en dropdown de agencias
+  const [agencySearch, setAgencySearch] = useState("");
+  const [agencySearchEdit, setAgencySearchEdit] = useState("");
+
+  // PAGINACIÓN
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 30;
 
   // Estados del formulario
   const [newApprentice, setNewApprentice] = useState({
@@ -61,13 +73,14 @@ const ApprenticeManagement: React.FC = () => {
     agencyId: "",
   });
 
-  // Cargar aprendices solo cuando se monta el componente
+  // Cargar aprendices y agencias cuando se monta el componente
   useEffect(() => {
     const loadInitialData = async () => {
       if (!dataLoaded) {
         clearError();
         try {
           await fetchApprentices();
+          await fetchAgencies(); // Cargar las agencias
           setDataLoaded(true);
         } catch (err) {
           console.error("Error loading initial data:", err);
@@ -77,6 +90,28 @@ const ApprenticeManagement: React.FC = () => {
 
     loadInitialData();
   }, [dataLoaded]);
+
+  // Resetear página cuando cambien filtro u orden
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filter, sortBy, sortOrder]);
+
+  // Filtrar agencias basado en la búsqueda
+  const filteredAgencies = agencies.filter(agency =>
+    agency.nameAgency.toLowerCase().includes(agencySearch.toLowerCase()) ||
+    agency.place.toLowerCase().includes(agencySearch.toLowerCase())
+  );
+
+  const filteredAgenciesEdit = agencies.filter(agency =>
+    agency.nameAgency.toLowerCase().includes(agencySearchEdit.toLowerCase()) ||
+    agency.place.toLowerCase().includes(agencySearchEdit.toLowerCase())
+  );
+
+  // Obtener nombre de la agencia por ID
+  const getAgencyName = (agencyId: string) => {
+    const agency = agencies.find(a => a.id === agencyId);
+    return agency ? `${agency.nameAgency} - ${agency.place}` : "No asignado";
+  };
 
   // Filtrar y ordenar aprendices
   const filteredAndSortedApprentices = React.useMemo(() => {
@@ -127,6 +162,11 @@ const ApprenticeManagement: React.FC = () => {
     return sorted;
   }, [apprentices, filter, sortBy, sortOrder, dataLoaded]);
 
+  // PAGINACIÓN: calcular páginas y slice
+  const totalPages = Math.ceil(filteredAndSortedApprentices.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedApprentices = filteredAndSortedApprentices.slice(startIndex, startIndex + itemsPerPage);
+
   // Manejar creación de aprendiz
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -143,7 +183,6 @@ const ApprenticeManagement: React.FC = () => {
         text: "Por favor, complete todos los campos obligatorios",
       });
       return;
-
     }
 
     if (new Date(newApprentice.entryDate) > new Date()) {
@@ -159,6 +198,7 @@ const ApprenticeManagement: React.FC = () => {
         ...newApprentice,
         age: parseInt(newApprentice.age),
         entryDate: new Date(newApprentice.entryDate),
+        agency: newApprentice.agencyId
       });
 
       setMessage({
@@ -175,6 +215,7 @@ const ApprenticeManagement: React.FC = () => {
         trainingLevel: ApprenticeTrainingLevel.PRINCIPIANTE,
         agencyId: "",
       });
+      setAgencySearch(""); // Limpiar búsqueda
 
       setShowCreateForm(false);
       await fetchApprentices();
@@ -199,22 +240,23 @@ const ApprenticeManagement: React.FC = () => {
       return;
     }
 
-    if (new Date(newApprentice.entryDate) > new Date()) {
-    setMessage({
-      type: "error",
-      text: "La fecha de ingreso no puede ser futura",
-    });
-    return;
-  }
+    if (new Date(editApprentice.entryDate) > new Date()) {
+      setMessage({
+        type: "error",
+        text: "La fecha de ingreso no puede ser futura",
+      });
+      return;
+    }
 
     try {
       await updateApprentice(editingApprentice.id, {
         ...editApprentice,
-        name: editApprentice.fullName.trim(),
+        fullName: editApprentice.fullName.trim(),
         age: parseInt(editApprentice.age),
         status: editApprentice.status,
         trainingLevel: editApprentice.trainingLevel,
         entryDate: new Date(editApprentice.entryDate),
+        agency: editApprentice.agencyId.trim()
       });
 
       setMessage({
@@ -231,6 +273,7 @@ const ApprenticeManagement: React.FC = () => {
         trainingLevel: ApprenticeTrainingLevel.PRINCIPIANTE,
         agencyId: "",
       });
+      setAgencySearchEdit(""); // Limpiar búsqueda
 
       await fetchApprentices();
       setTimeout(() => setMessage(null), 5000);
@@ -294,6 +337,13 @@ const ApprenticeManagement: React.FC = () => {
       trainingLevel: apprentice.trainingLevel,
       agencyId: apprentice.agencyId || "",
     });
+    // Establecer búsqueda inicial con la agencia actual
+    if (apprentice.agencyId) {
+      const currentAgency = agencies.find(a => a.id === apprentice.agencyId);
+      if (currentAgency) {
+        setAgencySearchEdit(`${currentAgency.nameAgency} - ${currentAgency.place}`);
+      }
+    }
   };
 
   // Iniciar eliminación
@@ -435,18 +485,18 @@ const ApprenticeManagement: React.FC = () => {
         {dataLoaded && (
           <div className="results-info">
             <span className="results-count">
-              {filteredAndSortedApprentices.length} de {apprentices.length}{" "}
+              {filteredAndSortedApprentices.length} de {apprentices.length} {" "}
               aprendices
             </span>
             <span className="sort-info">
-              Orden:{" "}
+              Orden: {" "}
               {sortBy === "name"
                 ? "Nombre"
                 : sortBy === "age"
                 ? "Edad"
                 : sortBy === "entryDate"
                 ? "Fecha Ingreso"
-                : "Estado"}{" "}
+                : "Estado"} {" "}
               •{sortOrder === "asc" ? " Ascendente" : " Descendente"}
             </span>
           </div>
@@ -482,7 +532,7 @@ const ApprenticeManagement: React.FC = () => {
                     !newApprentice.fullName.trim() ||
                     !newApprentice.age ||
                     !newApprentice.entryDate ||
-                    new Date(newApprentice.entryDate) > new Date() // Agregar esta condición
+                    new Date(newApprentice.entryDate) > new Date()
                   }
                 >
                   <span className="button-icon"><Icon name="plus" size={20} /></span>
@@ -505,7 +555,7 @@ const ApprenticeManagement: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredAndSortedApprentices.map((apprentice) => (
+                  {paginatedApprentices.map((apprentice) => (
                     <tr key={apprentice.id} className="apprentice-row">
                       <td className="apprentice-name-cell">
                         <div className="apprentice-name">{apprentice.fullName}</div>
@@ -531,9 +581,9 @@ const ApprenticeManagement: React.FC = () => {
                         </div>
                       </td>
                       <td>
-                        {/* <div className="detail-value">
-                          {apprentice.agencyId || "No asignado"}
-                        </div> */}
+                        <div className="detail-value">
+                          {getAgencyName(apprentice.agency)}
+                        </div>
                       </td>
                       <td>
                         <div className="table-actions">
@@ -559,8 +609,33 @@ const ApprenticeManagement: React.FC = () => {
                   ))}
                 </tbody>
               </table>
+              {/* PAGINACIÓN */}
+              {totalPages > 1 && (
+                <div className="pagination-container">
+                  <button
+                    className="pagination-btn"
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                  >
+                    ◀ Anterior
+                  </button>
+
+                  <span className="pagination-info">
+                    Página {currentPage} de {totalPages}
+                  </span>
+
+                  <button
+                    className="pagination-btn"
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                  >
+                    Siguiente ▶
+                  </button>
+                </div>
+              )}
             </div>
           )}
+        </div>
         </div>
 
         {/* Modal de creación */}
@@ -621,7 +696,6 @@ const ApprenticeManagement: React.FC = () => {
                           ...newApprentice,
                           entryDate: e.target.value,
                         })
-
                       }
                       required
                       max={getTodayDate()} 
@@ -680,19 +754,39 @@ const ApprenticeManagement: React.FC = () => {
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">ID de Agencia</label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      placeholder="Opcional"
-                      value={newApprentice.agencyId}
-                      onChange={(e) =>
-                        setNewApprentice({
-                          ...newApprentice,
-                          agencyId: e.target.value,
-                        })
-                      }
-                    />
+                    <label className="form-label">Agencia</label>
+                    <div className="agency-select-container">
+                      <input
+                        type="text"
+                        className="form-input search-input"
+                        placeholder="Buscar agencia por nombre..."
+                        value={agencySearch}
+                        onChange={(e) => setAgencySearch(e.target.value)}
+                      />
+                      <select
+                        className="form-select agency-select"
+                        value={newApprentice.agencyId}
+                        onChange={(e) =>
+                          setNewApprentice({
+                            ...newApprentice,
+                            agencyId: e.target.value,
+                          })
+                        }
+                        size={5} // Mostrar 5 opciones a la vez
+                      >
+                        <option value="">No asignado</option>
+                        {filteredAgencies.map((agency) => (
+                          <option key={agency.id} value={agency.id}>
+                            {agency.nameAgency} - {agency.place} (Fundada: {formatDate(agency.dateFundation.toString())})
+                          </option>
+                        ))}
+                      </select>
+                      {filteredAgencies.length === 0 && (
+                        <div className="no-agencies-message">
+                          No se encontraron agencias
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -722,6 +816,7 @@ const ApprenticeManagement: React.FC = () => {
                         trainingLevel: ApprenticeTrainingLevel.PRINCIPIANTE,
                         agencyId: "",
                       });
+                      setAgencySearch("");
                     }}
                     disabled={loading}
                   >
@@ -846,18 +941,39 @@ const ApprenticeManagement: React.FC = () => {
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">ID de Agencia</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    value={editApprentice.agencyId}
-                    onChange={(e) =>
-                      setEditApprentice({
-                        ...editApprentice,
-                        agencyId: e.target.value,
-                      })
-                    }
-                  />
+                  <label className="form-label">Agencia</label>
+                  <div className="agency-select-container">
+                    <input
+                      type="text"
+                      className="form-input search-input"
+                      placeholder="Buscar agencia por nombre..."
+                      value={agencySearchEdit}
+                      onChange={(e) => setAgencySearchEdit(e.target.value)}
+                    />
+                    <select
+                      className="form-select agency-select"
+                      value={editApprentice.agencyId}
+                      onChange={(e) =>
+                        setEditApprentice({
+                          ...editApprentice,
+                          agencyId: e.target.value,
+                        })
+                      }
+                      size={5} // Mostrar 5 opciones a la vez
+                    >
+                      <option value="">No asignado</option>
+                      {filteredAgenciesEdit.map((agency) => (
+                        <option key={agency.id} value={agency.id}>
+                          {agency.nameAgency} - {agency.place} (Fundada: {formatDate(agency.dateFundation.toString())})
+                        </option>
+                      ))}
+                    </select>
+                    {filteredAgenciesEdit.length === 0 && (
+                      <div className="no-agencies-message">
+                        No se encontraron agencias
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -886,6 +1002,7 @@ const ApprenticeManagement: React.FC = () => {
                       trainingLevel: ApprenticeTrainingLevel.PRINCIPIANTE,
                       agencyId: "",
                     });
+                    setAgencySearchEdit("");
                   }}
                   disabled={loading}
                 >
@@ -911,20 +1028,16 @@ const ApprenticeManagement: React.FC = () => {
                     <strong>Edad:</strong> {deletingApprentice.age} años
                   </div>
                   <div className="detail-item">
-                    <strong>Fecha de ingreso:</strong>{" "}
-                    {formatDate(deletingApprentice.entryDate)}
+                    <strong>Fecha de ingreso:</strong> {formatDate(deletingApprentice.entryDate)}
                   </div>
                   <div className="detail-item">
-                    <strong>Estado:</strong>{" "}
-                    {getStatusText(deletingApprentice.status)}
+                    <strong>Estado:</strong> {getStatusText(deletingApprentice.status)}
                   </div>
                   <div className="detail-item">
-                    <strong>Nivel Entrenamiento:</strong>{" "}
-                    {getTrainingLevelText(deletingApprentice.trainingLevel)}
+                    <strong>Nivel Entrenamiento:</strong> {getTrainingLevelText(deletingApprentice.trainingLevel)}
                   </div>
                   <div className="detail-item">
-                    <strong>Agencia:</strong>{" "}
-                    {deletingApprentice.Agencia}
+                    <strong>Agencia:</strong> {getAgencyName(deletingApprentice.agencyId)}
                   </div>
                 </div>
                 <p className="warning-text">
@@ -950,8 +1063,7 @@ const ApprenticeManagement: React.FC = () => {
             </div>
           </div>
         )}
-      </div>
-    </section>
+      </section>
   );
 };
 

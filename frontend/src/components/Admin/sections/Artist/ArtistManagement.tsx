@@ -37,6 +37,11 @@ const ArtistManagement: React.FC = () => {
   } | null>(null);
   const [dataLoaded, setDataLoaded] = useState(false);
 
+    // PAGINACIÓN
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 30;
+  
+
   // Estados del formulario
   const [newArtist, setNewArtist] = useState({
     stageName: "",
@@ -122,6 +127,11 @@ const ArtistManagement: React.FC = () => {
 
     return sorted;
   }, [artists, filter, sortBy, sortOrder, dataLoaded]);
+
+  // PAGINACIÓN: calcular páginas y slice
+  const totalPages = Math.ceil(filteredAndSortedArtists.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedArtists = filteredAndSortedArtists.slice(startIndex, startIndex + itemsPerPage);
 
   // Obtener nombre del aprendiz por ID
   const getApprenticeName = (apprenticeId: string) => {
@@ -460,7 +470,7 @@ const ArtistManagement: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredAndSortedArtists.map((artist) => (
+                  {paginatedArtists.map((artist) => (
                     <tr key={artist.id} className="artist-row">
                       <td className="artist-name-cell">
                         <div className="artist-name">{artist.stageName}</div>
@@ -516,6 +526,30 @@ const ArtistManagement: React.FC = () => {
                   ))}
                 </tbody>
               </table>
+              {/* PAGINACIÓN */}
+              {totalPages > 1 && (
+                <div className="pagination-container">
+                  <button
+                    className="pagination-btn"
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                  >
+                    ◀ Anterior
+                  </button>
+
+                  <span className="pagination-info">
+                    Página {currentPage} de {totalPages}
+                  </span>
+
+                  <button
+                    className="pagination-btn"
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                  >
+                    Siguiente ▶
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { artistService } from '../services/ArtistService';
-import { CreateArtistDto, ArtistResponseDto } from '../services/dtos/ArtistDto';
+import { CreateArtistDto } from '../../../backend/src/ApplicationLayer/DTOs/artistDto/create-artist.dto';
+import { ArtistResponseDto } from '../../../backend/src/ApplicationLayer/DTOs/artistDto/response-artist.dto';
 import { ArtistStatus } from '../../../backend/src/DomainLayer/Enums';
 
 interface ArtistContextType {
@@ -14,7 +15,7 @@ interface ArtistContextType {
   fetchArtists: () => Promise<void>;
   fetchArtist: (id: string) => Promise<ArtistResponseDto | null>;
   deleteArtist: (id: string) => Promise<void>;
-  updateArtist: (id: string, updateData: { transitionDate:Date, status: ArtistStatus, stageName: string, birthday: Date, groupId: string}) => Promise<void>;
+  updateArtist: (id: string, updateData: { transitionDate:Date, status: ArtistStatus, stageName: string, birthday: Date, groupId: string, apprenticeId : string}) => Promise<void>;
   clearError: () => void;
 }
 
@@ -91,7 +92,7 @@ export const ArtistProvider: React.FC<ArtistProviderProps> = ({ children }) => {
     }
   };
 
-  const updateArtist = async (id: string, updateData: {transitionDate:Date, status: ArtistStatus, stageName: string, birthday: Date, groupId: string }) => {
+  const updateArtist = async (id: string, updateData: {transitionDate:Date, status: ArtistStatus, stageName: string, birthday: Date, groupId: string, apprenticeId: string }) => {
     setLoading(true);
     setError(null);
     try {

@@ -13,5 +13,7 @@ export class CreateApprenticeDto{
     trainingLevel!:ApprenticeTrainingLevel;
 
     entryDate!: Date;
+
+    agency!: string;
     
 }

@@ -1,3 +1,4 @@
+// src/PresentationLayer/Modules/AgencyModule.ts
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AgencyEntity } from "../InfraestructureLayer/database/Entities/AgencyEntity";
@@ -6,56 +7,33 @@ import { AgencyMapper } from "../InfraestructureLayer/database/Mappers/AgencyMap
 import { IAgencyRepository } from "../DomainLayer/Repositories/IAgencyRepository";
 import { AgencyRepositoryImpl } from "../InfraestructureLayer/database/Repositories/AgencyRepository";
 import { AgencyController } from "../PresentationLayer/Controllers/agency.controller";
+import { AgencyService } from '@application/services/agency.service';
+import { AgencyDtoMapper } from "@application/DTOs/dtoMappers/agency.dtoMapper";
+import { ApprenticeMapper } from "@infrastructure/database/Mappers/ApprenticeMapper";
+import { ArtistMapper } from "@infrastructure/database/Mappers/ArtistMapper";
+import { GroupMapper } from "@infrastructure/database/Mappers/GroupMapper";
 
 @Module({
   imports: [TypeOrmModule.forFeature([AgencyEntity])],
   controllers: [AgencyController],
   providers: [
+    AgencyMapper,
+    GroupMapper,
+    ApprenticeMapper,
+    ArtistMapper,
+    
+    // Repositorio (igual que en ActivityModule)
     {
-      provide: IMapper, // ✅ Interfaz como token
-      useClass: AgencyMapper, // ✅ Implementación concreta
+      provide: IAgencyRepository,
+      useClass: AgencyRepositoryImpl,
     },
-    {
-      provide: IAgencyRepository, // ✅ Interfaz como token
-      useClass: AgencyRepositoryImpl, // ✅ Implementación concreta
-    },
+    
+    // DTO Mapper (igual que en ActivityModule)
+    AgencyDtoMapper,
+    
+    // Servicio
+    AgencyService,
   ],
   exports: [IAgencyRepository],
 })
 export class AgencyModule {}
-
-// // AgencyModule.ts  OTRA VERSION
-// import { Module } from '@nestjs/common';
-// import { TypeOrmModule } from '@nestjs/typeorm';
-// import { AgencyEntity } from '@entities/AgencyEntity';
-// import { AgencyMapper } from 'src/InfraestructureLayer/database/Mappers/AgencyMapper';
-// import { IAgencyRepository } from '@domain/Repositories/IAgencyRepository';
-// import { AgencyRepositoryImpl } from 'src/InfraestructureLayer/database/Repositories/AgencyRepository';
-// import { AgencyController } from '@presentation/Controllers/AgencyController';
-// import { AgencyService } from '@application/services/AgencyService';
-// import { ApprenticeMapper } from '../Mappers/ApprenticeMapper';
-// import { ArtistMapper } from '../Mappers/ArtistMapper';
-// import { GroupMapper } from '../Mappers/GroupMapper';
-
-// @Module({
-//   imports: [
-//     TypeOrmModule.forFeature([AgencyEntity])
-//   ],
-//   controllers: [AgencyController],
-//   providers: [
-//     AgencyMapper,
-//     ApprenticeMapper,
-//     ArtistMapper,
-//     GroupMapper,
-//     {
-//       provide: 'IAgencyRepository',
-//       useClass: AgencyRepositoryImpl
-//     },
-//     AgencyService
-//   ],
-//   exports: [
-//     'IAgencyRepository',
-//     AgencyService
-//   ]
-// })
-// export class AgencyModule {}

@@ -3,15 +3,16 @@ import { IMapper } from "./IMapper";
 import { Contract } from '@domain/Entities/Contract';
 import { Agency} from '@domain/Entities/Agency';
 import { Artist } from '@domain/Entities/Artist';
-import { Interval } from '@domain/Entities/Interval';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class ContractMapper extends IMapper<Contract, ContractEntity> {
     
     toDomainEntity(dataBaseEntity: ContractEntity): Contract {
         // Método base - solo para la estructura simple
         return new Contract(
             this.generateDomainId(dataBaseEntity),
-            null as any, null as any, null as any,
+            dataBaseEntity.startDate,dataBaseEntity.endDate, null as any, null as any,
             parseFloat(dataBaseEntity.distributionPercentage.toString()),
             dataBaseEntity.status,
             dataBaseEntity.conditions
@@ -21,13 +22,13 @@ export class ContractMapper extends IMapper<Contract, ContractEntity> {
     // Método específico para reconstrucción completa
     toCompleteDomainEntity(
         dataBaseEntity: ContractEntity,
-        interval: Interval,
         agency: Agency, 
         artist: Artist
     ): Contract {
         return new Contract(
             this.generateDomainId(dataBaseEntity),
-            interval,
+            dataBaseEntity.startDate, 
+            dataBaseEntity.endDate,
             agency,
             artist,
             parseFloat(dataBaseEntity.distributionPercentage.toString()),
@@ -38,7 +39,8 @@ export class ContractMapper extends IMapper<Contract, ContractEntity> {
 
     toDataBaseEntity(domainEntity: Contract): ContractEntity {
         const entity = new ContractEntity();
-        entity.intervalID = domainEntity.getInterval().getId();
+        entity.startDate = domainEntity.getStartDate();
+        entity.endDate = domainEntity.getEndDate();
         entity.agencyID = domainEntity.getAgencyId().getId();
         entity.artistID = domainEntity.getArtistId().getId();
         entity.status = domainEntity.getStatus();
@@ -48,6 +50,6 @@ export class ContractMapper extends IMapper<Contract, ContractEntity> {
     }
 
     private generateDomainId(dataBaseEntity: ContractEntity): string {
-        return `${dataBaseEntity.intervalID}_${dataBaseEntity.agencyID}_${dataBaseEntity.artistID}`;
+        return `${dataBaseEntity.agencyID}_${dataBaseEntity.artistID}`;
     }
 }

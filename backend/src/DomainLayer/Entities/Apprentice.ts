@@ -15,6 +15,7 @@ export class Apprentice implements IUpdatable {
     private entryDate: Date,
     private trainingLevel: ApprenticeTrainingLevel,
     private status: ApprenticeStatus,
+    private agency: string
   ) {
     this.validate();
   }
@@ -49,9 +50,9 @@ export class Apprentice implements IUpdatable {
                 age:number, 
                 status: ApprenticeStatus, 
                 trainingLevel: ApprenticeTrainingLevel, 
-                entryDate: Date){
+                entryDate: Date, agency: string){
         const id = uuidv4();
-        return new Apprentice(id, name, age, entryDate, trainingLevel, status);
+        return new Apprentice(id, name, age, entryDate, trainingLevel, status, agency);
   }
 
   private validate(): void {
@@ -164,6 +165,10 @@ export class Apprentice implements IUpdatable {
 
   public getAge(): number {
     return this.age;
+  }
+
+  public getAgency(): string{
+    return this.agency;
   }
 
   
