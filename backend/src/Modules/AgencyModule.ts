@@ -7,28 +7,32 @@ import { IAgencyRepository } from "../DomainLayer/Repositories/IAgencyRepository
 import { AgencyRepositoryImpl } from "../InfraestructureLayer/database/Repositories/AgencyRepository";
 import { AgencyController } from "../PresentationLayer/Controllers/agency.controller";
 import { AgencyService } from '@application/services/agency.service';
-import { BaseDtoMapper } from "@application/DTOs/dtoMappers/DtoMapper";
 import { AgencyDtoMapper } from "@application/DTOs/dtoMappers/agency.dtoMapper";
+import { ApprenticeMapper } from "@infrastructure/database/Mappers/ApprenticeMapper";
+import { ArtistMapper } from "@infrastructure/database/Mappers/ArtistMapper";
+import { GroupMapper } from "@infrastructure/database/Mappers/GroupMapper";
 
 @Module({
   imports: [TypeOrmModule.forFeature([AgencyEntity])],
   controllers: [AgencyController],
   providers: [
-    {
-      provide: IMapper,
-      useClass: AgencyMapper, 
-    },
+    AgencyMapper,
+    GroupMapper,
+    ApprenticeMapper,
+    ArtistMapper,
+    
+    // Repositorio (igual que en ActivityModule)
     {
       provide: IAgencyRepository,
       useClass: AgencyRepositoryImpl,
     },
-    {
-      provide: BaseDtoMapper,
-      useClass: AgencyDtoMapper,
-    },
+    
+    // DTO Mapper (igual que en ActivityModule)
+    AgencyDtoMapper,
+    
+    // Servicio
     AgencyService,
   ],
   exports: [IAgencyRepository],
 })
 export class AgencyModule {}
-
