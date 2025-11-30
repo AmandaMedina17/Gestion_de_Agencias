@@ -1,5 +1,8 @@
 import { CreateApprenticeDto } from '../../../backend/src/ApplicationLayer/DTOs/apprenticeDto/create-apprentice.dto';
 import { ApprenticeResponseDto } from './dtos/ApprenticeDto';
+import { BaseService } from "./BaseService";
+import { ApprenticeResponseDto } from '../../../backend/src/ApplicationLayer/DTOs/apprenticeDto/response-apprentice.dto';
+import { CreateApprenticeDto } from '../../../backend/src/ApplicationLayer/DTOs/apprenticeDto/create-apprentice.dto';
 
 const API_BASE_URL = 'http://localhost:3000'; // Puerto del backend NestJS
 

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { placeService } from '../services/PlaceService';
-import { CreatePlaceDto, PlaceResponseDto } from '../services/dtos/PlaceDto';
+import { PlaceResponseDto } from '../../../backend/src/ApplicationLayer/DTOs/placeDto/response-place.dto';
+import { CreatePlaceDto } from '../../../backend/src/ApplicationLayer/DTOs/placeDto/create-place.dto';
 
 interface PlaceContextType {
   // Estado - CORREGIDO: usa "places" en lugar de "responsibles"

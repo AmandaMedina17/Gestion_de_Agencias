@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { responsibleService } from '../services/ResponsibleService';
-import { CreateResponsibleDto, ResponsibleResponseDto } from '../services/dtos/ResponsibleDto';
+import { ResponsibleResponseDto } from '../../../backend/src/ApplicationLayer/DTOs/responsibleDto/response-responsible.dto';
+import { CreateResponsibleDto } from '../../../backend/src/ApplicationLayer/DTOs/responsibleDto/create-responsible.dto';
 
 interface ResponsibleContextType {
   // Estado

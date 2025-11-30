@@ -1,5 +1,11 @@
+<<<<<<< Updated upstream
 import { CreatePlaceDto } from '../../../backend/src/ApplicationLayer/DTOs/placeDto/create-place.dto';
 import { PlaceResponseDto } from './dtos/PlaceDto';
+=======
+import { BaseService } from "./BaseService";
+import { PlaceResponseDto } from '../../../backend/src/ApplicationLayer/DTOs/placeDto/response-place.dto';
+import { CreatePlaceDto } from '../../../backend/src/ApplicationLayer/DTOs/placeDto/create-place.dto';
+>>>>>>> Stashed changes
 
 const API_BASE_URL = 'http://localhost:3000'; 
 

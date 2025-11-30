@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { apprenticeService } from '../services/ApprenticeService';
-import { CreateApprenticeDto, ApprenticeResponseDto } from '../services/dtos/ApprenticeDto';
+import { ApprenticeResponseDto } from '../../../backend/src/ApplicationLayer/DTOs/apprenticeDto/response-apprentice.dto';
+import { CreateApprenticeDto } from '../../../backend/src/ApplicationLayer/DTOs/apprenticeDto/create-apprentice.dto';
 import { ApprenticeStatus, ApprenticeTrainingLevel } from '../../../backend/src/DomainLayer/Enums';
 
 interface ApprenticeContextType {

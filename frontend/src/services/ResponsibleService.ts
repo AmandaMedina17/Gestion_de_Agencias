@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import { CreateResponsibleDto } from '../../../backend/src/ApplicationLayer/DTOs/responsibleDto/create-responsible.dto';
 import { ResponsibleResponseDto } from './dtos/ResponsibleDto';
 
@@ -93,3 +94,14 @@ export const responsibleService = {
     }
   },
 };
+=======
+import { BaseService } from "./BaseService";
+import { ResponsibleResponseDto } from '../../../backend/src/ApplicationLayer/DTOs/responsibleDto/response-responsible.dto';
+import { CreateResponsibleDto } from '../../../backend/src/ApplicationLayer/DTOs/responsibleDto/create-responsible.dto';
+
+export const responsibleService = new BaseService<
+  CreateResponsibleDto,
+  ResponsibleResponseDto
+>("http://localhost:3000/responsible");
+
+>>>>>>> Stashed changes

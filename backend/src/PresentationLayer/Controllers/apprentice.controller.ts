@@ -24,7 +24,8 @@ export class ApprenticeController {
     }
   
     @Patch(':id')
-    update(@Param('id') id: string, @Body(ValidationPipe) updateapprenticeDto: UpdateApprenticeDto) {
+    update(@Param('id') id: string, 
+          @Body(ValidationPipe) updateapprenticeDto: UpdateApprenticeDto) {
       return this.apprenticeService.update(id, updateapprenticeDto);
     }
   

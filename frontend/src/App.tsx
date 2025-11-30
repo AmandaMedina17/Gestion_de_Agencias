@@ -9,32 +9,38 @@ import ManagerDashboard from './components/Manager/ManagerDashboard';
 import AdminDashboard from './components/Admin/AdminDashboard';
 import './App.css';
 import { PlaceProvider } from './context/PlaceContext';
+import { ArtistProvider } from './context/ArtistContext';
+import { ApprenticeEvaluationProvider } from './context/EvaluationContext';
 
 function App() {
   return (
-    <ApprenticeProvider>
-      <PlaceProvider>
-        <AuthProvider>
-          <Router>
-            <div className="App">
-              <Routes>
-                <Route path="/login" element={<Login />} />
-                <Route path="/manager" element={<ManagerDashboard />} />
-                <Route 
-                  path="/admin" 
-                  element={
-                    <ResponsibleProvider> {/* Solo en admin */}
-                      <AdminDashboard />
-                    </ResponsibleProvider>
-                  } 
-                />
-                <Route path="/" element={<Navigate to="/login" />} />
-              </Routes>
-            </div>
-          </Router>
-        </AuthProvider>
-      </PlaceProvider>
-    </ApprenticeProvider>
+    <ApprenticeEvaluationProvider>
+      <ArtistProvider>
+        <ApprenticeProvider>
+          <PlaceProvider>
+            <AuthProvider>
+              <Router>
+                <div className="App">
+                  <Routes>
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/manager" element={<ManagerDashboard />} />
+                    <Route 
+                      path="/admin" 
+                      element={
+                        <ResponsibleProvider> {/* Solo en admin */}
+                          <AdminDashboard />
+                        </ResponsibleProvider>
+                      } 
+                    />
+                    <Route path="/" element={<Navigate to="/login" />} />
+                  </Routes>
+                </div>
+              </Router>
+            </AuthProvider>
+          </PlaceProvider>
+        </ApprenticeProvider>
+      </ArtistProvider>
+    </ApprenticeEvaluationProvider>
   );
 }
 
