@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { apprenticeService } from '../services/ApprenticeService';
-import { ApprenticeResponseDto } from '../../../backend/src/ApplicationLayer/DTOs/apprenticeDto/response-apprentice.dto';
 import { CreateApprenticeDto } from '../../../backend/src/ApplicationLayer/DTOs/apprenticeDto/create-apprentice.dto';
+import { ApprenticeResponseDto } from '../../../backend/src/ApplicationLayer/DTOs/apprenticeDto/response-apprentice.dto';
 import { ApprenticeStatus, ApprenticeTrainingLevel } from '../../../backend/src/DomainLayer/Enums';
 
 interface ApprenticeContextType {
@@ -15,7 +15,7 @@ interface ApprenticeContextType {
   fetchApprentices: () => Promise<void>;
   fetchApprentice: (id: string) => Promise<ApprenticeResponseDto | null>;
   deleteApprentice: (id: string) => Promise<void>;
-  updateApprentice: (id: string, updateData: { name: string, age:number, status:ApprenticeStatus, trainingLevel:ApprenticeTrainingLevel, entryDate:Date }) => Promise<void>;
+  updateApprentice: (id: string, updateData: { fullName: string, age:number, status:ApprenticeStatus, trainingLevel:ApprenticeTrainingLevel, entryDate:Date }) => Promise<void>;
   clearError: () => void;
 }
 
@@ -92,7 +92,7 @@ export const ApprenticeProvider: React.FC<ApprenticeProviderProps> = ({ children
     }
   };
 
-  const updateApprentice = async (id: string, updateData: { name: string }) => {
+  const updateApprentice = async (id: string, updateData: { fullName: string, age:number, status:ApprenticeStatus, trainingLevel:ApprenticeTrainingLevel, entryDate:Date}) => {
     setLoading(true);
     setError(null);
     try {
