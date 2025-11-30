@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { artistService } from '../services/ArtistService';
-import { CreateArtistDto, ArtistResponseDto } from '../services/dtos/ArtistDto';
+import { CreateArtistDto } from '../../../backend/src/ApplicationLayer/DTOs/artistDto/create-artist.dto';
+import { ArtistResponseDto } from '../../../backend/src/ApplicationLayer/DTOs/artistDto/response-artist.dto';
 import { ArtistStatus } from '../../../backend/src/DomainLayer/Enums';
 
 interface ArtistContextType {

@@ -1,0 +1,913 @@
+/* Estilos para selects múltiples */
+.multiple-select {
+  min-height: 120px;
+  padding: 8px;
+}
+
+.multiple-select option {
+  padding: 8px 12px;
+  margin: 2px 0;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.multiple-select option:hover {
+  background-color: #f0f0f0;
+}
+
+.multiple-select option:checked {
+  background-color: #007bff;
+  color: white;
+}
+
+.select-hint {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+.selected-items {
+  margin-top: 8px;
+  padding: 8px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+/* Estilos para dropdowns con checkboxes */
+.dropdown-container {
+  position: relative;
+  width: 100%;
+}
+
+.dropdown-toggle {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.dropdown-toggle:hover {
+  border-color: #007bff;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  z-index: 1000;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.dropdown-header {
+  padding: 8px 12px;
+  border-bottom: 1px solid #eee;
+  background-color: #f8f9fa;
+}
+
+.select-all-checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.select-all-checkbox input {
+  margin-right: 8px;
+}
+
+.dropdown-list {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.dropdown-item {
+  padding: 8px 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+}
+
+/* Estilos para checkboxes */
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  width: 100%;
+}
+
+.checkbox-input {
+  display: none;
+}
+
+.checkbox-custom {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #007bff;
+  border-radius: 3px;
+  margin-right: 8px;
+  position: relative;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.checkbox-input:checked + .checkbox-custom {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.checkbox-input:checked + .checkbox-custom::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.no-items {
+  color: #6c757d;
+  font-style: italic;
+  text-align: center;
+  padding: 8px;
+}
+
+.selected-items {
+  margin-top: 8px;
+  padding: 8px;
+  background-color: #e8f5e8;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  color: #155724;
+}
+
+/* Estilos para inputs de fecha */
+.array-input-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.array-input-group .form-input {
+  flex: 1;
+  margin-right: 8px;
+}
+
+.remove-array-item {
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.remove-array-item:hover {
+  background: #c82333;
+}
+
+.add-array-item {
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.add-array-item:hover {
+  background: #218838;
+}
+
+
+.manager-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.controls-left {
+  display: flex;
+  gap: 1rem;
+}
+
+.controls-right {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.create-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.create-button:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.create-button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+.button-icon {
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+.filter-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input {
+  padding-right: 2.5rem;
+  min-width: 250px;
+}
+
+.clear-filter-btn {
+  position: absolute;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #6c757d;
+  padding: 0.25rem;
+}
+
+.clear-filter-btn:hover {
+  color: #dc3545;
+}
+
+.sort-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sort-select {
+  min-width: 180px;
+}
+
+.sort-order-btn {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  padding: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.sort-order-btn:hover:not(:disabled) {
+  background: #e9ecef;
+}
+
+.reload-button {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  max-width: 100;
+}
+
+.reload-button:hover:not(:disabled) {
+  background: #218838;
+}
+
+.results-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.table-container {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  width: 100%;
+}
+
+.activities-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1.2rem;
+}
+
+.activities-table th {
+  background: #f8f9fa;
+  padding: 1.2rem 1rem;
+  text-align: center;
+  font-weight: 700;
+  color: #495057;
+  border-bottom: 3px solid #dee2e6;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.activities-table td {
+  padding: 1.2rem 1rem;
+  border-bottom: 1px solid #e9ecef;
+  vertical-align: middle;
+  text-align: center;
+  font-size: 0.6rem;
+}
+
+.activity-row {
+  transition: all 0.2s;
+}
+
+.activity-row:hover {
+  background: #f8f8f8;
+}
+
+/* Badges de clasificación - Estilo similar a los status de Apprentice */
+.classification-badge {
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  text-align: center;
+  display: inline-block;
+  min-width: 120px;
+}
+
+/* Tipo de actividad */
+.type-value {
+  font-weight: 500;
+  color: #000000;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  background: #f8f9fa00;
+  display: inline-block;
+  min-width: 120px;
+  font-size: 1.1rem;
+}
+
+/* Listas de responsables, lugares y fechas */
+.responsibles-list,
+.places-list,
+.dates-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+}
+
+.responsible-item,
+.place-item,
+.date-item {
+  padding: 0.4rem 0.8rem;
+  background: #f8f9fa00;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  border-left: 3px solid #007bff00;
+  width: fit-content;
+}
+
+
+.more-items {
+  font-size: 0.8rem;
+  color: #6c757d;
+  font-style: italic;
+  padding: 0.2rem 0.8rem;
+}
+
+/* Acciones de la tabla - Mismo estilo que Apprentice */
+.table-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.table-actions .action-btn {
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.table-actions .edit-btn:hover {
+  background: #80d0fb6b;
+  transform: scale(1.1);
+}
+
+.table-actions .delete-btn:hover {
+  background: #80d0fb6b;
+  transform: scale(1.1);
+}
+
+.pagination-container {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
+.pagination-btn {
+  background: #007bff;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+
+.pagination-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.pagination-info {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  color: #6c757d;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  text-align: center;
+  color: #6c757d;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.activity-modal .modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  max-width: 700px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.activity-modal .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.activity-modal .form-group {
+  margin-bottom: 0;
+}
+
+.activity-modal .modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}
+
+.activity-modal .delete-confirmation {
+  margin: 1.5rem 0;
+}
+
+.activity-modal .activity-details {
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 6px;
+  margin: 1rem 0;
+}
+
+.activity-modal .detail-item {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.activity-modal .detail-item strong {
+  color: #6c757d;
+}
+
+.activity-modal .warning-text {
+  color: #dc3545;
+  font-weight: 500;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.activity-modal .delete-button {
+  background: #dc3545;
+}
+
+.activity-modal .delete-button:hover:not(:disabled) {
+  background: #c82333;
+}
+
+/* Estilos para dropdowns con checkboxes - Mantenemos los existentes pero con mejoras visuales */
+.dropdown-container {
+  position: relative;
+  width: 100%;
+}
+
+.dropdown-toggle {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: white;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  font-size: 1rem;
+}
+
+.dropdown-toggle:hover {
+  border-color: #007bff;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  z-index: 1000;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.dropdown-header {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+  background-color: #f8f9fa;
+}
+
+.select-all-checkbox {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.select-all-checkbox input {
+  margin-right: 8px;
+}
+
+.dropdown-list {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.dropdown-item {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+}
+
+/* Estilos para checkboxes - Mejorados para coincidir con el estilo general */
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  width: 100%;
+  font-size: 0.95rem;
+}
+
+.checkbox-input {
+  display: none;
+}
+
+.checkbox-custom {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #007bff;
+  border-radius: 4px;
+  margin-right: 10px;
+  position: relative;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.checkbox-input:checked + .checkbox-custom {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.checkbox-input:checked + .checkbox-custom::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.no-items {
+  color: #6c757d;
+  font-style: italic;
+  text-align: center;
+  padding: 12px;
+  font-size: 0.95rem;
+}
+
+.selected-items {
+  margin-top: 8px;
+  padding: 10px;
+  background-color: #e8f5e8;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: #155724;
+  font-weight: 500;
+}
+
+/* Estilos para inputs de fecha - Mejorados */
+.array-input-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 8px;
+}
+
+.array-input-group .form-input {
+  flex: 1;
+}
+
+.remove-array-item {
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.2s;
+}
+
+.remove-array-item:hover {
+  background: #c82333;
+}
+
+.add-array-item {
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.add-array-item:hover {
+  background: #218838;
+}
+
+/* Responsive - Mismo estilo que Apprentice */
+@media (max-width: 768px) {
+  .manager-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .controls-right {
+    justify-content: space-between;
+  }
+  
+  .search-input {
+    min-width: 200px;
+  }
+  
+  .activity-modal .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .activity-modal .modal-actions {
+    flex-direction: column;
+  }
+  
+  .table-container {
+    overflow-x: auto;
+  }
+  
+  .activities-table {
+    min-width: 700px;
+  }
+  
+  .activities-table th,
+  .activities-table td {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .activities-table th {
+    font-size: 0.8rem;
+  }
+  
+  .table-actions {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .table-actions .action-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 0.9rem;
+  }
+  
+  .classification-badge,
+  .type-value {
+    font-size: 0.85rem;
+    min-width: 100px;
+    padding: 0.3rem 0.8rem;
+  }
+}
+
+/* Estilos para selects en formularios - Coherencia con Apprentice */
+.form-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: white;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.form-select:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #495057;
+  font-size: 0.95rem;
+}
+
+.submit-button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.submit-button:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.submit-button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+.cancel-button {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.cancel-button:hover:not(:disabled) {
+  background: #545b62;
+}

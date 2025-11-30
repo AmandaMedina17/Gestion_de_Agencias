@@ -1,6 +1,6 @@
 import { Entity, Column,PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { ApprenticeEntity } from './ApprenticeEntity';
-import { EvaluationValue} from '@domain/Enums';
+import { EvaluationValue} from '../../../DomainLayer/Enums';
 
 @Entity('apprentice_evaluation')
 export class ApprenticeEvaluationEntity {
