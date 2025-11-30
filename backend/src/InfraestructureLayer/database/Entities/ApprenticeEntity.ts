@@ -9,7 +9,7 @@ import {
   OneToMany
 } from "typeorm";
 import { AgencyEntity } from "./AgencyEntity";
-import { ApprenticeStatus, ApprenticeTrainingLevel } from "@domain/Enums";
+import { ApprenticeStatus, ApprenticeTrainingLevel } from "../../../DomainLayer/Enums";
 import { ApprenticeEvaluationEntity } from "./ApprenticeEvaluationEntity";
 import { ArtistEntity } from "./ArtistEntity";
 
@@ -51,10 +51,8 @@ export class ApprenticeEntity {
   artistId!: ArtistEntity;
 
   @OneToMany(
-    () => ApprenticeEvaluationEntity,
-    (apprenticeEvaluation: ApprenticeEvaluationEntity) =>
-      apprenticeEvaluation.apprentice
+  () => ApprenticeEvaluationEntity,(evaluation) => evaluation.apprentice
   )
-  apprenticeEvaluations!: ApprenticeEvaluationEntity[];
+  evaluations!: ApprenticeEvaluationEntity[];
 }
 

@@ -6,7 +6,7 @@ import {
   OneToMany,
   JoinColumn,
 } from "typeorm";
-import { GroupStatus } from "@domain/Enums";
+import { GroupStatus } from "../../../DomainLayer/Enums";
 import { AgencyEntity } from "./AgencyEntity";
 import { AlbumEntity } from "./AlbumEntity";
 import { GroupActivityEntity } from "./GroupActivity";
@@ -31,6 +31,9 @@ export class GroupEntity {
 
   @Column()
   concept!: string;
+
+  @Column()
+  visualconcept!: string;
 
   @Column({ type: "date" })
   debutDate!: Date;

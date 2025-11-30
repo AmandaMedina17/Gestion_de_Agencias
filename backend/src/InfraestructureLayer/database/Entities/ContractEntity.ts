@@ -1,5 +1,4 @@
 import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from "typeorm";
-import { IntervalEntity } from "./IntervalEntity";
 import { ContractStatus } from "@domain/Enums";
 import { AgencyEntity } from "./AgencyEntity";
 import { ArtistEntity } from "./ArtistEntity";
@@ -7,13 +6,16 @@ import { ArtistEntity } from "./ArtistEntity";
 @Entity()
 export class ContractEntity {
   @PrimaryColumn()
-  intervalID!: string;
-
-  @PrimaryColumn()
   agencyID!: string;
 
   @PrimaryColumn()
   artistID!: string;
+
+  @PrimaryColumn({ type: "timestamp" })
+  startDate!: Date;
+
+  @PrimaryColumn({ type: "timestamp" })
+  endDate!: Date;
 
   @Column({
     type: "enum",
@@ -29,10 +31,6 @@ export class ContractEntity {
   distributionPercentage!: number;
 
   //Relaciones
-  @ManyToOne(() => IntervalEntity)
-  @JoinColumn({ name: "intervalID" })
-  interval!: IntervalEntity;
-
   @ManyToOne(() => AgencyEntity)
   @JoinColumn({ name: "agencyID" })
   agency!: AgencyEntity;

@@ -1,4 +1,4 @@
-import { ActivityClassification, ActivityType } from "@domain/Enums";
+import { ActivityClassification, ActivityType } from "../../../DomainLayer/Enums";
 import { ArrayNotEmpty, IsArray, IsEnum } from "class-validator";
 
 export class CreateActivityDto{

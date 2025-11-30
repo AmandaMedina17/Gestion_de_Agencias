@@ -1,6 +1,6 @@
 import { Entity, PrimaryColumn, ManyToOne, JoinColumn, Column } from 'typeorm';
 import { ArtistEntity } from './ArtistEntity';
-import { Date } from './DateEntity';
+import { DateEntity } from './DateEntity';
 
 @Entity('artist_collaboration')
 export class ArtistCollaborationEntity {
@@ -25,7 +25,7 @@ export class ArtistCollaborationEntity {
     artist2!: ArtistEntity;
 
     // Relación con la fecha
-    @ManyToOne(() => Date, (date: Date) => date.artistCollaborations)
+    @ManyToOne(() => DateEntity, (date: DateEntity) => date.artistCollaborations)
     @JoinColumn({ name: 'date_id' })
-    date!: Date;
+    date!: DateEntity;
 }

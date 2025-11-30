@@ -12,7 +12,7 @@ import { IMapper } from '../Mappers/IMapper';
 @Injectable()
 export class ApprenticeRepository
   extends BaseRepository<Apprentice, ApprenticeEntity>
-  implements IApprenticeRepository 
+  //implements IApprenticeRepository 
 {
   constructor(
     @InjectRepository(ApprenticeEntity)
@@ -21,30 +21,30 @@ export class ApprenticeRepository
   ) {
     super(repository, mapper);
   }
-  async getApprenticeEvaluations(id: string): Promise<Evaluation[]> {
-    const apprenticeEntity = await this.repository.findOne({
-      where: { id },
-      relations: ['apprenticeEvaluations', 'apprenticeEvaluations.evaluation']
-    });
+  // async getApprenticeEvaluations(id: string): Promise<Evaluation[]> {
+  //   const apprenticeEntity = await this.repository.findOne({
+  //     where: { id },
+  //     relations: ['apprenticeEvaluations', 'apprenticeEvaluations.evaluation']
+  //   });
 
-    if (!apprenticeEntity) {
-      throw new Error(`Apprentice with id ${id} not found`);
-    }
+  //   if (!apprenticeEntity) {
+  //     throw new Error(`Apprentice with id ${id} not found`);
+  //   }
 
-    if (!apprenticeEntity.apprenticeEvaluations) {
-      return [];
-    }
+  //   if (!apprenticeEntity.apprenticeEvaluations) {
+  //     return [];
+  //   }
 
-    // Mapeamos las EvaluationEntity a Evaluation (dominio)
-    return apprenticeEntity.apprenticeEvaluations.map(ae => {
-      const evaluationEntity = ae.evaluation;
-      // Aquí necesitarías un EvaluationMapper, por ahora creación manual
-      return new Evaluation(
-        evaluationEntity.id,
-        evaluationEntity.date,
-        evaluationEntity.evaluation
-      );
-    });
-  }
+  //   // Mapeamos las EvaluationEntity a Evaluation (dominio)
+  //   return apprenticeEntity.apprenticeEvaluations.map(ae => {
+  //     const evaluationEntity = ae.evaluation;
+  //     // Aquí necesitarías un EvaluationMapper, por ahora creación manual
+  //     return new Evaluation(
+  //       evaluationEntity.id,
+  //       evaluationEntity.date,
+  //       evaluationEntity.evaluation
+  //     );
+  //   });
+  // }
 
 }
