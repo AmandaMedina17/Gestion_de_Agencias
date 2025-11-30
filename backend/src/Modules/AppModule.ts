@@ -8,7 +8,8 @@ import { PlaceModule } from './PlaceModule';
 import { ActivityModule } from './ActivityModule';
 import { ApprenticeModule } from './ApprenticeModule';
 import { ArtistModule } from "./ArtistModule";
-
+import { AgencyModule } from './AgencyModule';
+import { ContractModule } from './ContractModule';
 @Module({
   imports: [
     DatabaseModule,
@@ -18,6 +19,8 @@ import { ArtistModule } from "./ArtistModule";
     ActivityModule,
     ApprenticeModule,
     ArtistModule,
+    AgencyModule,
+    ContractModule
   ],
   controllers: [AppController],
   providers: [AppService],

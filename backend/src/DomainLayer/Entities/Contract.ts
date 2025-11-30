@@ -74,7 +74,7 @@ export class Contract implements IUpdatable{
     this.validateContractDates(this.startDate,this.endDate);
   }
 
-  public create( startDate: Date, endDate: Date, agency: Agency, artist: Artist, distributionPercentage: number, status: ContractStatus, conditions: string) : Contract {
+  public static create( startDate: Date, endDate: Date, agency: Agency, artist: Artist, distributionPercentage: number, status: ContractStatus, conditions: string) : Contract {
     const id = uuidv4();
     return new Contract(id, startDate, endDate, agency, artist, distributionPercentage, status, conditions);
   }
@@ -156,7 +156,7 @@ export class Contract implements IUpdatable{
       this.status !== ContractStatus.ACTIVO
     ) {
       throw new Error(
-        "Solo se puede extender contratos activos o en renovación"
+        "Only active or renewal contracts can be extended"
       );
     }
     // Crear nueva fecha extendida
@@ -167,14 +167,14 @@ export class Contract implements IUpdatable{
 
   public shortenContract(reductionDays: number): void {
     if (this.status !== ContractStatus.EN_RENOVACION) {
-      throw new Error("Solo se puede acortar contratos en renovación");
+      throw new Error("Contracts can only be shortened during renewal.");
     }
     
     const newEndDate = new Date(this.endDate.getDate() - reductionDays);
 
     // Verificar que la nueva fecha no sea anterior a la fecha de inicio
     if (newEndDate <= this.startDate) {
-      throw new Error("La fecha de finalización no puede ser anterior a la fecha de inicio");
+      throw new Error("The completion date cannot be earlier than the start date");
     }
     
     (this as any).endDate = newEndDate;
