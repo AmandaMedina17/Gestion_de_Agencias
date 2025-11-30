@@ -40,7 +40,7 @@ export class Agency  implements IUpdatable{
 
   update(updateDto: UpdateData): void {
     if(updateDto.nameAgency){
-      this.validate_name(updateDto.nameAgecy);
+      this.validate_name(updateDto.nameAgency);
       this.nameAgency = updateDto.nameAgency;
     }
     if(updateDto.place){

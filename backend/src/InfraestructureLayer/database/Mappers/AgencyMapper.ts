@@ -1,22 +1,17 @@
 import { Agency } from "@domain/Entities/Agency";
 import { AgencyEntity } from "../Entities/AgencyEntity";
-import { DateValue } from "@domain/Value Objects/Values";
 import { IMapper } from "./IMapper";
+import { Injectable } from "@nestjs/common";
 
+@Injectable()
 export class AgencyMapper extends IMapper<Agency, AgencyEntity> {
   
   toDomainEntity(dataBaseEntity: AgencyEntity): Agency {
     try {
-      const place = dataBaseEntity.place;
-      // Reconstruir el Value Object DateValue desde la fecha almacenada
-      const dateFundation = DateValue.fromString(
-        dataBaseEntity.dateFundation.toISOString().split('T')[0] // Formato YYYY-MM-DD
-      );
-
       // Reconstruir la entidad de dominio
       return new Agency(
         dataBaseEntity.id,
-        place,
+        dataBaseEntity.place,
         dataBaseEntity.name,
         dataBaseEntity.dateFundation
       );
@@ -35,7 +30,6 @@ export class AgencyMapper extends IMapper<Agency, AgencyEntity> {
     agencyEntity.dateFundation = domainEntity.getDateFundation();
     
     // Las relaciones se manejan en el repositorio
-    //agencyEntity.apprentices = [];
     agencyEntity.groups = [];
     agencyEntity.artistMemberships = [];
 
