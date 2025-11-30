@@ -19,7 +19,7 @@ import { AgencyModule } from './AgencyModule';
     ActivityModule,
     ApprenticeModule,
     ArtistModule,
-    AgencyModule
+    //AgencyModule
   ],
   controllers: [AppController],
   providers: [AppService],
