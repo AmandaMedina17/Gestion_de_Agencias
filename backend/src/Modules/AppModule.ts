@@ -7,6 +7,7 @@ import { AuthModule } from './auth.module';
 import { PlaceModule } from './PlaceModule';
 import { ActivityModule } from './ActivityModule';
 import { ApprenticeModule } from './ApprenticeModule';
+import { IncomeModule } from './IncomeModule';
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import { ApprenticeModule } from './ApprenticeModule';
     AuthModule,
     PlaceModule,
     ActivityModule,
-    ApprenticeModule
+    ApprenticeModule,
+    IncomeModule
   ],
   controllers: [AppController],
   providers: [AppService],
