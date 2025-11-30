@@ -20,7 +20,7 @@ import { ContractModule } from './ContractModule';
     PlaceModule,
     ActivityModule,
     ApprenticeModule,
-    IncomeModule
+    IncomeModule,
     ArtistModule,
     AgencyModule,
     ContractModule
