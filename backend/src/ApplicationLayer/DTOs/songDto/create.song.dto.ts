@@ -8,7 +8,7 @@ export class CreateSongDto {
 
    @IsNotEmpty()
    @IsString()
-   nameAlbum! : string
+   idAlbum! : string
 
    @IsOptional()
    @IsDate()
