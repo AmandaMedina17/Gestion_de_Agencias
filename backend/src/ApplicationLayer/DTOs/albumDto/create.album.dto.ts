@@ -7,11 +7,10 @@ export class CreateAlbumDto {
 
    @IsOptional()
    @IsDate()
-   date! : Date
+   date? : Date
 
-   @IsOptional()
-   @IsNumber()
-   numberOfSongs! : Number
+   @IsNotEmpty()
+   @IsString()
+   mainProducer!: string
 
-   
 }

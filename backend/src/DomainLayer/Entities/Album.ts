@@ -1,7 +1,10 @@
+import { IUpdatable } from "@domain/UpdatableInterface";
 import { DateValue } from "../Value Objects/Values";
 import { v4 as uuidv4 } from "uuid";
+import { UpdateData } from "@domain/UpdateData";
 
-export class Album {
+//Aqui tengo que implementar las colecciones de navegacion para number of trakcs y number ofawards
+export class Album implements IUpdatable{
     constructor(
         private readonly id: string,
         private title: string,
@@ -9,8 +12,22 @@ export class Album {
         private mainProducer: string,
         private copiesSold: number,
         private numberOfTracks: number,
+        private numberOfAwards: number,
     ) {
         this.validate();
+    }
+
+    //Esto hay que implementarlo 
+    update(updateDto: UpdateData): void {
+        const albumUpadte = Album.create(updateDto.title,updateDto.date, 
+            updateDto.mainProducer, updateDto.copiesSold, updateDto.numberOfTracks)
+        
+        this.title = albumUpadte.title
+        this.releaseDate = albumUpadte.releaseDate!= undefined ? albumUpadte.releaseDate : this.releaseDate
+        this.mainProducer = albumUpadte.mainProducer
+        this.copiesSold = albumUpadte.copiesSold
+        this.numberOfAwards = albumUpadte.numberOfTracks
+
     }
 
     private validate(): void {
@@ -112,6 +129,10 @@ export class Album {
         return this.numberOfTracks;
     }
 
+    public getNumberOfAwards(): number {
+        return this.numberOfAwards;
+    }
+
     // SETTERS 
 
     //Estor viola el principio de inmutabilidad dejar asi temporalmente, para despues arreglarlo 
@@ -136,7 +157,7 @@ export class Album {
         this.numberOfTracks = tracks;
     }
 
-    public create(title: string, releaseDate: Date, mainProducer: string, copiesSold: number, numberOfTracks: number) : Album{
-        return new Album(uuidv4(), title, releaseDate, mainProducer, copiesSold, numberOfTracks);
+    public static create(title: string, releaseDate: Date, mainProducer: string, copiesSold =0, numberOfTracks = 0, numberOfAwards = 0) : Album{
+        return new Album(uuidv4(), title, releaseDate, mainProducer, copiesSold, numberOfTracks, numberOfAwards);
     }
 }
