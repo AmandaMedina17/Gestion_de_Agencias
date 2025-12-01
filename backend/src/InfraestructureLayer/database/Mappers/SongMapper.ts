@@ -16,7 +16,15 @@ export class SongMapper implements IMapper<Song,SongEntity>{
         dataBaseEntity.album,dataBaseEntity.entryDate)
     }
     toDataBaseEntity(domainEntity: Song): SongEntity {
-        throw new Error("Method not implemented.");
+       const entity = new SongEntity();
+
+       entity.id = domainEntity.getId();
+       entity.name = domainEntity.getName();
+       entity.album = domainEntity.getAlbumId();
+       entity.entryDate = domainEntity.getDate();
+
+
+       return entity;
     }
     
     
