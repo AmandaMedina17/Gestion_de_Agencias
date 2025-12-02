@@ -6,8 +6,8 @@ import { ContractResponseDto } from '@application/DTOs/contractDto/response-cont
 import { BaseService } from './base.service';
 import { BaseDtoMapper } from '@application/DTOs/dtoMappers/DtoMapper';
 import { UpdateContractDto } from '@application/DTOs/contractDto/update-contract.dto';
-import { CreateContractUseCase } from '@domain/UseCases/create_contract.uso-case';
-import { UpdateContractStatusUseCase } from '@domain/UseCases/update_contract_status.use-case';
+import { CreateContractUseCase } from '@application/UseCases/create_contract.uso-case';
+import { UpdateContractStatusUseCase } from '@application/UseCases/update_contract_status.use-case';
 import { ContractStatus } from '@domain/Enums';
 
 @Injectable()
