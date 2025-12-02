@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ContractEntity } from '@entities/ContractEntity';
-import { IMapper } from 'src/InfraestructureLayer/database/Mappers/IMapper';
-import { ContractMapper } from 'src/InfraestructureLayer/database/Mappers/ContractMapper';
+import { ContractEntity } from '@infrastructure/database/Entities/ContractEntity';
+import { IMapper } from '@infrastructure/database/Mappers/IMapper';
+import { ContractMapper } from '@infrastructure/database/Mappers/ContractMapper';
 import { IContractRepository } from '@domain/Repositories/IContractRepository';
-import { ContractRepositoryImpl} from 'src/InfraestructureLayer/database/Repositories/ContractRepository';
+import { ContractRepositoryImpl} from '@infrastructure/database/Repositories/ContractRepository';
 import { ContractController } from '@presentation/Controllers/contract.controller';
 import { BaseDtoMapper } from "@application/DTOs/dtoMappers/DtoMapper";
 import { ContractDtoMapper } from "@application/DTOs/dtoMappers/contract.dtoMapper";
@@ -15,6 +15,11 @@ import { ArtistDtoMapper } from '@application/DTOs/dtoMappers/artist.dto';
 import { AgencyDtoMapper } from '@application/DTOs/dtoMappers/agency.dtoMapper';
 import { ArtistModule } from './ArtistModule';
 import { AgencyModule } from './AgencyModule';
+import { AgencyMapper } from '@infrastructure/database/Mappers/AgencyMapper';
+import { ArtistMapper } from '@infrastructure/database/Mappers/ArtistMapper';
+import { AgencyEntity } from '@infrastructure/database/Entities/AgencyEntity';
+import { ArtistEntity } from '@infrastructure/database/Entities/ArtistEntity';
+import { UpdateContractUseCase } from '@domain/UseCases/update_contract.use-case';
 // @Module({
 //   imports: [
 //     TypeOrmModule.forFeature([ContractEntity])
@@ -43,13 +48,15 @@ import { AgencyModule } from './AgencyModule';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ContractEntity]),
+    TypeOrmModule.forFeature([ContractEntity, AgencyEntity, ArtistEntity]),
     AgencyModule, 
     ArtistModule
   ],
   controllers: [ContractController],
   providers: [
     ContractMapper,
+    AgencyMapper,
+    ArtistMapper,
     
     {
       provide: IContractRepository,  
@@ -65,6 +72,7 @@ import { AgencyModule } from './AgencyModule';
     AgencyDtoMapper,
     CreateContractUseCase,
     UpdateContractStatusUseCase,
+    UpdateContractUseCase,
 
     ContractService,
   ],

@@ -1,6 +1,6 @@
 import { IMapper } from "./IMapper";
 import { Apprentice } from "@domain/Entities/Apprentice";
-import { ApprenticeEntity } from "@entities/ApprenticeEntity";
+import { ApprenticeEntity } from "@infrastructure/database/Entities/ApprenticeEntity";
 import { ApprenticeTrainingLevel } from "@domain/Enums";
 import { ApprenticeStatus } from "@domain/Enums";
 import { Injectable } from "@nestjs/common";

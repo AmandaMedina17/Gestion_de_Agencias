@@ -3,7 +3,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BaseRepository } from './BaseRepositoryImpl';
 import { Responsible } from '@domain/Entities/Responsible';
-import { ResponsibleEntity } from '@entities/ResponsibleEntity';
+import { ResponsibleEntity } from '@infrastructure/database/Entities/ResponsibleEntity';
 import { IResponsibleRepository } from '@domain/Repositories/IResponsibleRepository';
 import { IMapper } from '../Mappers/IMapper';
 import { ResponsibleMapper } from '../Mappers/ResponsibleMapper';

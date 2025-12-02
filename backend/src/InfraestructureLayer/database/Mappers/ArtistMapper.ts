@@ -1,6 +1,6 @@
 import { IMapper } from "./IMapper";
 import { Artist } from "@domain/Entities/Artist";
-import { ArtistEntity } from "@entities/ArtistEntity";
+import { ArtistEntity } from "@infrastructure/database/Entities/ArtistEntity";
 import { Injectable } from "@nestjs/common";
 import { ApprenticeEntity } from "../Entities/ApprenticeEntity";
 
