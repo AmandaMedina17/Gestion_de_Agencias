@@ -1,5 +1,9 @@
 import { Entity, PrimaryColumn, Column, JoinColumn, OneToOne } from 'typeorm';
 import { ActivityEntity } from './ActivityEntity';
+<<<<<<< Updated upstream
+=======
+import { IncomeType } from '../../../DomainLayer/Enums';
+>>>>>>> Stashed changes
 
 @Entity()
 export class IncomeEntity {

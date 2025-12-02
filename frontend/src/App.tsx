@@ -13,40 +13,46 @@ import { ArtistProvider } from './context/ArtistContext';
 import { ActivityProvider } from './context/ActivityContext';
 import { ApprenticeEvaluationProvider } from './context/EvaluationContext';
 import { AgencyProvider } from './context/AgencyContext';
+import { ContractProvider } from './context/ContractContext';
+import { IncomeProvider } from './context/IncomeContext';
 
 function App() {
   return (
-    <AgencyProvider>
-      <ActivityProvider>
-        <ApprenticeEvaluationProvider>
-          <ArtistProvider>
-            <ApprenticeProvider>
-              <PlaceProvider>
-                <AuthProvider>
-                  <Router>
-                    <div className="App">
-                      <Routes>
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/manager" element={<ManagerDashboard />} />
-                        <Route 
-                          path="/admin" 
-                          element={
-                            <ResponsibleProvider> {/* Solo en admin */}
-                              <AdminDashboard />
-                            </ResponsibleProvider>
-                          } 
-                        />
-                        <Route path="/" element={<Navigate to="/login" />} />
-                      </Routes>
-                    </div>
-                  </Router>
-                </AuthProvider>
-              </PlaceProvider>
-            </ApprenticeProvider>
-          </ArtistProvider>
-        </ApprenticeEvaluationProvider>
-      </ActivityProvider>
-    </AgencyProvider>
+    <IncomeProvider>
+      <ContractProvider>
+        <AgencyProvider>
+          <ActivityProvider>
+            <ApprenticeEvaluationProvider>
+              <ArtistProvider>
+                <ApprenticeProvider>
+                  <PlaceProvider>
+                    <AuthProvider>
+                      <Router>
+                        <div className="App">
+                          <Routes>
+                            <Route path="/login" element={<Login />} />
+                            <Route path="/manager" element={<ManagerDashboard />} />
+                            <Route 
+                              path="/admin" 
+                              element={
+                                <ResponsibleProvider> {/* Solo en admin */}
+                                  <AdminDashboard />
+                                </ResponsibleProvider>
+                              } 
+                            />
+                            <Route path="/" element={<Navigate to="/login" />} />
+                          </Routes>
+                        </div>
+                      </Router>
+                    </AuthProvider>
+                  </PlaceProvider>
+                </ApprenticeProvider>
+              </ArtistProvider>
+            </ApprenticeEvaluationProvider>
+          </ActivityProvider>
+        </AgencyProvider>
+      </ContractProvider>
+    </IncomeProvider>
   );
 }
 

@@ -1,4 +1,8 @@
+<<<<<<< Updated upstream
 import { Entity, PrimaryColumn, Column, OneToMany } from "typeorm";
+=======
+import { Entity, PrimaryColumn, Column, OneToMany, OneToOne } from "typeorm";
+>>>>>>> Stashed changes
 import { ActivityClassification, ActivityType } from "../../../DomainLayer/Enums"
 import { GroupActivityEntity } from "./GroupActivity"
 import { ArtistActivityEntity } from "./ArtistActivityEntity";

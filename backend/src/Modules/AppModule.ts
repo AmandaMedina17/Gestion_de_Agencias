@@ -18,6 +18,10 @@ import { ContractModule } from './ContractModule';
     PlaceModule,
     ActivityModule,
     ApprenticeModule,
+<<<<<<< Updated upstream
+=======
+    IncomeModule,
+>>>>>>> Stashed changes
     ArtistModule,
     AgencyModule,
     ContractModule

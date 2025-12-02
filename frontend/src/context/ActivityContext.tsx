@@ -11,7 +11,7 @@ interface ActivityContextType {
   error: string | null;
 
   // Acciones
-  createActivity: (createDto: CreateActivityDto) => Promise<void>;
+  createActivity: (createDto: CreateActivityDto) => Promise<ActivityResponseDto>;
   fetchActivities: () => Promise<void>;
   fetchActivity: (id: string) => Promise<ActivityResponseDto | null>;
   deleteActivity: (id: string) => Promise<void>;
@@ -50,6 +50,7 @@ export const ActivityProvider: React.FC<ActivityProviderProps> = ({ children }) 
     try {
       const newActivity = await activityService.create(createDto);
       setActivities(prev => [...prev, newActivity]);
+      return newActivity;
     } catch (err: any) {
       setError(err.message || 'Error al crear actividad');
       throw err;
