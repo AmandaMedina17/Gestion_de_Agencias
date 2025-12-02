@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class MYMigration1764690527552 implements MigrationInterface {
-    name = 'MYMigration1764690527552'
+export class MYMigration1764699465079 implements MigrationInterface {
+    name = 'MYMigration1764699465079'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TYPE "public"."apprentice_evaluation_evaluation_enum" AS ENUM('EXCELENTE', 'BIEN', 'REGULAR', 'MAL', 'INSUFICIENTE')`);
@@ -40,7 +40,7 @@ export class MYMigration1764690527552 implements MigrationInterface {
         await queryRunner.query(`CREATE TYPE "public"."users_role_enum" AS ENUM('AGENCY_MANAGER', 'ARTIST', 'ADMIN')`);
         await queryRunner.query(`CREATE TABLE "users" ("id" SERIAL NOT NULL, "username" character varying NOT NULL, "password" character varying NOT NULL, "role" "public"."users_role_enum" NOT NULL, "isActive" boolean NOT NULL, CONSTRAINT "UQ_fe0bb3f6520ee0469504521e710" UNIQUE ("username"), CONSTRAINT "PK_a3ffb1c0c8416b9fc6f907b7433" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TYPE "public"."contract_entity_status_enum" AS ENUM('ACTIVO', 'FINALIZADO', 'EN_RENOVACION', 'RESCINDIDO')`);
-        await queryRunner.query(`CREATE TABLE "contract_entity" ("contract_id" character varying NOT NULL, "agencyID" character varying NOT NULL, "artistID" character varying NOT NULL, "startDate" date NOT NULL, "endDate" date NOT NULL, "status" "public"."contract_entity_status_enum" NOT NULL DEFAULT 'ACTIVO', "conditions" character varying NOT NULL, "distributionPercentage" numeric NOT NULL, CONSTRAINT "PK_da2ce5de70d2a871a3fc2021126" PRIMARY KEY ("contract_id", "agencyID", "artistID", "startDate", "endDate"))`);
+        await queryRunner.query(`CREATE TABLE "contract_entity" ("agencyID" character varying NOT NULL, "artistID" character varying NOT NULL, "startDate" TIMESTAMP NOT NULL, "endDate" TIMESTAMP NOT NULL, "status" "public"."contract_entity_status_enum" NOT NULL DEFAULT 'ACTIVO', "conditions" character varying NOT NULL, "distributionPercentage" numeric NOT NULL, CONSTRAINT "PK_23fca0811537cfe7609b4902179" PRIMARY KEY ("agencyID", "artistID", "startDate", "endDate"))`);
         await queryRunner.query(`ALTER TABLE "apprentice_evaluation" ADD CONSTRAINT "FK_16c854b5a70d3a2e3d16b01dd91" FOREIGN KEY ("apprentice_id") REFERENCES "apprentice"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "group_activity" ADD CONSTRAINT "FK_20370cab416c7603d4a0d1b9df4" FOREIGN KEY ("group_id") REFERENCES "group"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE "group_activity" ADD CONSTRAINT "FK_4928cee72972df0b5e7dae48f60" FOREIGN KEY ("activity_id") REFERENCES "activity_entity"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);

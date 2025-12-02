@@ -673,3 +673,87 @@
   font-weight: 600;
   color: #333;
 }
+
+/* Estilos para los selects normales (como el de estado) */
+.form-select {
+  width: 100%;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #333;
+  background-color: white;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 16px 12px;
+}
+
+.form-select:hover {
+  border-color: #888;
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.form-select:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Contenedor para el select con búsqueda */
+.agency-dropdown-container {
+  position: relative;
+  width: 100%;
+}
+
+.agency-search-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 30px;
+  bottom: 0;
+  border: none;
+  background: transparent;
+  padding: 10px 15px;
+  color: transparent;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.agency-search-input:focus {
+  color: #333;
+  background: white;
+  border: 1px solid #007bff;
+  border-radius: 4px;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  z-index: 2;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center; /* Centra verticalmente */
+  justify-content: center; /* Centra horizontalmente */
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 8px;
+  max-height: 90vh; /* No ocupa toda la pantalla */
+  overflow-y: auto;
+  position: relative;
+  margin: 20px; /* Espacio alrededor */
+}
