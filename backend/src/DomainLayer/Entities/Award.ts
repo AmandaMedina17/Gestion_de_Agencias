@@ -5,12 +5,19 @@ export class Award implements IUpdatable{
     constructor(
         private readonly id: string,
         private name: string,
-        private date:Date
+        private date:Date,
     ){
         this.validateName();
     }
     update(updateDto: UpdateData): void {
-        throw new Error("Method not implemented.");
+        
+        updateDto.name = updateDto.name != undefined ? updateDto.name : this.name
+        updateDto.date = updateDto.date!= undefined ? updateDto.date : this.date
+
+        const albumUpadte = Award.create(updateDto.nameSong,updateDto.date)
+                
+        this.name = albumUpadte.name
+        this.date = albumUpadte.date  
     }
 
     public validateName () : void{
@@ -30,7 +37,7 @@ export class Award implements IUpdatable{
         return this.date;
     }
 
-    public static create( name :string , date : Date ) : Award{
+    public static create( name :string , date : Date) : Award{
         const id = uuidv4()
         return new Award(id, name,date);
       }
