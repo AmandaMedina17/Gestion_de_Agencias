@@ -1,3 +1,4 @@
+import { CreateActivityDto } from "@application/DTOs/activityDto/create-activity.dto";
 import { Activity } from "@domain/Entities/Activity";
 import { Place } from "@domain/Entities/Place";
 import { Responsible } from "@domain/Entities/Responsible";
@@ -17,19 +18,19 @@ export class CreateActivityUseCase {
     private placeRepository: IPlaceRepository
   ) {}
 
-  async execute(activityProp: any): Promise<Activity> {
+  async execute(activityDto: CreateActivityDto): Promise<Activity> {
     const [responsibles, places] = await Promise.all([
-      this.getResponsibles(activityProp.responsibleIds),
-      this.getPlaces(activityProp.placeIds),
+      this.getResponsibles(activityDto.responsibleIds),
+      this.getPlaces(activityDto.placeIds),
     ]);
 
     // 2. Crear la actividad con las entidades relacionadas
     const activity = Activity.create(
-      activityProp.classification,
-      activityProp.type,
+      activityDto.classification,
+      activityDto.type,
       responsibles,
       places,
-      activityProp.dates
+      activityDto.dates
     );
 
     // 3. Guardar usando transacción

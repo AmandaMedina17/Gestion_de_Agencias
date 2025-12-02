@@ -13,7 +13,8 @@ import { ActivityPlaceEntity } from '@infrastructure/database/Entities/ActivityP
 import { ActivityDateEntity } from '@infrastructure/database/Entities/ActivityDateEntity';
 import { ResponsibleModule } from './ResponsibleModule';
 import { PlaceModule } from './PlaceModule';
-import { CreateActivityUseCase } from '@domain/UseCases/create_activity.use-case';
+import { CreateActivityUseCase } from '@application/UseCases/create_activity.use-case';
+import { UpdateActivityUseCase } from '@application/UseCases/update_activity.use-case';
 
 @Module({
   imports: [
@@ -33,7 +34,8 @@ import { CreateActivityUseCase } from '@domain/UseCases/create_activity.use-case
     },
     ActivityDtoMapper,
     ActivityService, 
-    CreateActivityUseCase
+    CreateActivityUseCase,
+    UpdateActivityUseCase
   ],
   exports:[IActivityRepository]
 
