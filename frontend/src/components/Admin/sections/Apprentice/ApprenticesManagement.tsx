@@ -176,7 +176,8 @@ const ApprenticeManagement: React.FC = () => {
     if (
       !newApprentice.fullName.trim() ||
       !newApprentice.age ||
-      !newApprentice.entryDate
+      !newApprentice.entryDate ||
+      !newApprentice.agencyId
     ) {
       setMessage({
         type: "error",
@@ -363,9 +364,14 @@ const ApprenticeManagement: React.FC = () => {
 
   // Formatear fecha para mostrar
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("es-ES");
-  };
-
+    if (!dateString) return "N/A";
+  
+  const date = new Date(dateString);
+  // Sumar un día
+  date.setDate(date.getDate() + 1);
+  
+  return date.toLocaleDateString("es-ES");
+    };
   // Traducir estados y niveles
   const getStatusText = (status: ApprenticeStatus) => {
     const statusMap = {
@@ -754,39 +760,26 @@ const ApprenticeManagement: React.FC = () => {
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">Agencia</label>
-                    <div className="agency-select-container">
-                      <input
-                        type="text"
-                        className="form-input search-input"
-                        placeholder="Buscar agencia por nombre..."
-                        value={agencySearch}
-                        onChange={(e) => setAgencySearch(e.target.value)}
-                      />
-                      <select
-                        className="form-select agency-select"
-                        value={newApprentice.agencyId}
-                        onChange={(e) =>
-                          setNewApprentice({
-                            ...newApprentice,
-                            agencyId: e.target.value,
-                          })
-                        }
-                        size={5} // Mostrar 5 opciones a la vez
-                      >
-                        <option value="">No asignado</option>
-                        {filteredAgencies.map((agency) => (
-                          <option key={agency.id} value={agency.id}>
-                            {agency.nameAgency} - {agency.place} (Fundada: {formatDate(agency.dateFundation.toString())})
-                          </option>
-                        ))}
-                      </select>
-                      {filteredAgencies.length === 0 && (
-                        <div className="no-agencies-message">
-                          No se encontraron agencias
-                        </div>
-                      )}
-                    </div>
+                    <label className="form-label">Agencia *</label>
+                    <select
+                      className="form-select"
+                      value={newApprentice.agencyId}
+                      onChange={(e) => {
+                        const selectedId = e.target.value;
+                        setNewApprentice({
+                          ...newApprentice,
+                          agencyId: selectedId,
+                        });
+                      }}
+                      required
+                    >
+                      <option value="">Seleccione una agencia</option>
+                      {agencies.map((agency) => (
+                        <option key={agency.id} value={agency.id}>
+                          {agency.nameAgency} - {agency.place} 
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 
@@ -942,38 +935,23 @@ const ApprenticeManagement: React.FC = () => {
 
                 <div className="form-group">
                   <label className="form-label">Agencia</label>
-                  <div className="agency-select-container">
-                    <input
-                      type="text"
-                      className="form-input search-input"
-                      placeholder="Buscar agencia por nombre..."
-                      value={agencySearchEdit}
-                      onChange={(e) => setAgencySearchEdit(e.target.value)}
-                    />
-                    <select
-                      className="form-select agency-select"
-                      value={editApprentice.agencyId}
-                      onChange={(e) =>
-                        setEditApprentice({
-                          ...editApprentice,
-                          agencyId: e.target.value,
-                        })
-                      }
-                      size={5} // Mostrar 5 opciones a la vez
-                    >
-                      <option value="">No asignado</option>
-                      {filteredAgenciesEdit.map((agency) => (
-                        <option key={agency.id} value={agency.id}>
-                          {agency.nameAgency} - {agency.place} (Fundada: {formatDate(agency.dateFundation.toString())})
-                        </option>
-                      ))}
-                    </select>
-                    {filteredAgenciesEdit.length === 0 && (
-                      <div className="no-agencies-message">
-                        No se encontraron agencias
-                      </div>
-                    )}
-                  </div>
+                  <select
+                    className="form-select"
+                    value={editApprentice.agencyId}
+                    onChange={(e) =>
+                      setEditApprentice({
+                        ...editApprentice,
+                        agencyId: e.target.value,
+                      })
+                    }
+                  >
+                    <option value="">No asignado</option>
+                    {agencies.map((agency) => (
+                      <option key={agency.id} value={agency.id}>
+                        {agency.nameAgency} - {agency.place} (Fundada: {formatDate(agency.dateFundation.toString())})
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 

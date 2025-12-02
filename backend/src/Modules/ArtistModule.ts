@@ -1,8 +1,8 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { ArtistEntity } from "@entities/ArtistEntity";
-import { IMapper } from "src/InfraestructureLayer/database/Mappers/IMapper";
-import { ArtistMapper } from "src/InfraestructureLayer/database/Mappers/ArtistMapper";
+import { ArtistEntity } from "@infrastructure/database/Entities/ArtistEntity";
+import { IMapper } from "@infrastructure/database/Mappers/IMapper";
+import { ArtistMapper } from "@infrastructure/database/Mappers/ArtistMapper";
 import { IArtistRepository } from "@domain/Repositories/IArtistRepository";
 import { ArtistRepository } from "../InfraestructureLayer/database/Repositories/ArtistRepository";
 import { BaseDtoMapper } from "@application/DTOs/dtoMappers/DtoMapper";

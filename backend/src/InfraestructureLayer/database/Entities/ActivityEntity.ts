@@ -1,5 +1,6 @@
 import { Entity, PrimaryColumn, Column, OneToMany, OneToOne } from "typeorm";
-import { ActivityClassification, ActivityType } from "@domain/Enums"
+import { ActivityClassification, ActivityType } from "../../../DomainLayer/Enums"
+
 import { GroupActivityEntity } from "./GroupActivity"
 import { ArtistActivityEntity } from "./ArtistActivityEntity";
 import { ActivityDateEntity } from "./ActivityDateEntity";

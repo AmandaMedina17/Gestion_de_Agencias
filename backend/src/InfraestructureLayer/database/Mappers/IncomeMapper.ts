@@ -1,6 +1,6 @@
 import { IMapper } from "./IMapper";
 import { Income } from "@domain/Entities/Income";
-import { IncomeEntity } from "@entities/IncomeEntity";
+import { IncomeEntity } from "@infrastructure/database/Entities/IncomeEntity";
 import { Injectable } from "@nestjs/common";
 
 @Injectable()

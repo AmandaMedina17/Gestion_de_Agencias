@@ -26,18 +26,18 @@ export class Activity implements IUpdatable{
     }
     if(updateDto.responsibles)
     {
-      this.validateResponsibles
+      this.validateResponsibles(updateDto.responsibles)
       this._responsibles = updateDto.responsibles;
     }
     if(updateDto.places)
     {
-      this.validatePlaces
+      this.validatePlaces(updateDto.places)
       this._places = updateDto.places
     }
     if(updateDto.dates)
     {
-      this.validateDates
-      this._dates = updateDto._dates
+      this.validateDates(updateDto.dates)
+      this._dates = updateDto.dates
     }
   }
 

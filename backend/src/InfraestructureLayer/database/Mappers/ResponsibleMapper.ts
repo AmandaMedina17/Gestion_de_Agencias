@@ -1,5 +1,5 @@
 import { IMapper } from "./IMapper";
-import { ResponsibleEntity } from "@entities/ResponsibleEntity";
+import { ResponsibleEntity } from "@infrastructure/database/Entities/ResponsibleEntity";
 import { Responsible } from "@domain/Entities/Responsible";
 import { Injectable } from '@nestjs/common';
 

@@ -1,6 +1,6 @@
 import { IMapper } from "./IMapper";
 import { Apprentice } from "@domain/Entities/Apprentice";
-import { ApprenticeEntity } from "@entities/ApprenticeEntity";
+import { ApprenticeEntity } from "@infrastructure/database/Entities/ApprenticeEntity";
 import { ApprenticeTrainingLevel } from "@domain/Enums";
 import { ApprenticeStatus } from "@domain/Enums";
 import { Injectable } from "@nestjs/common";
@@ -28,6 +28,7 @@ export class ApprenticeMapper extends IMapper<Apprentice, ApprenticeEntity>{
         entity.age = domainEntity.getAge();
         entity.status = domainEntity.getStatus();
         entity.trainingLevel = domainEntity.getTrainingLevel();
+        entity.agencyId = domainEntity.getAgency()
         return entity;
     }
 

@@ -1,0 +1,1019 @@
+
+.activity-info-card {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.activity-info-card h4 {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  color: #495057;
+  font-size: 1.1rem;
+}
+
+.activity-info-details {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.activity-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.activity-info-item strong {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.activity-id {
+  font-family: 'Courier New', monospace;
+  background: #e9ecef;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: #495057;
+}
+
+.activity-dates-list {
+  margin: 0;
+  padding-left: 1.2rem;
+  font-size: 0.9rem;
+}
+
+.activity-dates-list li {
+  margin-bottom: 0.25rem;
+  color: #495057;
+}
+
+/* Input de monto mejorado */
+.amount-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.currency-symbol {
+  position: absolute;
+  left: 0.75rem;
+  color: #495057;
+  font-weight: 500;
+  padding: 10px 10px 10x 10px;
+}
+
+.currency-symbol {
+  padding-right: 8px; 
+  padding-left: -9px; 
+}
+
+.currency-text {
+  position: absolute;
+  right: 0.75rem;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.amount-input {
+  padding-left: 50rem;
+  padding-right: 40rem;
+}
+
+/* Hint para fecha */
+.date-hint {
+  display: block;
+  margin-top: 0.25rem;
+  color: #6c757d;
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+/* Botones de acción modificados */
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #f1f3f4;
+}
+
+.action-buttons-left {
+  flex: 1;
+}
+
+.action-buttons-right  {
+  display: flex;
+  gap: 1rem;
+}
+
+.submit-buttonincome {
+  background: #043465;
+  color: white;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.skip-button {
+  padding: 15px 30px;
+  background: #043465;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.skip-button:hover:not(:disabled) {
+  background: #5a6268;
+}
+
+.skip-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+.submit-buttonincome:hover:not(:disabled) {
+  background: #5a6268;
+}
+
+/* Footer del formulario */
+.form-footer {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px dashed #dee2e6;
+}
+
+.form-hint {
+  color: #6c757d;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  margin: 0;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border-left: 3px solid #007bff;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .modal-actions {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .action-buttons-left,
+  .action-buttons-right {
+    width: 100%;
+  }
+  
+  .skip-button,
+  .submit-button,
+  .cancel-button {
+    width: 100%;
+  }
+}
+
+/* IncomeStyle.css - Agregar estos estilos */
+
+/* Dropdown de responsables */
+.dropdown-container {
+  position: relative;
+  width: 100%;
+}
+
+.responsible-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.responsible-input-container .form-input {
+  padding-right: 40px;
+  width: 100%;
+  cursor: text;
+}
+
+.dropdown-toggle-btn {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 0.8rem;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.dropdown-toggle-btn:hover:not(:disabled) {
+  background-color: #f8f9fa;
+  color: #007bff;
+}
+
+.dropdown-toggle-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Dropdown menu */
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 1000;
+  margin-top: 2px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.dropdown-header {
+  padding: 0.75rem 1rem;
+  background: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  font-weight: 600;
+  color: #495057;
+}
+
+.dropdown-header h5 {
+  margin: 0 0 0.25rem 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.results-count {
+  font-size: 0.75rem;
+  color: #6c757d;
+  font-weight: normal;
+}
+
+.dropdown-list {
+  padding: 0.5rem 0;
+}
+
+.dropdown-item {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  border-bottom: 1px solid #f8f9fa;
+}
+
+.dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.dropdown-item:hover {
+  background: #f8f9fa;
+}
+
+.responsible-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.responsible-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.responsible-id {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  color: #6c757d;
+  background: #f8f9fa;
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+}
+
+.dropdown-footer {
+  padding: 0.5rem 1rem;
+  background: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.dropdown-empty {
+  padding: 1.5rem;
+  text-align: center;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Información del responsable seleccionado */
+.selected-info {
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  background: #e7f4e4;
+  border-radius: 4px;
+  border: 1px solid #d4edda;
+}
+
+.selected-info small {
+  color: #155724;
+}
+
+/* Focus states */
+.form-input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  outline: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .dropdown-menu {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 400px;
+    max-height: 80vh;
+  }
+}
+
+/* Estilos para el modal de ver ingresos */
+.incomes-modal .modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  max-width: 1000px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.incomes-modal .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.incomes-modal .modal-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+/* Tabla de ingresos */
+.incomes-table-container {
+  margin-top: 1.5rem;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  overflow: hidden;
+}
+
+.incomes-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.incomes-table th {
+  background: #f8f9fa;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #495057;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.incomes-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e9ecef;
+  vertical-align: middle;
+}
+
+.income-row {
+  transition: background-color 0.2s;
+}
+
+.income-row:hover {
+  background-color: #f8f9fa;
+}
+
+/* Badges para tipos de ingreso */
+.income-type-badge {
+  font-weight: 500;
+  color: #333;
+  padding: 0.25rem 0.5rem;
+  background: #b5dfec;
+  border-radius: 4px;
+  border: 1px solid #e9ecef;
+  display: inline-block;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* Cantidades */
+.income-amount {
+  font-weight: 600;
+  color: #28a745;
+  font-family: 'Courier New', monospace;
+}
+
+/* Fechas */
+.income-date {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+
+/* Acciones */
+.income-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.income-actions .action-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.income-actions .view-btn {
+  background: #e7f4e4;
+  color: #28a745;
+}
+
+.income-actions .view-btn:hover {
+  background: #d4edda;
+  transform: scale(1.1);
+}
+
+.income-actions .delete-btn {
+  background: #f8d7da;
+  color: #dc3545;
+}
+
+.income-actions .delete-btn:hover {
+  background: #f5c6cb;
+  transform: scale(1.1);
+}
+
+/* Footer de la tabla */
+.incomes-footer {
+  background: #f8f9fa;
+}
+
+.incomes-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-top: 2px solid #dee2e6;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.summary-label {
+  font-size: 0.9rem;
+  color: #6c757d;
+  margin-bottom: 0.25rem;
+}
+
+.summary-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.total-amount {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #28a745;
+  margin-left: 0.5rem;
+}
+
+/* Botones del modal */
+.incomes-modal .modal-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #f1f3f4;
+}
+
+.modal-actions{
+    display: flex;
+    align-items: center;
+}
+
+
+
+.close-modal-btn {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.close-modal-btn:hover:not(:disabled) {
+  background: #5a6268;
+}
+
+.close-modal-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Estados vacíos y carga */
+.incomes-modal .loading-state,
+.incomes-modal .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  text-align: center;
+}
+
+.incomes-modal .loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+.incomes-modal .empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: #6c757d;
+}
+
+.incomes-modal .empty-state h4 {
+  margin: 0 0 0.5rem 0;
+  color: #495057;
+}
+
+.incomes-modal .empty-state p {
+  color: #6c757d;
+  margin: 0;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Botón en la tabla de actividades */
+.view-income-btn {
+  background: #e7f4e4;
+  border-color: #d4edda;
+}
+
+.view-income-btn:hover:not(:disabled) {
+  background: #80d0fb6b;
+  transform: scale(1.1);
+}
+
+.incomes-table th{
+    text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .incomes-modal .modal-content {
+    padding: 1.5rem;
+    margin: 1rem;
+    max-height: 85vh;
+  }
+  
+  .incomes-table {
+    font-size: 0.85rem;
+  }
+  
+  .incomes-table th,
+  .incomes-table td {
+    padding: 0.5rem;
+  }
+  
+  .incomes-summary {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+  
+  .incomes-modal .modal-actions {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .create-income-btn,
+  .close-modal-btn {
+    width: 100%;
+  }
+  
+  .income-actions {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .income-actions .action-btn {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+
+/* Estilos para el modal de ver ingresos - Header con botón a la derecha */
+.incomes-modal .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f1f3f4;
+  margin-bottom: 1.5rem;
+}
+
+.incomes-modal .modal-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.incomes-modal .close-button {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: #6c757d;
+  padding: 0.25rem 0.5rem;
+  line-height: 1;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.incomes-modal .close-button:hover:not(:disabled) {
+  background: #f1f3f4;
+  color: #dc3545;
+}
+
+.incomes-modal .close-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Resumen de actividad */
+.activity-summary-card {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.summary-label {
+  font-size: 0.9rem;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.summary-value {
+  font-weight: 600;
+  color: #333;
+  font-size: 1rem;
+}
+
+.summary-total {
+  font-weight: 700;
+  color: #28a745;
+  font-size: 1.1rem;
+}
+
+.summary-count {
+  font-weight: 600;
+  color: #007bff;
+  font-size: 1.1rem;
+}
+
+/* Botones de acción en la tabla */
+.income-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.income-actions .edit-btn-inc {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  color: #856404;
+}
+
+.income-actions .edit-btn-inc:hover {
+  background: #ffeaa7;
+  transform: scale(1.1);
+}
+
+.income-actions .delete-btn-inc {
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+}
+
+.income-actions .delete-btn-inc:hover {
+  background: #f5c6cb;
+  transform: scale(1.1);
+}
+
+/* Botones en el modal */
+.modal-actions .action-buttons-right {
+  display: flex;
+  gap: 1rem;
+}
+
+.close-modal-btn {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.close-modal-btn:hover:not(:disabled) {
+  background: #5a6268;
+  transform: translateY(-1px);
+}
+
+.close-modal-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Estilos para el modal de edición */
+.edit-income-modal .modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  max-width: 700px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.edit-income-modal .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.edit-income-modal .modal-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+
+
+/* Responsive */
+@media (max-width: 768px) {
+  .incomes-modal .modal-content,
+  .edit-income-modal .modal-content {
+    padding: 1.5rem;
+    margin: 1rem;
+    max-height: 85vh;
+  }
+  
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .income-actions {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .income-actions .action-btn {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .modal-actions .action-buttons-right {
+    width: 100%;
+  }
+  
+  .close-modal-btn {
+    width: 100%;
+  }
+}
+
+/* Estilos para el responsable en la tabla */
+.income-responsible {
+  font-weight: 500;
+  color: #333;
+  padding: 0.25rem 0.5rem;
+  background: #b5dfec;
+  border-radius: 4px;
+  border: 1px solid #e9ecef;
+  display: inline-block;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.summary-label {
+  font-size: 0.9rem;
+  color: #6c757d;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.summary-value {
+  font-weight: 600;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.summary-total {
+  font-weight: 700;
+  color: #28a745;
+  font-size: 1.3rem;
+}
+
+.summary-count {
+  font-weight: 700;
+  color: #007bff;
+  font-size: 1.3rem;
+}
+
+/* Tabla responsiva */
+@media (max-width: 768px) {
+  .incomes-table-container {
+    overflow-x: auto;
+  }
+  
+  .incomes-table {
+    min-width: 700px;
+  }
+  
+  .income-type-badge {
+    min-width: 120px;
+    font-size: 0.8rem;
+    padding: 0.3rem 0.6rem;
+  }
+  
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .summary-item {
+    padding: 0.75rem;
+  }
+}
+
+.close-button{
+    background: none;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: #6c757d;
+  padding: 0.25rem 0.5rem;
+  line-height: 1;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.close-button:hover:not(:disabled) {
+  background: #f1f3f4;
+  color: #dc3545;
+}
+
+.close-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.incomes-table td:nth-child(5) { 
+  padding-left: 4.3rem;
+}
+ 
+/*crear income si no se habia creado*/
+
+/* Estilos para el botón de crear ingreso en estado vacío */
+.create-income-btn {
+  margin-top: 1.5rem;
+  padding: 0.75rem 1.5rem;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.2s;
+}
+
+.create-income-btn:hover {
+  background-color: #45a049;
+}
+
+.create-income-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.create-income-btn .button-icon {
+  display: flex;
+  align-items: center;
+}

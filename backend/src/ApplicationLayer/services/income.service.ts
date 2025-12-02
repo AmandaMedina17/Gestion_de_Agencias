@@ -6,7 +6,7 @@ import { IncomeResponseDto } from "@application/DTOs/incomeDto/response-income.d
 import { UpdateIncomeDto } from "@application/DTOs/incomeDto/update-income.dto"
 import { IncomeRepository } from "@domain/Repositories/IncomeRepository"
 import { IncomeDtoMapper } from "@application/DTOs/dtoMappers/income.dtoMapper"
-import { CreateIncomeUseCase } from "@domain/UseCases/create_income.use-case"
+import { CreateIncomeUseCase } from "@application/UseCases/create_income.use-case"
 
 @Injectable()
 export class IncomeService

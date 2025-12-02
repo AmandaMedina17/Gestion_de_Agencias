@@ -95,3 +95,4 @@ export enum UserRole {
   ARTIST = 'ARTIST',
   ADMIN = 'ADMIN',
 }
+

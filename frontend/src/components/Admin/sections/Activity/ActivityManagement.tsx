@@ -3,6 +3,8 @@ import { useActivity } from "../../../../context/ActivityContext";
 import { useResponsible } from "../../../../context/ResponsibleContext";
 import { usePlace } from "../../../../context/PlaceContext";
 import { Icon } from "../../../icons";
+import CreateIncomeModal from "./Income/CreationIncome"
+import ViewActivityIncomesModal from "./Income/ViewActivityIncome";
 import './ActivityStyle.css'
 
 export enum ActivityClassification {
@@ -73,6 +75,15 @@ const ActivityManagement: React.FC = () => {
   // PAGINACIÓN
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 30;
+
+  //ingresos
+  const [showIncomeModal, setShowIncomeModal] = useState(false);
+  const [newlyCreatedActivityId, setNewlyCreatedActivityId] = useState<string | null>(null);
+
+  // Estados para el modal de ver ingresos
+  const [showIncomesModal, setShowIncomesModal] = useState(false);
+  const [selectedActivityForIncomes, setSelectedActivityForIncomes] = useState<any>(null);
+
 
   // Estados del formulario
   const [newActivity, setNewActivity] = useState({
@@ -268,10 +279,8 @@ const ActivityManagement: React.FC = () => {
     }
   };
 
-  // NUEVO: Manejadores para checkboxes de responsables
   
 
-  // Mantener solo los manejadores de fechas
   const handleAddDate = () => {
     setNewActivity({
       ...newActivity,
@@ -295,7 +304,6 @@ const ActivityManagement: React.FC = () => {
     });
   };
 
-  // CORREGIDO: Manejar creación de actividad - FECHAS FUTURAS
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     clearError();
@@ -313,7 +321,6 @@ const ActivityManagement: React.FC = () => {
       return;
     }
 
-    // CORREGIDO: Validar que las fechas sean futuras
     const hasPastDate = validDates.some(date => new Date(date) < new Date());
     if (hasPastDate) {
       setMessage({
@@ -324,7 +331,7 @@ const ActivityManagement: React.FC = () => {
     }
 
     try {
-      await createActivity({
+       const createdActivity = await createActivity({
         classification: newActivity.classification,
         type: newActivity.type,
         responsibleIds: validResponsibles,
@@ -336,6 +343,17 @@ const ActivityManagement: React.FC = () => {
         type: "success",
         text: `Actividad "${getClassificationText(newActivity.classification)} - ${getTypeText(newActivity.type)}" creada exitosamente`,
       });
+
+      setNewlyCreatedActivityId(createdActivity.id);
+
+      setShowCreateForm(false);
+      
+      // Abre automáticamente el modal de creación de Income
+      setTimeout(() => {
+        setShowIncomeModal(true);
+      }, 500); // Pequeño delay para mejor UX
+
+      await fetchActivities();
 
       // Resetear formulario correctamente
       setNewActivity({
@@ -356,6 +374,12 @@ const ActivityManagement: React.FC = () => {
         text: err.message || "Error al crear la actividad",
       });
     }
+  };
+
+  const handleIncomeModalClose = () => {
+    setShowIncomeModal(false);
+    // Opcional: Resetear los estados de la actividad creada
+    setNewlyCreatedActivityId(null);
   };
 
   // CORREGIDO: Manejar actualización de actividad - FECHAS FUTURAS
@@ -438,6 +462,19 @@ const ActivityManagement: React.FC = () => {
     }
   };
 
+  
+  // Función para abrir el modal de ingresos
+  const handleViewIncomes = (activity: any) => {
+    setSelectedActivityForIncomes(activity);
+    setShowIncomesModal(true);
+  };
+
+  // Función para cerrar el modal de ingresos
+  const handleCloseIncomesModal = () => {
+    setShowIncomesModal(false);
+    setSelectedActivityForIncomes(null);
+  };
+
   // Recargar datos manualmente
   const handleReload = async () => {
     clearError();
@@ -492,8 +529,14 @@ const ActivityManagement: React.FC = () => {
 
   // Formatear fecha para mostrar
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("es-ES");
-  };
+    if (!dateString) return "N/A";
+  
+  const date = new Date(dateString);
+  // Sumar un día
+  date.setDate(date.getDate() + 1);
+  
+  return date.toLocaleDateString("es-ES");
+    };
 
   // Traducir clasificaciones y tipos
   const getClassificationText = (classification: ActivityClassification) => {
@@ -509,7 +552,7 @@ const ActivityManagement: React.FC = () => {
       [ActivityClassification.GRABACIÓN_AUDIO]: "Grabacion de audio",
       [ActivityClassification.GRABACIÓN_VÍDEO]: "Grabacion de video",
       [ActivityClassification.REUNIÓN_FAN]: "Reunion con fan",
-      [ActivityClassification.SESIÓN_FOTOGRÁFICA]: "sesion de fotos",
+      [ActivityClassification.SESIÓN_FOTOGRÁFICA]: "Sesion de fotos",
     };
     return classificationMap[classification] || classification;
   };
@@ -717,6 +760,14 @@ const ActivityManagement: React.FC = () => {
                       <td>
                         <div className="table-actions">
                           <button
+                            className="action-btn view-income-btn"
+                            onClick={() => handleViewIncomes(activity)}
+                            title="Ver ingresos"
+                            disabled={loading}
+                          >
+                            <Icon name="eye" size={18} />
+                          </button>
+                          <button
                             className="action-btn edit-btn"
                             onClick={() => startEdit(activity)}
                             title="Editar actividad"
@@ -819,7 +870,6 @@ const ActivityManagement: React.FC = () => {
                 </div>
               </div>
 
-              {/* Responsables - NUEVO: Checkboxes */}
                <div className="form-group">
                 <label className="form-label">Responsables *</label>
                 <div className="dropdown-container" ref={responsibleDropdownRef}>
@@ -877,7 +927,6 @@ const ActivityManagement: React.FC = () => {
                 )}
               </div>
 
-              {/* Lugares - NUEVO: Checkboxes */}
               <div className="form-group">
                 <label className="form-label">Lugares *</label>
                 <div className="dropdown-container" ref={placeDropdownRef}>
@@ -935,7 +984,6 @@ const ActivityManagement: React.FC = () => {
                 )}
               </div>
 
-              {/* Fechas - MODIFICADO: Solo fechas futuras */}
               <div className="form-group">
                 <label className="form-label">Fechas *</label>
                 {newActivity.dates.map((date, index) => (
@@ -945,7 +993,6 @@ const ActivityManagement: React.FC = () => {
                       className="form-input"
                       value={date}
                       onChange={(e) => handleDateChange(index, e.target.value)}
-                      min={getTodayDate()} 
                     />
                     {newActivity.dates.length > 1 && (
                       <button
@@ -1001,6 +1048,26 @@ const ActivityManagement: React.FC = () => {
             </form>
           </div>
         </div>
+      )}
+
+      {showIncomeModal && newlyCreatedActivityId && (
+        <CreateIncomeModal
+          show={showIncomeModal}
+          onClose={handleIncomeModalClose}
+          activityId={newlyCreatedActivityId}
+          // Opcional: puedes pasar más información si la necesitas
+          // Por ejemplo, la fecha de la actividad para prellenar la fecha del income
+          activityDates={newActivity.dates.filter(date => date.trim() !== "")}
+        />
+      )}
+
+      {showIncomesModal && selectedActivityForIncomes && (
+        <ViewActivityIncomesModal
+          show={showIncomesModal}
+          onClose={handleCloseIncomesModal}
+          activityId={selectedActivityForIncomes.id}
+          activityName={`${getClassificationText(selectedActivityForIncomes.classification)} - ${getTypeText(selectedActivityForIncomes.type)}`}
+        />
       )}
 
       {/* Modal de edición */}

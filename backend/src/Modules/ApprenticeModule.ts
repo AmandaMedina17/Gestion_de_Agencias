@@ -1,10 +1,10 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { ApprenticeEntity } from "@entities/ApprenticeEntity";
-import { IMapper } from "src/InfraestructureLayer/database/Mappers/IMapper";
-import { ApprenticeMapper } from "src/InfraestructureLayer/database/Mappers/ApprenticeMapper";
+import { ApprenticeEntity } from "@infrastructure/database/Entities/ApprenticeEntity";
+import { IMapper } from "@infrastructure/database/Mappers/IMapper";
+import { ApprenticeMapper } from "@infrastructure/database/Mappers/ApprenticeMapper";
 import { IApprenticeRepository } from "@domain/Repositories/IApprenticeRepository";
-import { ApprenticeRepository } from "src/InfraestructureLayer/database/Repositories/ApprenticeRepository";
+import { ApprenticeRepository } from "@infrastructure/database/Repositories/ApprenticeRepository";
 import { ApprenticeController } from "../PresentationLayer/Controllers/apprentice.controller";
 import { BaseDtoMapper } from "@application/DTOs/dtoMappers/DtoMapper";
 import { ApprenticeDtoMapper } from "@application/DTOs/dtoMappers/apprentice.dtoMapper";

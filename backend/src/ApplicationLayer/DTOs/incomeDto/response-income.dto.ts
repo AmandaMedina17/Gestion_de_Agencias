@@ -1,4 +1,4 @@
-import { IncomeType } from "@domain/Enums";
+import { IncomeType } from "../../../DomainLayer/Enums";
 
 export class IncomeResponseDto {
     id!: string;
