@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryColumn, Column, ManyToMany, JoinColumn } from 'typeorm';
 import { AlbumEntity } from './AlbumEntity';
 
 @Entity()
@@ -12,14 +12,18 @@ export class AwardEntity {
   @Column({ type: 'date' })
   date!: Date;
 
-  @ManyToOne(() => AlbumEntity, (album: AlbumEntity) => album.awards, { 
+  @ManyToMany(() => AlbumEntity, (album: AlbumEntity) => album.awards, { 
     nullable: false, // Un premio debe tener un álbum (no puede ser null)
-    onDelete: 'CASCADE' // Si se elimina el álbum, se eliminan sus premios
+    cascade : true 
   })
   @JoinColumn({ name: 'album_id' })
-  album!: AlbumEntity;
+  album!: AlbumEntity[];
 
   // Columna para la clave foránea
   @Column({ name: 'album_id' })
   albumId!: string;
 }
+
+
+//aqui mis dudas con premio, preguntar a Amando como va a ser la cosa 
+//entre premio y album si es muchos a muchos o es many to one 
