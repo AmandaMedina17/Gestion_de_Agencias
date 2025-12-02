@@ -28,6 +28,7 @@ export class ApprenticeMapper extends IMapper<Apprentice, ApprenticeEntity>{
         entity.age = domainEntity.getAge();
         entity.status = domainEntity.getStatus();
         entity.trainingLevel = domainEntity.getTrainingLevel();
+        entity.agencyId = domainEntity.getAgency()
         return entity;
     }
 

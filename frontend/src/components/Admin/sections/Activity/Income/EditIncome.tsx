@@ -108,8 +108,6 @@ const EditIncomeModal: React.FC<EditIncomeModalProps> = ({
       
       await updateIncome(incomeToEdit.id, updateDto);
       
-      // Mostrar mensaje de éxito
-      alert('Ingreso actualizado exitosamente.');
       
       onClose();
     } catch (err) {

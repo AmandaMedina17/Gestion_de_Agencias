@@ -296,8 +296,14 @@ const AgencyManagement: React.FC = () => {
 
   // Formatear fecha para mostrar
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("es-ES");
-  };
+    if (!dateString) return "N/A";
+  
+  const date = new Date(dateString);
+  // Sumar un día
+  date.setDate(date.getDate() + 1);
+  
+  return date.toLocaleDateString("es-ES");
+    };
 
   // Obtener fecha actual en formato YYYY-MM-DD
   const getTodayDate = (): string => {

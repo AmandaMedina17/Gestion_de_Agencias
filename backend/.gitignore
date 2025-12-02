@@ -22,3 +22,6 @@ logs/
 
 #test
 hashes/
+
+#migrations
+./src/InfraestructureLayer/database/Migrations

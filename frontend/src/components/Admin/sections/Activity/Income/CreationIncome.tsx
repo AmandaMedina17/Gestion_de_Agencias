@@ -42,6 +42,7 @@ const CreateIncomeModal: React.FC<CreateIncomeModalProps> = ({
   const responsibleDropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   
+  
   // Usa la primera fecha de la actividad como fecha por defecto, si existe
   const defaultDate = activityDates.length > 0 
     ? activityDates[0] 
@@ -50,7 +51,7 @@ const CreateIncomeModal: React.FC<CreateIncomeModalProps> = ({
   const [newIncome, setNewIncome] = useState<Omit<CreateIncomeDto, 'date'> & { date: string }>({
     type: IncomeType.OTRO,
     mount: 0,
-    date: defaultDate,
+    date: defaultDate.split("T")[0],
     responsible: '',
     activityId: activityId,
   });
