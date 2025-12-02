@@ -2,6 +2,7 @@ import ActivityManagement from "./sections/Activity/ActivityManagement";
 import AgencyManagement from "./sections/Agency/AgencyManagement";
 import ApprenticesManagement from "./sections/Apprentice/ApprenticesManagement";
 import ArtistManagement from "./sections/Artist/ArtistManagement";
+import ContractManagement from "./sections/Contract/ContractManagement";
 import EvaluationManagement from "./sections/Evaluation/EvaluationsManagement";
 import PlaceManagement from "./sections/Place/PlaceManagement";
 import ResponsibleManagement from "./sections/Responsible/ResponsibleManager";
@@ -13,5 +14,6 @@ export const sectionComponents = {
   artists_management: ArtistManagement,
   evaluation_management: EvaluationManagement,
   activities_management: ActivityManagement,
-  agencies_management: AgencyManagement
+  agencies_management: AgencyManagement,
+  contract_management: ContractManagement
 };
