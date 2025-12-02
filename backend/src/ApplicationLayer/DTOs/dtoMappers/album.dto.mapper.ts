@@ -3,7 +3,9 @@ import { BaseDtoMapper } from "./DtoMapper";
 import { CreateAlbumDto } from "../albumDto/create.album.dto";
 import { ResponseAlbumDto } from "../albumDto/response.album.dto";
 import { error } from "console";
+import { Injectable } from "@nestjs/common";
 
+@Injectable()
 export class AlbumDtoMapper extends BaseDtoMapper<Album,CreateAlbumDto,ResponseAlbumDto>{
     fromDto(dto: CreateAlbumDto): Album {
         if(!dto.title)
@@ -22,7 +24,6 @@ export class AlbumDtoMapper extends BaseDtoMapper<Album,CreateAlbumDto,ResponseA
             mainProducer: domain.getMainProducer(),
             copiesSold: domain.getCopiesSold(),
             numberOfTracks: domain.getNumberOfTracks(),
-            numberOfAwards: domain.getNumberOfAwards()
         };
     }
     

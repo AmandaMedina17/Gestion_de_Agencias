@@ -6,13 +6,16 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { IMapper } from "../Mappers/IMapper";
 import { BillboardListScope } from "@domain/Enums";
+import { Injectable } from "@nestjs/common";
+import { SongMapper } from "../Mappers/SongMapper";
 
+@Injectable()
 export class SongRepository extends BaseRepository<Song,SongEntity> implements ISongRepository{
 
      constructor(
         @InjectRepository(SongEntity)
         repository: Repository<SongEntity>,
-        mapper: IMapper<Song,SongEntity>,
+        mapper: SongMapper
       ) {
         super(repository, mapper);
       }

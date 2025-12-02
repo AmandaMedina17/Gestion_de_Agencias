@@ -16,18 +16,14 @@ import { AlbumController } from '@presentation/Controllers/album/album.controlle
   ],
   controllers: [AlbumController],
   providers: [
-    {
-      provide: IMapper,      
-      useClass: AlbumMapper 
-    },
+          
+    AlbumMapper,
     {
       provide:ALBUM_REPOSITORY,    
       useClass: AlbumRepository 
-    },
-    {
-      provide: BaseDtoMapper,    
-      useClass: AlbumDtoMapper 
-    },
+    },    
+    AlbumDtoMapper,
+
     AlbumService
   ],
   exports: [

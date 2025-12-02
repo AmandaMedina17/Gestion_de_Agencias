@@ -16,18 +16,15 @@ import { SongController } from '@presentation/Controllers/song/song.controller';
   ],
   controllers: [SongController],
   providers: [
-    {
-      provide: IMapper,      
-      useClass: SongMapper  
-    },
+         
+    SongMapper,
     {
       provide:SONG_REPOSITORY,    
       useClass: SongRepository 
     },
-    {
-      provide: BaseDtoMapper,    
-      useClass: SongDtoMapper 
-    },
+    
+    SongDtoMapper,
+
     SongService
   ],
   exports: [

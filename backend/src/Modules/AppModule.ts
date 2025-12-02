@@ -11,6 +11,9 @@ import { IncomeModule } from './IncomeModule';
 import { ArtistModule } from "./ArtistModule";
 import { AgencyModule } from './AgencyModule';
 import { ContractModule } from './ContractModule';
+import { SongModule } from './song/song.module';
+import { Album } from '@domain/Entities/Album';
+import { AlbumModule } from './album/album.module';
 
 @Module({
   imports: [
@@ -23,7 +26,9 @@ import { ContractModule } from './ContractModule';
     IncomeModule,
     ArtistModule,
     AgencyModule,
-    ContractModule
+    ContractModule,
+    SongModule,
+    AlbumModule
   ],
   controllers: [AppController],
   providers: [AppService],

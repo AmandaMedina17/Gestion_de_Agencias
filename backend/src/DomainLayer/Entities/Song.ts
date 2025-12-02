@@ -11,7 +11,16 @@ export class Song implements IUpdatable{
         private songDate: Date,
     ){}
     update(updateDto: UpdateData): void {
-        throw new Error("Method not implemented.");
+        
+        updateDto.nameSong = updateDto.nameSong != undefined ? updateDto.nameSong : this.nameSong
+        updateDto.albumId = updateDto.albumId != undefined ? updateDto.albumId : this.albumId
+        updateDto.releaseDate = updateDto.releaseDate != undefined ? updateDto.releaseDate : this.songDate
+        
+        const albumUpadte = Song.create(updateDto.nameSong,updateDto.albumId,updateDto.releaseDate)
+                
+        this.nameSong = albumUpadte.nameSong 
+        this.albumId = albumUpadte.albumId 
+        this.songDate = albumUpadte.songDate   
     }
 
     static create(nameSong : string, albumId : string, songDate :Date): Song {
@@ -19,7 +28,7 @@ export class Song implements IUpdatable{
         if(!nameSong || nameSong.trim().length == 0)
             throw new Error("Song name can't be empty");
 
-        if(!isNaN(songDate.getTime()))
+        if(!songDate)
             throw new Error("Song date should exists");
         
         return new Song(uuidv4(),nameSong, albumId, songDate);

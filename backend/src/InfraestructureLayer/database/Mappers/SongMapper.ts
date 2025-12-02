@@ -6,10 +6,10 @@ import { Injectable } from "@nestjs/common";
 @Injectable()
 export class SongMapper implements IMapper<Song,SongEntity>{
     toDomainEntities(entities: SongEntity[]): Song[] {
-        throw new Error("Method not implemented.");
+        return entities.map(entity => this.toDomainEntity(entity));
     }
     toDataBaseEntities(domains: Song[]): SongEntity[] {
-        throw new Error("Method not implemented.");
+        return domains.map(domain => this.toDataBaseEntity(domain));
     }
     toDomainEntity(dataBaseEntity: SongEntity): Song {
       return new Song(dataBaseEntity.id,dataBaseEntity.name, 

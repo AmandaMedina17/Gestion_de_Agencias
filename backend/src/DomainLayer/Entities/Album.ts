@@ -12,21 +12,25 @@ export class Album implements IUpdatable{
         private mainProducer: string,
         private copiesSold: number,
         private numberOfTracks: number,
-        private numberOfAwards: number,
     ) {
         this.validate();
     }
 
     //Esto hay que implementarlo 
     update(updateDto: UpdateData): void {
+        
+        updateDto.title = updateDto.title != undefined ? updateDto.title : this.title
+        updateDto.releaseDate = updateDto.releaseDate != undefined ? updateDto.releaseDate : this.releaseDate
+        updateDto.mainProducer = updateDto.mainProducer != undefined ? updateDto.mainProducer : this.mainProducer
+        updateDto.copiesSold = updateDto.copiesSold != undefined ? updateDto.copiesSold : this.copiesSold
+
         const albumUpadte = Album.create(updateDto.title,updateDto.date, 
             updateDto.mainProducer, updateDto.copiesSold, updateDto.numberOfTracks)
         
-        this.title = albumUpadte.title
-        this.releaseDate = albumUpadte.releaseDate!= undefined ? albumUpadte.releaseDate : this.releaseDate
-        this.mainProducer = albumUpadte.mainProducer
-        this.copiesSold = albumUpadte.copiesSold
-        this.numberOfAwards = albumUpadte.numberOfTracks
+        this.title = albumUpadte.title 
+        this.releaseDate = albumUpadte.releaseDate 
+        this.mainProducer = albumUpadte.mainProducer 
+        this.copiesSold = albumUpadte.copiesSold 
 
     }
 
@@ -35,7 +39,7 @@ export class Album implements IUpdatable{
             throw new Error('El número de copias vendidas no puede ser negativo');
         }
 
-        if (this.numberOfTracks <= 0) {
+        if (this.numberOfTracks < 0) {
             throw new Error('El álbum debe tener al menos una canción');
         }
 
@@ -52,9 +56,9 @@ export class Album implements IUpdatable{
             throw new Error('El título del álbum no puede exceder 200 caracteres');
         }
 
-        if (this.releaseDate.getTime() > new Date().getTime()) {
-            throw new Error('La fecha de lanzamiento no puede estar en el futuro');
-        }
+        // if (this.releaseDate.getTime() > new Date().getTime()) {
+        //     throw new Error('La fecha de lanzamiento no puede estar en el futuro');
+        // }
         if (!this.mainProducer || this.mainProducer.length === 0) {
             throw new Error('El nombre del productor no puede estar vacío');
         }
@@ -129,12 +133,6 @@ export class Album implements IUpdatable{
         return this.numberOfTracks;
     }
 
-    public getNumberOfAwards(): number {
-        return this.numberOfAwards;
-    }
-
-    // SETTERS 
-
     //Estor viola el principio de inmutabilidad dejar asi temporalmente, para despues arreglarlo 
     public setMainProducer(producer: string): void {
         this.mainProducer = producer;
@@ -148,7 +146,7 @@ export class Album implements IUpdatable{
     }
 
     public setNumberOfTracks(tracks: number): void {
-        if (tracks <= 0) {
+        if (tracks < 0) {
             throw new Error('El álbum debe tener al menos una canción');
         }
         if (tracks > 50) {
@@ -157,7 +155,7 @@ export class Album implements IUpdatable{
         this.numberOfTracks = tracks;
     }
 
-    public static create(title: string, releaseDate: Date, mainProducer: string, copiesSold =0, numberOfTracks = 0, numberOfAwards = 0) : Album{
-        return new Album(uuidv4(), title, releaseDate, mainProducer, copiesSold, numberOfTracks, numberOfAwards);
+    public static create(title: string, releaseDate: Date, mainProducer: string, copiesSold =0, numberOfTracks = 0) : Album{
+        return new Album(uuidv4(), title, releaseDate, mainProducer, copiesSold, numberOfTracks);
     }
 }

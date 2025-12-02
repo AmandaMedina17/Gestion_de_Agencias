@@ -22,13 +22,13 @@ export class AlbumMapper implements IMapper<Album,AlbumEntity>{
         ormEnt.copiesSold = domainEntity.getCopiesSold()
         ormEnt.numberOfTracks = domainEntity.getNumberOfTracks()
         
-       return new AlbumEntity
+        return ormEnt
     }
     toDomainEntities(entities: AlbumEntity[]): Album[] {
-        throw new Error("Method not implemented.");
+        return entities.map(entity => this.toDomainEntity(entity));
     }
     toDataBaseEntities(domains: Album[]): AlbumEntity[] {
-        throw new Error("Method not implemented.");
+        return domains.map(domain => this.toDataBaseEntity(domain));
     }
 
 }

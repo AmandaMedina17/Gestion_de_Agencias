@@ -6,13 +6,14 @@ import { AlbumEntity } from "../Entities/AlbumEntity";
 import { BaseRepository } from "./BaseRepositoryImpl";
 import { Repository } from "typeorm";
 import { IMapper } from "../Mappers/IMapper";
+import { AlbumMapper } from "../Mappers/AlbumMapper";
 
 @Injectable()
 export class AlbumRepository extends BaseRepository<Album,AlbumEntity> implements IAlbumRepository{
     constructor(
         @InjectRepository(AlbumEntity)
         repository: Repository<AlbumEntity>,
-        mapper: IMapper<Album,AlbumEntity>,
+        mapper: AlbumMapper
     ) {
         super(repository, mapper);
     }

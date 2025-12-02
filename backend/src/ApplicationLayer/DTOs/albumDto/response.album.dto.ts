@@ -5,5 +5,4 @@ export class ResponseAlbumDto{
     mainProducer!: string;
     copiesSold!: number;
     numberOfTracks!: number;
-    numberOfAwards!: number;
 }
