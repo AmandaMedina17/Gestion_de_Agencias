@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useIncome } from '../../../../../context/IncomeContext';
-import { useResponsible } from '../../../../../context/ResponsibleContext'; // Importar el contexto de responsables
+import { useResponsible } from '../../../../../context/ResponsibleContext'; 
 import { IncomeResponseDto } from '../../../../../../../backend/src/ApplicationLayer/DTOs/incomeDto/response-income.dto';
+import CreateIncomeModal from './CreationIncome';
 import { Icon } from '../../../../icons';
 import EditIncomeModal from './EditIncome';
 import './IncomeStyle.css';
@@ -38,6 +39,7 @@ const ViewActivityIncomesModal: React.FC<ViewActivityIncomesModalProps> = ({
   const [totalAmount, setTotalAmount] = useState<number>(0);
   const [selectedIncome, setSelectedIncome] = useState<IncomeResponseDto | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   // Función para obtener el nombre del responsable por ID
   const getResponsibleName = (responsibleId: string) => {
@@ -63,13 +65,15 @@ const ViewActivityIncomesModal: React.FC<ViewActivityIncomesModalProps> = ({
   };
 
   // Formatear fecha
-  const formatDate = (dateString: string | Date) => {
-    return new Date(dateString).toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
+  const formatDate = (dateString: string) => {
+    if (!dateString) return "N/A";
+  
+  const date = new Date(dateString);
+  // Sumar un día
+  date.setDate(date.getDate() + 1);
+  
+  return date.toLocaleDateString("es-ES");
+    };
 
   // Formatear moneda
   const formatCurrency = (amount: number) => {
@@ -88,15 +92,12 @@ const ViewActivityIncomesModal: React.FC<ViewActivityIncomesModalProps> = ({
     }
   }, [show]);
 
-  // Filtrar ingresos por actividad y calcular total
   useEffect(() => {
     if (incomes.length > 0) {
       const filtered = incomes.filter(income => income.activityId === activityId);
       setActivityIncomes(filtered);
       
-      // Calcular total
-      const total = filtered.reduce((sum, income) => sum + income.mount, 0);
-      setTotalAmount(total);
+     
     } else {
       setActivityIncomes([]);
       setTotalAmount(0);
@@ -119,6 +120,13 @@ const ViewActivityIncomesModal: React.FC<ViewActivityIncomesModalProps> = ({
     // Recargar ingresos para reflejar cambios
     fetchIncomes();
   };
+
+  const handleCreateModalClose = () => {
+  setShowCreateModal(false);
+  // Recargar ingresos para reflejar los cambios
+  fetchIncomes();
+};
+  
 
   if (!show) return null;
 
@@ -160,12 +168,21 @@ const ViewActivityIncomesModal: React.FC<ViewActivityIncomesModalProps> = ({
               <div className="loading-spinner"></div>
               <p>Cargando ingresos...</p>
             </div>
-          ) : activityIncomes.length === 0 ? (
-            <div className="empty-state">
-              <div className="empty-icon">💰</div>
-              <h4>No hay ingresos registrados</h4>
-              <p>Esta actividad no tiene ingresos registrados aún.</p>
-            </div>
+            ) : activityIncomes.length === 0 ? (
+              <div className="empty-state">
+                <div className="empty-icon">💰</div>
+                <h4>No hay ingresos registrados</h4>
+                <p>Esta actividad no tiene ingresos registrados aún.</p>
+                {/* Agregar botón para crear ingreso */}
+                <button
+                  className="create-income-btn"
+                  onClick={() => setShowCreateModal(true)}
+                >
+                  <Icon name="plus" size={16} />
+                  Crear Ingreso
+                </button>
+              </div>
+            
           ) : (
             <div className="incomes-table-container">
               <table className="incomes-table">
@@ -193,7 +210,7 @@ const ViewActivityIncomesModal: React.FC<ViewActivityIncomesModalProps> = ({
                       </td>
                       <td>
                         <span className="income-date">
-                          {formatDate(income.date)}
+                          {formatDate(income.date.toString())}
                         </span>
                       </td>
                       <td>
@@ -211,16 +228,7 @@ const ViewActivityIncomesModal: React.FC<ViewActivityIncomesModalProps> = ({
                             <Icon name="edit" size={16} />
                           </button>
 
-                          <button
-                            className="action-btn delete-btn-inc"
-                            title="Eliminar ingreso"
-                            onClick={() => {
-                              if (window.confirm(`¿Está seguro de eliminar el ingreso de ${formatCurrency(income.mount)}?`)) {
-                              }
-                            }}
-                          >
-                            <Icon name="trash" size={16} />
-                          </button>
+                          
                         </div>
                       </td>
                     </tr>
@@ -238,6 +246,16 @@ const ViewActivityIncomesModal: React.FC<ViewActivityIncomesModalProps> = ({
           show={showEditModal}
           onClose={handleEditModalClose}
           incomeToEdit={selectedIncome}
+          activityId={activityId}
+          activityName={activityName}
+        />
+      )}
+
+      {/* Modal de creación de ingreso */}
+      {showCreateModal && (
+        <CreateIncomeModal
+          show={showCreateModal}
+          onClose={handleCreateModalClose}
           activityId={activityId}
           activityName={activityName}
         />

@@ -46,13 +46,10 @@ const ContractManagement: React.FC = () => {
   // Referencias para dropdowns
   const agencyDropdownRef = useRef<HTMLDivElement>(null);
   const artistDropdownRef = useRef<HTMLDivElement>(null);
-  const editAgencyDropdownRef = useRef<HTMLDivElement>(null);
-  const editArtistDropdownRef = useRef<HTMLDivElement>(null);
 
   const [showAgencyDropdown, setShowAgencyDropdown] = useState(false);
   const [showArtistDropdown, setShowArtistDropdown] = useState(false);
-  const [showEditAgencyDropdown, setShowEditAgencyDropdown] = useState(false);
-  const [showEditArtistDropdown, setShowEditArtistDropdown] = useState(false);
+
 
   // PAGINACIÓN
   const [currentPage, setCurrentPage] = useState(1);
@@ -93,18 +90,7 @@ const ContractManagement: React.FC = () => {
       ) {
         setShowArtistDropdown(false);
       }
-      if (
-        editAgencyDropdownRef.current &&
-        !editAgencyDropdownRef.current.contains(event.target as Node)
-      ) {
-        setShowEditAgencyDropdown(false);
-      }
-      if (
-        editArtistDropdownRef.current &&
-        !editArtistDropdownRef.current.contains(event.target as Node)
-      ) {
-        setShowEditArtistDropdown(false);
-      }
+      
     };
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -321,8 +307,6 @@ const ContractManagement: React.FC = () => {
     if (
       !editContract.startDate ||
       !editContract.endDate ||
-      !editContract.agencyId ||
-      !editContract.artistId ||
       !editContract.distributionPercentage ||
       !editContract.conditions.trim()
     ) {
@@ -464,8 +448,14 @@ const ContractManagement: React.FC = () => {
 
   // Formatear fecha para mostrar
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("es-ES");
-  };
+    if (!dateString) return "N/A";
+  
+  const date = new Date(dateString);
+  // Sumar un día
+  date.setDate(date.getDate() + 1);
+  
+  return date.toLocaleDateString("es-ES");
+    };
 
   // Traducir estados
   const getStatusText = (status: ContractStatus) => {
@@ -505,13 +495,7 @@ const ContractManagement: React.FC = () => {
     setShowAgencyDropdown(false);
   };
 
-  const handleEditAgencySelect = (agencyId: string) => {
-    setEditContract({
-      ...editContract,
-      agencyId: agencyId,
-    });
-    setShowEditAgencyDropdown(false);
-  };
+ 
 
   // Handle artist selection
   const handleArtistSelect = (artistId: string) => {
@@ -522,13 +506,6 @@ const ContractManagement: React.FC = () => {
     setShowArtistDropdown(false);
   };
 
-  const handleEditArtistSelect = (artistId: string) => {
-    setEditContract({
-      ...editContract,
-      artistId: artistId,
-    });
-    setShowEditArtistDropdown(false);
-  };
 
   return (
     <section id="contract_manager" className="content-section active">
@@ -1053,100 +1030,8 @@ const ContractManagement: React.FC = () => {
         <div className="modal-overlay contract-modal">
           <div className="modal-content">
             <h3>Editar Contrato</h3>
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Artista *</label>
-                <div className="dropdown-container" ref={editArtistDropdownRef}>
-                  <button
-                    type="button"
-                    className="dropdown-toggle"
-                    onClick={() =>
-                      setShowEditArtistDropdown(!showEditArtistDropdown)
-                    }
-                  >
-                    <span>
-                      {editContract.artistId
-                        ? getArtistName(editContract.artistId)
-                        : "Seleccionar artista"}
-                    </span>
-                    <Icon
-                      name={showEditArtistDropdown ? "up" : "down"}
-                      size={16}
-                    />
-                  </button>
-
-                  {showEditArtistDropdown && (
-                    <div className="dropdown-menu">
-                      <div className="dropdown-list">
-                        {artists.map((artist) => (
-                          <div
-                            key={artist.id}
-                            className={`dropdown-item ${
-                              editContract.artistId === artist.id
-                                ? "selected"
-                                : ""
-                            }`}
-                            onClick={() => handleEditArtistSelect(artist.id)}
-                          >
-                            {artist.stageName}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-                {artists.length === 0 && (
-                  <div className="no-items">No hay artistas disponibles</div>
-                )}
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Agencia *</label>
-                <div className="dropdown-container" ref={editAgencyDropdownRef}>
-                  <button
-                    type="button"
-                    className="dropdown-toggle"
-                    onClick={() =>
-                      setShowEditAgencyDropdown(!showEditAgencyDropdown)
-                    }
-                  >
-                    <span>
-                      {editContract.agencyId
-                        ? getAgencyName(editContract.agencyId)
-                        : "Seleccionar agencia"}
-                    </span>
-                    <Icon
-                      name={showEditAgencyDropdown ? "up" : "down"}
-                      size={16}
-                    />
-                  </button>
-
-                  {showEditAgencyDropdown && (
-                    <div className="dropdown-menu">
-                      <div className="dropdown-list">
-                        {agencies.map((agency) => (
-                          <div
-                            key={agency.id}
-                            className={`dropdown-item ${
-                              editContract.agencyId === agency.id
-                                ? "selected"
-                                : ""
-                            }`}
-                            onClick={() => handleEditAgencySelect(agency.id)}
-                          >
-                            {agency.nameAgency} - {agency.place}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-                {agencies.length === 0 && (
-                  <div className="no-items">No hay agencias disponibles</div>
-                )}
-              </div>
-            </div>
-
+            
+            
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label">Fecha de inicio *</label>
@@ -1253,8 +1138,6 @@ const ContractManagement: React.FC = () => {
                   loading ||
                   !editContract.startDate ||
                   !editContract.endDate ||
-                  !editContract.agencyId ||
-                  !editContract.artistId ||
                   !editContract.distributionPercentage ||
                   !editContract.conditions.trim()
                 }
@@ -1283,7 +1166,6 @@ const ContractManagement: React.FC = () => {
           </div>
         </div>
       )}
-
       {/* Modal de confirmación de eliminación */}
       {deletingContract && (
         <div className="modal-overlay contract-modal">

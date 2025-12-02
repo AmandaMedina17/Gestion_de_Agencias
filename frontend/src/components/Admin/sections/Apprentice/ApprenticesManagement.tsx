@@ -176,7 +176,8 @@ const ApprenticeManagement: React.FC = () => {
     if (
       !newApprentice.fullName.trim() ||
       !newApprentice.age ||
-      !newApprentice.entryDate
+      !newApprentice.entryDate ||
+      !newApprentice.agencyId
     ) {
       setMessage({
         type: "error",
@@ -363,9 +364,14 @@ const ApprenticeManagement: React.FC = () => {
 
   // Formatear fecha para mostrar
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("es-ES");
-  };
-
+    if (!dateString) return "N/A";
+  
+  const date = new Date(dateString);
+  // Sumar un día
+  date.setDate(date.getDate() + 1);
+  
+  return date.toLocaleDateString("es-ES");
+    };
   // Traducir estados y niveles
   const getStatusText = (status: ApprenticeStatus) => {
     const statusMap = {
@@ -766,12 +772,22 @@ const ApprenticeManagement: React.FC = () => {
                       <select
                         className="form-select agency-select"
                         value={newApprentice.agencyId}
-                        onChange={(e) =>
+                        onChange={(e) =>{
+                          const selectedId = e.target.value;
+                          const selectedAgency = agencies.find(a => a.id === selectedId);
+                          
                           setNewApprentice({
                             ...newApprentice,
-                            agencyId: e.target.value,
-                          })
-                        }
+                            agencyId: selectedId,
+                          });
+                          
+                          // Actualizar el campo de búsqueda con el nombre de la agencia seleccionada
+                          if (selectedAgency) {
+                            setAgencySearch(`${selectedAgency.nameAgency}`);
+                          } else {
+                            setAgencySearch(""); // Limpiar si no hay selección
+                          }
+                        }}
                         size={5} // Mostrar 5 opciones a la vez
                       >
                         <option value="">No asignado</option>

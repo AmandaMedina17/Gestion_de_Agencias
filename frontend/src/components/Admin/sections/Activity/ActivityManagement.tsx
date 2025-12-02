@@ -529,8 +529,14 @@ const ActivityManagement: React.FC = () => {
 
   // Formatear fecha para mostrar
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("es-ES");
-  };
+    if (!dateString) return "N/A";
+  
+  const date = new Date(dateString);
+  // Sumar un día
+  date.setDate(date.getDate() + 1);
+  
+  return date.toLocaleDateString("es-ES");
+    };
 
   // Traducir clasificaciones y tipos
   const getClassificationText = (classification: ActivityClassification) => {
@@ -864,7 +870,6 @@ const ActivityManagement: React.FC = () => {
                 </div>
               </div>
 
-              {/* Responsables - NUEVO: Checkboxes */}
                <div className="form-group">
                 <label className="form-label">Responsables *</label>
                 <div className="dropdown-container" ref={responsibleDropdownRef}>
@@ -922,7 +927,6 @@ const ActivityManagement: React.FC = () => {
                 )}
               </div>
 
-              {/* Lugares - NUEVO: Checkboxes */}
               <div className="form-group">
                 <label className="form-label">Lugares *</label>
                 <div className="dropdown-container" ref={placeDropdownRef}>
@@ -980,7 +984,6 @@ const ActivityManagement: React.FC = () => {
                 )}
               </div>
 
-              {/* Fechas - MODIFICADO: Solo fechas futuras */}
               <div className="form-group">
                 <label className="form-label">Fechas *</label>
                 {newActivity.dates.map((date, index) => (
@@ -990,7 +993,6 @@ const ActivityManagement: React.FC = () => {
                       className="form-input"
                       value={date}
                       onChange={(e) => handleDateChange(index, e.target.value)}
-                      min={getTodayDate()} 
                     />
                     {newActivity.dates.length > 1 && (
                       <button
