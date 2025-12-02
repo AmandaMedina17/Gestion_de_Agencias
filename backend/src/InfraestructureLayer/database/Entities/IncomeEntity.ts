@@ -1,6 +1,6 @@
 import { Entity, PrimaryColumn, Column, JoinColumn, OneToOne } from 'typeorm';
 import { ActivityEntity } from './ActivityEntity';
-import { IncomeType } from '@domain/Enums';
+import { IncomeType } from '../../../DomainLayer/Enums';
 
 @Entity('income')
 export class IncomeEntity {

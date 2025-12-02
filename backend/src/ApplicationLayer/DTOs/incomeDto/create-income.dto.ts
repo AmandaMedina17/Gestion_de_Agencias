@@ -1,4 +1,4 @@
-import { IncomeType } from "@domain/Enums"
+import { IncomeType } from "../../../DomainLayer/Enums"
 import { Transform } from "class-transformer"
 import { IsDate, IsEnum, IsNotEmpty, IsNumber, IsPositive, IsString } from "class-validator"
 
