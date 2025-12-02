@@ -1,11 +1,13 @@
 import { BillboardList } from "@domain/Entities/BillboardList"
 import { BillboardListScope } from "@domain/Enums"
+import { Transform } from "class-transformer";
 import { IsDate, IsEnum, IsNotEmpty, IsNumber, IsString } from "class-validator"
 
 export class CreateBillBoardListDto {
       
    @IsNotEmpty()
    @IsDate()
+   @Transform(({ value }) => new Date(value)) //Convierte string a Date automáticamente
    publicDate!: Date
 
    @IsNotEmpty()
@@ -18,6 +20,9 @@ export class CreateBillBoardListDto {
 
    @IsNotEmpty()
    @IsNumber()
+   @Transform(({ value }) => parseInt(value, 10))
    endList!:number
+
+   
 
 }

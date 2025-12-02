@@ -11,6 +11,7 @@ import { IncomeModule } from './IncomeModule';
 import { ArtistModule } from "./ArtistModule";
 import { AgencyModule } from './AgencyModule';
 import { ContractModule } from './ContractModule';
+import { BillboardListModule } from './billboard-list/billboard-list.module';
 
 @Module({
   imports: [
@@ -23,7 +24,8 @@ import { ContractModule } from './ContractModule';
     IncomeModule,
     ArtistModule,
     AgencyModule,
-    ContractModule
+    ContractModule,
+    BillboardListModule
   ],
   controllers: [AppController],
   providers: [AppService],

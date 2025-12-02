@@ -21,6 +21,7 @@ export class BillboardListMapper extends IMapper<BillboardList, BillboardListEnt
         entity.id = domainEntity.getId();
         entity.publicDate = domainEntity.getPublicDate();
         entity.scope = domainEntity.getScope();
+        entity.name = domainEntity.getNameList()
         entity.endList = domainEntity.getEndList();
 
         return entity;

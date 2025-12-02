@@ -21,8 +21,6 @@ export class BillboardList implements IUpdatable {
     this.scope = billboardUpdate.scope!= undefined ? billboardUpdate.scope : this.scope
     this.nameList = billboardUpdate.nameList!= undefined ? billboardUpdate.nameList: this.nameList
     this.endList = billboardUpdate.endList!= undefined ? billboardUpdate.endList : this.endList
-
-
   }
   public getId(): string {
     return this.id;

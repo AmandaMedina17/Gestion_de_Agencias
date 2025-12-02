@@ -16,18 +16,12 @@ import { BillboardListController } from '@presentation/Controllers/billboard-lis
     ],
     controllers: [BillboardListController],
     providers: [
-      {
-        provide: IMapper,      
-        useClass: BillboardListMapper
-      },
+      BillboardListMapper,
       {
         provide:BILLBOARD_LIST_REPOSITORY,    
         useClass: BillboardListRepository
       },
-      {
-        provide: BaseDtoMapper,    
-        useClass: BillboardListDtoMapper
-      },
+      BillboardListDtoMapper,
       BillboardListService
     ],
     exports: [

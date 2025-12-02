@@ -2,7 +2,9 @@ import { BillboardList } from "@domain/Entities/BillboardList";
 import { BaseDtoMapper } from "./DtoMapper";
 import { CreateBillBoardListDto } from "../billboardDto/create.billboard.dto";
 import { ResponseBillboardListDto } from "../billboardDto/response.billboard.dto";
+import { Injectable } from "@nestjs/common";
 
+@Injectable()
 export class BillboardListDtoMapper extends BaseDtoMapper<BillboardList, CreateBillBoardListDto, ResponseBillboardListDto>{
 
     fromDto(dto: CreateBillBoardListDto): BillboardList { 

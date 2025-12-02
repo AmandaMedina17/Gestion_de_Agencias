@@ -15,7 +15,6 @@ export class BillboardListRepository
   constructor(
     @InjectRepository(BillboardListEntity)
     repository: Repository<BillboardListEntity>,
-    @Inject(BillboardListMapper)
     mapper: BillboardListMapper
 
   ) {

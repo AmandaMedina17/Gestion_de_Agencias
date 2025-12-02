@@ -1,10 +1,10 @@
-import { Entity,PrimaryGeneratedColumn, Column , ManyToOne, JoinColumn, OneToMany} from "typeorm";
+import { Entity,PrimaryGeneratedColumn, Column , ManyToOne, JoinColumn, OneToMany, PrimaryColumn} from "typeorm";
 import { SongBillboardEntity } from "./SongBillboardEntity";
 import { BillboardListScope } from "@domain/Enums";
 
 @Entity('billboardList')
 export class BillboardListEntity{
-    @PrimaryGeneratedColumn()
+    @PrimaryColumn()
     id!: string;
 
     @Column({ name: 'name' })
