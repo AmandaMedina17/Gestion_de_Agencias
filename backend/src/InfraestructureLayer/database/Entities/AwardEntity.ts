@@ -18,8 +18,5 @@ export class AwardEntity {
   })
   @JoinColumn({ name: 'album_id' })
   album!: AlbumEntity;
-
-  // Columna para la clave foránea
-  @Column({ name: 'album_id' })
-  albumId!: string;
+  
 }
