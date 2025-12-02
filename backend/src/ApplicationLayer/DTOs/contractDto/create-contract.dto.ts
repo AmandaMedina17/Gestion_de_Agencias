@@ -1,16 +1,18 @@
 import { IsNotEmpty, IsString,IsEnum, IsDate, IsNumber} from "class-validator";
 import { ContractStatus } from "../../../DomainLayer/Enums";
-import { Transform } from "class-transformer";
+import { Transform } from 'class-transformer';
 
 export class CreateContractDto{
     @IsNotEmpty()
     @Transform(({ value }) => new Date(value)) 
     @IsDate()
+    @Transform(({ value }) => new Date(value)) //Convierte string a Date automáticamente
     startDate!: Date;
 
     @IsNotEmpty()
     @Transform(({ value }) => new Date(value)) 
     @IsDate()
+    @Transform(({ value }) => new Date(value)) //Convierte string a Date automáticamente
     endDate!: Date;
 
     @IsNotEmpty()

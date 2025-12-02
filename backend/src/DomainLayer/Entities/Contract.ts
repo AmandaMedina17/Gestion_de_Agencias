@@ -18,6 +18,11 @@ export class Contract implements IUpdatable{
   ) {
     this.validate();
   }
+  static create(startDate: Date,endDate: Date, agency: Agency, artist: Artist,distributionPercentage: number, status: ContractStatus, conditions: string) : Contract{
+    const id = uuidv4();
+    return new Contract(id,startDate,endDate,agency,artist,distributionPercentage,status,conditions);
+  }
+  
   update(updateDto: UpdateData): void {
     if(updateDto.distributionPercentage)
       {
@@ -73,12 +78,6 @@ export class Contract implements IUpdatable{
     this.validate_conditions(this.conditions);
     this.validateContractDates(this.startDate,this.endDate);
   }
-
-  public static create( startDate: Date, endDate: Date, agency: Agency, artist: Artist, distributionPercentage: number, status: ContractStatus, conditions: string) : Contract {
-    const id = uuidv4();
-    return new Contract(id, startDate, endDate, agency, artist, distributionPercentage, status, conditions);
-  }
-
   private validateContractDates(startDate: Date, endDate: Date): void {
     if (!endDate || !startDate) {
       throw new Error("The start date and the end date are required");
@@ -86,14 +85,14 @@ export class Contract implements IUpdatable{
     if (startDate >= endDate) {
       throw new Error("The start date cannot be before the end date ");
     }
-    // El contrato no puede empezar antes del debut del artista
-    if (startDate < this.artist.getDebutDate()) {
-      throw new Error(
-        "The contract cannot start before the artist debut");
-    }
-    if(startDate < this.agency.getDateFundation()) {
-      throw new Error("The contract cannot start before the agency creation")
-    }
+    // // El contrato no puede empezar antes del debut del artista
+    // if (startDate < this.artist.getDebutDate()) {
+    //   throw new Error(
+    //     "The contract cannot start before the artist debut");
+    // }
+    // if(startDate < this.agency.getDateFundation()) {
+    //   throw new Error("The contract cannot start before the agency creation")
+    // }
   }
 
   // Métodos para modificar el estado del contrato
@@ -115,21 +114,21 @@ export class Contract implements IUpdatable{
 
   // Método para cambiar el porcentaje de distribución (solo en renovacion)
   public changeDistributionPercentage(newPercentage: number): void {
-    if (this.status !== ContractStatus.EN_RENOVACION) {
-      throw new Error(
-        "The percentage can only be modified in contracts under negotiation."
-      );
-    }
+    // if (this.status !== ContractStatus.EN_RENOVACION) {
+    //   throw new Error(
+    //     "The percentage can only be modified in contracts under negotiation."
+    //   );
+    // }
     this.distributionPercentage = newPercentage;
   }
 
   // Método para actualizar las condiciones (solo en renovacion)
   public updateConditions(newConditions: string): void {
-    if (this.status !== ContractStatus.EN_RENOVACION) {
-      throw new Error(
-        "Conditions can only be updated in contracts under negotiation."
-      );
-    }
+    // if (this.status !== ContractStatus.EN_RENOVACION) {
+    //   throw new Error(
+    //     "Conditions can only be updated in contracts under negotiation."
+    //   );
+    // }
     this.conditions = newConditions;
   }
 
