@@ -26,7 +26,6 @@ export class ActivityDtoMapper extends BaseDtoMapper<Activity, CreateActivityDto
             throw new Error('Activity is undefined in ActivityDtoMapper');
         }
 
-        // Validar que los mappers estén disponibles
         if (!this.responsibleDtoMapper) {
             throw new Error('ResponsibleDtoMapper is not injected');
         }

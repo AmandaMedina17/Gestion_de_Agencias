@@ -1,14 +1,12 @@
-<<<<<<< Updated upstream
 import { Entity, PrimaryColumn, Column, OneToMany } from "typeorm";
-=======
-import { Entity, PrimaryColumn, Column, OneToMany, OneToOne } from "typeorm";
->>>>>>> Stashed changes
 import { ActivityClassification, ActivityType } from "../../../DomainLayer/Enums"
+
 import { GroupActivityEntity } from "./GroupActivity"
 import { ArtistActivityEntity } from "./ArtistActivityEntity";
 import { ActivityDateEntity } from "./ActivityDateEntity";
 import { ActivityResponsibleEntity } from "./ActivityResponsibleEntity";
 import { ActivityPlaceEntity } from "./ActivityPlaceEntity";
+import { IncomeEntity } from "./IncomeEntity";
 
 @Entity()
 export class ActivityEntity {
@@ -26,6 +24,10 @@ export class ActivityEntity {
     enum: ActivityType,
   })
   type!: ActivityType;
+
+  // Una actividad tiene asociado un ingreso
+  @OneToOne(() => IncomeEntity, income => income.activity, { onDelete: 'RESTRICT' })
+  income?: IncomeEntity;
 
   // Una actividad puede ser realizada por cero o muchos grupos (a través de groupActivities)
   @OneToMany(
