@@ -8,7 +8,7 @@ import { IncomeMapper } from '@infrastructure/database/Mappers/IncomeMapper';
 import { IncomeDtoMapper } from '@application/DTOs/dtoMappers/income.dtoMapper';
 import { IncomeRepository } from '@domain/Repositories/IncomeRepository';
 import { IncomeRepositoryImpl } from '@infrastructure/database/Repositories/IncomeRepositoryImpl';
-import { CreateIncomeUseCase } from '@domain/UseCases/create_income.use-case';
+import { CreateIncomeUseCase } from '@application/UseCases/create_income.use-case';
 
 @Module({
   imports: 
