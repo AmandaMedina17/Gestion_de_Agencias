@@ -11,10 +11,9 @@ import { IncomeModule } from './IncomeModule';
 import { ArtistModule } from "./ArtistModule";
 import { AgencyModule } from './AgencyModule';
 import { ContractModule } from './ContractModule';
-import { SongModule } from './song/song.module';
-import { Album } from '@domain/Entities/Album';
-import { AlbumModule } from './album/album.module';
 import { BillboardListModule } from './billboard-list/billboard-list.module';
+import { SongModule } from './song/song.module';
+import { AlbumModule } from './album/album.module';
 
 @Module({
   imports: [
@@ -28,9 +27,9 @@ import { BillboardListModule } from './billboard-list/billboard-list.module';
     ArtistModule,
     AgencyModule,
     ContractModule,
+    BillboardListModule,
     SongModule,
-    AlbumModule,
-    BillboardListModule
+    AlbumModule
   ],
   controllers: [AppController],
   providers: [AppService],

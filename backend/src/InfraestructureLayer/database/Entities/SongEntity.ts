@@ -17,9 +17,7 @@ export class SongEntity{
     @JoinColumn({ name: 'album_id' })
     album!: string;
 
-    @OneToMany(() => SongBillboardEntity, (songBillboardNat: SongBillboardEntity) => songBillboardNat.song)
-    songBillboardsNat!: SongBillboardEntity[];
+    @OneToMany(() => SongBillboardEntity, (songBillboards: SongBillboardEntity) => songBillboards.song)
+    songBillboards!: SongBillboardEntity[];
 
-    @OneToMany(() => SongBillboardEntity, (songBillboardsInt: SongBillboardEntity) => songBillboardsInt.song)
-    songBillboardsInt!: SongBillboardEntity[];
 }
