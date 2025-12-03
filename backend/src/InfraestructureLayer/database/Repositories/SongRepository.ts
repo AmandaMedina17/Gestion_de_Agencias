@@ -5,7 +5,7 @@ import { ISongRepository } from "@domain/Repositories/ISongRepository";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { IMapper } from "../Mappers/IMapper";
-import { BillboardListScope } from "@domain/Enums";
+import { BillboardListScope } from "../../../DomainLayer/Enums";
 import { Injectable } from "@nestjs/common";
 import { SongMapper } from "../Mappers/SongMapper";
 

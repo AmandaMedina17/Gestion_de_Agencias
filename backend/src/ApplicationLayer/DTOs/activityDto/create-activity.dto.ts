@@ -1,12 +1,15 @@
-import { ActivityClassification, ActivityType } from "@domain/Enums";
+import {
+  ActivityClassification,
+  ActivityType,
+} from "../../../DomainLayer/Enums";
 import { ArrayNotEmpty, IsArray, IsEnum } from "class-validator";
 
-export class CreateActivityDto{
+export class CreateActivityDto {
   @IsEnum(ActivityClassification)
-  classification!: ActivityClassification
+  classification!: ActivityClassification;
 
   @IsEnum(ActivityType)
-  type!: ActivityType
+  type!: ActivityType;
 
   @IsArray()
   @ArrayNotEmpty()
@@ -20,4 +23,3 @@ export class CreateActivityDto{
   @ArrayNotEmpty()
   dates!: Date[];
 }
-

@@ -1,10 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import { useAgency } from '../../context/AgencyContext'; 
 import ManagerSidebar from './ManagerSidebar';
 import '../../components/Manager/ManagerDashboard.css';
 
 const ManagerDashboard: React.FC = () => {
   const [activeSection, setActiveSection] = useState('profile');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [agencyName, setAgencyName] = useState<string>('No asignada');
+  const [agencyDetails, setAgencyDetails] = useState<any>(null);
+  
+  // Obtener usuario del contexto de autenticación
+  const { user } = useAuth();
+  // Obtener agencias del contexto
+  const { agencies, fetchAgencies } = useAgency();
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
@@ -19,13 +28,44 @@ const ManagerDashboard: React.FC = () => {
     closeSidebar();
   };
 
-  // Datos de ejemplo - luego los reemplazarás con datos reales de tu API
+  // Función para obtener el nombre de la agencia por ID
+  const getAgencyNameById = (agencyId: string): string => {
+    if (!agencyId || !agencies.length) return "No asignada";
+    
+    const agency = agencies.find(a => a.id === agencyId);
+    return agency ? `${agency.nameAgency} - ${agency.place}` : "No encontrada";
+  };
+
+  // Función para obtener detalles completos de la agencia
+  const getAgencyDetails = (agencyId: string) => {
+    if (!agencyId || !agencies.length) return null;
+    return agencies.find(a => a.id === agencyId);
+  };
+
+  // Cargar agencias al montar el componente
+  useEffect(() => {
+    if (user?.agency) {
+      fetchAgencies();
+    }
+  }, [user?.agency]);
+
+  // Actualizar nombre de la agencia cuando se carguen las agencias
+  useEffect(() => {
+    if (user?.agency && agencies.length > 0) {
+      const agencyName = getAgencyNameById(user.agency);
+      const agencyDetails = getAgencyDetails(user.agency);
+      setAgencyName(agencyName);
+      setAgencyDetails(agencyDetails);
+    }
+  }, [user?.agency, agencies]);
+
+  // Datos del manager usando la información del usuario
   const managerData = {
-    name: "Amanda Medina",
-    role: "Manager",
-    email: "amanda.medina@agencia.com",
-    phone: "52364197",
-    agency: "Una ahi",
+    name: user?.username || "Manager",
+    role: user?.role === "AGENCY_MANAGER" ? "Manager de Agencia" : "Manager",
+    email: `${user?.username}@agencia.com` || "manager@agencia.com",
+    agency: agencyName, // Usar el nombre de la agencia
+    agencyId: user?.agency || "", // Guardar ID por si acaso
     joinDate: "1 Jul 2025"
   };
 
@@ -37,6 +77,13 @@ const ManagerDashboard: React.FC = () => {
     { realName: "Lucía Fernández", stageName: "Lucy Soul", group: "Soul Sisters", debutDate: "18/09/2017", status: "active" },
     { realName: "Roberto Silva", stageName: "Rob Indie", group: "The Indie Band", debutDate: "30/04/2016", status: "inactive" }
   ];
+
+  // Formatear fecha de fundación si existe
+  const formatDate = (dateString: string | Date) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("es-ES");
+  };
 
   return (
     <div id="managers_interface">
@@ -68,15 +115,15 @@ const ManagerDashboard: React.FC = () => {
                 <h1>{managerData.name}</h1>
                 <p className="profile-role">{managerData.role}</p>
                 <p className="profile-email">{managerData.email}</p>
+                {/* Mostrar la agencia en el header también */}
+                <p className="profile-agency">
+                  <strong>Agencia:</strong> {managerData.agency}
+                </p>
               </div>
             </div>
             <div className="profile-details">
               <div className="detail-card">
                 <h3>📋 Información Personal</h3>
-                <div className="detail-item">
-                  <span className="detail-label">Teléfono:</span>
-                  <span className="detail-value">{managerData.phone}</span>
-                </div>
                 <div className="detail-item">
                   <span className="detail-label">Agencia:</span>
                   <span className="detail-value">{managerData.agency}</span>
@@ -97,10 +144,23 @@ const ManagerDashboard: React.FC = () => {
               <div className="profile-info">
                 <h1>Artistas Activos</h1>
                 <p className="profile-role">Gestión de Artistas</p>
+                <p className="profile-agency">
+                  <strong>Agencia:</strong> {managerData.agency}
+                </p>
               </div>
             </div>
             
             <div className="artists-table-container">
+              {/* Mostrar información de la agencia actual */}
+              <div className="agency-filter-info">
+                <p>Mostrando artistas de la agencia: <strong>{managerData.agency}</strong></p>
+                {agencyDetails && (
+                  <p className="agency-sub-info">
+                    {agencyDetails.nameAgency} - {agencyDetails.place}
+                  </p>
+                )}
+              </div>
+              
               <table className="artists-table">
                 <thead>
                   <tr>

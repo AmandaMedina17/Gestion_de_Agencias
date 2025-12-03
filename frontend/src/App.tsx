@@ -15,44 +15,75 @@ import { ApprenticeEvaluationProvider } from './context/EvaluationContext';
 import { AgencyProvider } from './context/AgencyContext';
 import { ContractProvider } from './context/ContractContext';
 import { IncomeProvider } from './context/IncomeContext';
+import { BillboardListProvider } from './context/BillboardListContext';
+import { useAuth } from './context/AuthContext';
+import { AlbumProvider } from './context/AlbumContext';
+import { SongProvider } from './context/SongContext';
+
+const PrivateRoute = ({ children, allowedRoles }: { children: React.ReactNode, allowedRoles: string[] }) => {
+  const { user, isAuthenticated } = useAuth();
+  
+  if (!isAuthenticated || !user) {
+    return <Navigate to="/login" />;
+  }
+  
+  if (!allowedRoles.includes(user.role)) {
+    return <Navigate to="/" />;
+  }
+  
+  return <>{children}</>;
+};
 
 function App() {
   return (
-    <IncomeProvider>
-      <ContractProvider>
-        <AgencyProvider>
-          <ActivityProvider>
-            <ApprenticeEvaluationProvider>
-              <ArtistProvider>
-                <ApprenticeProvider>
-                  <PlaceProvider>
-                    <AuthProvider>
-                      <Router>
-                        <div className="App">
-                          <Routes>
-                            <Route path="/login" element={<Login />} />
-                            <Route path="/manager" element={<ManagerDashboard />} />
-                            <Route 
-                              path="/admin" 
-                              element={
-                                <ResponsibleProvider> {/* Solo en admin */}
-                                  <AdminDashboard />
-                                </ResponsibleProvider>
-                              } 
-                            />
-                            <Route path="/" element={<Navigate to="/login" />} />
-                          </Routes>
-                        </div>
-                      </Router>
-                    </AuthProvider>
-                  </PlaceProvider>
-                </ApprenticeProvider>
-              </ArtistProvider>
-            </ApprenticeEvaluationProvider>
-          </ActivityProvider>
-        </AgencyProvider>
-      </ContractProvider>
-    </IncomeProvider>
+    <SongProvider>
+      <AlbumProvider>
+        <BillboardListProvider>
+          <IncomeProvider>
+            <ContractProvider>
+              <AgencyProvider>
+                <ActivityProvider>
+                  <ApprenticeEvaluationProvider>
+                    <ArtistProvider>
+                      <ApprenticeProvider>
+                        <PlaceProvider>
+                          <AuthProvider>
+                            <Router>
+                              <div className="App">
+                                <Routes>
+                                  <Route path="/login" element={<Login />} />
+                                  <Route 
+                                    path="/manager" 
+                                    element={
+                                      <PrivateRoute allowedRoles={['AGENCY_MANAGER', 'MANAGER']}>
+                                        <ManagerDashboard />
+                                      </PrivateRoute>
+                                    } 
+                                  />
+                                  <Route 
+                                    path="/admin" 
+                                    element={
+                                      <ResponsibleProvider> {/* Solo en admin */}
+                                        <AdminDashboard />
+                                      </ResponsibleProvider>
+                                    } 
+                                  />
+                                  <Route path="/" element={<Navigate to="/login" />} />
+                                </Routes>
+                              </div>
+                            </Router>
+                          </AuthProvider>
+                        </PlaceProvider>
+                      </ApprenticeProvider>
+                    </ArtistProvider>
+                  </ApprenticeEvaluationProvider>
+                </ActivityProvider>
+              </AgencyProvider>
+            </ContractProvider>
+          </IncomeProvider>
+        </BillboardListProvider>
+      </AlbumProvider>
+    </SongProvider>
   );
 }
 

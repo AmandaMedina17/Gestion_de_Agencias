@@ -10,7 +10,7 @@ export class BillboardList implements IUpdatable {
     private publicDate: Date,
     private scope: BillboardListScope,
     private nameList: string,
-    private endList: number 
+    private endList: number
   ) {}
 
   update(updateDto: UpdateData): void {
@@ -26,10 +26,6 @@ export class BillboardList implements IUpdatable {
     return this.id;
   }
 
-  public getEndList(): number {
-    return this.endList;
-  }
-
   public getNameList(): string {
     return this.nameList;
   }
@@ -40,6 +36,10 @@ export class BillboardList implements IUpdatable {
 
   public getScope(): BillboardListScope {
     return this.scope;
+  }
+
+  public getEndList(): number{
+    return this.endList;
   }
 
   public static create( publicDate: Date, scope: BillboardListScope, nameList: string, endList: number ) :BillboardList {

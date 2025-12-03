@@ -1,5 +1,4 @@
-import { BillboardList } from "@domain/Entities/BillboardList";
-import { BillboardListScope } from "@domain/Enums";
+import { BillboardListScope } from "../../../DomainLayer/Enums";
 
 export class ResponseBillboardListDto{
     id!: string;

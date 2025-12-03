@@ -1,4 +1,7 @@
 import React from 'react';
+import { useAuth } from '../../context/AuthContext';
+import { useAgency } from '../../context/AgencyContext';
+//import './Sidebar.css';
 
 interface ManagerSidebarProps {
   isOpen: boolean;
@@ -13,9 +16,18 @@ const ManagerSidebar: React.FC<ManagerSidebarProps> = ({
   onSectionChange, 
   onClose 
 }) => {
+  const { user } = useAuth();
+  const { agencies } = useAgency();
+  
+  // Función para obtener el nombre de la agencia por ID
+  const getAgencyName = (agencyId: string) => {
+    if (!agencyId || !agencies.length) return "No asignada";
+    const agency = agencies.find(a => a.id === agencyId);
+    return agency ? agency.nameAgency : "No encontrada";
+  };
+
   const menuItems = [
-    { id: 'profile', label: 'Perfil', icon: '👤', tooltip: 'Perfil Usuario' },
-    { id: 'active_artist', label: '💃🏻 Artistas Activos', tooltip: 'Datos de Artista, Grupo y Contrato' },
+    { id: 'active_artist', label: '🎤 Artistas Activos', tooltip: 'Datos de Artista, Grupo y Contrato' },
     { id: 'group_calendar', label: '📆 Calendario de Grupos', tooltip: 'Detalles de las Actividades Grupales' },
     { id: 'artist_calendar', label: '📖 Calendario de Artistas', tooltip: 'Detalles de Actividades de los Artistas' },
     { id: 'artist_income', label: '💰 Ingresos de Artistas', tooltip: 'Ingresos y éxitos' },
@@ -25,6 +37,27 @@ const ManagerSidebar: React.FC<ManagerSidebarProps> = ({
 
   return (
     <div className={`sidebar ${isOpen ? 'show' : ''}`} id="drop">
+      {/* Información del usuario y agencia */}
+      <div className="sidebar-user-info">
+        <div className="user-avatar">
+          <div className="avatar-circle">
+            {user?.username?.charAt(0)?.toUpperCase() || "M"}
+          </div>
+        </div>
+        <div className="user-details">
+          <h3 className="username">{user?.username || "Manager"}</h3>
+          <div className="user-role">Manager</div>
+          <div className="user-agency">
+            <span className="agency-label">Agencia:</span>
+            <span className="agency-name">{user?.agency ? getAgencyName(user.agency) : "No asignada"}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Separador */}
+      <div className="sidebar-divider"></div>
+
+      {/* Menú de navegación */}
       <nav className="sidebar-nav">
         {menuItems.map((item) => (
           <button
@@ -32,11 +65,25 @@ const ManagerSidebar: React.FC<ManagerSidebarProps> = ({
             className={`nav-item ${activeSection === item.id ? 'active' : ''}`}
             onClick={() => onSectionChange(item.id)}
           >
-            {item.label}
+            <span className="nav-item-icon">{item.label.split(' ')[0]}</span>
+            <span className="nav-item-label">{item.label.substring(item.label.indexOf(' ') + 1)}</span>
             <span className="tooltip">{item.tooltip}</span>
           </button>
         ))}
       </nav>
+
+      {/* Botón de cerrar sesión */}
+      <div className="sidebar-footer">
+        <button className="logout-btn" onClick={() => {
+          // Aquí agregarías la lógica de logout
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          window.location.href = '/login';
+        }}>
+          <span className="logout-icon">🚪</span>
+          <span className="logout-text">Cerrar Sesión</span>
+        </button>
+      </div>
     </div>
   );
 };
