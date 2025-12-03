@@ -14,7 +14,7 @@ export class AlbumDtoMapper extends BaseDtoMapper<Album,CreateAlbumDto,ResponseA
         if(!dto.mainProducer)
             throw new Error("Main producer not provided to album")
 
-        return Album.create(dto.title,dto.date!,dto.mainProducer)
+        return Album.create(dto.title,dto.date!,dto.mainProducer,dto.copiesSold)
     }
     toResponse(domain: Album): ResponseAlbumDto {
         return {

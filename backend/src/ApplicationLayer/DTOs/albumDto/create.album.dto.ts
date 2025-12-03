@@ -15,4 +15,9 @@ export class CreateAlbumDto {
    @IsString()
    mainProducer!: string
 
+   @IsOptional()
+   @IsNumber()
+   @Transform(({ value }) => parseInt(value, 10))
+   copiesSold!:number
+
 }
