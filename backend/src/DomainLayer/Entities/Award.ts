@@ -6,6 +6,7 @@ export class Award implements IUpdatable{
         private readonly id: string,
         private name: string,
         private date:Date,
+        private album:string
     ){
         this.validateName();
     }
@@ -13,8 +14,9 @@ export class Award implements IUpdatable{
         
         updateDto.name = updateDto.name != undefined ? updateDto.name : this.name
         updateDto.date = updateDto.date!= undefined ? updateDto.date : this.date
+        updateDto.album = updateDto.album!= undefined ? updateDto.album : this.album
 
-        const albumUpadte = Award.create(updateDto.nameSong,updateDto.date)
+        const albumUpadte = Award.create(updateDto.nameSong,updateDto.date,updateDto.album)
                 
         this.name = albumUpadte.name
         this.date = albumUpadte.date  
@@ -37,8 +39,12 @@ export class Award implements IUpdatable{
         return this.date;
     }
 
-    public static create( name :string , date : Date) : Award{
+    public getAlbumId(): string{
+        return this.album;
+    }
+
+    public static create( name :string , date : Date, album:string) : Award{
         const id = uuidv4()
-        return new Award(id, name,date);
+        return new Award(id, name,date,album);
       }
 }

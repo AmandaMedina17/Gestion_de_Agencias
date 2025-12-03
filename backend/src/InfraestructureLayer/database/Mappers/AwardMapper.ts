@@ -11,7 +11,7 @@ export class AwardMapper extends IMapper<Award, AwardEntity>{
             throw new Error('Cannot map null entity to domain');
         }
 
-        return new Award(dataBaseEntity.id,dataBaseEntity.name,dataBaseEntity.date)
+        return new Award(dataBaseEntity.id,dataBaseEntity.name,dataBaseEntity.date, dataBaseEntity.album.id)
     }
 
     toDataBaseEntity(domainEntity: Award): AwardEntity{
@@ -20,6 +20,7 @@ export class AwardMapper extends IMapper<Award, AwardEntity>{
         entity.id = domainEntity.getId();
         entity.name= domainEntity.getName();
         entity.date= domainEntity.getDate();
+
 
         return entity;
     }
