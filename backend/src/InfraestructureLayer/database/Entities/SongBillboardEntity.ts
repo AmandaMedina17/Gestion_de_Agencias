@@ -4,7 +4,7 @@ import { BillboardListEntity } from './BillboardListEntity';
 
 @Entity('song_billboard')
 export class SongBillboardEntity {
-    // Llave primaria compuesta - usando songId y billboardListId
+    //Llave primaria utiliando ambos ids
     @PrimaryColumn({ name: 'song_id' })
     songId!: string;
 
@@ -15,7 +15,7 @@ export class SongBillboardEntity {
     puesto!: number;
 
     // Relación con SongEntity
-    @ManyToOne(() => SongEntity, (song: SongEntity) => song.songBillboards)
+    @ManyToOne(() => SongEntity, (song: SongEntity) => song.songBillboardsNat)
     @JoinColumn({ name: 'song_id' })
     song!: SongEntity;
 

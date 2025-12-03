@@ -5,16 +5,19 @@ import { ArtistEntity } from "./ArtistEntity";
 
 @Entity()
 export class ContractEntity {
+  @PrimaryColumn({ name: 'contract_id' })
+  contractID!: string;
+
   @PrimaryColumn()
   agencyID!: string;
 
   @PrimaryColumn()
   artistID!: string;
 
-  @PrimaryColumn({ type: "timestamp" })
+  @PrimaryColumn({ type: "date" })
   startDate!: Date;
 
-  @PrimaryColumn({ type: "timestamp" })
+  @PrimaryColumn({ type: "date" })
   endDate!: Date;
 
   @Column({

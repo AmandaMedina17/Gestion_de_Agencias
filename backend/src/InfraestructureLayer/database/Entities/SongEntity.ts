@@ -1,10 +1,10 @@
-import { Entity,PrimaryGeneratedColumn, Column , ManyToOne, JoinColumn, ManyToMany, OneToMany} from "typeorm";
+import { Entity,PrimaryGeneratedColumn, Column , ManyToOne, JoinColumn, ManyToMany, OneToMany, PrimaryColumn} from "typeorm";
 import { AlbumEntity } from "./AlbumEntity";
 import { SongBillboardEntity } from "./SongBillboardEntity";
 
 @Entity('song')
 export class SongEntity{
-    @PrimaryGeneratedColumn()
+    @PrimaryColumn()
     id!: string;
 
     @Column({ name: 'name' })
@@ -13,12 +13,13 @@ export class SongEntity{
     @Column({ name: 'entry_date' })
     entryDate!: Date;
 
-    //relaciones
     @ManyToOne(() => AlbumEntity, album => album.songs)
     @JoinColumn({ name: 'album_id' })
-    album!: AlbumEntity;
+    album!: string;
 
-    @OneToMany(() => SongBillboardEntity, (songBillboard: SongBillboardEntity) => songBillboard.song)
-    songBillboards!: SongBillboardEntity[];
+    @OneToMany(() => SongBillboardEntity, (songBillboardNat: SongBillboardEntity) => songBillboardNat.song)
+    songBillboardsNat!: SongBillboardEntity[];
 
+    @OneToMany(() => SongBillboardEntity, (songBillboardsInt: SongBillboardEntity) => songBillboardsInt.song)
+    songBillboardsInt!: SongBillboardEntity[];
 }

@@ -3,6 +3,7 @@ import { AgencyService } from '../services/AgencyService'
 import { CreateAgencyDto } from '../../../backend/src/ApplicationLayer/DTOs/agencyDto/create-agency.dto';
 import { AgencyResponseDto } from '../../../backend/src/ApplicationLayer/DTOs/agencyDto/response-agency.dto';
 
+
 interface AgencyContextType {
   // Estado
   agencies: AgencyResponseDto[];

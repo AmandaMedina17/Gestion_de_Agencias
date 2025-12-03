@@ -1,6 +1,6 @@
 import { Group } from "@domain/Entities/Group";
 import { IMapper } from "./IMapper";
-import { GroupEntity } from "@entities/GroupEntity";
+import { GroupEntity } from "@infrastructure/database/Entities/GroupEntity";
 
 export class GroupMapper extends IMapper<Group, GroupEntity>{
     

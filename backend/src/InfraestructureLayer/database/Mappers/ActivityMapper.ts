@@ -1,6 +1,6 @@
 import { IMapper } from "./IMapper";
 import { Activity } from "@domain/Entities/Activity";
-import { ActivityEntity } from "@entities/ActivityEntity";
+import { ActivityEntity } from "@infrastructure/database/Entities/ActivityEntity";
 import { ResponsibleMapper } from "./ResponsibleMapper";
 import { PlaceMapper } from "./PlaceMapper";
 import { Injectable } from "@nestjs/common";

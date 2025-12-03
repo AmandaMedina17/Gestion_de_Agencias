@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ResponsibleEntity } from '@entities/ResponsibleEntity';
-import { IMapper } from 'src/InfraestructureLayer/database/Mappers/IMapper';
-import { ResponsibleMapper } from 'src/InfraestructureLayer/database/Mappers/ResponsibleMapper';
+import { ResponsibleEntity } from '@infrastructure/database/Entities/ResponsibleEntity';
+import { IMapper } from '@infrastructure/database/Mappers/IMapper';
+import { ResponsibleMapper } from '@infrastructure/database/Mappers/ResponsibleMapper';
 import { IResponsibleRepository } from '@domain/Repositories/IResponsibleRepository';
-import { ResponsibleRepository } from 'src/InfraestructureLayer/database/Repositories/ResponsibleRepository';
+import { ResponsibleRepository } from '@infrastructure/database/Repositories/ResponsibleRepository';
 import { ResponsibleController } from '@presentation/Controllers/responsible.controller';
 import { ResponsibleService } from '@application/services/responsible.service';
 import { BaseDtoMapper } from '@application/DTOs/dtoMappers/DtoMapper';

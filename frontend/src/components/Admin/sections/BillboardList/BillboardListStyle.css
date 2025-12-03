@@ -1,0 +1,119 @@
+/* BillboardListStyle.css */
+
+/* Contenedor principal */
+#billboard_list_manager {
+  padding: 0;
+}
+
+/* Estilos de la tabla */
+.billboard-lists-grid {
+  margin-top: 1.5rem;
+}
+
+.billboard-lists-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.billboard-lists-table th {
+  background: #f8f9fa;
+  padding: 1rem;
+  text-align: center;
+  font-weight: 600;
+  color: #495057;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.billboard-lists-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.billboard-lists-table tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* Badges para alcance */
+.scope-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.scope-diaria {
+  background-color: #e3f2fd;
+  color: #1565c0;
+  border: 1px solid #bbdefb;
+}
+
+.scope-semanal {
+  background-color: #f3e5f5;
+  color: #7b1fa2;
+  border: 1px solid #e1bee7;
+}
+
+.scope-mensual {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+.scope-anual {
+  background-color: #fff3e0;
+  color: #ef6c00;
+  border: 1px solid #ffcc80;
+}
+
+/* Estilos para el modal */
+.billboard-list-modal .modal-content {
+  max-width: 500px;
+}
+
+/* Estilos específicos para la tabla */
+.billboard-list-name-cell {
+  min-width: 200px;
+}
+
+.billboard-list-name {
+  font-weight: 500;
+  color: #212529;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .billboard-lists-table {
+    display: block;
+    overflow-x: auto;
+  }
+  
+  .billboard-lists-table th,
+  .billboard-lists-table td {
+    padding: 0.75rem;
+    font-size: 0.875rem;
+  }
+}
+/* Ajuste rápido para mover columnas a la izquierda */
+
+.billboard-lists-table th:nth-child(2),
+.billboard-lists-table td:nth-child(2) {
+  padding-left: 0rem !important;
+}
+
+.billboard-lists-table th:first-child,
+.billboard-lists-table td:first-child {
+  padding-left: 0rem !important;
+}
+
+.billboard-lists-table th:last-child,
+.billboard-lists-table td:last-child {
+  padding-right: 0.75rem !important;
+  text-align: center !important;
+}

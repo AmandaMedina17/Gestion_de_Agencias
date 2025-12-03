@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { Repository, DataSource, QueryRunner, EntityManager } from 'typeorm';
+import { Repository, DataSource, EntityManager } from 'typeorm';
 import { Activity } from '@domain/Entities/Activity';
 import { IActivityRepository } from '@domain/Repositories/IActivityRepository';
 import { ActivityEntity } from '../Entities/ActivityEntity';
@@ -96,7 +96,7 @@ export class ActivityRepository extends BaseRepository<Activity, ActivityEntity>
     const activityId: string = activity.getId();
 
     // 📍 GUARDAR RESPONSABLES
-    
+    await transactionalEntityManager.delete(ActivityResponsibleEntity, { activityId });
     const activityResponsibles: ActivityResponsibleEntity[] = activity.getResponsibles().map(responsible => {
       const entity = new ActivityResponsibleEntity();
       entity.activityId = activityId;
@@ -109,7 +109,7 @@ export class ActivityRepository extends BaseRepository<Activity, ActivityEntity>
     }
 
     // 📍 GUARDAR LUGARES
-    
+    await transactionalEntityManager.delete(ActivityPlaceEntity, { activityId });
     const activityPlaces: ActivityPlaceEntity[] = activity.getPlaces().map(place => {
       const entity = new ActivityPlaceEntity();
       entity.activityId = activityId;
@@ -122,7 +122,7 @@ export class ActivityRepository extends BaseRepository<Activity, ActivityEntity>
     }
 
     // 📍 GUARDAR FECHAS
-    
+    await transactionalEntityManager.delete(ActivityDateEntity, { activityId });
     const activityDates: ActivityDateEntity[] = activity.getDates().map((date: Date) => {
       const entity = new ActivityDateEntity();
       entity.activityId = activityId;
