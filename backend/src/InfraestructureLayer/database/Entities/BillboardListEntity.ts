@@ -10,8 +10,8 @@ export class BillboardListEntity{
     @Column({ name: 'name' })
     name!: string;
 
-    @Column({ name: 'public_date' })
-    publicDate!: Date;
+    @Column({ name: 'entry_date' })
+    entryDate!: Date;
 
     @Column({
         type : 'enum',
