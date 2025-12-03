@@ -12,6 +12,8 @@ import { ArtistModule } from "./ArtistModule";
 import { AgencyModule } from './AgencyModule';
 import { ContractModule } from './ContractModule';
 import { BillboardListModule } from './billboard-list/billboard-list.module';
+import { SongModule } from './song/song.module';
+import { AlbumModule } from './album/album.module';
 
 @Module({
   imports: [
@@ -25,7 +27,9 @@ import { BillboardListModule } from './billboard-list/billboard-list.module';
     ArtistModule,
     AgencyModule,
     ContractModule,
-    BillboardListModule
+    BillboardListModule,
+    SongModule,
+    AlbumModule
   ],
   controllers: [AppController],
   providers: [AppService],
