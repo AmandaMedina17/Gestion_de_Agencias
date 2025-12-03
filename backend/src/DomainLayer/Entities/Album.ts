@@ -1,14 +1,11 @@
-import { IUpdatable } from "@domain/UpdatableInterface";
 import { DateValue } from "../Value Objects/Values";
 import { v4 as uuidv4 } from "uuid";
-import { UpdateData } from "@domain/UpdateData";
 
-//Aqui tengo que implementar las colecciones de navegacion para number of trakcs y number ofawards
-export class Album implements IUpdatable{
+export class Album {
     constructor(
         private readonly id: string,
         private title: string,
-        private releaseDate: Date,
+        private releaseDate: DateValue,
         private mainProducer: string,
         private copiesSold: number,
         private numberOfTracks: number,
@@ -16,30 +13,12 @@ export class Album implements IUpdatable{
         this.validate();
     }
 
-    //Esto hay que implementarlo 
-    update(updateDto: UpdateData): void {
-        
-        updateDto.title = updateDto.title != undefined ? updateDto.title : this.title
-        updateDto.releaseDate = updateDto.releaseDate != undefined ? updateDto.releaseDate : this.releaseDate
-        updateDto.mainProducer = updateDto.mainProducer != undefined ? updateDto.mainProducer : this.mainProducer
-        updateDto.copiesSold = updateDto.copiesSold != undefined ? updateDto.copiesSold : this.copiesSold
-
-        const albumUpadte = Album.create(updateDto.title,updateDto.date, 
-            updateDto.mainProducer, updateDto.copiesSold, updateDto.numberOfTracks)
-        
-        this.title = albumUpadte.title 
-        this.releaseDate = albumUpadte.releaseDate 
-        this.mainProducer = albumUpadte.mainProducer 
-        this.copiesSold = albumUpadte.copiesSold 
-
-    }
-
     private validate(): void {
         if (this.copiesSold < 0) {
             throw new Error('El número de copias vendidas no puede ser negativo');
         }
 
-        if (this.numberOfTracks < 0) {
+        if (this.numberOfTracks <= 0) {
             throw new Error('El álbum debe tener al menos una canción');
         }
 
@@ -56,9 +35,9 @@ export class Album implements IUpdatable{
             throw new Error('El título del álbum no puede exceder 200 caracteres');
         }
 
-        // if (this.releaseDate.getTime() > new Date().getTime()) {
-        //     throw new Error('La fecha de lanzamiento no puede estar en el futuro');
-        // }
+        if (this.releaseDate.isFuture()) {
+            throw new Error('La fecha de lanzamiento no puede estar en el futuro');
+        }
         if (!this.mainProducer || this.mainProducer.length === 0) {
             throw new Error('El nombre del productor no puede estar vacío');
         }
@@ -97,7 +76,7 @@ export class Album implements IUpdatable{
      * Calcula la antigüedad del álbum en años
      */
     public getAlbumAge(): number {
-        return new Date().getTime() - this.releaseDate.getTime();
+        return this.releaseDate.getAge();
     }
 
     /**
@@ -117,7 +96,7 @@ export class Album implements IUpdatable{
         return this.title;
     }
 
-    public getReleaseDate(): Date{
+    public getReleaseDate(): DateValue {
         return this.releaseDate;
     }
 
@@ -133,7 +112,8 @@ export class Album implements IUpdatable{
         return this.numberOfTracks;
     }
 
-    //Estor viola el principio de inmutabilidad dejar asi temporalmente, para despues arreglarlo 
+    // SETTERS 
+
     public setMainProducer(producer: string): void {
         this.mainProducer = producer;
     }
@@ -146,7 +126,7 @@ export class Album implements IUpdatable{
     }
 
     public setNumberOfTracks(tracks: number): void {
-        if (tracks < 0) {
+        if (tracks <= 0) {
             throw new Error('El álbum debe tener al menos una canción');
         }
         if (tracks > 50) {
@@ -155,7 +135,8 @@ export class Album implements IUpdatable{
         this.numberOfTracks = tracks;
     }
 
-    public static create(title: string, releaseDate: Date, mainProducer: string, copiesSold =0, numberOfTracks = 0) : Album{
-        return new Album(uuidv4(), title, releaseDate, mainProducer, copiesSold, numberOfTracks);
+    public create(title: string, releaseDate: DateValue, mainProducer: string, copiesSold: number, numberOfTracks: number) : Album{
+        const id = uuidv4();
+        return new Album(id, title, releaseDate, mainProducer, copiesSold, numberOfTracks);
     }
 }
