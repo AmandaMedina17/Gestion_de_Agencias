@@ -19,7 +19,7 @@ import { AgencyMapper } from '@infrastructure/database/Mappers/AgencyMapper';
 import { ArtistMapper } from '@infrastructure/database/Mappers/ArtistMapper';
 import { AgencyEntity } from '@infrastructure/database/Entities/AgencyEntity';
 import { ArtistEntity } from '@infrastructure/database/Entities/ArtistEntity';
-import { UpdateContractUseCase } from '@domain/UseCases/update_contract.use-case';
+import { UpdateContractUseCase } from '@application/UseCases/update_contract.use-case';
 // @Module({
 //   imports: [
 //     TypeOrmModule.forFeature([ContractEntity])
