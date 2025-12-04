@@ -39,5 +39,9 @@ export class ContractController {
   remove(@Param('id') id: string) {
     return this.contractService.remove(id);
   }
+  @Get(':id/artists')
+  getArtistContract(@Param('id') id: string){
+    return this.contractService.getArtistContracts(id);
+  }
 
 }
