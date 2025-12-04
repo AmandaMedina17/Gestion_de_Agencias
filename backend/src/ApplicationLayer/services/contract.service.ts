@@ -10,14 +10,14 @@ import { CreateContractUseCase } from '@application/UseCases/create_contract.uso
 import { UpdateContractStatusUseCase } from '@application/UseCases/update_contract_status.use-case';
 import { ContractStatus } from '@domain/Enums';
 import { UpdateContractUseCase } from '@domain/UseCases/update_contract.use-case';
+import { ContractDtoMapper } from '@application/DTOs/dtoMappers/contract.dtoMapper';
 
 @Injectable()
 export class ContractService extends BaseService<Contract, CreateContractDto, ContractResponseDto, UpdateContractDto> {
   constructor(
     @Inject(IContractRepository)
     private readonly contractRepository: IContractRepository,
-    @Inject(BaseDtoMapper)
-    private readonly contractDtoMapper: BaseDtoMapper<Contract, CreateContractDto, ContractResponseDto>,
+    private readonly contractDtoMapper: ContractDtoMapper,
     private readonly createContractUseCase: CreateContractUseCase,
     private readonly updateContractStatusUseCase: UpdateContractStatusUseCase,
     private readonly updateContractUseCase: UpdateContractUseCase

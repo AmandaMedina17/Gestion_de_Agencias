@@ -12,28 +12,24 @@ import { AgencyDtoMapper } from "@application/DTOs/dtoMappers/agency.dtoMapper";
 import { ApprenticeMapper } from "@infrastructure/database/Mappers/ApprenticeMapper";
 import { ArtistMapper } from "@infrastructure/database/Mappers/ArtistMapper";
 import { GroupMapper } from "@infrastructure/database/Mappers/GroupMapper";
+import { ArtistModule } from "./ArtistModule";
+import { ApprenticeModule } from "./ApprenticeModule";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([AgencyEntity])],
+  imports: [TypeOrmModule.forFeature([AgencyEntity]),
+  ArtistModule,
+  ApprenticeModule],
   controllers: [AgencyController],
   providers: [
     AgencyMapper,
-    GroupMapper,
-    ApprenticeMapper,
-    ArtistMapper,
-    
-    // Repositorio (igual que en ActivityModule)
+    GroupMapper, //importar el modulo
     {
       provide: IAgencyRepository,
       useClass: AgencyRepositoryImpl,
     },
-    
-    // DTO Mapper (igual que en ActivityModule)
     AgencyDtoMapper,
-    
-    // Servicio
     AgencyService,
   ],
-  exports: [IAgencyRepository],
+  exports: [IAgencyRepository, AgencyDtoMapper, AgencyMapper],
 })
 export class AgencyModule {}
