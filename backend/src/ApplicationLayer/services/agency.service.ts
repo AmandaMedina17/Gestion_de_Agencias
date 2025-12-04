@@ -31,10 +31,10 @@ export class AgencyService extends BaseService<Agency, CreateAgencyDto, AgencyRe
   }
   async getAgencyArtists(agencyId: string): Promise<ArtistResponseDto[]> {
     const artists =  await this.getAgencyArtistsUseCase.execute(agencyId);
-    return artists.map((artist: Artist) => this.artistDtoMapper.toResponse(artist));
+    return this.artistDtoMapper.toResponseList(artists);
   }
   async getAgencyApprentices(agencyId: string): Promise<ApprenticeResponseDto[]>{
     const apprentices = await this.getAgencyApprenticesUseCase.execute(agencyId);
-    return apprentices.map((apprentice: any) => this.apprenticeDtoMapper.toResponse(apprentice))
+    return this.apprenticeDtoMapper.toResponseList(apprentices);
   }
 }
