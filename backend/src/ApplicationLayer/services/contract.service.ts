@@ -11,6 +11,7 @@ import { UpdateContractStatusUseCase } from '@application/UseCases/update_contra
 import { ContractStatus } from '@domain/Enums';
 import { UpdateContractUseCase } from '@domain/UseCases/update_contract.use-case';
 import { ContractDtoMapper } from '@application/DTOs/dtoMappers/contract.dtoMapper';
+import { GetArtistContractsUseCase } from '@application/UseCases/get_artist_contracts.use-case';
 
 @Injectable()
 export class ContractService extends BaseService<Contract, CreateContractDto, ContractResponseDto, UpdateContractDto> {
@@ -20,7 +21,8 @@ export class ContractService extends BaseService<Contract, CreateContractDto, Co
     private readonly contractDtoMapper: ContractDtoMapper,
     private readonly createContractUseCase: CreateContractUseCase,
     private readonly updateContractStatusUseCase: UpdateContractStatusUseCase,
-    private readonly updateContractUseCase: UpdateContractUseCase
+    private readonly updateContractUseCase: UpdateContractUseCase,
+    private readonly getArtistContractsUseCase : GetArtistContractsUseCase
   ) {
     super(contractRepository, contractDtoMapper)
   }
@@ -35,6 +37,10 @@ export class ContractService extends BaseService<Contract, CreateContractDto, Co
   async update(id: string, updateContractDto: UpdateContractDto): Promise<ContractResponseDto> {
     const contract = await this.updateContractUseCase.execute(id, updateContractDto);
     return this.contractDtoMapper.toResponse(contract);
+  }
+  async getArtistContracts(artistId: string): Promise<ContractResponseDto[]>{
+    const contracts = await this.getArtistContractsUseCase.execute(artistId);
+    return this.contractDtoMapper.toResponseList(contracts);
   }
 
 }

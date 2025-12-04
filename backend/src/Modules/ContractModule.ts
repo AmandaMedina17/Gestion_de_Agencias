@@ -16,31 +16,7 @@ import { AgencyModule } from './AgencyModule';
 import { AgencyEntity } from '@infrastructure/database/Entities/AgencyEntity';
 import { ArtistEntity } from '@infrastructure/database/Entities/ArtistEntity';
 import { UpdateContractUseCase } from '@domain/UseCases/update_contract.use-case';
-// @Module({
-//   imports: [
-//     TypeOrmModule.forFeature([ContractEntity])
-//   ],
-//   controllers: [ContractController],
-//   providers: [
-//     {
-//       provide: IMapper, 
-//       useClass: ContractMapper 
-//     },
-//     {
-//       provide: IContractRepository,  
-//       useClass: ContractRepositoryImpl  
-//     },
-//     {
-//       provide: BaseDtoMapper,     
-//       useClass: ContractDtoMapper,
-//     },
-//     ContractService,
-//   ],
-//   exports: [
-//     IContractRepository 
-//   ]
-// })
-// export class ContractModule {}
+import { GetArtistContractsUseCase } from '@application/UseCases/get_artist_contracts.use-case';
 
 @Module({
   imports: [
@@ -60,6 +36,7 @@ import { UpdateContractUseCase } from '@domain/UseCases/update_contract.use-case
     UpdateContractStatusUseCase,
     UpdateContractUseCase,
     ContractService,
+    GetArtistContractsUseCase,
   ],
   exports: [
     IContractRepository,
