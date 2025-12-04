@@ -15,6 +15,7 @@ import { ApprenticeResponseDto } from '@application/DTOs/apprenticeDto/response-
 import { GetAgencyArtistsUseCase } from '../UseCases/get_agency_artists.use-case';
 import { ApprenticeDtoMapper } from '../DTOs/dtoMappers/apprentice.dtoMapper';
 import { GetAgencyApprenticesUseCase } from '../UseCases/get_agency_apprentices.use-case';
+import { GetAgencyGroupsUseCase } from '../UseCases/get_agency_groups.use-case';
 @Injectable()
 export class AgencyService extends BaseService<Agency, CreateAgencyDto, AgencyResponseDto, UpdateAgencyDto> {
     constructor(
@@ -24,7 +25,8 @@ export class AgencyService extends BaseService<Agency, CreateAgencyDto, AgencyRe
     private readonly artistDtoMapper: ArtistDtoMapper,
     private readonly apprenticeDtoMapper: ApprenticeDtoMapper,
     private readonly getAgencyArtistsUseCase: GetAgencyArtistsUseCase,
-    private readonly getAgencyApprenticesUseCase: GetAgencyApprenticesUseCase
+    private readonly getAgencyApprenticesUseCase: GetAgencyApprenticesUseCase,
+    private readonly getAgencyGroupsUseCase: GetAgencyGroupsUseCase
 
   ) {
     super(agencyRepository, agencyDtoMapper)
@@ -37,4 +39,8 @@ export class AgencyService extends BaseService<Agency, CreateAgencyDto, AgencyRe
     const apprentices = await this.getAgencyApprenticesUseCase.execute(agencyId);
     return this.apprenticeDtoMapper.toResponseList(apprentices);
   }
+  // async getAgencyGroups(agencyId: string): Promise<GroupResponseDto[]>{
+  //   const groups = await this.getAgencyGroupsUseCase.execute(agencyId);
+  //   return this.groupDtoMapper.toResponseList(groups);
+  // }
 }

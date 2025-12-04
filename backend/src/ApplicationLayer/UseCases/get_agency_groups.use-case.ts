@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { IAgencyRepository } from '@domain/Repositories/IAgencyRepository';
-import { Artist } from '@domain/Entities/Artist';
+import { Group} from '@domain/Entities/Group';
 
 @Injectable()
-export class GetAgencyArtistsUseCase {
+export class GetAgencyGroupsUseCase {
   constructor(
     private readonly agencyRepository: IAgencyRepository,
    ) {}
 
-  async execute(agencyId: string): Promise<Artist[]> {
+  async execute(agencyId: string): Promise<Group[]> {
     // Validar que la agencia existe
     const agency = await this.agencyRepository.findById(agencyId);
     if (!agency) {
@@ -16,7 +16,7 @@ export class GetAgencyArtistsUseCase {
     }
 
     // Obtener los artistas de la agencia
-    return  await this.agencyRepository.getAgencyArtists(agencyId);
+    return  await this.agencyRepository.getAgencyGroups(agencyId);
     
   }
 }

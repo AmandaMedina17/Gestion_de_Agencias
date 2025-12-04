@@ -18,6 +18,7 @@ import { GetAgencyApprenticesUseCase } from "@application/UseCases/get_agency_ap
 import { GetAgencyArtistsUseCase } from "@application/UseCases/get_agency_artists.use-case";
 import { ApprenticeModule } from "./ApprenticeModule";
 import { ApprenticeDtoMapper } from "@application/DTOs/dtoMappers/apprentice.dtoMapper";
+import { GetAgencyGroupsUseCase } from "@application/UseCases/get_agency_groups.use-case";
 
 @Module({
   imports: [
@@ -48,7 +49,8 @@ import { ApprenticeDtoMapper } from "@application/DTOs/dtoMappers/apprentice.dto
 
     //Casos de uso
     GetAgencyApprenticesUseCase,
-    GetAgencyArtistsUseCase
+    GetAgencyArtistsUseCase,
+    GetAgencyGroupsUseCase
   ],
   exports: [IAgencyRepository],
 })

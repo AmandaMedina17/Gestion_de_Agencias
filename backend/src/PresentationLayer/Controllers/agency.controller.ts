@@ -49,4 +49,9 @@ export class AgencyController {
     return this.agencyService.getAgencyApprentices(id);
   }
 
+  // @Get(':id/groups')
+  // getAgencyGroups(@Param('id') id: string) {
+  //   return this.agencyService.getAgencyGroups(id);
+  // }
+
 }
