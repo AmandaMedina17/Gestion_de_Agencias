@@ -14,7 +14,10 @@ export class ArtistRepository
   constructor(
     @InjectRepository(ArtistEntity)
     repository: Repository<ArtistEntity>,
-    mapper: IMapper<Artist, ArtistEntity>,
+    mapper: ArtistMapper
+    // @InjectRepository(ContractEntity)
+    // private readonly contractRepo: Repository<ContractEntity>,
+    // private readonly contractMapper: ContractMapper,
   ) {
     super(repository, mapper);
   }

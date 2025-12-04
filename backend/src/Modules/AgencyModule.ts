@@ -52,6 +52,6 @@ import { GetAgencyGroupsUseCase } from "@application/UseCases/get_agency_groups.
     GetAgencyArtistsUseCase,
     GetAgencyGroupsUseCase
   ],
-  exports: [IAgencyRepository],
+  exports: [IAgencyRepository, AgencyDtoMapper, AgencyMapper],
 })
 export class AgencyModule {}

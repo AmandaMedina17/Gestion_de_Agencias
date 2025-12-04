@@ -16,11 +16,11 @@ export class ContractService extends BaseService<Contract, CreateContractDto, Co
   constructor(
     @Inject(IContractRepository)
     private readonly contractRepository: IContractRepository,
-    @Inject(BaseDtoMapper)
-    private readonly contractDtoMapper: BaseDtoMapper<Contract, CreateContractDto, ContractResponseDto>,
+    private readonly contractDtoMapper: ContractDtoMapper,
     private readonly createContractUseCase: CreateContractUseCase,
     private readonly updateContractStatusUseCase: UpdateContractStatusUseCase,
-    private readonly updateContractUseCase: UpdateContractUseCase
+    private readonly updateContractUseCase: UpdateContractUseCase,
+    private readonly getArtistContractsUseCase : GetArtistContractsUseCase
   ) {
     super(contractRepository, contractDtoMapper)
   }
@@ -35,6 +35,10 @@ export class ContractService extends BaseService<Contract, CreateContractDto, Co
   async update(id: string, updateContractDto: UpdateContractDto): Promise<ContractResponseDto> {
     const contract = await this.updateContractUseCase.execute(id, updateContractDto);
     return this.contractDtoMapper.toResponse(contract);
+  }
+  async getArtistContracts(artistId: string): Promise<ContractResponseDto[]>{
+    const contracts = await this.getArtistContractsUseCase.execute(artistId);
+    return this.contractDtoMapper.toResponseList(contracts);
   }
 
 }

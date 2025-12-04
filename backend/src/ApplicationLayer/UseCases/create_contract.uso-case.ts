@@ -1,7 +1,7 @@
 import { IContractRepository } from "@domain/Repositories/IContractRepository";
 import { IAgencyRepository } from "@domain/Repositories/IAgencyRepository";
 import { IArtistRepository } from "@domain/Repositories/IArtistRepository";
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { Contract } from "@domain/Entities/Contract";
 import { ContractStatus } from "@domain/Enums";
 
@@ -9,8 +9,11 @@ import { ContractStatus } from "@domain/Enums";
 @Injectable()
 export class CreateContractUseCase {
   constructor(
+    @Inject(IContractRepository)
     private contractRepository: IContractRepository,
+    @Inject(IAgencyRepository)
     private agencyRepository: IAgencyRepository,
+    @Inject(IArtistRepository)
     private artistRepository: IArtistRepository
   ) {}
 

@@ -23,6 +23,41 @@ export class ContractRepositoryImpl implements IContractRepository {
     private readonly dataSource: DataSource,
     private readonly contractMapper: ContractMapper,
   ) {}
+
+  
+  async getArtistContracts(artistId: string): Promise<Contract[]> {
+  try {
+    // Verificar que el artista existe
+    const artistExists = await this.artistRepo.findOne({
+      where: { id: artistId }
+    });
+
+    if (!artistExists) {
+      throw new Error(`Artist with ID ${artistId} not found`);
+    }
+
+    // Buscar todos los contratos del artista
+    const contractEntities = await this.contractRepo.find({
+      where: { artistID: artistId },
+      relations: this.getDefaultRelations(),
+      order: { 
+        startDate: 'ASC' 
+      }
+    });
+
+    if (!contractEntities || contractEntities.length === 0) {
+      return []; // Retornar array vacío si no hay contratos
+    }
+
+    // Mapear las entidades a objetos de dominio
+    return contractEntities.map(entity => 
+      this.contractMapper.toCompleteDomainEntity(entity)
+    );
+  } catch (error) {
+    console.error(`Error fetching contracts for artist ${artistId}:`, error);
+    throw error;
+  }
+}
   async delete(id: string): Promise<void> {
     try {
       // El ID ahora es el contractID (no el ID compuesto)
@@ -48,19 +83,6 @@ export class ContractRepositoryImpl implements IContractRepository {
   if (!entity) {
     return null;
   }
-
-  // // Ahora buscar con TODAS las claves primarias
-  // const fullEntity = await this.contractRepo.findOne({
-  //   where: {
-  //     contractID: entity.contractID,
-  //     agencyID: entity.agencyID,
-  //     artistID: entity.artistID,
-  //     startDate: entity.startDate,
-  //     endDate: entity.endDate
-  //   },
-  //   relations: this.getDefaultRelations(),
-  // });
-
   return entity ? this.contractMapper.toCompleteDomainEntity(entity) : null;
 }
 

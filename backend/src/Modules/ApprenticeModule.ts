@@ -14,10 +14,7 @@ import { ApprenticeService } from "@application/services/apprentice.service";
   imports: [TypeOrmModule.forFeature([ApprenticeEntity])],
   controllers: [ApprenticeController],
   providers: [
-    {
-      provide: IMapper,
-      useClass: ApprenticeMapper,
-    },
+    ApprenticeMapper,
     {
       provide: IApprenticeRepository,
       useClass: ApprenticeRepository,
