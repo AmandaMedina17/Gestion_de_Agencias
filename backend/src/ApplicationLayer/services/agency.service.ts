@@ -16,6 +16,8 @@ import { GetAgencyArtistsUseCase } from '../UseCases/get_agency_artists.use-case
 import { ApprenticeDtoMapper } from '../DTOs/dtoMappers/apprentice.dtoMapper';
 import { GetAgencyApprenticesUseCase } from '../UseCases/get_agency_apprentices.use-case';
 import { GetAgencyGroupsUseCase } from '../UseCases/get_agency_groups.use-case';
+import { IArtistRepository } from '@domain/Repositories/IArtistRepository';
+import { ArtistRepository } from '../../InfraestructureLayer/database/Repositories/ArtistRepository';
 @Injectable()
 export class AgencyService extends BaseService<Agency, CreateAgencyDto, AgencyResponseDto, UpdateAgencyDto> {
     constructor(
@@ -23,10 +25,14 @@ export class AgencyService extends BaseService<Agency, CreateAgencyDto, AgencyRe
     private readonly agencyRepository: IAgencyRepository,
     private readonly agencyDtoMapper: AgencyDtoMapper,
     private readonly artistDtoMapper: ArtistDtoMapper,
+    // private readonly groupDtoMapper: GroupDtoMapper,
     private readonly apprenticeDtoMapper: ApprenticeDtoMapper,
     private readonly getAgencyArtistsUseCase: GetAgencyArtistsUseCase,
     private readonly getAgencyApprenticesUseCase: GetAgencyApprenticesUseCase,
-    private readonly getAgencyGroupsUseCase: GetAgencyGroupsUseCase
+    private readonly getAgencyGroupsUseCase: GetAgencyGroupsUseCase,
+    @Inject(IArtistRepository)
+    private readonly artistRepository: IArtistRepository,
+
 
   ) {
     super(agencyRepository, agencyDtoMapper)
@@ -42,5 +48,26 @@ export class AgencyService extends BaseService<Agency, CreateAgencyDto, AgencyRe
   // async getAgencyGroups(agencyId: string): Promise<GroupResponseDto[]>{
   //   const groups = await this.getAgencyGroupsUseCase.execute(agencyId);
   //   return this.groupDtoMapper.toResponseList(groups);
+  // }
+  // async getAgencyActiveArtistAndGruopInfo(agencyId: string): Promise<[ArtistResponseDto,GroupResponseDto | null][]>{
+  //   const activeArtists = await this.agencyRepository.findActiveArtistsByAgency(agencyId);
+  //   const result: [ArtistResponseDto, GroupResponseDto | null][] = [];
+  //   for (const artist of activeArtists) {
+  //   // Obtener el grupo actual del artista
+  //   const currentGroup = await this.artistRepository.getArtistCurrentGroup(artist.getId());
+    
+  //   // Convertir artista a DTO
+  //   const artistDto = this.artistDtoMapper.toResponse(artist);
+    
+  //   // Convertir grupo a DTO (si existe)
+  //   let groupDto: GroupResponseDto | null = null;
+  //   if (currentGroup) {
+  //     groupDto = this.groupDtoMapper.toResponse(currentGroup);
+  //   }
+    
+  //   result.push([artistDto, groupDto]);
+  // }
+  
+  // return result;
   // }
 }

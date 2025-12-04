@@ -54,4 +54,9 @@ export class AgencyController {
   //   return this.agencyService.getAgencyGroups(id);
   // }
 
+  // @Get(':id/activeArtists')
+  // getActiveArtistsWithGroup(@Param('id') id: string){
+  //   return this.agencyService.getAgencyActiveArtistAndGruopInfo(id);
+  // }
+
 }
