@@ -39,4 +39,14 @@ export class AgencyController {
   remove(@Param('id') id: string) {
     return this.agencyService.remove(id);
   }
+  @Get(':id/artists')
+  getAgencyArtists(@Param('id') id: string) {
+    return this.agencyService.getAgencyArtists(id);
+  }
+
+  @Get(':id/apprentices')
+  getAgencyApprentices(@Param('id') id: string) {
+    return this.agencyService.getAgencyApprentices(id);
+  }
+
 }

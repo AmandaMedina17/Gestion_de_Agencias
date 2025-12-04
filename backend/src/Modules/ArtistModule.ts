@@ -22,12 +22,13 @@ import { ArtistService } from "../ApplicationLayer/services/artist.service";
       provide: IArtistRepository,
       useClass: ArtistRepository,
     },
+    ArtistDtoMapper,
     {
       provide: BaseDtoMapper,
       useClass: ArtistDtoMapper,
     },
     ArtistService,
   ],
-  exports: [IArtistRepository],
+  exports: [IArtistRepository, ArtistDtoMapper],
 })
 export class ArtistModule {}

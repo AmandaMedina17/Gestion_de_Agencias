@@ -12,9 +12,19 @@ import { AgencyDtoMapper } from "@application/DTOs/dtoMappers/agency.dtoMapper";
 import { ApprenticeMapper } from "@infrastructure/database/Mappers/ApprenticeMapper";
 import { ArtistMapper } from "@infrastructure/database/Mappers/ArtistMapper";
 import { GroupMapper } from "@infrastructure/database/Mappers/GroupMapper";
+import { ArtistDtoMapper } from "@application/DTOs/dtoMappers/artist.dto";
+import { ArtistModule } from "./ArtistModule";
+import { GetAgencyApprenticesUseCase } from "@application/UseCases/get_agency_apprentices.use-case";
+import { GetAgencyArtistsUseCase } from "@application/UseCases/get_agency_artists.use-case";
+import { ApprenticeModule } from "./ApprenticeModule";
+import { ApprenticeDtoMapper } from "@application/DTOs/dtoMappers/apprentice.dtoMapper";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([AgencyEntity])],
+  imports: [
+    TypeOrmModule.forFeature([AgencyEntity]),
+    ArtistModule,
+    ApprenticeModule
+  ],
   controllers: [AgencyController],
   providers: [
     AgencyMapper,
@@ -22,17 +32,23 @@ import { GroupMapper } from "@infrastructure/database/Mappers/GroupMapper";
     ApprenticeMapper,
     ArtistMapper,
     
-    // Repositorio (igual que en ActivityModule)
+    // Repositorio
     {
       provide: IAgencyRepository,
       useClass: AgencyRepositoryImpl,
     },
     
-    // DTO Mapper (igual que en ActivityModule)
+    // DTO Mapper
     AgencyDtoMapper,
+    ArtistDtoMapper,
+    ApprenticeDtoMapper,
     
     // Servicio
     AgencyService,
+
+    //Casos de uso
+    GetAgencyApprenticesUseCase,
+    GetAgencyArtistsUseCase
   ],
   exports: [IAgencyRepository],
 })

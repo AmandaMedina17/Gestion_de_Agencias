@@ -22,12 +22,13 @@ import { ApprenticeService } from "@application/services/apprentice.service";
       provide: IApprenticeRepository,
       useClass: ApprenticeRepository,
     },
+    ApprenticeDtoMapper,
     {
       provide: BaseDtoMapper,
       useClass: ApprenticeDtoMapper,
     },
     ApprenticeService,
   ],
-  exports: [IApprenticeRepository],
+  exports: [IApprenticeRepository, ApprenticeDtoMapper],
 })
 export class ApprenticeModule {}
