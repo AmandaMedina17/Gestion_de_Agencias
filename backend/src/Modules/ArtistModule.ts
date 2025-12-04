@@ -15,6 +15,7 @@ import { AgencyMapper } from "@infrastructure/database/Mappers/AgencyMapper";
 import { ContractDtoMapper } from "@application/DTOs/dtoMappers/contract.dtoMapper";
 import { AgencyDtoMapper } from "@application/DTOs/dtoMappers/agency.dtoMapper";
 import { ContractModule } from "./ContractModule";
+import { GetArtistsWithAgencyChangesAndGroupsUseCase } from "@application/UseCases/get_artists_with_agency_changes_and_groups.use-case";
 
 @Module({
   imports: [TypeOrmModule.forFeature([ArtistEntity,ContractEntity])],
@@ -27,7 +28,8 @@ import { ContractModule } from "./ContractModule";
       useClass: ArtistRepository,
     },
     ArtistService,
+    GetArtistsWithAgencyChangesAndGroupsUseCase,
   ],
-  exports: [IArtistRepository, ArtistDtoMapper, ArtistMapper],
+  exports: [IArtistRepository, ArtistDtoMapper, ArtistMapper], //quiza necesito exportar GetArtistsWithAgencyChangesAndGroupsUseCase
 })
 export class ArtistModule {}

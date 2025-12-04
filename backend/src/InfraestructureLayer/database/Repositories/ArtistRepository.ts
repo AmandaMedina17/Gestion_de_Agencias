@@ -33,6 +33,49 @@ export class ArtistRepository
     return this.mapper.toDomainEntity(savedArtist);
   }
 
+  async getArtists_WithAgencyChangesAndGroups(): Promise<Artist[]> {
+    // Subquery para contar cambios reales de agencia
+    const agencyChangesSubQuery = this.repository
+      .createQueryBuilder('artist')
+      .select('artist.id')
+      .addSelect('COUNT(DISTINCT am.agencyId)', 'distinctAgencies')
+      .addSelect('COUNT(am.agencyId)', 'totalMemberships')
+      .leftJoin('artist.agencyMemberships', 'am')
+      .leftJoin('am.interval', 'interval')
+      .groupBy('artist.id')
+      .having('COUNT(DISTINCT am.agencyId) >= 2')  // Al menos 2 agencias diferentes
+      .andHaving('COUNT(am.agencyId) >= 3');       // Al menos 3 membresías (asegura cambios)
+
+    // Subquery para contar grupos
+    const groupsSubQuery = this.repository
+      .createQueryBuilder('artist')
+      .select('artist.id')
+      .addSelect('COUNT(DISTINCT gm.groupId)', 'groupCount')
+      .leftJoin('artist.groupMemberships', 'gm')
+      .groupBy('artist.id')
+      .having('COUNT(DISTINCT gm.groupId) > 1');
+
+    // Combinar ambas condiciones
+    const result = await this.repository
+      .createQueryBuilder('artist')
+      .innerJoin(
+        `(${agencyChangesSubQuery.getQuery()})`,
+        'ac',
+        'artist.id = ac.artist_id'
+      )
+      .innerJoin(
+        `(${groupsSubQuery.getQuery()})`,
+        'gc',
+        'artist.id = gc.artist_id'
+      )
+      .setParameters({
+        ...agencyChangesSubQuery.getParameters(),
+        ...groupsSubQuery.getParameters(),
+      })
+      .getMany();
+
+    return this.mapper.toDomainEntities(result);
+}
     // async findArtistsWithScheduleConflicts(startDate: Date, endDate: Date): Promise<Artist[]> {
     //     const artistEntities = await this.repository
     //     .createQueryBuilder('artist')
