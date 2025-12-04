@@ -29,16 +29,6 @@ export class AgencyRepositoryImpl
     super(repository, mapper);
   }
 
-  async findByName(name: string): Promise<Agency> {
-    const entity = await this.repository.findOne({ 
-      where: { name } 
-    });
-    if (!entity) {
-      throw new Error('Agency not found');
-    }
-    return this.mapper.toDomainEntity(entity);
-  }
-
   async getAgencyGroups(id: string): Promise<Group[]> {
     const agencyEntity = await this.repository.findOne({
       where: { id },

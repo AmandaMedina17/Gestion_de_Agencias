@@ -20,8 +20,12 @@ import { ApprenticeService } from "@application/services/apprentice.service";
       useClass: ApprenticeRepository,
     },
     ApprenticeDtoMapper,
+    {
+      provide: BaseDtoMapper,
+      useClass: ApprenticeDtoMapper,
+    },
     ApprenticeService,
   ],
-  exports: [IApprenticeRepository, ApprenticeDtoMapper, ApprenticeMapper],
+  exports: [IApprenticeRepository, ApprenticeDtoMapper],
 })
 export class ApprenticeModule {}
