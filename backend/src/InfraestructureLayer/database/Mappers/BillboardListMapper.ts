@@ -11,7 +11,7 @@ export class BillboardListMapper extends IMapper<BillboardList, BillboardListEnt
             throw new Error('Cannot map null entity to domain');
         }
 
-        return new BillboardList(dataBaseEntity.id,dataBaseEntity.entryDate,
+        return new BillboardList(dataBaseEntity.id,dataBaseEntity.publicDate,
             dataBaseEntity.scope,dataBaseEntity.name,dataBaseEntity.endList)
     }
 
@@ -19,7 +19,7 @@ export class BillboardListMapper extends IMapper<BillboardList, BillboardListEnt
         const entity = new BillboardListEntity();
 
         entity.id = domainEntity.getId();
-        entity.entryDate= domainEntity.getPublicDate();
+        entity.publicDate= domainEntity.getPublicDate();
         entity.scope = domainEntity.getScope();
         entity.name = domainEntity.getNameList()
         entity.endList = domainEntity.getEndList();

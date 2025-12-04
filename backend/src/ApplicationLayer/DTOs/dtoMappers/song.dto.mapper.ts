@@ -8,17 +8,12 @@ import { Injectable } from "@nestjs/common";
 export class SongDtoMapper extends BaseDtoMapper<Song, CreateSongDto, ResponseSongDto>{
 
   fromDto(dto: CreateSongDto): Song { 
-    
-    if(!dto.nameSong)
-      throw new Error("Name of the song is missing");
-
-    if(!dto.idAlbum)
-      throw new Error("Album not provided")
-
-    return Song.create(dto.nameSong, dto.idAlbum, dto.releaseDate != undefined ? dto.releaseDate   : new Date())
+    throw new Error('Song creation requires complex logic. Use CreateIncomeUseCase instead.');
   };
 
   toResponse(domain: Song): ResponseSongDto {
+    console.log("Id Album:")
+    console.log(domain.getAlbumId());
     return {
         id: domain.getId(),
         name: domain.getName(),

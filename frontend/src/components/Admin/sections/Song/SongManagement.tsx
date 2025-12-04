@@ -3,6 +3,7 @@ import { useSong } from "../../../../context/SongContext";
 import { useAlbum } from "../../../../context/AlbumContext";
 import { Icon } from "../../../icons";
 import './SongStyle.css';
+import AcUnitIcon from '@mui/icons-material/AcUnit';
 
 const SongManagement: React.FC = () => {
   const {
@@ -202,7 +203,7 @@ const SongManagement: React.FC = () => {
       await createSong({
         nameSong: newSong.nameSong,
         idAlbum: newSong.idAlbum,
-        releaseDate: newSong.releaseDate ? new Date(newSong.releaseDate) : undefined,
+        releaseDate:  new Date(newSong.releaseDate) ,
       });
 
       setMessage({
@@ -239,7 +240,7 @@ const SongManagement: React.FC = () => {
       await updateSong(editingSong.id, {
         nameSong: editSong.nameSong,
         idAlbum: editSong.idAlbum,
-        releaseDate: editSong.releaseDate ? new Date(editSong.releaseDate) : undefined,
+        releaseDate: new Date(editSong.releaseDate),
       });
 
       setMessage({
@@ -382,7 +383,7 @@ const SongManagement: React.FC = () => {
               disabled={loading}
             >
               <span className="button-icon">
-                <Icon name="plus" size={20} />
+                <AcUnitIcon></AcUnitIcon>
               </span>
               Nueva Canción
             </button>
@@ -505,24 +506,19 @@ const SongManagement: React.FC = () => {
                 <thead>
                   <tr>
                     <th>Nombre</th>
-                    <th>Álbum</th>
                     <th>Fecha Lanzamiento</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
                   {paginatedSongs.map((song) => {
-                    const albumName = getAlbumNameFromSong(song);
+                    // const albumName = getAlbumNameFromSong(song);
                     return (
                       <tr key={song.id} className="song-row">
                         <td className="song-name-cell">
                           <div className="song-name">{song.name}</div>
                         </td>
-                        <td>
-                          <div className="detail-value">
-                            {albumName}
-                          </div>
-                        </td>
+                        
                         <td>
                           <div className="detail-value">
                             {formatDate(song.fecha.toString())}
@@ -625,7 +621,7 @@ const SongManagement: React.FC = () => {
                   />
                 </div>
 
-                <div className="form-group">
+                {/* <div className="form-group">
                   <label className="form-label">Álbum *</label>
                   <select
                     className="form-select"
@@ -645,7 +641,7 @@ const SongManagement: React.FC = () => {
                       </option>
                     ))}
                   </select>
-                </div>
+                </div> */}
               </div>
 
               <div className="modal-actions">
@@ -719,7 +715,7 @@ const SongManagement: React.FC = () => {
                 />
               </div>
 
-              <div className="form-group">
+              {/* <div className="form-group">
                 <label className="form-label">Álbum *</label>
                 <select
                   className="form-select"
@@ -739,7 +735,7 @@ const SongManagement: React.FC = () => {
                     </option>
                   ))}
                 </select>
-              </div>
+              </div> */}
             </div>
 
             <div className="modal-actions">

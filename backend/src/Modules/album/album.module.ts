@@ -1,7 +1,7 @@
 import { AlbumDtoMapper } from '@application/DTOs/dtoMappers/album.dto.mapper';
 import { BaseDtoMapper } from '@application/DTOs/dtoMappers/DtoMapper';
 import { AlbumService } from '@application/services/album/album.service';
-import { ALBUM_REPOSITORY } from '@domain/Repositories/IAlbumRepository';
+import { IAlbumRepository } from '@domain/Repositories/IAlbumRepository';
 import { AlbumEntity } from '@infrastructure/database/Entities/AlbumEntity';
 import { AlbumMapper } from '@infrastructure/database/Mappers/AlbumMapper';
 import { IMapper } from '@infrastructure/database/Mappers/IMapper';
@@ -19,7 +19,7 @@ import { AlbumController } from '@presentation/Controllers/album/album.controlle
           
     AlbumMapper,
     {
-      provide:ALBUM_REPOSITORY,    
+      provide: IAlbumRepository,    
       useClass: AlbumRepository 
     },    
     AlbumDtoMapper,
@@ -27,7 +27,7 @@ import { AlbumController } from '@presentation/Controllers/album/album.controlle
     AlbumService
   ],
   exports: [
-      ALBUM_REPOSITORY
+      IAlbumRepository
   ]
 })
 export class AlbumModule {}

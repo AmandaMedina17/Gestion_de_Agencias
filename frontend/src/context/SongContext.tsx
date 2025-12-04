@@ -17,7 +17,7 @@ interface SongContextType {
   updateSong: (id: string, updateData: { 
     nameSong: string; 
     idAlbum: string;
-    releaseDate?: Date;
+    releaseDate: Date;
   }) => Promise<void>;
   clearError: () => void;
 }
@@ -98,7 +98,7 @@ export const SongProvider: React.FC<SongProviderProps> = ({ children }) => {
   const updateSong = async (id: string, updateData: { 
     nameSong: string; 
     idAlbum: string;
-    releaseDate?: Date;
+    releaseDate: Date;
   }) => {
     setLoading(true);
     setError(null);

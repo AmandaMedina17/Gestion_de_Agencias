@@ -1,7 +1,8 @@
 import { BaseDtoMapper } from '@application/DTOs/dtoMappers/DtoMapper';
 import { SongDtoMapper } from '@application/DTOs/dtoMappers/song.dto.mapper';
 import { SongService } from '@application/services/song/song.service';
-import { SONG_REPOSITORY } from '@domain/Repositories/ISongRepository';
+import { CreateSongUseCase } from '@application/UseCases/create_song.use-case';
+import { ISongRepository } from '@domain/Repositories/ISongRepository';
 import { SongEntity } from '@infrastructure/database/Entities/SongEntity';
 import { IMapper } from '@infrastructure/database/Mappers/IMapper';
 import { SongMapper } from '@infrastructure/database/Mappers/SongMapper';
@@ -9,26 +10,28 @@ import { SongRepository } from '@infrastructure/database/Repositories/SongReposi
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SongController } from '@presentation/Controllers/song/song.controller';
+import { AlbumModule } from '../album/album.module';
+
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([SongEntity])
+    TypeOrmModule.forFeature([SongEntity]),
+    AlbumModule
   ],
   controllers: [SongController],
   providers: [
          
     SongMapper,
     {
-      provide:SONG_REPOSITORY,    
+      provide: ISongRepository,    
       useClass: SongRepository 
     },
-    
     SongDtoMapper,
-
-    SongService
+    SongService,
+    CreateSongUseCase,
   ],
   exports: [
-      SONG_REPOSITORY
+      ISongRepository
   ]
 })
 export class SongModule {}

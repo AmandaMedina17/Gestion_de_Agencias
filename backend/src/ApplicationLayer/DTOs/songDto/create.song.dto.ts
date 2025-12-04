@@ -14,5 +14,5 @@ export class CreateSongDto {
    @IsOptional()
    @IsDate()
    @Transform(({ value }) => new Date(value))
-   releaseDate? : Date
+   releaseDate! : Date
 }
