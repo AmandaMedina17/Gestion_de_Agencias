@@ -5,6 +5,10 @@ import { BaseRepository } from './BaseRepositoryImpl';
 import { Artist} from '@domain/Entities/Artist';
 import { ArtistEntity } from '../Entities/ArtistEntity';
 import { IMapper } from '../Mappers/IMapper';
+import { Contract } from '@domain/Entities/Contract';
+import { ContractEntity } from '../Entities/ContractEntity';
+import { ContractMapper } from '../Mappers/ContractMapper';
+import { ArtistMapper } from '../Mappers/ArtistMapper';
 
 @Injectable()
 export class ArtistRepository
@@ -13,7 +17,10 @@ export class ArtistRepository
   constructor(
     @InjectRepository(ArtistEntity)
     repository: Repository<ArtistEntity>,
-    mapper: IMapper<Artist, ArtistEntity>,
+    mapper: ArtistMapper
+    // @InjectRepository(ContractEntity)
+    // private readonly contractRepo: Repository<ContractEntity>,
+    // private readonly contractMapper: ContractMapper,
   ) {
     super(repository, mapper);
   }
