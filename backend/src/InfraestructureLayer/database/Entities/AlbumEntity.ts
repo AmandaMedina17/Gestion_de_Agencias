@@ -53,6 +53,9 @@ export class AlbumEntity {
   @OneToMany(() => AwardEntity, (award: AwardEntity) => award.album)
   awards!: AwardEntity[];
 
-  @OneToMany(() => SongEntity, (song) => song.album) 
+  @OneToMany(() => SongEntity, (song) => song.album, {
+    onDelete : 'CASCADE',
+    onUpdate : 'CASCADE'
+  }) 
   songs!: SongEntity[];
 }
