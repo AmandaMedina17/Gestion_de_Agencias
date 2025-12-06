@@ -4,6 +4,7 @@ import { CreateAlbumDto } from "../albumDto/create.album.dto";
 import { ResponseAlbumDto } from "../albumDto/response.album.dto";
 import { error } from "console";
 import { Injectable } from "@nestjs/common";
+import { Song } from "@domain/Entities/Song";
 
 @Injectable()
 export class AlbumDtoMapper extends BaseDtoMapper<Album,CreateAlbumDto,ResponseAlbumDto>{

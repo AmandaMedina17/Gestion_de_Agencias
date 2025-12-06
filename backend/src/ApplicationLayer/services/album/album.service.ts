@@ -1,5 +1,4 @@
-import { BaseDtoMapper } from '@application/DTOs/dtoMappers/DtoMapper';
-import { ALBUM_REPOSITORY, IAlbumRepository } from '@domain/Repositories/IAlbumRepository';
+import { IAlbumRepository } from '@domain/Repositories/IAlbumRepository';
 import { Inject, Injectable } from '@nestjs/common';
 import { BaseService } from '../base.service';
 import { Album } from '@domain/Entities/Album';
@@ -11,7 +10,7 @@ import { AlbumDtoMapper } from '@application/DTOs/dtoMappers/album.dto.mapper';
 @Injectable()
 export class AlbumService extends BaseService<Album,CreateAlbumDto,ResponseAlbumDto,UpdateAlbumDto>{
     constructor(
-        @Inject(ALBUM_REPOSITORY)
+        @Inject(IAlbumRepository)
         private readonly albumRepository: IAlbumRepository,
         private readonly albumDtoMapper: AlbumDtoMapper
     ) {

@@ -681,7 +681,6 @@ const AlbumManagement: React.FC = () => {
                         releaseDate: e.target.value,
                       })
                     }
-                    max={getTodayDate()}
                   />
                 </div>
               </div>
@@ -788,7 +787,6 @@ const AlbumManagement: React.FC = () => {
                       releaseDate: e.target.value,
                     })
                   }
-                  max={getTodayDate()}
                 />
               </div>
 

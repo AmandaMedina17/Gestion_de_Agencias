@@ -13,9 +13,15 @@ export class SongEntity{
     @Column({ name: 'entry_date' })
     entryDate!: Date;
 
-    @ManyToOne(() => AlbumEntity, album => album.songs)
+    @Column({name : 'album_id'})
+    albumId!:  string;
+
+    @ManyToOne(() => AlbumEntity, album => album.songs,{
+        onDelete : 'CASCADE',
+        onUpdate : 'CASCADE'
+    })
     @JoinColumn({ name: 'album_id' })
-    album!: string;
+    album!: AlbumEntity;
 
     @OneToMany(() => SongBillboardEntity, (songBillboards: SongBillboardEntity) => songBillboards.song)
     songBillboards!: SongBillboardEntity[];

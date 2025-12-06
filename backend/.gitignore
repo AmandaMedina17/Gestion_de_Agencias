@@ -24,4 +24,4 @@ logs/
 hashes/
 
 #migrations
-./src/InfraestructureLayer/database/Migrations
+/src/InfraestructureLayer/database/Migrations

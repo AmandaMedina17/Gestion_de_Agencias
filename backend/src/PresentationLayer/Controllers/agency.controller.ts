@@ -39,4 +39,24 @@ export class AgencyController {
   remove(@Param('id') id: string) {
     return this.agencyService.remove(id);
   }
+  @Get(':id/artists')
+  getAgencyArtists(@Param('id') id: string) {
+    return this.agencyService.getAgencyArtists(id);
+  }
+
+  @Get(':id/apprentices')
+  getAgencyApprentices(@Param('id') id: string) {
+    return this.agencyService.getAgencyApprentices(id);
+  }
+
+  // @Get(':id/groups')
+  // getAgencyGroups(@Param('id') id: string) {
+  //   return this.agencyService.getAgencyGroups(id);
+  // }
+
+  // @Get(':id/activeArtists')
+  // getActiveArtistsWithGroup(@Param('id') id: string){
+  //   return this.agencyService.getAgencyActiveArtistAndGruopInfo(id);
+  // }
+
 }

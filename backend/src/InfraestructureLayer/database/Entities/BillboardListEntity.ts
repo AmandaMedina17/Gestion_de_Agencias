@@ -21,21 +21,7 @@ export class BillboardListEntity{
 
     @Column({ name: 'end_list'})
     endList! : number;
-
-    @Column({
-        type : 'enum',
-        enum : BillboardListScope
-    })
-
-    @Column({
-        type : 'enum',
-        enum : BillboardListScope
-    })
-    scope!: BillboardListScope;
-
-    @Column({ name: 'end_list'})
-    endList! : number;
-
+    
     //Relación OneToMany con la entidad de unión
     @OneToMany(() => SongBillboardEntity, (songBillboard: SongBillboardEntity) => songBillboard.billboardList)
     songBillboards!: SongBillboardEntity[];

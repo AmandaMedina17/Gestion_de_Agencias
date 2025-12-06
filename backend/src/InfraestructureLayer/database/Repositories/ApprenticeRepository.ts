@@ -17,7 +17,7 @@ export class ApprenticeRepository
   constructor(
     @InjectRepository(ApprenticeEntity)
     repository: Repository<ApprenticeEntity>,
-    mapper: IMapper<Apprentice, ApprenticeEntity>,
+    mapper: ApprenticeMapper
   ) {
     super(repository, mapper);
   }

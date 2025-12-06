@@ -5,18 +5,18 @@ import { Artist } from "@domain/Entities/Artist";
 import { Injectable, Inject } from "@nestjs/common";
 import { BaseService } from "./base.service";
 import { IArtistRepository } from "@domain/Repositories/IArtistRepository";
-import { BaseDtoMapper } from "@application/DTOs/dtoMappers/DtoMapper";
-import { ApprenticeRepository } from "../../InfraestructureLayer/database/Repositories/ApprenticeRepository";
+// import { GetArtistContractsUseCase } from '../UseCases/get_artist_contracts.use-case';
+import { ContractDtoMapper } from '../DTOs/dtoMappers/contract.dtoMapper';
+import { ContractResponseDto } from "@application/DTOs/contractDto/response-contract.dto";
+import { ArtistDtoMapper } from "@application/DTOs/dtoMappers/artist.dto";
 
 @Injectable()
 export class ArtistService extends BaseService<Artist, CreateArtistDto, ArtistResponseDto, UpdateArtistDto>{
     constructor(
         @Inject(IArtistRepository)
         private readonly artistRepository: IArtistRepository,
-        private readonly artistDtoMapper: BaseDtoMapper<Artist, CreateArtistDto, ArtistResponseDto>
+        private readonly artistDtoMapper: ArtistDtoMapper,
     ){
         super(artistRepository, artistDtoMapper)
     }
-
-    
 }

@@ -9,25 +9,25 @@ import { BaseDtoMapper } from "@application/DTOs/dtoMappers/DtoMapper";
 import { ArtistDtoMapper } from "@application/DTOs/dtoMappers/artist.dto";
 import { ArtistController } from "@presentation/Controllers/artist.controller";
 import { ArtistService } from "../ApplicationLayer/services/artist.service";
+import { ContractEntity } from "@infrastructure/database/Entities/ContractEntity";
+import { ContractMapper } from "@infrastructure/database/Mappers/ContractMapper";
+import { AgencyMapper } from "@infrastructure/database/Mappers/AgencyMapper";
+import { ContractDtoMapper } from "@application/DTOs/dtoMappers/contract.dtoMapper";
+import { AgencyDtoMapper } from "@application/DTOs/dtoMappers/agency.dtoMapper";
+import { ContractModule } from "./ContractModule";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ArtistEntity])],
+  imports: [TypeOrmModule.forFeature([ArtistEntity,ContractEntity])],
   controllers: [ArtistController],
   providers: [
-    {
-      provide: IMapper,
-      useClass: ArtistMapper,
-    },
+    ArtistMapper,
+    ArtistDtoMapper,
     {
       provide: IArtistRepository,
       useClass: ArtistRepository,
     },
-    {
-      provide: BaseDtoMapper,
-      useClass: ArtistDtoMapper,
-    },
     ArtistService,
   ],
-  exports: [IArtistRepository],
+  exports: [IArtistRepository, ArtistDtoMapper, ArtistMapper],
 })
 export class ArtistModule {}

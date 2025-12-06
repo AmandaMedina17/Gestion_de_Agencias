@@ -15,9 +15,9 @@ export enum UserRole {
 }
 
 export default function Login() {
-  const navigate = useNavigate() // <-- quitar si NO usas router
+  const navigate = useNavigate()
 
-  const { login, loading } = useAuth()  // <-- usamos el contexto
+  const { login, loading } = useAuth()  
   const [showPassword, setShowPassword] = useState(false)
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")

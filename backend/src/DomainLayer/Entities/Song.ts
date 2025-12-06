@@ -2,6 +2,7 @@ import { IUpdatable } from "@domain/UpdatableInterface";
 import { UpdateData } from "@domain/UpdateData";
 import { DateValue } from "@domain/Value Objects/Values";
 import { v4 as uuidv4 } from "uuid";
+import { Album } from "./Album";
 
 export class Song implements IUpdatable{
     constructor(
@@ -10,18 +11,7 @@ export class Song implements IUpdatable{
         private albumId: string,
         private songDate: Date,
     ){}
-    update(updateDto: UpdateData): void {
-        
-        updateDto.nameSong = updateDto.nameSong != undefined ? updateDto.nameSong : this.nameSong
-        updateDto.albumId = updateDto.albumId != undefined ? updateDto.albumId : this.albumId
-        updateDto.releaseDate = updateDto.releaseDate != undefined ? updateDto.releaseDate : this.songDate
-        
-        const albumUpadte = Song.create(updateDto.nameSong,updateDto.albumId,updateDto.releaseDate)
-                
-        this.nameSong = albumUpadte.nameSong 
-        this.albumId = albumUpadte.albumId 
-        this.songDate = albumUpadte.songDate   
-    }
+    update(updateDto: UpdateData): void {}
 
     static create(nameSong : string, albumId : string, songDate :Date): Song {
         
@@ -48,5 +38,13 @@ export class Song implements IUpdatable{
 
     public getDate() : Date{
         return this.songDate;
+    }
+
+    public setName(name? : string ):void {
+        this.nameSong = name != undefined ? name :  this.nameSong
+    }
+
+    public setAlbumId(idAlbum :string){
+        this.albumId = idAlbum;
     }
 }

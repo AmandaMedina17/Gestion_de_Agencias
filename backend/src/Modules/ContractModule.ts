@@ -11,40 +11,12 @@ import { ContractDtoMapper } from "@application/DTOs/dtoMappers/contract.dtoMapp
 import { ContractService} from "../ApplicationLayer/services/contract.service";
 import { CreateContractUseCase } from '@application/UseCases/create_contract.uso-case';
 import { UpdateContractStatusUseCase } from '@application/UseCases/update_contract_status.use-case';
-import { ArtistDtoMapper } from '@application/DTOs/dtoMappers/artist.dto';
-import { AgencyDtoMapper } from '@application/DTOs/dtoMappers/agency.dtoMapper';
 import { ArtistModule } from './ArtistModule';
 import { AgencyModule } from './AgencyModule';
-import { AgencyMapper } from '@infrastructure/database/Mappers/AgencyMapper';
-import { ArtistMapper } from '@infrastructure/database/Mappers/ArtistMapper';
 import { AgencyEntity } from '@infrastructure/database/Entities/AgencyEntity';
 import { ArtistEntity } from '@infrastructure/database/Entities/ArtistEntity';
 import { UpdateContractUseCase } from '@domain/UseCases/update_contract.use-case';
-// @Module({
-//   imports: [
-//     TypeOrmModule.forFeature([ContractEntity])
-//   ],
-//   controllers: [ContractController],
-//   providers: [
-//     {
-//       provide: IMapper, 
-//       useClass: ContractMapper 
-//     },
-//     {
-//       provide: IContractRepository,  
-//       useClass: ContractRepositoryImpl  
-//     },
-//     {
-//       provide: BaseDtoMapper,     
-//       useClass: ContractDtoMapper,
-//     },
-//     ContractService,
-//   ],
-//   exports: [
-//     IContractRepository 
-//   ]
-// })
-// export class ContractModule {}
+import { GetArtistContractsUseCase } from '@application/UseCases/get_artist_contracts.use-case';
 
 @Module({
   imports: [
@@ -55,29 +27,21 @@ import { UpdateContractUseCase } from '@domain/UseCases/update_contract.use-case
   controllers: [ContractController],
   providers: [
     ContractMapper,
-    AgencyMapper,
-    ArtistMapper,
-    
+    ContractDtoMapper,
     {
       provide: IContractRepository,  
       useClass: ContractRepositoryImpl  
     },
-      
-    {
-      provide: BaseDtoMapper,     
-      useClass: ContractDtoMapper,
-    },
-    
-    ArtistDtoMapper,
-    AgencyDtoMapper,
     CreateContractUseCase,
     UpdateContractStatusUseCase,
     UpdateContractUseCase,
-
     ContractService,
+    GetArtistContractsUseCase,
   ],
   exports: [
-    IContractRepository 
+    IContractRepository,
+    ContractDtoMapper,
+    ContractMapper
   ]
 })
 export class ContractModule {}
