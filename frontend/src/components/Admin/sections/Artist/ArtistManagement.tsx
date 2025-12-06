@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useArtist } from "../../../../context/ArtistContext";
 import { useApprentice } from "../../../../context/ApprenticeContext";
-import { Icon } from "../../../icons";
-import './ArtistStyle.css'
+import GenericTable, { Column } from "../../../ui/datatable";
+import CreateModal, { FormField } from "../../../ui/reutilizables/CreateModal";
+import EditModal from "../../../ui/reutilizables/EditModal";
+import DeleteModal from "../../../ui/reutilizables/DeleteModal";
+import './ArtistStyle.css';
+import { ArtistResponseDto } from "../../../../../../backend/src/ApplicationLayer/DTOs/artistDto/response-artist.dto";
 
-export enum ArtistStatus{
-    ACTIVO = "ACTIVO",
-    EN_PAUSA = "EN_PAUSA",
-    INACTIVO = "INACTIVO"
+export enum ArtistStatus {
+  ACTIVO = "ACTIVO",
+  EN_PAUSA = "EN_PAUSA",
+  INACTIVO = "INACTIVO",
 }
 
 const ArtistManagement: React.FC = () => {
@@ -24,884 +28,477 @@ const ArtistManagement: React.FC = () => {
 
   const { apprentices, fetchApprentices } = useApprentice();
 
-  // Estados principales
-  const [filter, setFilter] = useState("");
-  const [sortBy, setSortBy] = useState<"stageName" | "birthDate" | "transitionDate" | "status">("stageName");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [editingArtist, setEditingArtist] = useState<any>(null);
-  const [deletingArtist, setDeletingArtist] = useState<any>(null);
-  const [message, setMessage] = useState<{
-    type: "success" | "error";
-    text: string;
+  const [notification, setNotification] = useState<{
+    type: "success" | "error" | "info" | "warning";
+    title?: string;
+    message: string;
   } | null>(null);
-  const [dataLoaded, setDataLoaded] = useState(false);
 
-    // PAGINACIÓN
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 30;
-  
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingArtist, setEditingArtist] = useState<ArtistResponseDto | null>(null);
+  const [deletingArtist, setDeletingArtist] = useState<ArtistResponseDto | null>(null);
 
-  // Estados del formulario
-  const [newArtist, setNewArtist] = useState({
-    stageName: "",
-    birthDate: "",
-    transitionDate: "",
-    status: ArtistStatus.ACTIVO,
-    groupId: "",
-    apprenticeId: "",
-  });
-
-  const [editArtist, setEditArtist] = useState({
-    stageName: "",
-    birthDate: "",
-    transitionDate: "",
-    status: ArtistStatus.ACTIVO,
-    groupId: "",
-    apprenticeId: "",
-  });
-
-  // Cargar datos iniciales
   useEffect(() => {
-    const loadInitialData = async () => {
-      if (!dataLoaded) {
-        clearError();
-        try {
-          await fetchArtists();
-          await fetchApprentices();
-          setDataLoaded(true);
-        } catch (err) {
-          console.error("Error loading initial data:", err);
-        }
+    const loadData = async () => {
+      try {
+        await Promise.all([
+          fetchArtists(),
+          fetchApprentices()
+        ]);
+      } catch (err) {
+        console.error("Error loading data:", err);
       }
     };
+    loadData();
+  }, []);
 
-    loadInitialData();
-  }, [dataLoaded]);
-
-  // Filtrar y ordenar artistas
-  const filteredAndSortedArtists = React.useMemo(() => {
-    if (!dataLoaded) return [];
-
-    let filtered = artists;
-
-    // Aplicar filtro por nombre artístico
-    if (filter) {
-      filtered = artists.filter((artist) =>
-        artist.stageName.toLowerCase().includes(filter.toLowerCase())
-      );
+  // Obtener nombre del aprendiz
+  const getApprenticeName = (artist: ArtistResponseDto) => {
+    if (artist.apprenticeId && typeof artist.apprenticeId === 'object') {
+      return artist.stageName;
     }
-
-    // Aplicar ordenamiento
-    const sorted = [...filtered].sort((a, b) => {
-      let aValue, bValue;
-
-      switch (sortBy) {
-        case "stageName":
-          aValue = a.stageName;
-          bValue = b.stageName;
-          break;
-        case "birthDate":
-          aValue = new Date(a.birthday);
-          bValue = new Date(b.birthday);
-          break;
-        case "transitionDate":
-          aValue = new Date(a.transitionDate);
-          bValue = new Date(b.transitionDate);
-          break;
-        case "status":
-          aValue = a.status;
-          bValue = b.status;
-          break;
-        default:
-          aValue = a.stageName;
-          bValue = b.stageName;
-      }
-
-      if (sortOrder === "asc") {
-        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-      } else {
-        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
-      }
-    });
-
-    return sorted;
-  }, [artists, filter, sortBy, sortOrder, dataLoaded]);
-
-  // PAGINACIÓN: calcular páginas y slice
-  const totalPages = Math.ceil(filteredAndSortedArtists.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedArtists = filteredAndSortedArtists.slice(startIndex, startIndex + itemsPerPage);
-
-  // Obtener nombre del aprendiz por ID
-  const getApprenticeName = (apprenticeId: string) => {
-    if (!apprenticeId) return "No asignado";
-    const apprentice = apprentices.find(a => a.id === apprenticeId);
-    return apprentice ? apprentice.fullName : "No encontrado";
+    const apprentice = apprentices.find(a => a.id === artist.apprenticeId);
+    return apprentice ? apprentice.fullName : "No asignado";
   };
 
-  // Manejar creación de artista
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    clearError();
-    setMessage(null);
+  // Funciones auxiliares para mostrar notificaciones
+  const showNotification = (type: "success" | "error" | "info" | "warning", title: string, message: string) => {
+    setNotification({ type, title, message });
+  };
 
-    if (!newArtist.stageName.trim()) {
-      setMessage({
-        type: "error",
-        text: "Por favor, complete el nombre artístico",
-      });
-      return;
+  const showSuccess = (title: string, message: string) => {
+    showNotification("success", title, message);
+  };
+
+  const showError = (title: string, message: string) => {
+    showNotification("error", title, message);
+  };
+
+  const showCreateSuccess = () => {
+    showSuccess("¡Artista Creado!", "El artista ha sido creado exitosamente.");
+  };
+
+  const showCreateError = (errorMessage?: string) => {
+    showError("Error al Crear", errorMessage || "No se pudo crear el artista.");
+  };
+
+  const showUpdateSuccess = () => {
+    showSuccess("¡Artista Actualizado!", "El artista ha sido actualizado exitosamente.");
+  };
+
+  const showUpdateError = (errorMessage?: string) => {
+    showError("Error al Actualizar", errorMessage || "No se pudo actualizar el artista.");
+  };
+
+  const showDeleteSuccess = () => {
+    showSuccess("¡Artista Eliminado!", "El artista ha sido eliminado exitosamente.");
+  };
+
+  const showDeleteError = (errorMessage?: string) => {
+    showError("Error al Eliminar", errorMessage || "No se pudo eliminar el artista.");
+  };
+
+  // Definir campos del formulario de artista
+  const artistFields: FormField[] = [
+    {
+      name: "stageName",
+      label: "Nombre artístico",
+      type: "text",
+      placeholder: "Ej: Bad Bunny",
+      required: true,
+      min: 2,
+      max: 100,
+      validate: (value) => {
+        if (!value.trim()) return "El nombre artístico es requerido";
+        if (value.length < 2) return "Debe tener al menos 2 caracteres";
+        if (value.length > 100) return "No puede exceder 100 caracteres";
+        return null;
+      }
+    },
+    {
+      name: "birthday",
+      label: "Fecha de nacimiento",
+      type: "date",
+      required: true,
+      validate: (value) => {
+        if (!value) return "La fecha de nacimiento es requerida";
+        const date = new Date(value);
+        if (date > new Date()) return "La fecha no puede ser futura";
+        return null;
+      }
+    },
+    {
+      name: "transitionDate",
+      label: "Fecha de transición",
+      type: "date",
+      required: true,
+      validate: (value) => {
+        if (!value) return "La fecha de transición es requerida";
+        const date = new Date(value);
+        if (date > new Date()) return "La fecha no puede ser futura";
+        return null;
+      }
+    },
+    {
+      name: "status",
+      label: "Estado",
+      type: "autocomplete",
+      required: true,
+      options: [
+        { value: ArtistStatus.ACTIVO, label: "Activo" },
+        { value: ArtistStatus.EN_PAUSA, label: "En Pausa" },
+        { value: ArtistStatus.INACTIVO, label: "Inactivo" }
+      ]
+    },
+    {
+      name: "groupId",
+      label: "ID de Grupo (opcional)",
+      type: "text",
+      placeholder: "Ej: GRP-001",
+      required: false,
+      validate: (value) => {
+        if (value && value.length > 50) return "No puede exceder 50 caracteres";
+        return null;
+      }
+    },
+    {
+      name: "apprenticeId",
+      label: "Aprendiz Asociado",
+      type: "autocomplete",
+      required: true,
+      options: apprentices.map(apprentice => ({
+        value: apprentice.id,
+        label: `${apprentice.fullName}`
+      }))
     }
+  ];
 
+  const artistEditFields: FormField[] = [
+    {
+      name: "stageName",
+      label: "Nombre artístico",
+      type: "text",
+      required: true,
+      min: 2,
+      max: 100,
+      validate: (value) => {
+        if (!value.trim()) return "El nombre artístico es requerido";
+        if (value.length < 2) return "Debe tener al menos 2 caracteres";
+        return null;
+      }
+    },
+    {
+      name: "birthday",
+      label: "Fecha de nacimiento",
+      type: "date",
+      required: true,
+      validate: (value) => {
+        if (!value) return "La fecha de nacimiento es requerida";
+        const date = new Date(value);
+        if (date > new Date()) return "La fecha no puede ser futura";
+        return null;
+      }
+    },
+    {
+      name: "transitionDate",
+      label: "Fecha de transición",
+      type: "date",
+      required: true,
+      validate: (value) => {
+        if (!value) return "La fecha de transición es requerida";
+        const date = new Date(value);
+        if (date > new Date()) return "La fecha no puede ser futura";
+        return null;
+      }
+    },
+    {
+      name: "status",
+      label: "Estado",
+      type: "autocomplete",
+      required: true,
+      options: [
+        { value: ArtistStatus.ACTIVO, label: "Activo" },
+        { value: ArtistStatus.EN_PAUSA, label: "En Pausa" },
+        { value: ArtistStatus.INACTIVO, label: "Inactivo" }
+      ]
+    },
+    {
+      name: "groupId",
+      label: "ID de Grupo (opcional)",
+      type: "text",
+      required: false
+    }
+  ];
+
+  // Datos iniciales para creación
+  const initialCreateData = {
+    stageName: "",
+    birthday: "",
+    transitionDate: "",
+    status: ArtistStatus.ACTIVO,
+    groupId: "",
+    apprenticeId: ""
+  };
+
+  // Manejar creación
+  const handleCreate = async (data: Record<string, any>) => {
     try {
       await createArtist({
-        ...newArtist,
-        birthday: new Date(newArtist.birthDate),
-        transitionDate: new Date(newArtist.transitionDate),
-        
-        
+        stageName: data.stageName.trim(),
+        birthday: new Date(data.birthday),
+        transitionDate: new Date(data.transitionDate),
+        status: data.status,
+        groupId: data.groupId.trim() || undefined,
+        apprenticeId: data.apprenticeId
       });
 
-      setMessage({
-        type: "success",
-        text: `Artista "${newArtist.stageName}" creado exitosamente`,
-      });
-
-      // Resetear formulario
-      setNewArtist({
-        stageName: "",
-        birthDate: "",
-        transitionDate: "",
-        status: ArtistStatus.ACTIVO,
-        groupId: "",
-        apprenticeId: "",
-      });
-
-      setShowCreateForm(false);
+      showCreateSuccess();
+      setShowCreateModal(false);
       await fetchArtists();
-      setTimeout(() => setMessage(null), 5000);
+
     } catch (err: any) {
-      setMessage({
-        type: "error",
-        text: err.message || "Error al crear el artista",
-      });
+      showCreateError(err.message);
     }
   };
 
-  // Manejar actualización de artista
-  const handleUpdate = async () => {
-    if (!editingArtist || !editArtist.stageName.trim()) {
-      return;
-    }
-
+  // Manejar actualización
+  const handleUpdate = async (id: string | number, data: Record<string, any>) => {
     try {
-      await updateArtist(editingArtist.id, {
-        ...editArtist,
-        birthday: new Date(editArtist.birthDate),
-        transitionDate: new Date(editArtist.transitionDate),
+      await updateArtist(id as string, {
+        stageName: data.stageName.trim(),
+        birthday: new Date(data.birthday),
+        transitionDate: new Date(data.transitionDate),
+        status: data.status,
+        groupId: data.groupId.trim() || undefined,
+        apprenticeId: data.apprenticeId
       });
 
-      setMessage({
-        type: "success",
-        text: `Artista actualizado exitosamente`,
-      });
-
+      showUpdateSuccess();
       setEditingArtist(null);
-      setEditArtist({
-        stageName: "",
-        birthDate: "",
-        transitionDate: "",
-        status: ArtistStatus.ACTIVO,
-        groupId: "",
-        apprenticeId: "",
-      });
-
       await fetchArtists();
-      setTimeout(() => setMessage(null), 5000);
     } catch (err: any) {
-      setMessage({
-        type: "error",
-        text: err.message || "Error al actualizar el artista",
-      });
+      showUpdateError(err.message);
     }
   };
 
-  // Manejar eliminación de artista
-  const handleDelete = async () => {
-    if (!deletingArtist) {
-      return;
-    }
+  // Manejar eliminación
+  const handleDelete = async (id: string | number) => {
+    if (!deletingArtist) return;
 
     try {
-      await deleteArtist(deletingArtist.id);
-      setMessage({
-        type: "success",
-        text: `Artista "${deletingArtist.stageName}" eliminado exitosamente`,
-      });
+      await deleteArtist(id as string);
+      showDeleteSuccess();
       setDeletingArtist(null);
       await fetchArtists();
-      setTimeout(() => setMessage(null), 5000);
     } catch (err: any) {
-      setMessage({
-        type: "error",
-        text: err.message || "Error al eliminar el artista",
-      });
+      showDeleteError(err.message);
     }
   };
 
-  // Recargar datos manualmente
-  const handleReload = async () => {
-    clearError();
-    try {
-      await fetchArtists();
-      await fetchApprentices();
-      setMessage({
-        type: "success",
-        text: "Datos actualizados correctamente",
-      });
-      setTimeout(() => setMessage(null), 3000);
-    } catch (err: any) {
-      setMessage({
-        type: "error",
-        text: err.message || "Error al recargar los datos",
-      });
-    }
+  // Funciones auxiliares
+  const formatDate = (date: Date | string) => {
+    if (!date) return "N/A";
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    dateObj.setDate(dateObj.getDate() + 1);
+    return dateObj.toLocaleDateString("es-ES");
   };
 
-  // Iniciar edición
-  const startEdit = (artist: any) => {
-    setEditingArtist(artist);
-    setEditArtist({
-      stageName: artist.stageName,
-      birthDate: artist.birthday ? artist.birthday.split("T")[0] : "",
-      transitionDate: artist.transitionDate ? artist.transitionDate.split("T")[0] : "",
-      status: artist.status,
-      groupId: artist.groupId || "",
-      apprenticeId: artist.apprenticeId || "",
-    });
-  };
-
-  // Iniciar eliminación
-  const startDelete = (artist: any) => {
-    setDeletingArtist(artist);
-  };
-
-  // Limpiar filtro
-  const handleClearFilter = () => {
-    setFilter("");
-  };
-
-  // Alternar ordenamiento
-  const toggleSortOrder = () => {
-    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-  };
-
-  // Formatear fecha para mostrar
-  const formatDate = (dateString: string) => {
-    if (!dateString) return "N/A";
-  
-  const date = new Date(dateString);
-  // Sumar un día
-  date.setDate(date.getDate() + 1);
-  
-  return date.toLocaleDateString("es-ES");
-    };
-
-  // Traducir estados
-    const getStatusText = (status: ArtistStatus) => {
+  const getStatusText = (status: ArtistStatus) => {
     const statusMap = {
       [ArtistStatus.ACTIVO]: "Activo",
-      [ArtistStatus.INACTIVO]: "Inactivo",
       [ArtistStatus.EN_PAUSA]: "En Pausa",
+      [ArtistStatus.INACTIVO]: "Inactivo",
     };
     return statusMap[status] || status;
   };
 
+  const getStatusClass = (status: ArtistStatus) => {
+    const statusClassMap = {
+      [ArtistStatus.ACTIVO]: "active",
+      [ArtistStatus.EN_PAUSA]: "paused",
+      [ArtistStatus.INACTIVO]: "inactive",
+    };
+    return statusClassMap[status] || "";
+  };
+
+  // Calcular edad
+  const calculateAge = (birthday: Date | string) => {
+    if (!birthday) return "N/A";
+    const birthDate = typeof birthday === 'string' ? new Date(birthday) : birthday;
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  };
+
+  // Definir columnas para la tabla
+  const columns: Column<ArtistResponseDto>[] = [
+    {
+      key: "stageName",
+      title: "Nombre Artístico",
+      sortable: true,
+      width: "18%",
+      align: "center"
+    },
+    {
+      key: "birthday",
+      title: "Fecha Nacimiento",
+      sortable: true,
+      width: "14%",
+      align: "center",
+      render: (item) => formatDate(item.birthday)
+    },
+    {
+      key: "age",
+      title: "Edad",
+      sortable: false,
+      width: "8%",
+      align: "center",
+      render: (item) => calculateAge(item.birthday)
+    },
+    {
+      key: "transitionDate",
+      title: "Fecha Transición",
+      sortable: true,
+      width: "14%",
+      align: "center",
+      render: (item) => formatDate(item.transitionDate)
+    },
+    {
+      key: "status",
+      title: "Estado",
+      sortable: true,
+      width: "12%",
+      align: "center",
+      render: (item) => (
+        <span className={`status-badge status-${getStatusClass(item.status)}`}>
+          {getStatusText(item.status)}
+        </span>
+      )
+    },
+    {
+      key: "group",
+      title: "Grupo",
+      width: "10%",
+      align: "center",
+      render: (item) => item.groupId || "N/A"
+    },
+    {
+      key: "apprentice.fullName",
+      title: "Aprendiz Asociado",
+      width: "24%",
+      align: "center",
+      render: (item) => getApprenticeName(item)
+    }
+  ];
+
+  // Función para renderizar detalles en modal de eliminación
+  const renderArtistDetails = (artist: ArtistResponseDto) => {
+    return (
+      <div className="artist-details">
+        <div className="detail-item">
+          <strong>Nombre Artístico:</strong> <span>{artist.stageName}</span>
+        </div>
+        <div className="detail-item">
+          <strong>Fecha Nacimiento:</strong> <span>{formatDate(artist.birthday)}</span>
+        </div>
+        <div className="detail-item">
+          <strong>Edad:</strong> <span>{calculateAge(artist.birthday)} años</span>
+        </div>
+        <div className="detail-item">
+          <strong>Fecha Transición:</strong> <span>{formatDate(artist.transitionDate)}</span>
+        </div>
+        <div className="detail-item">
+          <strong>Estado:</strong> <span>{getStatusText(artist.status)}</span>
+        </div>
+        <div className="detail-item">
+          <strong>Grupo:</strong> <span>{artist.groupId || "No asignado"}</span>
+        </div>
+        <div className="detail-item">
+          <strong>Aprendiz Asociado:</strong> <span>{getApprenticeName(artist)}</span>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <section id="artist_management" className="content-section active">
-      <div className="profile-header">
-        <div className="profile-info">
-          <h1>Gestión de Artistas</h1>
-          <p className="section-description">
-            Administre todos los artistas del sistema 
-          </p>
-        </div>
-      </div>
+      <GenericTable<ArtistResponseDto>
+        title="Gestión de Artistas"
+        description="Administre todos los artistas del sistema"
+        data={artists}
+        columns={columns}
+        loading={loading}
+        onReload={() => {
+          fetchArtists();
+          fetchApprentices();
+        }}
+        showCreateForm={showCreateModal}
+        onShowCreateChange={setShowCreateModal}
+        editingItem={editingArtist}
+        onEditingChange={setEditingArtist}
+        deletingItem={deletingArtist}
+        onDeletingChange={setDeletingArtist}
+        itemsPerPage={30}
+        className="artist-table"
+        notification={notification || undefined}
+        onNotificationClose={() => setNotification(null)}
+      />
 
-      <div className="detail-card">
-        {/* Mensajes globales */}
-        {message && (
-          <div className={`message ${message.type}`}>{message.text}</div>
-        )}
+      {/* Modal de creación usando componente genérico */}
+      {showCreateModal && (
+        <CreateModal
+          title="Crear Nuevo Artista"
+          fields={artistFields}
+          initialData={initialCreateData}
+          onSubmit={handleCreate}
+          onClose={() => setShowCreateModal(false)}
+          loading={loading}
+          submitText="Crear Artista"
+        />
+      )}
 
-        {error && <div className="message error">{error}</div>}
+      {/* Modal de edición usando componente genérico */}
+      {editingArtist && (
+        <EditModal
+          title="Editar Artista"
+          fields={artistEditFields}
+          initialData={{
+            stageName: editingArtist.stageName,
+            birthday: editingArtist.birthday ? 
+              (new Date(editingArtist.birthday).toISOString().split("T")[0]) : "",
+            transitionDate: editingArtist.transitionDate ? 
+              (new Date(editingArtist.transitionDate).toISOString().split("T")[0]) : "",
+            status: editingArtist.status,
+            groupId: editingArtist.groupId || ""
+          }}
+          itemId={editingArtist.id}
+          onSubmit={handleUpdate}
+          onClose={() => setEditingArtist(null)}
+          loading={loading}
+          submitText="Actualizar Artista"
+          
+        />
+      )}
 
-        {/* Controles superiores */}
-        <div className="manager-controls">
-          <div className="controls-left">
-            <button
-              className="create-button"
-              onClick={() => setShowCreateForm(true)}
-              disabled={loading}
-            >
-              <span className="button-icon"><Icon name="plus" size={20} /></span>
-              Nuevo Artista
-            </button>
-          </div>
-
-          <div className="controls-right">
-            <div className="filter-group">
-              <input
-                type="text"
-                className="form-input search-input"
-                placeholder="Filtrar por nombre artístico..."
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                disabled={loading}
-              />
-              {filter && (
-                <button
-                  className="clear-filter-btn"
-                  onClick={handleClearFilter}
-                  title="Limpiar filtro"
-                >
-                  ×
-                </button>
-              )}
-            </div>
-
-            <div className="sort-group">
-              <select
-                className="form-select sort-select"
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
-                disabled={loading}
-              >
-                <option value="stageName">Ordenar por nombre</option>
-                <option value="birthDate">Ordenar por fecha nacimiento</option>
-                <option value="transitionDate">Ordenar por fecha transición</option>
-                <option value="status">Ordenar por estado</option>
-              </select>
-              <button
-                className="sort-order-btn"
-                onClick={toggleSortOrder}
-                disabled={loading}
-                title={sortOrder === "asc" ? "Orden ascendente" : "Orden descendente"}
-              >
-                {sortOrder === "asc" ? <Icon name="down" size={18} /> : <Icon name="up" size={18} />}
-              </button>
-            </div>
-
-            <button
-              className="reload-button"
-              onClick={handleReload}
-              disabled={loading}
-              title="Recargar datos"
-            >
-              {loading ? "⟳" : "↻"}
-            </button>
-          </div>
-        </div>
-
-        {/* Contador de resultados */}
-        {dataLoaded && (
-          <div className="results-info">
-            <span className="results-count">
-              {filteredAndSortedArtists.length} de {artists.length} artistas
-            </span>
-            <span className="sort-info">
-              Orden:{" "}
-              {sortBy === "stageName"
-                ? "Nombre Artístico"
-                : sortBy === "birthDate"
-                ? "Fecha Nacimiento"
-                : sortBy === "transitionDate"
-                ? "Fecha Transición"
-                : "Estado"}{" "}
-              •{sortOrder === "asc" ? " Ascendente" : " Descendente"}
-            </span>
-          </div>
-        )}
-
-        {/* Grid de artistas */}
-        <div className="artists-grid">
-          {!dataLoaded ? (
-            <div className="loading-state">
-              <div className="loading-spinner"></div>
-              <p>Cargando artistas...</p>
-            </div>
-          ) : loading ? (
-            <div className="loading-state">
-              <div className="loading-spinner"></div>
-              <p>Actualizando...</p>
-            </div>
-          ) : filteredAndSortedArtists.length === 0 ? (
-            <div className="empty-state">
-              <div className="empty-icon">🎤</div>
-              <h3>No hay artistas</h3>
-              <p>
-                {filter
-                  ? `No se encontraron resultados para "${filter}"`
-                  : "Comience agregando el primer artista"}
-              </p>
-              {!filter && (
-                <button
-                  className="create-button"
-                  onClick={() => setShowCreateForm(true)}
-                >
-                  <span className="button-icon"><Icon name="plus" size={20} /></span>
-                  Crear Primer Artista
-                </button>
-              )}
-            </div>
-          ) : (
-            <div className="table-container">
-              <table className="artists-table">
-                <thead>
-                  <tr>
-                    <th>Nombre Artístico</th>
-                    <th>Fecha Nacimiento</th>
-                    <th>Fecha Transición</th>
-                    <th>Estado</th>
-                    <th>Grupo</th>
-                    <th>Aprendiz Asociado</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedArtists.map((artist) => (
-                    <tr key={artist.id} className="artist-row">
-                      <td className="artist-name-cell">
-                        <div className="artist-name">{artist.stageName}</div>
-                      </td>
-                      <td>
-                        <div className="detail-value">
-                          {formatDate(artist.birthday.toString())}
-                        </div>
-                      </td>
-                      <td>
-                        <div className="detail-value">
-                          {formatDate(artist.transitionDate.toString())}
-                        </div>
-                      </td>
-                      <td>
-                        <span
-                          className={`status-badge status-${artist.status.toLowerCase()}`}
-                        >
-                          {getStatusText(artist.status)}
-                        </span>
-                      </td>
-                      <td>
-                        <div className="detail-value">
-                          {artist.groupId || "No asignado"}
-                        </div>
-                      </td>
-                      <td>
-                        <div className="detail-value">
-                          {getApprenticeName(artist.apprenticeId)}
-                        </div>
-                      </td>
-                      <td>
-                        <div className="table-actions">
-                          <button
-                            className="action-btn edit-btn"
-                            onClick={() => startEdit(artist)}
-                            title="Editar artista"
-                            disabled={loading}
-                          >
-                            <Icon name="edit" size={18} />
-                          </button>
-                          <button
-                            className="action-btn delete-btn"
-                            onClick={() => startDelete(artist)}
-                            title="Eliminar artista"
-                            disabled={loading}
-                          >
-                            <Icon name="trash" size={18} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {/* PAGINACIÓN */}
-              {totalPages > 1 && (
-                <div className="pagination-container">
-                  <button
-                    className="pagination-btn"
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage(currentPage - 1)}
-                  >
-                    ◀ Anterior
-                  </button>
-
-                  <span className="pagination-info">
-                    Página {currentPage} de {totalPages}
-                  </span>
-
-                  <button
-                    className="pagination-btn"
-                    disabled={currentPage === totalPages}
-                    onClick={() => setCurrentPage(currentPage + 1)}
-                  >
-                    Siguiente ▶
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Modal de creación */}
-        {showCreateForm && (
-          <div className="modal-overlay artist-modal">
-            <div className="modal-content">
-              <h3>Crear Nuevo Artista</h3>
-              <form onSubmit={handleCreate}>
-                <div className="form-row">
-                  <div className="form-group">
-                    <label className="form-label">Nombre artístico *</label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      placeholder="Ej: Bad Bunny"
-                      value={newArtist.stageName}
-                      onChange={(e) =>
-                        setNewArtist({
-                          ...newArtist,
-                          stageName: e.target.value,
-                        })
-                      }
-                      required
-                      minLength={2}
-                      maxLength={100}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Fecha de nacimiento *</label>
-                    <input
-                      type="date"
-                      className="form-input"
-                      value={newArtist.birthDate}
-                      onChange={(e) =>
-                        setNewArtist({
-                          ...newArtist,
-                          birthDate: e.target.value,
-                        })
-                      }
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="form-row">
-                  <div className="form-group">
-                    <label className="form-label">Fecha de transición *</label>
-                    <input
-                      type="date"
-                      className="form-input"
-                      value={newArtist.transitionDate}
-                      onChange={(e) =>
-                        setNewArtist({
-                          ...newArtist,
-                          transitionDate: e.target.value,
-                        })
-                      }
-                      required
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Estado</label>
-                    <select
-                      className="form-select"
-                      value={newArtist.status}
-                      onChange={(e) =>
-                        setNewArtist({
-                          ...newArtist,
-                          status: e.target.value as ArtistStatus,
-                        })
-                      }
-                    >
-                      <option value={ArtistStatus.ACTIVO}>Activo</option>
-                      <option value={ArtistStatus.INACTIVO}>Inactivo</option>
-                      <option value={ArtistStatus.EN_PAUSA}>En Pausa</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="form-row">
-                  <div className="form-group">
-                    <label className="form-label">ID de Grupo</label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      placeholder="Opcional"
-                      value={newArtist.groupId}
-                      onChange={(e) =>
-                        setNewArtist({
-                          ...newArtist,
-                          groupId: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Aprendiz Asociado *</label>
-                    <select
-                      className="form-select"
-                      value={newArtist.apprenticeId}
-                      onChange={(e) =>
-                        setNewArtist({
-                          ...newArtist,
-                          apprenticeId: e.target.value,
-                        })
-                      }
-                      required
-                    >
-                      <option value="">Seleccione un aprendiz</option>
-                      {apprentices.map((apprentice) => (
-                        <option key={apprentice.id} value={apprentice.id}>
-                          {apprentice.fullName}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="modal-actions">
-                  <button
-                    type="submit"
-                    className="submit-button"
-                    disabled={loading || !newArtist.stageName.trim() || !newArtist.apprenticeId}
-                  >
-                    {loading ? "Creando..." : "Crear Artista"}
-                  </button>
-                  <button
-                    type="button"
-                    className="cancel-button"
-                    onClick={() => {
-                      setShowCreateForm(false);
-                      setNewArtist({
-                        stageName: "",
-                        birthDate: "",
-                        transitionDate: "",
-                        status: ArtistStatus.ACTIVO,
-                        groupId: "",
-                        apprenticeId: "",
-                      });
-                    }}
-                    disabled={loading}
-                  >
-                    Cancelar
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {/* Modal de edición */}
-        {editingArtist && (
-          <div className="modal-overlay artist-modal">
-            <div className="modal-content">
-              <h3>Editar Artista</h3>
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">Nombre artístico *</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    value={editArtist.stageName}
-                    onChange={(e) =>
-                      setEditArtist({
-                        ...editArtist,
-                        stageName: e.target.value,
-                      })
-                    }
-                    required
-                    minLength={2}
-                    maxLength={100}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Fecha de nacimiento *</label>
-                  <input
-                    type="date"
-                    className="form-input"
-                    value={editArtist.birthDate}
-                    onChange={(e) =>
-                      setEditArtist({
-                        ...editArtist,
-                        birthDate: e.target.value,
-                      })
-                    }
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">Fecha de transición *</label>
-                  <input
-                    type="date"
-                    className="form-input"
-                    value={editArtist.transitionDate}
-                    onChange={(e) =>
-                      setEditArtist({
-                        ...editArtist,
-                        transitionDate: e.target.value,
-                      })
-                    }
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Estado</label>
-                  <select
-                    className="form-select"
-                    value={editArtist.status}
-                    onChange={(e) =>
-                      setEditArtist({
-                        ...editArtist,
-                        status: e.target.value as ArtistStatus,
-                      })
-                    }
-                  >
-                    <option value={ArtistStatus.ACTIVO}>Activo</option>
-                    <option value={ArtistStatus.INACTIVO}>Inactivo</option>
-                    <option value={ArtistStatus.EN_PAUSA}>En Pausa</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">ID de Grupo</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    value={editArtist.groupId}
-                    onChange={(e) =>
-                      setEditArtist({
-                        ...editArtist,
-                        groupId: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Aprendiz Asociado *</label>
-                  <select
-                    className="form-select"
-                    value={editArtist.apprenticeId}
-                    onChange={(e) =>
-                      setEditArtist({
-                        ...editArtist,
-                        apprenticeId: e.target.value,
-                      })
-                    }
-                    required
-                  >
-                    <option value="">Seleccione un aprendiz</option>
-                    {apprentices.map((apprentice) => (
-                      <option key={apprentice.id} value={apprentice.id}>
-                        {apprentice.fullName}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="modal-actions">
-                <button
-                  className="submit-button"
-                  onClick={handleUpdate}
-                  disabled={loading || !editArtist.stageName.trim() || !editArtist.apprenticeId}
-                >
-                  {loading ? "Actualizando..." : "Actualizar"}
-                </button>
-                <button
-                  className="cancel-button"
-                  onClick={() => {
-                    setEditingArtist(null);
-                    setEditArtist({
-                      stageName: "",
-                      birthDate: "",
-                      transitionDate: "",
-                      status: ArtistStatus.ACTIVO,
-                      groupId: "",
-                      apprenticeId: "",
-                    });
-                  }}
-                  disabled={loading}
-                >
-                  Cancelar
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Modal de confirmación de eliminación */}
-        {deletingArtist && (
-          <div className="modal-overlay artist-modal">
-            <div className="modal-content">
-              <h3>¿Eliminar Artista?</h3>
-              <div className="delete-confirmation">
-                <p>¿Está seguro de que desea eliminar este artista?</p>
-                <div className="artist-details">
-                  <div className="detail-item">
-                    <strong>Nombre Artístico:</strong> {deletingArtist.stageName}
-                  </div>
-                  <div className="detail-item">
-                    <strong>Fecha Nacimiento:</strong> {formatDate(deletingArtist.birthDate)}
-                  </div>
-                  <div className="detail-item">
-                    <strong>Fecha Transición:</strong> {formatDate(deletingArtist.transitionDate)}
-                  </div>
-                  <div className="detail-item">
-                    <strong>Estado:</strong> {getStatusText(deletingArtist.status)}
-                  </div>
-                  <div className="detail-item">
-                    <strong>Grupo:</strong> {deletingArtist.groupId || "No asignado"}
-                  </div>
-                  <div className="detail-item">
-                    <strong>Aprendiz Asociado:</strong> {getApprenticeName(deletingArtist.apprenticeId)}
-                  </div>
-                </div>
-                <p className="warning-text">
-                  ⚠️ Esta acción no se puede deshacer.
-                </p>
-              </div>
-              <div className="modal-actions">
-                <button
-                  className="submit-button delete-button"
-                  onClick={handleDelete}
-                  disabled={loading}
-                >
-                  {loading ? "Eliminando..." : "Sí, Eliminar"}
-                </button>
-                <button
-                  className="cancel-button"
-                  onClick={() => setDeletingArtist(null)}
-                  disabled={loading}
-                >
-                  Cancelar
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+      {/* Modal de eliminación usando componente genérico */}
+      {deletingArtist && (
+        <DeleteModal<ArtistResponseDto>
+          title="¿Eliminar Artista?"
+          item={deletingArtist}
+          itemName="Artista"
+          itemId={deletingArtist.id}
+          onConfirm={handleDelete}
+          onClose={() => setDeletingArtist(null)}
+          loading={loading}
+          confirmText="Sí, Eliminar"
+          warningMessage="⚠️ Esta acción no se puede deshacer. Se eliminarán todos los datos asociados al artista."
+          renderDetails={renderArtistDetails}
+        />
+      )}
     </section>
   );
 };

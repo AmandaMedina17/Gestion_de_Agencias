@@ -1,7 +1,11 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { useAlbum } from "../../../../context/AlbumContext";
-import { Icon } from "../../../icons";
+import GenericTable, { Column } from "../../../ui/datatable";
+import CreateModal, { FormField } from "../../../ui/reutilizables/CreateModal";
+import EditModal from "../../../ui/reutilizables/EditModal";
+import DeleteModal from "../../../ui/reutilizables/DeleteModal";
 import './AlbumStyle.css';
+import { ResponseAlbumDto as AlbumResponseDto } from "../../../../../../backend/src/ApplicationLayer/DTOs/albumDto/response.album.dto";
 
 export enum AlbumStatus {
   ACTIVO = "ACTIVO",
@@ -20,307 +24,377 @@ const AlbumManagement: React.FC = () => {
     clearError,
   } = useAlbum();
 
-  // Estados principales
-  const [filter, setFilter] = useState("");
-  const [sortBy, setSortBy] = useState<"title" | "releaseDate" | "copiesSold" | "numberOfTracks">("title");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [editingAlbum, setEditingAlbum] = useState<any>(null);
-  const [deletingAlbum, setDeletingAlbum] = useState<any>(null);
-  const [message, setMessage] = useState<{
-    type: "success" | "error";
-    text: string;
+  const [notification, setNotification] = useState<{
+    type: "success" | "error" | "info" | "warning";
+    title?: string;
+    message: string;
   } | null>(null);
-  const [dataLoaded, setDataLoaded] = useState(false);
 
-  // PAGINACIÓN
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 30;
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingAlbum, setEditingAlbum] = useState<AlbumResponseDto | null>(null);
+  const [deletingAlbum, setDeletingAlbum] = useState<AlbumResponseDto | null>(null);
 
-  // Estados del formulario
-  const [newAlbum, setNewAlbum] = useState({
-    title: "",
-    releaseDate: "",
-    mainProducer: "",
-    copiesSold: "",
-    numberOfTracks: "",
-  });
-
-  const [editAlbum, setEditAlbum] = useState({
-    title: "",
-    releaseDate: "",
-    mainProducer: "",
-    copiesSold: 0,
-    numberOfTracks: "",
-  });
-
-  // Cargar álbumes cuando se monta el componente
   useEffect(() => {
-    const loadInitialData = async () => {
-      if (!dataLoaded) {
-        clearError();
-        try {
-          await fetchAlbums();
-          setDataLoaded(true);
-        } catch (err) {
-          console.error("Error loading albums:", err);
-        }
+    const loadData = async () => {
+      try {
+        await fetchAlbums();
+      } catch (err) {
+        console.error("Error loading data:", err);
       }
     };
+    loadData();
+  }, []);
 
-    loadInitialData();
-  }, [dataLoaded]);
+  // Funciones auxiliares para mostrar notificaciones
+  const showNotification = (type: "success" | "error" | "info" | "warning", title: string, message: string) => {
+    setNotification({ type, title, message });
+  };
 
-  // Resetear página cuando cambien filtro u orden
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [filter, sortBy, sortOrder]);
+  const showSuccess = (title: string, message: string) => {
+    showNotification("success", title, message);
+  };
 
-  // Filtrar y ordenar álbumes
-  const filteredAndSortedAlbums = useMemo(() => {
-    if (!dataLoaded) return [];
+  const showError = (title: string, message: string) => {
+    showNotification("error", title, message);
+  };
 
-    let filtered = albums;
+  const showCreateSuccess = () => {
+    showSuccess("¡Álbum Creado!", "El álbum ha sido creado exitosamente.");
+  };
 
-    // Aplicar filtro por título
-    if (filter) {
-      filtered = albums.filter((album) =>
-        album.title.toLowerCase().includes(filter.toLowerCase())
-      );
-    }
+  const showCreateError = (errorMessage?: string) => {
+    showError("Error al Crear", errorMessage || "No se pudo crear el álbum.");
+  };
 
-    // Aplicar ordenamiento
-    const sorted = [...filtered].sort((a, b) => {
-      let aValue, bValue;
+  const showUpdateSuccess = () => {
+    showSuccess("¡Álbum Actualizado!", "El álbum ha sido actualizado exitosamente.");
+  };
 
-      switch (sortBy) {
-        case "title":
-          aValue = a.title;
-          bValue = b.title;
-          break;
-        case "releaseDate":
-          aValue = new Date(a.releaseDate);
-          bValue = new Date(b.releaseDate);
-          break;
-        case "copiesSold":
-          aValue = a.copiesSold;
-          bValue = b.copiesSold;
-          break;
-        case "numberOfTracks":
-          aValue = a.numberOfTracks;
-          bValue = b.numberOfTracks;
-          break;
-        default:
-          aValue = a.title;
-          bValue = b.title;
+  const showUpdateError = (errorMessage?: string) => {
+    showError("Error al Actualizar", errorMessage || "No se pudo actualizar el álbum.");
+  };
+
+  const showDeleteSuccess = () => {
+    showSuccess("¡Álbum Eliminado!", "El álbum ha sido eliminado exitosamente.");
+  };
+
+  const showDeleteError = (errorMessage?: string) => {
+    showError("Error al Eliminar", errorMessage || "No se pudo eliminar el álbum.");
+  };
+
+  // Definir campos del formulario de álbum
+  const albumFields: FormField[] = [
+    {
+      name: "title",
+      label: "Título del álbum",
+      type: "text",
+      placeholder: "Ej: Thriller, Bad, After Hours",
+      required: true,
+      min: 2,
+      max: 150,
+      validate: (value) => {
+        if (!value.trim()) return "El título del álbum es requerido";
+        if (value.length < 2) return "Debe tener al menos 2 caracteres";
+        if (value.length > 150) return "No puede exceder 150 caracteres";
+        return null;
       }
-
-      if (sortOrder === "asc") {
-        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-      } else {
-        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+    },
+    {
+      name: "mainProducer",
+      label: "Productor principal",
+      type: "text",
+      placeholder: "Ej: Quincy Jones, Metro Boomin, Pharrell Williams",
+      required: true,
+      min: 2,
+      max: 100,
+      validate: (value) => {
+        if (!value.trim()) return "El productor principal es requerido";
+        if (value.length < 2) return "Debe tener al menos 2 caracteres";
+        if (value.length > 100) return "No puede exceder 100 caracteres";
+        return null;
       }
-    });
-
-    return sorted;
-  }, [albums, filter, sortBy, sortOrder, dataLoaded]);
-
-  // PAGINACIÓN: calcular páginas y slice
-  const totalPages = Math.ceil(filteredAndSortedAlbums.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedAlbums = filteredAndSortedAlbums.slice(startIndex, startIndex + itemsPerPage);
-
-  // Manejar creación de álbum
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    clearError();
-    setMessage(null);
-
-    if (!newAlbum.title.trim() || !newAlbum.mainProducer.trim()) {
-      setMessage({
-        type: "error",
-        text: "Por favor, complete todos los campos obligatorios",
-      });
-      return;
+    },
+    {
+      name: "releaseDate",
+      label: "Fecha de lanzamiento",
+      type: "date",
+      required: false,
+      validate: (value) => {
+        if (value) {
+          const date = new Date(value);
+          if (date > new Date()) return "La fecha no puede ser futura";
+        }
+        return null;
+      }
+    },
+    {
+      name: "copiesSold",
+      label: "Copias vendidas",
+      type: "number",
+      required: false,
+      min: 0,
+      placeholder: "Ej: 1000000",
+      validate: (value) => {
+        if (value) {
+          const numValue = parseFloat(value);
+          if (isNaN(numValue)) return "Debe ser un número válido";
+          if (numValue < 0) return "No puede ser negativo";
+          if (numValue > 1000000000) return "No puede exceder 1,000,000,000 copias";
+        }
+        return null;
+      }
     }
+  ];
 
+  const albumEditFields: FormField[] = [
+    {
+      name: "title",
+      label: "Título del álbum",
+      type: "text",
+      required: true,
+      min: 2,
+      max: 150,
+      validate: (value) => {
+        if (!value.trim()) return "El título del álbum es requerido";
+        if (value.length < 2) return "Debe tener al menos 2 caracteres";
+        return null;
+      }
+    },
+    {
+      name: "mainProducer",
+      label: "Productor principal",
+      type: "text",
+      required: true,
+      min: 2,
+      max: 100,
+      validate: (value) => {
+        if (!value.trim()) return "El productor principal es requerido";
+        if (value.length < 2) return "Debe tener al menos 2 caracteres";
+        return null;
+      }
+    },
+    {
+      name: "releaseDate",
+      label: "Fecha de lanzamiento",
+      type: "date",
+      required: false,
+      validate: (value) => {
+        if (value) {
+          const date = new Date(value);
+          if (date > new Date()) return "La fecha no puede ser futura";
+        }
+        return null;
+      }
+    },
+    {
+      name: "copiesSold",
+      label: "Copias vendidas",
+      type: "number",
+      required: false,
+      min: 0,
+      validate: (value) => {
+        if (value) {
+          const numValue = parseFloat(value);
+          if (isNaN(numValue)) return "Debe ser un número válido";
+          if (numValue < 0) return "No puede ser negativo";
+        }
+        return null;
+      }
+    }
+  ];
+
+  // Datos iniciales para creación
+  const initialCreateData = {
+    title: "",
+    mainProducer: "",
+    releaseDate: "",
+    copiesSold: ""
+  };
+
+  // Manejar creación
+  const handleCreate = async (data: Record<string, any>) => {
     try {
       await createAlbum({
-        title: newAlbum.title,
-        mainProducer: newAlbum.mainProducer,
-        date: newAlbum.releaseDate ? new Date(newAlbum.releaseDate) : undefined,
-        copiesSold: 0
-        
+        title: data.title.trim(),
+        mainProducer: data.mainProducer.trim(),
+        date: data.releaseDate ? new Date(data.releaseDate) : undefined,
+        copiesSold: data.copiesSold ? parseInt(data.copiesSold) : 0,
       });
 
-      setMessage({
-        type: "success",
-        text: `Álbum "${newAlbum.title}" creado exitosamente`,
-      });
-
-      // Resetear formulario
-      setNewAlbum({
-        title: "",
-        releaseDate: "",
-        mainProducer: "",
-        copiesSold: "",
-        numberOfTracks: "",
-      });
-
-      setShowCreateForm(false);
+      showCreateSuccess();
+      setShowCreateModal(false);
       await fetchAlbums();
 
-      setTimeout(() => setMessage(null), 5000);
     } catch (err: any) {
-      setMessage({
-        type: "error",
-        text: err.message || "Error al crear el álbum",
-      });
+      showCreateError(err.message);
     }
   };
 
-  // Manejar actualización de álbum
-  const handleUpdate = async () => {
-    if (!editingAlbum || !editAlbum.title.trim() || !editAlbum.mainProducer.trim()) {
-      return;
-    }
-
+  // Manejar actualización
+  const handleUpdate = async (id: string | number, data: Record<string, any>) => {
     try {
-      await updateAlbum(editingAlbum.id, {
-        title: editAlbum.title,
-        mainProducer: editAlbum.mainProducer,
-        releaseDate: editAlbum.releaseDate ? new Date(editAlbum.releaseDate) : undefined,
-        copiesSold: editAlbum.copiesSold
+      await updateAlbum(id as string, {
+        title: data.title.trim(),
+        mainProducer: data.mainProducer.trim(),
+        releaseDate: data.releaseDate ? new Date(data.releaseDate) : undefined,
+        copiesSold: data.copiesSold ? parseInt(data.copiesSold) : 0,
       });
 
-      setMessage({
-        type: "success",
-        text: `Álbum actualizado exitosamente`,
-      });
-
+      showUpdateSuccess();
       setEditingAlbum(null);
-      setEditAlbum({
-        title: "",
-        releaseDate: "",
-        mainProducer: "",
-        copiesSold: 0,
-        numberOfTracks: "",
-      });
-
       await fetchAlbums();
-      setTimeout(() => setMessage(null), 5000);
     } catch (err: any) {
-      setMessage({
-        type: "error",
-        text: err.message || "Error al actualizar el álbum",
-      });
+      showUpdateError(err.message);
     }
   };
 
-  // Manejar eliminación de álbum
-  const handleDelete = async () => {
-    if (!deletingAlbum) {
-      return;
-    }
+  // Manejar eliminación
+  const handleDelete = async (id: string | number) => {
+    if (!deletingAlbum) return;
 
     try {
-      await deleteAlbum(deletingAlbum.id);
-      setMessage({
-        type: "success",
-        text: `Álbum "${deletingAlbum.title}" eliminado exitosamente`,
-      });
+      await deleteAlbum(id as string);
+      showDeleteSuccess();
       setDeletingAlbum(null);
       await fetchAlbums();
-      setTimeout(() => setMessage(null), 5000);
     } catch (err: any) {
-      setMessage({
-        type: "error",
-        text: err.message || "Error al eliminar el álbum",
-      });
+      showDeleteError(err.message);
     }
   };
 
-  // Recargar datos manualmente
-  const handleReload = async () => {
-    clearError();
-    try {
-      await fetchAlbums();
-      setMessage({
-        type: "success",
-        text: "Datos actualizados correctamente",
-      });
-      setTimeout(() => setMessage(null), 3000);
-    } catch (err: any) {
-      setMessage({
-        type: "error",
-        text: err.message || "Error al recargar los datos",
-      });
-    }
+  // Funciones auxiliares
+  const formatDate = (date: Date | string) => {
+    if (!date) return "No establecida";
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    dateObj.setDate(dateObj.getDate() + 1);
+    return dateObj.toLocaleDateString("es-ES");
   };
 
-  // Iniciar edición
-  const startEdit = (album: any) => {
-    setEditingAlbum(album);
-    setEditAlbum({
-      title: album.title,
-      releaseDate: album.releaseDate ? album.releaseDate.split("T")[0] : "",
-      mainProducer: album.mainProducer,
-      copiesSold: album.copiesSold?.toString() || "",
-      numberOfTracks: album.numberOfTracks?.toString() || "",
-    });
-  };
-
-  // Iniciar eliminación
-  const startDelete = (album: any) => {
-    setDeletingAlbum(album);
-  };
-
-  // Limpiar filtro
-  const handleClearFilter = () => {
-    setFilter("");
-  };
-
-  // Alternar ordenamiento
-  const toggleSortOrder = () => {
-    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-  };
-
-  // Formatear fecha para mostrar
-  const formatDate = (dateString: string) => {
-    if (!dateString) return "N/A";
-  
-  const date = new Date(dateString);
-  // Sumar un día
-  date.setDate(date.getDate() + 1);
-  
-  return date.toLocaleDateString("es-ES");
-    };
-
-  // Formatear números con separadores de miles
   const formatNumber = (num: number) => {
     return new Intl.NumberFormat("es-ES").format(num);
   };
 
-  // Obtener fecha máxima para el input date (hoy)
-  const getTodayDate = (): string => {
+  const getYearsSinceRelease = (releaseDate: Date | string) => {
+    if (!releaseDate) return "N/A";
+    const release = typeof releaseDate === 'string' ? new Date(releaseDate) : releaseDate;
     const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, "0");
-    const day = String(today.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
+    const years = today.getFullYear() - release.getFullYear();
+    return `${years} año${years !== 1 ? 's' : ''}`;
+  };
+
+  // Definir columnas para la tabla
+  const columns: Column<AlbumResponseDto>[] = [
+    {
+      key: "title",
+      title: "Título",
+      sortable: true,
+      width: "25%",
+      align: "center"
+    },
+    {
+      key: "mainProducer",
+      title: "Productor Principal",
+      sortable: true,
+      width: "20%",
+      align: "center"
+    },
+    {
+      key: "releaseDate",
+      title: "Lanzamiento",
+      sortable: true,
+      width: "15%",
+      align: "center",
+      render: (item) => formatDate(item.releaseDate)
+    },
+    {
+      key: "yearsSinceRelease",
+      title: "Antigüedad",
+      sortable: false,
+      width: "10%",
+      align: "center",
+      render: (item) => getYearsSinceRelease(item.releaseDate)
+    },
+    {
+      key: "copiesSold",
+      title: "Copias Vendidas",
+      sortable: true,
+      width: "15%",
+      align: "center",
+      render: (item) => `${formatNumber(item.copiesSold)} copias`
+    },
+    {
+      key: "totalTracks",
+      title: "Total Pistas",
+      sortable: false,
+      width: "15%",
+      align: "center",
+      render: (item) => {
+        const tracks = item.numberOfTracks || 0;
+        return (
+          <span className="tracks-count">
+            {tracks} pista{tracks !== 1 ? 's' : ''}
+          </span>
+        );
+      }
+    }
+  ];
+
+  // Función para renderizar detalles en modal de eliminación
+  const renderAlbumDetails = (album: AlbumResponseDto) => {
+    const tracks = album.numberOfTracks || 0;
+    
+    return (
+      <div className="album-details">
+        <div className="detail-item">
+          <strong>Título:</strong> <span>{album.title}</span>
+        </div>
+        <div className="detail-item">
+          <strong>Productor Principal:</strong> <span>{album.mainProducer}</span>
+        </div>
+        <div className="detail-item">
+          <strong>Fecha de Lanzamiento:</strong> <span>{formatDate(album.releaseDate)}</span>
+        </div>
+        <div className="detail-item">
+          <strong>Antigüedad:</strong> <span>{getYearsSinceRelease(album.releaseDate)}</span>
+        </div>
+        <div className="detail-item">
+          <strong>Copias Vendidas:</strong> <span>{formatNumber(album.copiesSold)} copias</span>
+        </div>
+        <div className="detail-item">
+          <strong>Total de Pistas:</strong> <span>{tracks} pista{tracks !== 1 ? 's' : ''}</span>
+        </div>
+        {tracks > 0 && (
+          <div className="detail-item tracks-list">
+            <strong>Pistas:</strong>
+            
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
-    <section id="album_manager" className="content-section active">
-      <div className="profile-header">
-        <div className="profile-info">
-          <h1>Gestión de Álbumes</h1>
-          <p className="section-description">
-            Administre todos los álbumes del sistema
-          </p>
-        </div>
-      </div>
+    <section id="album_management" className="content-section active">
+      <GenericTable<AlbumResponseDto>
+        title="Gestión de Álbumes"
+        description="Administre todos los álbumes del sistema"
+        data={albums}
+        columns={columns}
+        loading={loading}
+        onReload={() => fetchAlbums()}
+        showCreateForm={showCreateModal}
+        onShowCreateChange={setShowCreateModal}
+        editingItem={editingAlbum}
+        onEditingChange={setEditingAlbum}
+        deletingItem={deletingAlbum}
+        onDeletingChange={setDeletingAlbum}
+        itemsPerPage={30}
+        className="album-table"
+        notification={notification || undefined}
+        onNotificationClose={() => setNotification(null)}
+      />
 
+<<<<<<< Updated upstream
       <div className="detail-card">
         {/* Mensajes globales */}
         {message && (
@@ -641,10 +715,24 @@ const AlbumManagement: React.FC = () => {
             </form>
           </div>
         </div>
+=======
+      {/* Modal de creación usando componente genérico */}
+      {showCreateModal && (
+        <CreateModal
+          title="Crear Nuevo Álbum"
+          fields={albumFields}
+          initialData={initialCreateData}
+          onSubmit={handleCreate}
+          onClose={() => setShowCreateModal(false)}
+          loading={loading}
+          submitText="Crear Álbum"
+        />
+>>>>>>> Stashed changes
       )}
 
-      {/* Modal de edición */}
+      {/* Modal de edición usando componente genérico */}
       {editingAlbum && (
+<<<<<<< Updated upstream
         <div className="modal-overlay album-modal">
           <div className="modal-content">
             <h3>Editar Álbum</h3>
@@ -749,54 +837,40 @@ const AlbumManagement: React.FC = () => {
             </div>
           </div>
         </div>
+=======
+        <EditModal
+          title="Editar Álbum"
+          fields={albumEditFields}
+          initialData={{
+            title: editingAlbum.title,
+            mainProducer: editingAlbum.mainProducer,
+            releaseDate: editingAlbum.releaseDate ? 
+              (new Date(editingAlbum.releaseDate).toISOString().split("T")[0]) : "",
+            copiesSold: editingAlbum.copiesSold.toString()
+          }}
+          itemId={editingAlbum.id}
+          onSubmit={handleUpdate}
+          onClose={() => setEditingAlbum(null)}
+          loading={loading}
+          submitText="Actualizar Álbum"
+        />
+>>>>>>> Stashed changes
       )}
 
-      {/* Modal de confirmación de eliminación */}
+      {/* Modal de eliminación usando componente genérico */}
       {deletingAlbum && (
-        <div className="modal-overlay album-modal">
-          <div className="modal-content">
-            <h3>¿Eliminar Álbum?</h3>
-            <div className="delete-confirmation">
-              <p>¿Está seguro de que desea eliminar este álbum?</p>
-              <div className="album-details">
-                <div className="detail-item">
-                  <strong>Título:</strong> {deletingAlbum.title}
-                </div>
-                <div className="detail-item">
-                  <strong>Productor Principal:</strong> {deletingAlbum.mainProducer}
-                </div>
-                <div className="detail-item">
-                  <strong>Fecha Lanzamiento:</strong> {formatDate(deletingAlbum.releaseDate)}
-                </div>
-                <div className="detail-item">
-                  <strong>Copias Vendidas:</strong> {formatNumber(deletingAlbum.copiesSold)} copias
-                </div>
-                <div className="detail-item">
-                  <strong>Número de Pistas:</strong> {deletingAlbum.numberOfTracks}
-                </div>
-              </div>
-              <p className="warning-text">
-                ⚠️ Esta acción no se puede deshacer y también eliminará todas las canciones asociadas.
-              </p>
-            </div>
-            <div className="modal-actions">
-              <button
-                className="submit-button delete-button"
-                onClick={handleDelete}
-                disabled={loading}
-              >
-                {loading ? "Eliminando..." : "Sí, Eliminar"}
-              </button>
-              <button
-                className="cancel-button"
-                onClick={() => setDeletingAlbum(null)}
-                disabled={loading}
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        </div>
+        <DeleteModal<AlbumResponseDto>
+          title="¿Eliminar Álbum?"
+          item={deletingAlbum}
+          itemName="Álbum"
+          itemId={deletingAlbum.id}
+          onConfirm={handleDelete}
+          onClose={() => setDeletingAlbum(null)}
+          loading={loading}
+          confirmText="Sí, Eliminar"
+          warningMessage="⚠️ Esta acción no se puede deshacer. Todas las canciones asociadas también serán eliminadas."
+          renderDetails={renderAlbumDetails}
+        />
       )}
     </section>
   );
