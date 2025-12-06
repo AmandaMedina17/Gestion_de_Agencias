@@ -29,9 +29,9 @@ export class UpdateContractUseCase {
   }
 
   private validateNoAgencyArtistChange(updateContractDto: UpdateContractDto, existingContract : Contract): void {
-    // if (updateContractDto.agencyId || updateContractDto.artistId) {
-    //   throw new Error('Cannot change agency or artist in an existing contract. Create a new contract instead.');
-    // }
+    if (updateContractDto.agencyId || updateContractDto.artistId) {
+      throw new Error('Cannot change agency or artist in an existing contract. Create a new contract instead.');
+    }
   }
 
   private applyUpdates(contract: Contract, updateContractDto: UpdateContractDto): void {
