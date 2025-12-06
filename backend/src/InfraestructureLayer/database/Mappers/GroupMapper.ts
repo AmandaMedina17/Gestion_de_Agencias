@@ -5,9 +5,32 @@ import { GroupEntity } from "@infrastructure/database/Entities/GroupEntity";
 export class GroupMapper extends IMapper<Group, GroupEntity>{
     
     toDomainEntity(dataBaseEntity: GroupEntity): Group {
-        throw new Error("Method not implemented.");
+        if(!dataBaseEntity)
+        {
+            throw new Error('Cannot map null entity to domain');
+        }
+        
+        return new Group(
+            dataBaseEntity.id,
+            dataBaseEntity.name,
+            dataBaseEntity.status,
+            dataBaseEntity.debutDate,
+            dataBaseEntity.concept,
+            dataBaseEntity.is_created,
+            dataBaseEntity.agencyId
+        )
     }
     toDataBaseEntity(domainEntity: Group): GroupEntity {
-        throw new Error("Method not implemented.");
+        const entity = new GroupEntity();
+        
+        entity.id = domainEntity.getId();
+        entity.name = domainEntity.getName();
+        entity.status = domainEntity.getStatus();
+        entity.debutDate = domainEntity.getDebutDate();
+        entity.is_created = domainEntity.isCreated();
+        entity.concept = domainEntity.getConcept()
+        entity.agencyId = domainEntity.getAgency()
+        
+        return entity;
     }
 }

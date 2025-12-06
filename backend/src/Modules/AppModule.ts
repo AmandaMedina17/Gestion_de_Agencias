@@ -14,6 +14,7 @@ import { ContractModule } from './ContractModule';
 import { BillboardListModule } from './billboard-list/billboard-list.module';
 import { SongModule } from './song/song.module';
 import { AlbumModule } from './album/album.module';
+import { GroupModule } from './GroupModule';
 
 @Module({
   imports: [
@@ -29,7 +30,8 @@ import { AlbumModule } from './album/album.module';
     ContractModule,
     BillboardListModule,
     SongModule,
-    AlbumModule
+    AlbumModule,
+    GroupModule
   ],
   controllers: [AppController],
   providers: [AppService],
