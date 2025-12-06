@@ -2,6 +2,7 @@ import { IUpdatable } from "@domain/UpdatableInterface";
 import { DateValue } from "../Value Objects/Values";
 import { v4 as uuidv4 } from "uuid";
 import { UpdateData } from "@domain/UpdateData";
+import { Song } from "./Song";
 
 //Aqui tengo que implementar las colecciones de navegacion para number of trakcs y number ofawards
 export class Album implements IUpdatable{
@@ -11,7 +12,7 @@ export class Album implements IUpdatable{
         private releaseDate: Date,
         private mainProducer: string,
         private copiesSold: number,
-        private numberOfTracks: number,
+        private numberOfTracks : number
     ) {
         this.validate();
     }
@@ -145,15 +146,6 @@ export class Album implements IUpdatable{
         this.copiesSold = copies;
     }
 
-    public setNumberOfTracks(tracks: number): void {
-        if (tracks < 0) {
-            throw new Error('El álbum debe tener al menos una canción');
-        }
-        if (tracks > 50) {
-            throw new Error('El álbum no puede tener más de 50 canciones');
-        }
-        this.numberOfTracks = tracks;
-    }
 
     public static create(title: string, releaseDate: Date, mainProducer: string, copiesSold =0, numberOfTracks = 0) : Album{
         return new Album(uuidv4(), title, releaseDate, mainProducer, copiesSold, numberOfTracks);

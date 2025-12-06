@@ -27,4 +27,13 @@ export class AlbumRepository extends BaseRepository<Album,AlbumEntity> implement
           }
           return this.mapper.toDomainEntity(entity);
     }
+    async findById(id: string): Promise<Album | null> {
+        const entity : AlbumEntity | null =  await this.repository.findOne({where : {id}, relations : ['songs']});
+        console.log(entity)
+        if(!entity)
+        throw new Error("This album doesn't exist")
+
+        return this.mapper.toDomainEntity(entity);
+    }
+
 }
