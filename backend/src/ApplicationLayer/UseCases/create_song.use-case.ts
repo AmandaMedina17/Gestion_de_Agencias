@@ -15,16 +15,15 @@ export class CreateSongUseCase {
   ) {}
 
   async execute(songDto: CreateSongDto): Promise<Song> {
-    
+
     const album = await this.albumRepository.findById(songDto.idAlbum);
-    if (!album) {
+    if (!album)
       throw new Error(`album with id ${songDto.idAlbum} not found`);
-    }
 
     const song = Song.create(
         songDto.nameSong,
         songDto.idAlbum,
-        songDto.releaseDate != undefined ? songDto.releaseDate   : new Date()
+        album.getReleaseDate()
     )
     
     return await this.songRepository.save(song);

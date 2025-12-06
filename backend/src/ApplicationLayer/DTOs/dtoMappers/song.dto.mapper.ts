@@ -12,8 +12,6 @@ export class SongDtoMapper extends BaseDtoMapper<Song, CreateSongDto, ResponseSo
   };
 
   toResponse(domain: Song): ResponseSongDto {
-    console.log("Id Album:")
-    console.log(domain.getAlbumId());
     return {
         id: domain.getId(),
         name: domain.getName(),

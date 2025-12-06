@@ -26,9 +26,6 @@ export class AlbumEntity {
   @Column()
   copiesSold!: number;
 
-  @Column()
-  numberOfTracks!: number;
-
   // Un álbum puede pertenecer a 0 o 1 grupo
   @ManyToOne(() => GroupEntity, (group: GroupEntity) => group.albums, {
     nullable: true, // Permite que sea null (álbum sin grupo)
@@ -56,6 +53,9 @@ export class AlbumEntity {
   @OneToMany(() => AwardEntity, (award: AwardEntity) => award.album)
   awards!: AwardEntity[];
 
-  @OneToMany(() => SongEntity, (song) => song.album) //pueden ahber muchos aprendices en una agencia
+  @OneToMany(() => SongEntity, (song) => song.album, {
+    onDelete : 'CASCADE',
+    onUpdate : 'CASCADE'
+  }) 
   songs!: SongEntity[];
 }
