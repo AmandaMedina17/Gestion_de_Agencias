@@ -1,7 +1,6 @@
 import { Entity, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { ArtistEntity } from './ArtistEntity';
 import { AgencyEntity } from './AgencyEntity';
-import { IntervalEntity } from './IntervalEntity';
 
 @Entity('artist_agency_membership')
 export class ArtistAgencyMembershipEntity {
@@ -26,7 +25,7 @@ export class ArtistAgencyMembershipEntity {
     agency!: AgencyEntity;
 
     // Relación con el intervalo
-    @ManyToOne(() => IntervalEntity, (interval: IntervalEntity) => interval.artistAgencyMemberships)
-    @JoinColumn({ name: 'interval_id' })
-    interval!: IntervalEntity;
+    // @ManyToOne(() => IntervalEntity, (interval: IntervalEntity) => interval.artistAgencyMemberships)
+    // @JoinColumn({ name: 'interval_id' })
+    // interval!: IntervalEntity;
 }
