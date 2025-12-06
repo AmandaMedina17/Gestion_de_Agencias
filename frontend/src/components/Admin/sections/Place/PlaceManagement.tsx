@@ -1,7 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { usePlace } from "../../../../context/PlaceContext";
-import { Icon } from "../../../icons";
-import "./PlaceStyle.css";
+import GenericTable, { Column } from "../../../ui/datatable";
+import CreateModal, { FormField } from "../../../ui/reutilizables/CreateModal";
+import EditModal from "../../../ui/reutilizables/EditModal";
+import DeleteModal from "../../../ui/reutilizables/DeleteModal";
+import './PlaceStyle.css';
+
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import Stack from '@mui/material/Stack';
+
+export interface PlaceResponseDto {
+  id: string;
+  name: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
 
 const PlaceManagement: React.FC = () => {
   const {
@@ -15,463 +31,252 @@ const PlaceManagement: React.FC = () => {
     clearError,
   } = usePlace();
 
-  // Estados principales
-  const [filter, setFilter] = useState("");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [editingPlace, setEditingPlace] = useState<any>(null);
-  const [deletingPlace, setDeletingPlace] = useState<any>(null);
-  const [newPlaceName, setNewPlaceName] = useState("");
-  const [editPlaceName, setEditPlaceName] = useState("");
-  const [message, setMessage] = useState<{
-    type: "success" | "error";
-    text: string;
+  const [notification, setNotification] = useState<{
+    type: "success" | "error" | "info" | "warning";
+    title?: string;
+    message: string;
   } | null>(null);
-  const [dataLoaded, setDataLoaded] = useState(false);
 
-  // Cargar lugares solo cuando se monta el componente
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingPlace, setEditingPlace] = useState<PlaceResponseDto | null>(null);
+  const [deletingPlace, setDeletingPlace] = useState<PlaceResponseDto | null>(null);
+
+  // Cargar lugares al montar el componente
   useEffect(() => {
-    const loadInitialData = async () => {
-      if (!dataLoaded) {
-        clearError();
-        try {
-          await fetchPlaces();
-          setDataLoaded(true);
-        } catch (err) {
-          console.error("Error loading initial data:", err);
-        }
+    const loadData = async () => {
+      try {
+        await fetchPlaces();
+      } catch (err) {
+        console.error("Error loading places:", err);
+        setNotification({
+          type: "error",
+          title: "Error",
+          message: "Error al cargar los lugares"
+        });
       }
     };
+    
+    loadData();
+  }, []);
 
-    loadInitialData();
-  }, [dataLoaded]);
+  // Funciones auxiliares para mostrar notificaciones
+  const showNotification = (type: "success" | "error" | "info" | "warning", title: string, message: string) => {
+    setNotification({ type, title, message });
+  };
 
-  // Filtrar y ordenar lugares - solo procesamiento local
-  const filteredAndSortedPlaces = React.useMemo(() => {
-    if (!dataLoaded) return [];
+  const showSuccess = (title: string, message: string) => {
+    showNotification("success", title, message);
+  };
 
-    let filtered = places;
+  const showError = (title: string, message: string) => {
+    showNotification("error", title, message);
+  };
 
-    // Aplicar filtro
-    if (filter) {
-      filtered = places.filter((place) =>
-        place.name.toLowerCase().includes(filter.toLowerCase())
-      );
-    }
+  const showCreateSuccess = () => {
+    showSuccess("¡Lugar Creado!", "El lugar ha sido creado exitosamente.");
+  };
 
-    // Aplicar ordenamiento por nombre
-    const sorted = [...filtered].sort((a, b) => {
-      if (sortOrder === "asc") {
-        return a.name.localeCompare(b.name, "es", { sensitivity: "base" });
-      } else {
-        return b.name.localeCompare(a.name, "es", { sensitivity: "base" });
+  const showCreateError = (errorMessage?: string) => {
+    showError("Error al Crear", errorMessage || "No se pudo crear el lugar.");
+  };
+
+  const showUpdateSuccess = () => {
+    showSuccess("¡Lugar Actualizado!", "El lugar ha sido actualizado exitosamente.");
+  };
+
+  const showUpdateError = (errorMessage?: string) => {
+    showError("Error al Actualizar", errorMessage || "No se pudo actualizar el lugar.");
+  };
+
+  const showDeleteSuccess = () => {
+    showSuccess("¡Lugar Eliminado!", "El lugar ha sido eliminado exitosamente.");
+  };
+
+  const showDeleteError = (errorMessage?: string) => {
+    showError("Error al Eliminar", errorMessage || "No se pudo eliminar el lugar.");
+  };
+
+  // Definir campos del formulario para lugar
+  const placeFields: FormField[] = [
+    {
+      name: "name",
+      label: "Nombre del lugar",
+      type: "text",
+      placeholder: "Ej: Auditorio Principal, Sala de Ensayos, etc.",
+      required: true,
+      min: 2,
+      max: 100,
+      validate: (value) => {
+        if (value.length < 2) return "El nombre debe tener al menos 2 caracteres";
+        if (value.length > 100) return "El nombre no puede exceder 100 caracteres";
+        return null;
       }
-    });
+    }
+  ];
 
-    return sorted;
-  }, [places, filter, sortOrder, dataLoaded]);
+  // Datos iniciales para creación
+  const initialCreateData = {
+    name: ""
+  };
 
   // Manejar creación de lugar
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleCreate = async (data: Record<string, any>) => {
     clearError();
-    setMessage(null);
-
-    if (!newPlaceName.trim()) {
-      setMessage({
-        type: "error",
-        text: "Por favor, ingrese un nombre válido",
-      });
-      return;
-    }
+    setNotification(null);
 
     try {
-      await createPlace({ name: newPlaceName.trim() });
-      setMessage({
-        type: "success",
-        text: `Lugar "${newPlaceName.trim()}" creado exitosamente`,
-      });
-      setNewPlaceName("");
-      setShowCreateForm(false);
-
-      // Recargar la lista después de crear
+      await createPlace({ name: data.name.trim() });
+      
+      showCreateSuccess();
+      setShowCreateModal(false);
       await fetchPlaces();
-
-      setTimeout(() => setMessage(null), 5000);
+      
     } catch (err: any) {
-      setMessage({
-        type: "error",
-        text: err.message || "Error al crear el lugar",
-      });
+      showCreateError(err.message);
     }
   };
 
   // Manejar actualización de lugar
-  const handleUpdate = async () => {
-    if (!editingPlace || !editPlaceName.trim()) {
-      return;
-    }
+  const handleUpdate = async (id: string | number, data: Record<string, any>) => {
+    clearError();
+    setNotification(null);
 
     try {
-      await updatePlace(editingPlace.id, { name: editPlaceName.trim() });
-      setMessage({
-        type: "success",
-        text: `Lugar actualizado exitosamente a "${editPlaceName.trim()}"`,
-      });
+      await updatePlace(id as string, { name: data.name.trim() });
+      
+      showUpdateSuccess();
       setEditingPlace(null);
-      setEditPlaceName("");
-
-      // Recargar la lista después de actualizar
       await fetchPlaces();
-
-      setTimeout(() => setMessage(null), 5000);
+      
     } catch (err: any) {
-      setMessage({
-        type: "error",
-        text: err.message || "Error al actualizar el lugar",
-      });
+      showUpdateError(err.message);
     }
   };
 
   // Manejar eliminación de lugar
-  const handleDelete = async () => {
-    if (!deletingPlace) {
-      return;
-    }
+  const handleDelete = async (id: string | number) => {
+    if (!deletingPlace) return;
 
     try {
-      await deletePlace(deletingPlace.id);
-      setMessage({
-        type: "success",
-        text: `Lugar "${deletingPlace.name}" eliminado exitosamente`,
-      });
+      await deletePlace(id as string);
+      
+      showDeleteSuccess();
       setDeletingPlace(null);
-
-      // Recargar la lista después de eliminar
       await fetchPlaces();
-
-      setTimeout(() => setMessage(null), 5000);
+      
     } catch (err: any) {
-      setMessage({
-        type: "error",
-        text: err.message || "Error al eliminar el lugar",
-      });
+      showDeleteError(err.message);
     }
   };
 
-  // Recargar datos manualmente
-  const handleReload = async () => {
-    clearError();
+  // Definir columnas para la tabla
+  const columns: Column<PlaceResponseDto>[] = [
+    {
+      key: "name",
+      title: "Nombre del Lugar",
+      sortable: true,
+      width: "70%",
+      align: "center"
+    },
+    
+  ];
+
+  // Función para formatear fecha
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return "N/A";
     try {
-      await fetchPlaces();
-      setMessage({
-        type: "success",
-        text: "Datos actualizados correctamente",
+      const date = new Date(dateString);
+      date.setDate(date.getDate() + 1);
+      return date.toLocaleDateString("es-ES", {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
       });
-      setTimeout(() => setMessage(null), 3000);
-    } catch (err: any) {
-      setMessage({
-        type: "error",
-        text: err.message || "Error al recargar los datos",
-      });
+    } catch {
+      return dateString;
     }
   };
 
-  // Iniciar edición
-  const startEdit = (place: any) => {
-    setEditingPlace(place);
-    setEditPlaceName(place.name);
-  };
-
-  // Iniciar eliminación
-  const startDelete = (place: any) => {
-    setDeletingPlace(place);
-  };
-
-  // Limpiar filtro
-  const handleClearFilter = () => {
-    setFilter("");
-  };
-
-  // Alternar ordenamiento
-  const toggleSortOrder = () => {
-    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-  };
+  // Función para renderizar detalles en modal de eliminación
+  const renderPlaceDetails = (place: PlaceResponseDto) => (
+    <div className="place-details">
+      <div className="detail-item">
+        <strong>ID:</strong> <span>{place.id}</span>
+      </div>
+      <div className="detail-item">
+        <strong>Nombre:</strong> <span>{place.name}</span>
+      </div>
+    </div>
+  );
 
   return (
     <section id="place_management" className="content-section active">
-      <div className="profile-header">
-        <div className="profile-info">
-          <h1>Gestión de Lugares</h1>
-          <p className="section-description">
-            Administre todos los lugares del sistema en una sola vista
-          </p>
-        </div>
-      </div>
+      <GenericTable<PlaceResponseDto>
+        title="Gestión de Lugares"
+        description="Administre todos los lugares del sistema en una sola vista"
+        data={places}
+        columns={columns}
+        loading={loading}
+        onReload={() => fetchPlaces()}
+        showCreateForm={showCreateModal}
+        onShowCreateChange={setShowCreateModal}
+        editingItem={editingPlace}
+        onEditingChange={setEditingPlace}
+        deletingItem={deletingPlace}
+        onDeletingChange={setDeletingPlace}
+        itemsPerPage={20}
+        className="place-table"
+        notification={notification || undefined}
+        onNotificationClose={() => setNotification(null)}
+      />
 
-      <div className="detail-card">
-        {/* Mensajes globales */}
-        {message && (
-          <div className={`message ${message.type}`}>{message.text}</div>
-        )}
+      {/* Modal de creación usando componente genérico */}
+      {showCreateModal && (
+        <CreateModal
+          title="Crear Nuevo Lugar"
+          fields={placeFields}
+          initialData={initialCreateData}
+          onSubmit={handleCreate}
+          onClose={() => setShowCreateModal(false)}
+          loading={loading}
+          submitText="Crear Lugar"
+          cancelText="Cancelar"
+        />
+      )}
 
-        {error && <div className="message error">{error}</div>}
+      {/* Modal de edición usando componente genérico */}
+      {editingPlace && (
+        <EditModal
+          title="Editar Lugar"
+          fields={placeFields}
+          initialData={{
+            name: editingPlace.name
+          }}
+          itemId={editingPlace.id}
+          onSubmit={handleUpdate}
+          onClose={() => setEditingPlace(null)}
+          loading={loading}
+          submitText="Actualizar Lugar"
+          cancelText="Cancelar"
+          
+        />
+      )}
 
-        {/* Controles superiores */}
-        <div className="manager-controls">
-          <div className="controls-left">
-            <button
-              className="create-button"
-              onClick={() => setShowCreateForm(true)}
-              disabled={loading}
-            >
-              <span className="button-icon"><Icon name="plus" size={20} /></span>
-              Nuevo Lugar
-            </button>
-          </div>
-
-          <div className="controls-right">
-            <div className="filter-group">
-              <input
-                type="text"
-                className="form-input search-input"
-                placeholder="Filtrar por nombre..."
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                disabled={loading}
-              />
-              {filter && (
-                <button
-                  className="clear-filter-btn"
-                  onClick={handleClearFilter}
-                  title="Limpiar filtro"
-                >
-                  ×
-                </button>
-              )}
-            </div>
-
-            <div className="sort-group">
-              <button
-                className="sort-order-btn"
-                onClick={toggleSortOrder}
-                disabled={loading}
-                title={sortOrder === "asc" ? "Orden A-Z" : "Orden Z-A"}
-              >
-                {sortOrder === "asc" ? <Icon name="down" size={18} />: <Icon name="up" size={18} />}
-              </button>
-            </div>
-
-            <button
-              className="reload-button"
-              onClick={handleReload}
-              disabled={loading}
-              title="Recargar datos"
-            >
-              <Icon name="reload" size={16} />
-            </button>
-          </div>
-        </div>
-
-        {/* Contador de resultados */}
-        {dataLoaded && (
-          <div className="results-info">
-            <span className="results-count">
-              {filteredAndSortedPlaces.length} de {places.length} lugares
-            </span>
-            <span className="sort-info">
-              Orden: {sortOrder === "asc" ? "A-Z" : "Z-A"}
-            </span>
-          </div>
-        )}
-
-        {/* Grid de lugares */}
-        <div className="places-grid">
-          {!dataLoaded ? (
-            <div className="loading-state">
-              <div className="loading-spinner"></div>
-              <p>Cargando lugares...</p>
-            </div>
-          ) : loading ? (
-            <div className="loading-state">
-              <div className="loading-spinner"></div>
-              <p>Actualizando...</p>
-            </div>
-          ) : filteredAndSortedPlaces.length === 0 ? (
-            <div className="empty-state">
-              <div className="empty-icon">🏢</div>
-              <h3>No hay lugares</h3>
-              <p>
-                {filter
-                  ? `No se encontraron resultados para "${filter}"`
-                  : "Comience agregando el primer lugar"}
-              </p>
-              {!filter && (
-                <button
-                  className="create-button"
-                  onClick={() => setShowCreateForm(true)}
-                >
-                  <span className="button-icon">+</span>
-                  Crear Primer Lugar
-                </button>
-              )}
-            </div>
-          ) : (
-            <div className="grid-container">
-              {filteredAndSortedPlaces.map((place) => (
-                <div key={place.id} className="place-card">
-                  <div className="place-name">{place.name}</div>
-                  <div className="place-actions">
-                    <button
-                      className="action-btn edit-btn"
-                      onClick={() => startEdit(place)}
-                      title="Editar lugar"
-                      disabled={loading}
-                    >
-                      <Icon name="edit" size={18} />
-                    </button>
-                    <button
-                      className="action-btn delete-btn"
-                      onClick={() => startDelete(place)}
-                      title="Eliminar lugar"
-                      disabled={loading}
-                    >
-                      <Icon name="trash" size={18} />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Modal de creación */}
-        {showCreateForm && (
-          <div className="modal-overlay">
-            <div className="modal-content">
-              <h3>Crear Nuevo Lugar</h3>
-              <form onSubmit={handleCreate}>
-                <div className="form-group">
-                  <label className="form-label">Nombre del lugar</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    placeholder="Ej: Auditorio Principal, Sala de Ensayos, etc."
-                    value={newPlaceName}
-                    onChange={(e) => setNewPlaceName(e.target.value)}
-                    autoFocus
-                    required
-                    minLength={2}
-                    maxLength={100}
-                  />
-                </div>
-                <div className="modal-actions">
-                  <button
-                    type="submit"
-                    className="submit-button"
-                    disabled={loading || !newPlaceName.trim()}
-                  >
-                    {loading ? "Creando..." : "Crear Lugar"}
-                  </button>
-                  <button
-                    type="button"
-                    className="cancel-button"
-                    onClick={() => {
-                      setShowCreateForm(false);
-                      setNewPlaceName("");
-                    }}
-                    disabled={loading}
-                  >
-                    Cancelar
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {/* Modal de edición */}
-        {editingPlace && (
-          <div className="modal-overlay">
-            <div className="modal-content">
-              <h3>Editar Lugar</h3>
-              <div className="form-group">
-                <label className="form-label">Nombre del lugar</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  placeholder="Ej: Auditorio Principal, Sala de Ensayos, etc."
-                  value={editPlaceName}
-                  onChange={(e) => setEditPlaceName(e.target.value)}
-                  autoFocus
-                  required
-                  minLength={2}
-                  maxLength={100}
-                />
-              </div>
-              <div className="modal-actions">
-                <button
-                  className="submit-button"
-                  onClick={handleUpdate}
-                  disabled={
-                    loading ||
-                    !editPlaceName.trim() ||
-                    editPlaceName === editingPlace.name
-                  }
-                >
-                  {loading ? "Actualizando..." : "Actualizar"}
-                </button>
-                <button
-                  className="cancel-button"
-                  onClick={() => {
-                    setEditingPlace(null);
-                    setEditPlaceName("");
-                  }}
-                  disabled={loading}
-                >
-                  Cancelar
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Modal de confirmación de eliminación */}
-        {deletingPlace && (
-          <div className="modal-overlay">
-            <div className="modal-content">
-              <h3>¿Eliminar Lugar?</h3>
-              <div className="delete-confirmation">
-                <p>¿Está seguro de que desea eliminar este lugar?</p>
-                <div className="place-details">
-                  <div className="detail-item">
-                    <strong>Nombre:</strong> {deletingPlace.name}
-                  </div>
-                </div>
-                <p className="warning-text">
-                  ⚠️ Esta acción no se puede deshacer.
-                </p>
-              </div>
-              <div className="modal-actions">
-                <button
-                  className="submit-button delete-button"
-                  onClick={handleDelete}
-                  disabled={loading}
-                >
-                  {loading ? "Eliminando..." : "Sí, Eliminar"}
-                </button>
-                <button
-                  className="cancel-button"
-                  onClick={() => setDeletingPlace(null)}
-                  disabled={loading}
-                >
-                  Cancelar
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+      {/* Modal de eliminación usando componente genérico */}
+      {deletingPlace && (
+        <DeleteModal<PlaceResponseDto>
+          title="¿Eliminar Lugar?"
+          item={deletingPlace}
+          itemName="Lugar"
+          itemId={deletingPlace.id}
+          onConfirm={handleDelete}
+          onClose={() => setDeletingPlace(null)}
+          loading={loading}
+          confirmText="Sí, Eliminar"
+          warningMessage="⚠️ Esta acción no se puede deshacer."
+          renderDetails={renderPlaceDetails}
+        />
+      )}
     </section>
   );
 };

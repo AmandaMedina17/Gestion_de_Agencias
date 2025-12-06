@@ -2,7 +2,12 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useSong } from "../../../../context/SongContext";
 import { useAlbum } from "../../../../context/AlbumContext";
 import { Icon } from "../../../icons";
+<<<<<<< Updated upstream
 import './SongStyle.css';
+=======
+import "./SongStyle.css";
+import AcUnitIcon from "@mui/icons-material/AcUnit";
+>>>>>>> Stashed changes
 
 const SongManagement: React.FC = () => {
   const {
@@ -56,7 +61,7 @@ const SongManagement: React.FC = () => {
         try {
           await fetchSongs();
           await fetchAlbums();
-          
+
           // DEBUG: Verificar estructura de las canciones
           console.log("=== DEBUG CANCIONES ===");
           if (songs.length > 0) {
@@ -68,13 +73,13 @@ const SongManagement: React.FC = () => {
             console.log("¿Tiene album?:", "album" in firstSong);
             console.log("¿Tiene idAlbum?:", "idAlbum" in firstSong);
           }
-          
+
           // DEBUG: Verificar estructura de los álbumes
           console.log("=== DEBUG ÁLBUMES ===");
           if (albums.length > 0) {
             console.log("Primeros 3 álbumes:", albums.slice(0, 3));
           }
-          
+
           setDataLoaded(true);
         } catch (err) {
           console.error("Error loading initial data:", err);
@@ -93,15 +98,15 @@ const SongManagement: React.FC = () => {
   // Obtener ID del álbum de la canción - CORREGIDO
   const getAlbumIdFromSong = (song: any): string => {
     // Primero intentamos con albumId (del DTO)
-    if (song.albumId && typeof song.albumId === 'string') {
+    if (song.albumId && typeof song.albumId === "string") {
       return song.albumId;
     }
     // Luego intentamos con album (como en aprendices)
-    if (song.album && typeof song.album === 'string') {
+    if (song.album && typeof song.album === "string") {
       return song.album;
     }
     // Luego intentamos con idAlbum
-    if (song.idAlbum && typeof song.idAlbum === 'string') {
+    if (song.idAlbum && typeof song.idAlbum === "string") {
       return song.idAlbum;
     }
     // Si no hay ninguna, retornamos string vacío
@@ -112,18 +117,20 @@ const SongManagement: React.FC = () => {
   // Obtener nombre del álbum por ID - CORREGIDO
   const getAlbumName = (albumId: string) => {
     console.log("getAlbumName recibió albumId:", albumId);
-    
+
     if (!albumId || albumId.trim() === "") {
       return "No asignado";
     }
-    
-    const album = albums.find(a => a.id === albumId);
-    
+
+    const album = albums.find((a) => a.id === albumId);
+
     if (album) {
       return album.title;
     } else {
-      console.warn(`Álbum con ID "${albumId}" no encontrado en:`, 
-        albums.map(a => ({ id: a.id, title: a.title })));
+      console.warn(
+        `Álbum con ID "${albumId}" no encontrado en:`,
+        albums.map((a) => ({ id: a.id, title: a.title }))
+      );
       return "No asignado";
     }
   };
@@ -182,7 +189,10 @@ const SongManagement: React.FC = () => {
   // PAGINACIÓN: calcular páginas y slice
   const totalPages = Math.ceil(filteredAndSortedSongs.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedSongs = filteredAndSortedSongs.slice(startIndex, startIndex + itemsPerPage);
+  const paginatedSongs = filteredAndSortedSongs.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
 
   // Manejar creación de canción
   const handleCreate = async (e: React.FormEvent) => {
@@ -202,7 +212,11 @@ const SongManagement: React.FC = () => {
       await createSong({
         nameSong: newSong.nameSong,
         idAlbum: newSong.idAlbum,
+<<<<<<< Updated upstream
         releaseDate: newSong.releaseDate ? new Date(newSong.releaseDate) : undefined,
+=======
+        releaseDate: new Date(newSong.releaseDate),
+>>>>>>> Stashed changes
       });
 
       setMessage({
@@ -337,11 +351,11 @@ const SongManagement: React.FC = () => {
   // Formatear fecha para mostrar
   const formatDate = (dateString: string) => {
     if (!dateString) return "N/A";
-  
+
     const date = new Date(dateString);
     // Sumar un día
     date.setDate(date.getDate() + 1);
-    
+
     return date.toLocaleDateString("es-ES");
   };
 
@@ -518,18 +532,22 @@ const SongManagement: React.FC = () => {
                         <td className="song-name-cell">
                           <div className="song-name">{song.name}</div>
                         </td>
+<<<<<<< Updated upstream
                         <td>
                           <div className="detail-value">
                             {albumName}
                           </div>
                         </td>
+=======
+
+>>>>>>> Stashed changes
                         <td>
                           <div className="detail-value">
                             {formatDate(song.fecha.toString())}
                           </div>
                         </td>
                         <td>
-                          <div className="table-actions">
+                          <div className="table-actions-botons">
                             <button
                               className="action-btn edit-btn"
                               onClick={() => startEdit(song)}
@@ -652,7 +670,9 @@ const SongManagement: React.FC = () => {
                 <button
                   type="submit"
                   className="submit-button"
-                  disabled={loading || !newSong.nameSong.trim() || !newSong.idAlbum}
+                  disabled={
+                    loading || !newSong.nameSong.trim() || !newSong.idAlbum
+                  }
                 >
                   {loading ? "Creando..." : "Crear Canción"}
                 </button>
@@ -746,7 +766,9 @@ const SongManagement: React.FC = () => {
               <button
                 className="submit-button"
                 onClick={handleUpdate}
-                disabled={loading || !editSong.nameSong.trim() || !editSong.idAlbum}
+                disabled={
+                  loading || !editSong.nameSong.trim() || !editSong.idAlbum
+                }
               >
                 {loading ? "Actualizando..." : "Actualizar"}
               </button>

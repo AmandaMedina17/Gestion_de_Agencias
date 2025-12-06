@@ -1,5 +1,6 @@
 // App.tsx
 import React, { Activity } from 'react';
+<<<<<<< Updated upstream
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ResponsibleProvider } from './context/ResponsibleContext';
@@ -8,6 +9,16 @@ import Login from './components/Login/Login';
 import ManagerDashboard from './components/Manager/ManagerDashboard';
 import AdminDashboard from './components/Admin/AdminDashboard';
 import './App.css';
+=======
+import{ BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+ import { ResponsibleProvider } from './context/ResponsibleContext';
+import { ApprenticeProvider } from './context/ApprenticeContext';
+// import Login from './components/Login/Login';
+import ManagerDashboard from './components/Manager/ManagerDashboard';
+import AdminDashboard from './components/Admin/AdminDashboard';
+//import './App.css';
+>>>>>>> Stashed changes
 import { PlaceProvider } from './context/PlaceContext';
 import { ArtistProvider } from './context/ArtistContext';
 import { ActivityProvider } from './context/ActivityContext';
@@ -19,6 +30,11 @@ import { BillboardListProvider } from './context/BillboardListContext';
 import { useAuth } from './context/AuthContext';
 import { AlbumProvider } from './context/AlbumContext';
 import { SongProvider } from './context/SongContext';
+<<<<<<< Updated upstream
+=======
+import LoginPage from './components/prueba/LoginPage'
+import './components/prueba/LoginPage'
+>>>>>>> Stashed changes
 
 const PrivateRoute = ({ children, allowedRoles }: { children: React.ReactNode, allowedRoles: string[] }) => {
   const { user, isAuthenticated } = useAuth();
@@ -51,6 +67,7 @@ function App() {
                             <Router>
                               <div className="App">
                                 <Routes>
+<<<<<<< Updated upstream
                                   <Route path="/login" element={<Login />} />
                                   <Route 
                                     path="/manager" 
@@ -69,6 +86,17 @@ function App() {
                                     } 
                                   />
                                   <Route path="/" element={<Navigate to="/login" />} />
+=======
+                                  <Route path="/" element={<LoginPage />} />
+                                  <Route 
+                                                        path="/admin" 
+                                                        element={
+                                                          <ResponsibleProvider> {/* Solo en admin */}
+                                                            <AdminDashboard />
+                                                          </ResponsibleProvider>
+                                                        } 
+                                                      />
+>>>>>>> Stashed changes
                                 </Routes>
                               </div>
                             </Router>
@@ -84,6 +112,10 @@ function App() {
         </BillboardListProvider>
       </AlbumProvider>
     </SongProvider>
+<<<<<<< Updated upstream
+=======
+   
+>>>>>>> Stashed changes
   );
 }
 

@@ -1,13 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { useBillboardList } from "../../../../context/BillboardListContext";
-import { Icon } from "../../../icons";
+import GenericTable, { Column } from "../../../ui/datatable";
+import CreateModal, { FormField } from "../../../ui/reutilizables/CreateModal";
+import EditModal from "../../../ui/reutilizables/EditModal";
+import DeleteModal from "../../../ui/reutilizables/DeleteModal";
 import './BillboardListStyle.css';
 
-export enum BillboardListScope{
-    INTERNACIONAL = "INTERNACIONAL",
-    NACIONAL = "NACIONAL"
-}
+import { ResponseBillboardListDto as BillboardListResponseDto} from "../../../../../../backend/src/ApplicationLayer/DTOs/billboardDto/response.billboard.dto";
 
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import Stack from '@mui/material/Stack';
+
+export enum BillboardListScope {
+  INTERNACIONAL = "INTERNACIONAL",
+  NACIONAL = "NACIONAL",
+}
 
 const BillboardListManagement: React.FC = () => {
   const {
@@ -21,306 +31,182 @@ const BillboardListManagement: React.FC = () => {
     clearError,
   } = useBillboardList();
 
-  // Estados principales
-  const [filter, setFilter] = useState("");
-  const [sortBy, setSortBy] = useState<"nameList" | "publicDate" | "scope" | "endList">("nameList");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [editingList, setEditingList] = useState<any>(null);
-  const [deletingList, setDeletingList] = useState<any>(null);
-  const [message, setMessage] = useState<{
-    type: "success" | "error";
-    text: string;
+  const [notification, setNotification] = useState<{
+    type: "success" | "error" | "info" | "warning";
+    title?: string;
+    message: string;
   } | null>(null);
-  const [dataLoaded, setDataLoaded] = useState(false);
 
-  // PAGINACIÓN
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 30;
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingList, setEditingList] = useState<BillboardListResponseDto | null>(null);
+  const [deletingList, setDeletingList] = useState<BillboardListResponseDto | null>(null);
 
-  // Estados del formulario
-  const [newList, setNewList] = useState({
-    publicDate: "",
-    scope: BillboardListScope.NACIONAL,
-    nameList: "",
-    endList: "100",
-  });
-
-  const [editList, setEditList] = useState({
-    publicDate: "",
-    scope: BillboardListScope.NACIONAL,
-    nameList: "",
-    endList: "100",
-  });
-
-  // Cargar listas cuando se monta el componente
   useEffect(() => {
-    const loadInitialData = async () => {
-      if (!dataLoaded) {
-        clearError();
-        try {
-          await fetchBillboardLists();
-          setDataLoaded(true);
-        } catch (err) {
-          console.error("Error loading initial data:", err);
-        }
+    const loadData = async () => {
+      try {
+        await fetchBillboardLists();
+      } catch (err) {
+        console.error("Error loading data:", err);
       }
     };
+    loadData();
+  }, []);
 
-    loadInitialData();
-  }, [dataLoaded]);
-
-  // Resetear página cuando cambien filtro u orden
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [filter, sortBy, sortOrder]);
-
-  // Filtrar y ordenar listas
-  const filteredAndSortedLists = React.useMemo(() => {
-    if (!dataLoaded) return [];
-
-    let filtered = billboardLists;
-
-    // Aplicar filtro por nombre o alcance
-    if (filter) {
-      filtered = billboardLists.filter((list) =>
-        list.nameList.toLowerCase().includes(filter.toLowerCase()) ||
-        list.scope.toLowerCase().includes(filter.toLowerCase())
-      );
-    }
-
-    // Aplicar ordenamiento
-    const sorted = [...filtered].sort((a, b) => {
-      let aValue, bValue;
-
-      switch (sortBy) {
-        case "nameList":
-          aValue = a.nameList;
-          bValue = b.nameList;
-          break;
-        case "publicDate":
-          aValue = new Date(a.publicDate);
-          bValue = new Date(b.publicDate);
-          break;
-        case "scope":
-          aValue = a.scope;
-          bValue = b.scope;
-          break;
-        case "endList":
-          aValue = a.endList;
-          bValue = b.endList;
-          break;
-        default:
-          aValue = a.nameList;
-          bValue = b.nameList;
+  // Definir campos del formulario de lista Billboard
+  const billboardListFields: FormField[] = [
+    {
+      name: "nameList",
+      label: "Nombre de la lista",
+      type: "text",
+      placeholder: "Ej: Top 100 Semanal",
+      required: true,
+      min: 2,
+      max: 100,
+      validate: (value) => {
+        if (value.length < 2) return "El nombre debe tener al menos 2 caracteres";
+        return null;
       }
-
-      if (sortOrder === "asc") {
-        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-      } else {
-        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+    },
+    {
+      name: "publicDate",
+      label: "Fecha de publicación",
+      type: "date",
+      required: true,
+      validate: (value) => {
+        if (!value) return "La fecha de publicación es requerida";
+        return null;
       }
-    });
-
-    return sorted;
-  }, [billboardLists, filter, sortBy, sortOrder, dataLoaded]);
-
-  // PAGINACIÓN: calcular páginas y slice
-  const totalPages = Math.ceil(filteredAndSortedLists.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedLists = filteredAndSortedLists.slice(startIndex, startIndex + itemsPerPage);
-
-  // Manejar creación de lista
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    clearError();
-    setMessage(null);
-
-    if (
-      !newList.publicDate ||
-      !newList.nameList.trim() ||
-      !newList.endList
-    ) {
-      setMessage({
-        type: "error",
-        text: "Por favor, complete todos los campos obligatorios",
-      });
-      return;
+    },
+    {
+      name: "scope",
+      label: "Alcance",
+      type: "autocomplete",
+      required: true,
+      options: [
+        { value: BillboardListScope.INTERNACIONAL, label: "Internacional" },
+        { value: BillboardListScope.NACIONAL, label: "Nacional" }
+      ]
+    },
+    {
+      name: "endList",
+      label: "Cantidad de puestos",
+      type: "text",
+      required: true,
+      min: 1,
+      max: 1000,
+      validate: (value) => {
+        const numValue = parseInt(value);
+        if (numValue <= 0) return "El número de puestos de la lista debe ser mayor a 0";
+        if (numValue > 1000) return "El número de puestos de la lista no puede ser mayor a 1000";
+        return null;
+      }
     }
+  ];
 
-    const endListNumber = parseInt(newList.endList);
-    if (endListNumber <= 0) {
-      setMessage({
-        type: "error",
-        text: "El fin de lista debe ser mayor a 0",
-      });
-      return;
-    }
+  // Datos iniciales para creación
+  const initialCreateData = {
+    nameList: "",
+    publicDate: "",
+    scope: BillboardListScope.NACIONAL,
+    endList: "100"
+  };
 
+  // Funciones auxiliares para mostrar notificaciones
+  const showNotification = (type: "success" | "error" | "info" | "warning", title: string, message: string) => {
+    setNotification({ type, title, message });
+  };
+
+  const showSuccess = (title: string, message: string) => {
+    showNotification("success", title, message);
+  };
+
+  const showError = (title: string, message: string) => {
+    showNotification("error", title, message);
+  };
+
+  const showCreateSuccess = () => {
+    showSuccess("¡Lista Billboard Creada!", "La lista Billboard ha sido creada exitosamente.");
+  };
+
+  const showCreateError = (errorMessage?: string) => {
+    showError("Error al Crear", errorMessage || "No se pudo crear la lista Billboard.");
+  };
+
+  const showUpdateSuccess = () => {
+    showSuccess("¡Lista Billboard Actualizada!", "La lista Billboard ha sido actualizada exitosamente.");
+  };
+
+  const showUpdateError = (errorMessage?: string) => {
+    showError("Error al Actualizar", errorMessage || "No se pudo actualizar la lista Billboard.");
+  };
+
+  const showDeleteSuccess = () => {
+    showSuccess("¡Lista Billboard Eliminada!", "La lista Billboard ha sido eliminada exitosamente.");
+  };
+
+  const showDeleteError = (errorMessage?: string) => {
+    showError("Error al Eliminar", errorMessage || "No se pudo eliminar la lista Billboard.");
+  };
+
+  // Manejar creación
+  const handleCreate = async (data: Record<string, any>) => {
     try {
       await createBillboardList({
-        publicDate: new Date(newList.publicDate),
-        scope: newList.scope,
-        nameList: newList.nameList.trim(),
-        endList: endListNumber,
+        nameList: data.nameList,
+        publicDate: new Date(data.publicDate),
+        scope: data.scope,
+        endList: parseInt(data.endList)
       });
 
-      setMessage({
-        type: "success",
-        text: `Lista "${newList.nameList}" creada exitosamente`,
-      });
-
-      // Resetear formulario
-      setNewList({
-        publicDate: "",
-        scope: BillboardListScope.NACIONAL,
-        nameList: "",
-        endList: "100",
-      });
-
-      setShowCreateForm(false);
+      showCreateSuccess();
+      setShowCreateModal(false);
       await fetchBillboardLists();
 
-      setTimeout(() => setMessage(null), 5000);
     } catch (err: any) {
-      setMessage({
-        type: "error",
-        text: err.message || "Error al crear la lista",
-      });
+      showCreateError(err.message);
     }
   };
 
-  // Manejar actualización de lista
-  const handleUpdate = async () => {
-    if (!editingList) return;
-
-    if (
-      !editList.publicDate ||
-      !editList.nameList.trim() ||
-      !editList.endList
-    ) {
-      setMessage({
-        type: "error",
-        text: "Por favor, complete todos los campos obligatorios",
-      });
-      return;
-    }
-
-    const endListNumber = parseInt(editList.endList);
-    if (endListNumber <= 0) {
-      setMessage({
-        type: "error",
-        text: "El fin de lista debe ser mayor a 0",
-      });
-      return;
-    }
-
+  // Manejar actualización
+  const handleUpdate = async (id: string | number, data: Record<string, any>) => {
     try {
-      await updateBillboardList(editingList.id, {
-        publicDate: new Date(editList.publicDate),
-        scope: editList.scope,
-        nameList: editList.nameList.trim(),
-        endList: endListNumber,
+      await updateBillboardList(id as string, {
+        nameList: data.nameList,
+        publicDate: new Date(data.publicDate),
+        scope: data.scope,
+        endList: parseInt(data.endList)
       });
 
-      setMessage({
-        type: "success",
-        text: `Lista actualizada exitosamente`,
-      });
-
+      showUpdateSuccess();
       setEditingList(null);
-      setEditList({
-        publicDate: "",
-        scope: BillboardListScope.NACIONAL,
-        nameList: "",
-        endList: "100",
-      });
-
       await fetchBillboardLists();
-      setTimeout(() => setMessage(null), 5000);
     } catch (err: any) {
-      setMessage({
-        type: "error",
-        text: err.message || "Error al actualizar la lista",
-      });
+      showUpdateError(err.message);
     }
   };
 
-  // Manejar eliminación de lista
-  const handleDelete = async () => {
+  // Manejar eliminación
+  const handleDelete = async (id: string | number) => {
     if (!deletingList) return;
 
     try {
-      await deleteBillboardList(deletingList.id);
-      setMessage({
-        type: "success",
-        text: `Lista "${deletingList.nameList}" eliminada exitosamente`,
-      });
+      await deleteBillboardList(id as string);
+      showDeleteSuccess();
       setDeletingList(null);
       await fetchBillboardLists();
-      setTimeout(() => setMessage(null), 5000);
     } catch (err: any) {
-      setMessage({
-        type: "error",
-        text: err.message || "Error al eliminar la lista",
-      });
+      showDeleteError(err.message);
     }
   };
 
-  // Recargar datos manualmente
-  const handleReload = async () => {
-    clearError();
-    try {
-      await fetchBillboardLists();
-      setMessage({
-        type: "success",
-        text: "Datos actualizados correctamente",
-      });
-      setTimeout(() => setMessage(null), 3000);
-    } catch (err: any) {
-      setMessage({
-        type: "error",
-        text: err.message || "Error al recargar los datos",
-      });
-    }
+  // Funciones auxiliares
+  const formatDate = (date: Date | string) => {
+    if (!date) return "N/A";
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    dateObj.setDate(dateObj.getDate() + 1);
+    return dateObj.toLocaleDateString("es-ES");
   };
 
-  // Iniciar edición
-  const startEdit = (list: any) => {
-    setEditingList(list);
-    setEditList({
-      publicDate: list.publicDate.split("T")[0], // Formato YYYY-MM-DD
-      scope: list.scope,
-      nameList: list.nameList,
-      endList: list.endList.toString(),
-    });
-  };
-
-  // Iniciar eliminación
-  const startDelete = (list: any) => {
-    setDeletingList(list);
-  };
-
-  // Limpiar filtro
-  const handleClearFilter = () => {
-    setFilter("");
-  };
-
-  // Alternar ordenamiento
-  const toggleSortOrder = () => {
-    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-  };
-
-  // Formatear fecha para mostrar
-  const formatDate = (dateString: string) => {
-    if (!dateString) return "N/A";
-    const date = new Date(dateString);
-    // Sumar un día para compensar diferencia de zona horaria
-    date.setDate(date.getDate() + 1);
-    return date.toLocaleDateString("es-ES");
-  };
-
-  // Traducir alcances
   const getScopeText = (scope: BillboardListScope) => {
     const scopeMap = {
       [BillboardListScope.INTERNACIONAL]: "Internacional",
@@ -329,517 +215,133 @@ const BillboardListManagement: React.FC = () => {
     return scopeMap[scope] || scope;
   };
 
-  const getTodayDate = (): string => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
+  // Definir columnas para la tabla
+  const columns: Column<BillboardListResponseDto>[] = [
+    {
+      key: "nameList",
+      title: "Nombre",
+      sortable: true,
+      width: "30%",
+      align: "center"
+    },
+    {
+      key: "publicDate",
+      title: "Fecha",
+      sortable: true,
+      width: "20%",
+      align: "center",
+      render: (item) => formatDate(item.publicDate)
+    },
+    {
+      key: "scope",
+      title: "Alcance",
+      sortable: true,
+      width: "20%",
+      align: "center",
+      render: (item) => (
+        <span className={`scope-badge scope-${item.scope.toLowerCase()}`}>
+          {getScopeText(item.scope)}
+        </span>
+      )
+    },
+    {
+      key: "endList",
+      title: "Puestos",
+      sortable: true,
+      width: "15%",
+      align: "center",
+      render: (item) => item.endList.toString()
+    }
+  ];
+
+  // Función para renderizar detalles en modal de eliminación
+  const renderBillboardListDetails = (list: BillboardListResponseDto) => (
+    <div className="billboard-list-details">
+      <div className="detail-item">
+        <strong>Nombre:</strong> <span>{list.nameList}</span>
+      </div>
+      <div className="detail-item">
+        <strong>Fecha:</strong> <span>{formatDate(list.publicDate)}</span>
+      </div>
+      <div className="detail-item">
+        <strong>Alcance:</strong> <span>{getScopeText(list.scope)}</span>
+      </div>
+      <div className="detail-item">
+        <strong>Fin de lista:</strong> <span>{list.endList}</span>
+      </div>
+    </div>
+  );
 
   return (
     <section id="billboard_list_manager" className="content-section active">
-      <div className="profile-header">
-        <div className="profile-info">
-          <h1>Gestión de Listas Billboard</h1>
-          <p className="section-description">
-            Administre todas las listas Billboard del sistema
-          </p>
-        </div>
-      </div>
+      <GenericTable<BillboardListResponseDto>
+        title="Gestión de Listas Billboard"
+        description="Administre todas las listas Billboard del sistema"
+        data={billboardLists}
+        columns={columns}
+        loading={loading}
+        onReload={() => fetchBillboardLists()}
+        showCreateForm={showCreateModal}
+        onShowCreateChange={setShowCreateModal}
+        editingItem={editingList}
+        onEditingChange={setEditingList}
+        deletingItem={deletingList}
+        onDeletingChange={setDeletingList}
+        itemsPerPage={30}
+        className="billboard-list-table"
+        notification={notification || undefined}
+        onNotificationClose={() => setNotification(null)}
+      />
 
-      <div className="detail-card">
-        {/* Mensajes globales */}
-        {message && (
-          <div className={`message ${message.type}`}>{message.text}</div>
-        )}
-
-        {error && <div className="message error">{error}</div>}
-
-        {/* Controles superiores */}
-        <div className="manager-controls">
-          <div className="controls-left">
-            <button
-              className="create-button"
-              onClick={() => setShowCreateForm(true)}
-              disabled={loading}
-            >
-              <span className="button-icon"><Icon name="plus" size={20} /></span>
-              Nueva Lista
-            </button>
-          </div>
-
-          <div className="controls-right">
-            <div className="filter-group">
-              <input
-                type="text"
-                className="form-input search-input"
-                placeholder="Filtrar por nombre o alcance..."
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                disabled={loading}
-              />
-              {filter && (
-                <button
-                  className="clear-filter-btn"
-                  onClick={handleClearFilter}
-                  title="Limpiar filtro"
-                >
-                  ×
-                </button>
-              )}
-            </div>
-
-            <div className="sort-group">
-              <select
-                className="form-select sort-select"
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
-                disabled={loading}
-              >
-                <option value="nameList">Ordenar por nombre</option>
-                <option value="publicDate">Ordenar por fecha</option>
-                <option value="scope">Ordenar por alcance</option>
-                <option value="endList">Ordenar por fin de lista</option>
-              </select>
-              <button
-                className="sort-order-btn"
-                onClick={toggleSortOrder}
-                disabled={loading}
-                title={
-                  sortOrder === "asc" ? "Orden ascendente" : "Orden descendente"
-                }
-              >
-                {sortOrder === "asc" ? <Icon name="down" size={18} /> : <Icon name="up" size={18} />}
-              </button>
-            </div>
-
-            <button
-              className="reload-button"
-              onClick={handleReload}
-              disabled={loading}
-              title="Recargar datos"
-            >
-              {loading ? "⟳" : "↻"}
-            </button>
-          </div>
-        </div>
-
-        {/* Contador de resultados */}
-        {dataLoaded && (
-          <div className="results-info">
-            <span className="results-count">
-              {filteredAndSortedLists.length} de {billboardLists.length} listas
-            </span>
-            <span className="sort-info">
-              Orden:{" "}
-              {sortBy === "nameList"
-                ? "Nombre"
-                : sortBy === "publicDate"
-                ? "Fecha"
-                : sortBy === "scope"
-                ? "Alcance"
-                : "Fin de lista"}{" "}
-              •{sortOrder === "asc" ? " Ascendente" : " Descendente"}
-            </span>
-          </div>
-        )}
-
-        {/* Grid de listas */}
-        <div className="billboard-lists-grid">
-          {!dataLoaded ? (
-            <div className="loading-state">
-              <div className="loading-spinner"></div>
-              <p>Cargando listas...</p>
-            </div>
-          ) : loading ? (
-            <div className="loading-state">
-              <div className="loading-spinner"></div>
-              <p>Actualizando...</p>
-            </div>
-          ) : filteredAndSortedLists.length === 0 ? (
-            <div className="empty-state">
-              <div className="empty-icon">📊</div>
-              <h3>No hay listas Billboard</h3>
-              <p>
-                {filter
-                  ? `No se encontraron resultados para "${filter}"`
-                  : "Comience agregando la primera lista"}
-              </p>
-              {!filter && (
-                <button
-                  className="create-button"
-                  onClick={() => setShowCreateForm(true)}
-                  disabled={
-                    loading 
-                    
-                  }
-                >
-                  <span className="button-icon"><Icon name="plus" size={20} /></span>
-                  Crear Primera Lista
-                </button>
-              )}
-            </div>
-          ) : (
-            <div className="table-container">
-              <table className="billboard-lists-table">
-                <thead>
-                  <tr>
-                    <th>Nombre</th>
-                    <th>Fecha</th>
-                    <th>Alcance</th>
-                    <th>Fin de Lista</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedLists.map((list) => (
-                    <tr key={list.id} className="billboard-list-row">
-                      <td className="billboard-list-name-cell">
-                        <div className="billboard-list-name">{list.nameList}</div>
-                      </td>
-                      <td>
-                        <div className="detail-value">
-                          {formatDate(list.publicDate.toString())}
-                        </div>
-                      </td>
-                      <td>
-                        <span
-                          className={`scope-badge scope-${list.scope.toLowerCase()}`}
-                        >
-                          {getScopeText(list.scope)}
-                        </span>
-                      </td>
-                      <td>
-                        <div className="detail-value">{list.endList}</div>
-                      </td>
-                      <td>
-                        <div className="table-actions">
-                          <button
-                            className="action-btn edit-btn"
-                            onClick={() => startEdit(list)}
-                            title="Editar lista"
-                            disabled={loading}
-                          >
-                            <Icon name="edit" size={18} />
-                          </button>
-                          <button
-                            className="action-btn delete-btn"
-                            onClick={() => startDelete(list)}
-                            title="Eliminar lista"
-                            disabled={loading}
-                          >
-                            <Icon name="trash" size={18} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {/* PAGINACIÓN */}
-              {totalPages > 1 && (
-                <div className="pagination-container">
-                  <button
-                    className="pagination-btn"
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage(currentPage - 1)}
-                  >
-                    ◀ Anterior
-                  </button>
-
-                  <span className="pagination-info">
-                    Página {currentPage} de {totalPages}
-                  </span>
-
-                  <button
-                    className="pagination-btn"
-                    disabled={currentPage === totalPages}
-                    onClick={() => setCurrentPage(currentPage + 1)}
-                  >
-                    Siguiente ▶
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Modal de creación */}
-      {showCreateForm && (
-        <div className="modal-overlay billboard-list-modal">
-          <div className="modal-content">
-            <h3>Crear Nueva Lista Billboard</h3>
-            <form onSubmit={handleCreate}>
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">Nombre de la lista *</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    placeholder="Ej: Top 100 Semanal"
-                    value={newList.nameList}
-                    onChange={(e) =>
-                      setNewList({
-                        ...newList,
-                        nameList: e.target.value,
-                      })
-                    }
-                    required
-                    minLength={2}
-                    maxLength={100}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Fecha de publicación *</label>
-                  <input
-                    type="date"
-                    className="form-input"
-                    value={newList.publicDate}
-                    onChange={(e) =>
-                      setNewList({
-                        ...newList,
-                        publicDate: e.target.value,
-                      })
-                    }
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">Alcance *</label>
-                  <select
-                    className="form-select"
-                    value={newList.scope}
-                    onChange={(e) =>
-                      setNewList({
-                        ...newList,
-                        scope: e.target.value as BillboardListScope,
-                      })
-                    }
-                    required
-                  >
-                    <option value={BillboardListScope.INTERNACIONAL}>Internacional</option>
-                    <option value={BillboardListScope.NACIONAL}>Nacional</option>
-                  
-                  </select>
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Fin de lista *</label>
-                  <input
-                    type="number"
-                    className="form-input"
-                    placeholder="Ej: 100"
-                    value={newList.endList}
-                    onChange={(e) =>
-                      setNewList({
-                        ...newList,
-                        endList: e.target.value,
-                      })
-                    }
-                    required
-                    min="1"
-                    max="1000"
-                  />
-                </div>
-              </div>
-
-              <div className="modal-actions">
-                <button
-                  type="submit"
-                  className="submit-button"
-                  disabled={
-                    loading ||
-                    !newList.publicDate ||
-                    !newList.nameList.trim() ||
-                    !newList.endList
-                  }
-                >
-                  {loading ? "Creando..." : "Crear Lista"}
-                </button>
-                <button
-                  type="button"
-                  className="cancel-button"
-                  onClick={() => {
-                    setShowCreateForm(false);
-                    setNewList({
-                      publicDate: "",
-                      scope: BillboardListScope.NACIONAL,
-                      nameList: "",
-                      endList: "100",
-                    });
-                  }}
-                  disabled={loading}
-                >
-                  Cancelar
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+      {/* Modal de creación usando componente genérico */}
+      {showCreateModal && (
+        <CreateModal
+          title="Crear Nueva Lista Billboard"
+          fields={billboardListFields}
+          initialData={initialCreateData}
+          onSubmit={handleCreate}
+          onClose={() => setShowCreateModal(false)}
+          loading={loading}
+          submitText="Crear Lista"
+        />
       )}
 
-      {/* Modal de edición */}
+      {/* Modal de edición usando componente genérico */}
       {editingList && (
-        <div className="modal-overlay billboard-list-modal">
-          <div className="modal-content">
-            <h3>Editar Lista Billboard</h3>
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Nombre de la lista *</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={editList.nameList}
-                  onChange={(e) =>
-                    setEditList({
-                      ...editList,
-                      nameList: e.target.value,
-                    })
-                  }
-                  required
-                  minLength={2}
-                  maxLength={100}
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Fecha de publicación *</label>
-                <input
-                  type="date"
-                  className="form-input"
-                  value={editList.publicDate}
-                  onChange={(e) =>
-                    setEditList({
-                      ...editList,
-                      publicDate: e.target.value,
-                    })
-                  }
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Alcance *</label>
-                <select
-                  className="form-select"
-                  value={editList.scope}
-                  onChange={(e) =>
-                    setEditList({
-                      ...editList,
-                      scope: e.target.value as BillboardListScope,
-                    })
-                  }
-                  required
-                >
-                  <option value={BillboardListScope.INTERNACIONAL}>Internacional</option>
-                  <option value={BillboardListScope.NACIONAL}>Nacional</option>
-                 
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Fin de lista *</label>
-                <input
-                  type="number"
-                  className="form-input"
-                  value={editList.endList}
-                  onChange={(e) =>
-                    setEditList({
-                      ...editList,
-                      endList: e.target.value,
-                    })
-                  }
-                  required
-                  min="1"
-                  max="1000"
-                />
-              </div>
-            </div>
-
-            <div className="modal-actions">
-              <button
-                className="submit-button"
-                onClick={handleUpdate}
-                disabled={
-                  loading ||
-                  !editList.publicDate ||
-                  !editList.nameList.trim() ||
-                  !editList.endList
-                }
-              >
-                {loading ? "Actualizando..." : "Actualizar"}
-              </button>
-              <button
-                className="cancel-button"
-                onClick={() => {
-                  setEditingList(null);
-                  setEditList({
-                    publicDate: "",
-                    scope: BillboardListScope.NACIONAL,
-                    nameList: "",
-                    endList: "100",
-                  });
-                }}
-                disabled={loading}
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        </div>
+        <EditModal
+          title="Editar Lista Billboard"
+          fields={billboardListFields}
+          initialData={{
+            nameList: editingList.nameList,
+            publicDate: editingList.publicDate ? 
+              (new Date(editingList.publicDate).toISOString().split("T")[0]) 
+              : "",
+            scope: editingList.scope,
+            endList: editingList.endList.toString()
+          }}
+          itemId={editingList.id}
+          onSubmit={handleUpdate}
+          onClose={() => setEditingList(null)}
+          loading={loading}
+          submitText="Actualizar Lista"
+         
+        />
       )}
 
-      {/* Modal de confirmación de eliminación */}
+      {/* Modal de eliminación usando componente genérico */}
       {deletingList && (
-        <div className="modal-overlay billboard-list-modal">
-          <div className="modal-content">
-            <h3>¿Eliminar Lista Billboard?</h3>
-            <div className="delete-confirmation">
-              <p>¿Está seguro de que desea eliminar esta lista?</p>
-              <div className="billboard-list-details">
-                <div className="detail-item">
-                  <strong>Nombre:</strong> {deletingList.nameList}
-                </div>
-                <div className="detail-item">
-                  <strong>Fecha:</strong> {formatDate(deletingList.publicDate)}
-                </div>
-                <div className="detail-item">
-                  <strong>Alcance:</strong> {getScopeText(deletingList.scope)}
-                </div>
-                <div className="detail-item">
-                  <strong>Fin de lista:</strong> {deletingList.endList}
-                </div>
-              </div>
-              <p className="warning-text">
-                ⚠️ Esta acción no se puede deshacer.
-              </p>
-            </div>
-            <div className="modal-actions">
-              <button
-                className="submit-button delete-button"
-                onClick={handleDelete}
-                disabled={loading}
-              >
-                {loading ? "Eliminando..." : "Sí, Eliminar"}
-              </button>
-              <button
-                className="cancel-button"
-                onClick={() => setDeletingList(null)}
-                disabled={loading}
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        </div>
+        <DeleteModal<BillboardListResponseDto>
+          title="¿Eliminar Lista Billboard?"
+          item={deletingList}
+          itemName="Lista Billboard"
+          itemId={deletingList.id}
+          onConfirm={handleDelete}
+          onClose={() => setDeletingList(null)}
+          loading={loading}
+          confirmText="Sí, Eliminar"
+          warningMessage="⚠️ Esta acción no se puede deshacer."
+          renderDetails={renderBillboardListDetails}
+        />
       )}
     </section>
   );
