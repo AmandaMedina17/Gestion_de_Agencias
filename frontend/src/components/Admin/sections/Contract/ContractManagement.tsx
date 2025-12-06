@@ -1,9 +1,14 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useContract } from "../../../../context/ContractContext";
 import { useAgency } from "../../../../context/AgencyContext";
 import { useArtist } from "../../../../context/ArtistContext";
-import { Icon } from "../../../icons";
-import "./ContractStyle.css";
+import GenericTable, { Column } from "../../../ui/datatable";
+import CreateModal, { FormField } from "../../../ui/reutilizables/CreateModal";
+import EditModal from "../../../ui/reutilizables/EditModal";
+import DeleteModal from "../../../ui/reutilizables/DeleteModal";
+import './ContractStyle.css';
+import { ContractResponseDto } from "../../../../../../backend/src/ApplicationLayer/DTOs/contractDto/response-contract.dto";
+
 
 export enum ContractStatus {
   ACTIVO = "ACTIVO",
@@ -11,6 +16,9 @@ export enum ContractStatus {
   EN_RENOVACION = "EN_RENOVACION",
   RESCINDIDO = "RESCINDIDO",
 }
+
+
+
 
 const ContractManagement: React.FC = () => {
   const {
@@ -28,436 +36,323 @@ const ContractManagement: React.FC = () => {
   const { agencies, fetchAgencies } = useAgency();
   const { artists, fetchArtists } = useArtist();
 
-  // Estados principales
-  const [filter, setFilter] = useState("");
-  const [sortBy, setSortBy] = useState<
-    "artist" | "agency" | "startDate" | "endDate" | "status"
-  >("artist");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [editingContract, setEditingContract] = useState<any>(null);
-  const [deletingContract, setDeletingContract] = useState<any>(null);
-  const [message, setMessage] = useState<{
-    type: "success" | "error";
-    text: string;
+ 
+
+   const [notification, setNotification] = useState<{
+    type: "success" | "error" | "info" | "warning";
+    title?: string;
+    message: string;
   } | null>(null);
-  const [dataLoaded, setDataLoaded] = useState(false);
-
-  // Referencias para dropdowns
-  const agencyDropdownRef = useRef<HTMLDivElement>(null);
-  const artistDropdownRef = useRef<HTMLDivElement>(null);
-
-  const [showAgencyDropdown, setShowAgencyDropdown] = useState(false);
-  const [showArtistDropdown, setShowArtistDropdown] = useState(false);
 
 
-  // PAGINACIÓN
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 30;
-
-  // Estados del formulario
-  const [newContract, setNewContract] = useState({
-    startDate: "",
-    endDate: "",
-    agencyId: "",
-    artistId: "",
-    distributionPercentage: "",
-    status: ContractStatus.ACTIVO,
-    conditions: "",
-  });
-
-  const [editContract, setEditContract] = useState({
-    startDate: "",
-    endDate: "",
-    agencyId: "",
-    artistId: "",
-    distributionPercentage: "",
-    status: ContractStatus.ACTIVO,
-    conditions: "",
-  });
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingContract, setEditingContract] = useState<ContractResponseDto | null>(null);
+  const [deletingContract, setDeletingContract] = useState<ContractResponseDto | null>(null);
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        agencyDropdownRef.current &&
-        !agencyDropdownRef.current.contains(event.target as Node)
-      ) {
-        setShowAgencyDropdown(false);
+    const loadData = async () => {
+      try {
+        await Promise.all([
+          fetchContracts(),
+          fetchAgencies(),
+          fetchArtists()
+        ]);
+      } catch (err) {
+        console.error("Error loading data:", err);
       }
-      if (
-        artistDropdownRef.current &&
-        !artistDropdownRef.current.contains(event.target as Node)
-      ) {
-        setShowArtistDropdown(false);
-      }
-      
     };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    loadData();
   }, []);
 
-  // Cargar contratos, agencias y artistas cuando se monta el componente
-  useEffect(() => {
-    const loadInitialData = async () => {
-      if (!dataLoaded) {
-        clearError();
-        try {
-          await Promise.all([
-            fetchContracts(),
-            fetchAgencies(),
-            fetchArtists(),
-          ]);
-          setDataLoaded(true);
-        } catch (err) {
-          console.error("Error loading initial data:", err);
-        }
-      }
-    };
+  
 
-    loadInitialData();
-  }, [dataLoaded]);
-
-  // Resetear página cuando cambien filtro u orden
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [filter, sortBy, sortOrder]);
-
-  // Obtener agencia y artista seleccionados
-  const getSelectedAgency = (agencyId: string) => {
-    return agencies.find((a) => a.id === agencyId);
-  };
-
-  const getSelectedArtist = (artistId: string) => {
-    return artists.find((a) => a.id === artistId);
-  };
-
-  // Obtener nombre de la agencia y artista por ID
-  const getAgencyName = (agencyId: string) => {
-    const agency = getSelectedAgency(agencyId);
-    return agency ? `${agency.nameAgency} - ${agency.place}` : "No asignada";
-  };
-
-  const getArtistName = (artistId: string) => {
-    const artist = getSelectedArtist(artistId);
+   const getArtistName = (contract: ContractResponseDto) => {
+    if (contract.artist && typeof contract.artist === 'object') {
+      return contract.artist.stageName;
+    }
+    const artist = artists.find(a => a.apprenticeId === contract.artist.apprenticeId);
     return artist ? artist.stageName : "No asignado";
   };
 
-  // Filtrar y ordenar contratos
-  const filteredAndSortedContracts = React.useMemo(() => {
-    if (!dataLoaded) return [];
-
-    let filtered = contracts;
-
-    // Aplicar filtro por artista o agencia
-    if (filter) {
-      filtered = contracts.filter(
-        (contract) =>
-          contract.artist.stageName
-            .toLowerCase()
-            .includes(filter.toLowerCase()) ||
-          contract.agency.nameAgency
-            .toLowerCase()
-            .includes(filter.toLowerCase())
-      );
+  // FUNCIÓN PARA OBTENER NOMBRE DE LA AGENCIA
+  const getAgencyName = (contract: ContractResponseDto) => {
+    if (contract.agency && typeof contract.agency === 'object') {
+      return contract.agency.nameAgency;
     }
+    const agency = agencies.find(a => a.nameAgency === contract.agency.nameAgency);
+    return agency ? agency.nameAgency : "No asignada";
+  };
 
-    // Aplicar ordenamiento
-    const sorted = [...filtered].sort((a, b) => {
-      let aValue, bValue;
-
-      switch (sortBy) {
-        case "artist":
-          aValue = a.artist;
-          bValue = b.artist;
-          break;
-        case "agency":
-          aValue = a.agency;
-          bValue = b.agency;
-          break;
-        case "startDate":
-          aValue = new Date(a.startDate);
-          bValue = new Date(b.startDate);
-          break;
-        case "endDate":
-          aValue = new Date(a.endDate);
-          bValue = new Date(b.endDate);
-          break;
-        case "status":
-          aValue = a.status;
-          bValue = b.status;
-          break;
-        default:
-          aValue = a.artist;
-          bValue = b.artist;
+  // Definir campos del formulario de contrato
+  const contractFields: FormField[] = [
+    {
+      name: "artistId",
+      label: "Artista",
+      type: "autocomplete",
+      required: true,
+      options: artists.map(artist => ({
+        value: artist.id,
+        label: artist.stageName
+      }))
+    },
+    {
+      name: "agencyId",
+      label: "Agencia",
+      type: "autocomplete",
+      required: true,
+      options: agencies.map(agency => ({
+        value: agency.id,
+        label: `${agency.nameAgency} - ${agency.place}`
+      }))
+    },
+    {
+      name: "startDate",
+      label: "Fecha de inicio",
+      type: "date",
+      required: true,
+      validate: (value) => {
+        if (!value) return "La fecha de inicio es requerida";
+        return null;
       }
-
-      if (sortOrder === "asc") {
-        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-      } else {
-        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+    },
+    {
+      name: "endDate",
+      label: "Fecha de fin",
+      type: "date",
+      required: true,
+      validate: (value, formData) => {
+        if (!value) return "La fecha de fin es requerida";
+        if (formData && formData.startDate && new Date(value) <= new Date(formData.startDate)) {
+          return "La fecha de fin debe ser posterior a la fecha de inicio";
+        }
+        return null;
       }
-    });
-
-    return sorted;
-  }, [contracts, filter, sortBy, sortOrder, dataLoaded, agencies, artists]);
-
-  // PAGINACIÓN: calcular páginas y slice
-  const totalPages = Math.ceil(
-    filteredAndSortedContracts.length / itemsPerPage
-  );
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedContracts = filteredAndSortedContracts.slice(
-    startIndex,
-    startIndex + itemsPerPage
-  );
-
-  // CORREGIDO: Manejar creación de contrato
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    clearError();
-    setMessage(null);
-
-    if (
-      !newContract.startDate ||
-      !newContract.endDate ||
-      !newContract.agencyId ||
-      !newContract.artistId ||
-      !newContract.distributionPercentage ||
-      !newContract.conditions.trim()
-    ) {
-      setMessage({
-        type: "error",
-        text: "Por favor, complete todos los campos obligatorios",
-      });
-      return;
+    },
+    {
+      name: "distributionPercentage",
+      label: "Porcentaje de distribución",
+      type: "number",
+      required: true,
+      min: 0,
+      max: 100,
+      validate: (value) => {
+        const numValue = parseFloat(value);
+        if (isNaN(numValue)) return "Debe ser un número válido";
+        if (numValue < 0 || numValue > 100) return "Debe estar entre 0 y 100";
+        return null;
+      }
+    },
+    {
+      name: "status",
+      label: "Estado",
+      type: "autocomplete",
+      required: true,
+      options: [
+        { value: ContractStatus.ACTIVO, label: "Activo" },
+        { value: ContractStatus.EN_RENOVACION, label: "En renovación" },
+        { value: ContractStatus.RESCINDIDO, label: "Rescindido" },
+        { value: ContractStatus.FINALIZADO, label: "Finalizado" }
+      ]
+    },
+    {
+      name: "conditions",
+      label: "Condiciones",
+      type: "textarea",
+      required: true,
+      rows: 4,
+      placeholder: "Describe las condiciones del contrato...",
+      validate: (value) => {
+        if (!value.trim()) return "Las condiciones son requeridas";
+        return null;
+      }
     }
+  ];
 
-    if (new Date(newContract.startDate) >= new Date(newContract.endDate)) {
-      setMessage({
-        type: "error",
-        text: "La fecha de inicio debe ser anterior a la fecha de fin",
-      });
-      return;
+  const contractEditFields: FormField[] = [
+    {
+      name: "startDate",
+      label: "Fecha de inicio",
+      type: "date",
+      required: true,
+      validate: (value) => {
+        if (!value) return "La fecha de inicio es requerida";
+        return null;
+      }
+    },
+    {
+      name: "endDate",
+      label: "Fecha de fin",
+      type: "date",
+      required: true,
+      validate: (value, formData) => {
+        if (!value) return "La fecha de fin es requerida";
+        if (formData && formData.startDate && new Date(value) <= new Date(formData.startDate)) {
+          return "La fecha de fin debe ser posterior a la fecha de inicio";
+        }
+        return null;
+      }
+    },
+    {
+      name: "distributionPercentage",
+      label: "Porcentaje de distribución",
+      type: "number",
+      required: true,
+      min: 0,
+      max: 100,
+      validate: (value) => {
+        const numValue = parseFloat(value);
+        if (isNaN(numValue)) return "Debe ser un número válido";
+        if (numValue < 0 || numValue > 100) return "Debe estar entre 0 y 100";
+        return null;
+      }
+    },
+    {
+      name: "status",
+      label: "Estado",
+      type: "autocomplete",
+      required: true,
+      options: [
+        { value: ContractStatus.ACTIVO, label: "Activo" },
+        { value: ContractStatus.EN_RENOVACION, label: "En renovación" },
+        { value: ContractStatus.RESCINDIDO, label: "Rescindido" },
+        { value: ContractStatus.FINALIZADO, label: "Finalizado" }
+      ]
+    },
+    {
+      name: "conditions",
+      label: "Condiciones",
+      type: "textarea",
+      required: true,
+      rows: 4,
+      placeholder: "Describe las condiciones del contrato...",
+      validate: (value) => {
+        if (!value.trim()) return "Las condiciones son requeridas";
+        return null;
+      }
     }
+  ];
 
-    const distributionPercentage = parseFloat(
-      newContract.distributionPercentage
-    );
-    if (distributionPercentage < 0 || distributionPercentage > 100) {
-      setMessage({
-        type: "error",
-        text: "El porcentaje de distribución debe estar entre 0 y 100",
-      });
-      return;
-    }
+  // Datos iniciales para creación
+  const initialCreateData = {
+    artistId: "",
+    agencyId: "",
+    startDate: "",
+    endDate: "",
+    distributionPercentage: "",
+    status: ContractStatus.ACTIVO,
+    conditions: ""
+  };
 
+  // Funciones auxiliares para mostrar notificaciones
+  const showNotification = (type: "success" | "error" | "info" | "warning", title: string, message: string) => {
+    setNotification({ type, title, message });
+  };
+
+  const showSuccess = (title: string, message: string) => {
+    showNotification("success", title, message);
+  };
+
+  const showError = (title: string, message: string) => {
+    showNotification("error", title, message);
+  };
+
+  const showCreateSuccess = () => {
+    showSuccess("¡Contrato Creado!", "El contrato ha sido creado exitosamente.");
+  };
+
+  const showCreateError = (errorMessage?: string) => {
+    showError("Error al Crear", errorMessage || "No se pudo crear el contrato.");
+  };
+
+  const showUpdateSuccess = () => {
+    showSuccess("¡Contrato Actualizado!", "El contrato ha sido actualizado exitosamente.");
+  };
+
+  const showUpdateError = (errorMessage?: string) => {
+    showError("Error al Actualizar", errorMessage || "No se pudo actualizar el contrato.");
+  };
+
+  const showDeleteSuccess = () => {
+    showSuccess("¡Contrato Eliminado!", "El contrato ha sido eliminado exitosamente.");
+  };
+
+  const showDeleteError = (errorMessage?: string) => {
+    showError("Error al Eliminar", errorMessage || "No se pudo eliminar el contrato.");
+  };
+
+  // Manejar creación
+  const handleCreate = async (data: Record<string, any>) => {
     try {
-      // Crear el objeto de datos para enviar
-      const contractData = {
-        startDate: new Date(newContract.startDate),
-        endDate: new Date(newContract.endDate),
-        agencyId: newContract.agencyId,
-        artistId: newContract.artistId,
-        distributionPercentage: distributionPercentage,
-        status: newContract.status,
-        conditions: newContract.conditions.trim(),
-      };
+      console.log(data.agencyId);
+      console.log(data.artistId);
 
-      console.log("Enviando contrato al backend:", contractData);
-
-      // Llamar a createContract
-      await createContract(contractData);
-
-      setMessage({
-        type: "success",
-        text: `Contrato creado exitosamente`,
+      await createContract({
+        startDate: new Date(data.startDate),
+        endDate: new Date(data.endDate),
+        agencyId: data.agencyId,
+        artistId: data.artistId,
+        distributionPercentage: parseFloat(data.distributionPercentage),
+        status: data.status,
+        conditions: data.conditions.trim()
       });
 
-      // Resetear formulario
-      setNewContract({
-        startDate: "",
-        endDate: "",
-        agencyId: "",
-        artistId: "",
-        distributionPercentage: "",
-        status: ContractStatus.ACTIVO,
-        conditions: "",
-      });
-
-      setShowCreateForm(false);
+      showCreateSuccess();
+      setShowCreateModal(false);
+      setShowCreateModal(false);
       await fetchContracts();
 
-      setTimeout(() => setMessage(null), 5000);
+
     } catch (err: any) {
-      console.error("Error al crear contrato:", err);
-      setMessage({
-        type: "error",
-        text: err.message || "Error al crear el contrato",
-      });
+      showCreateError(err.message);
     }
   };
 
-  // CORREGIDO: Manejar actualización de contrato
-  const handleUpdate = async () => {
-    if (!editingContract) return;
-
-    if (
-      !editContract.startDate ||
-      !editContract.endDate ||
-      !editContract.distributionPercentage ||
-      !editContract.conditions.trim()
-    ) {
-      setMessage({
-        type: "error",
-        text: "Por favor, complete todos los campos obligatorios",
-      });
-      return;
-    }
-
-    if (new Date(editContract.startDate) >= new Date(editContract.endDate)) {
-      setMessage({
-        type: "error",
-        text: "La fecha de inicio debe ser anterior a la fecha de fin",
-      });
-      return;
-    }
-
-    const distributionPercentage = parseFloat(
-      editContract.distributionPercentage
-    );
-    if (distributionPercentage < 0 || distributionPercentage > 100) {
-      setMessage({
-        type: "error",
-        text: "El porcentaje de distribución debe estar entre 0 y 100",
-      });
-      return;
-    }
-
+  // Manejar actualización
+  const handleUpdate = async (id: string | number, data: Record<string, any>) => {
     try {
-      const contractData = {
-        startDate: new Date(editContract.startDate),
-        endDate: new Date(editContract.endDate),
-        agencyId: editContract.agencyId,
-        artistId: editContract.artistId,
-        distributionPercentage: distributionPercentage,
-        status: editContract.status,
-        conditions: editContract.conditions.trim(),
-      };
-
-      console.log("Actualizando contrato:", contractData);
-
-      await updateContract(editingContract.id, contractData);
-
-      setMessage({
-        type: "success",
-        text: `Contrato actualizado exitosamente`,
+      await updateContract(id as string, {
+        startDate: new Date(data.startDate),
+        endDate: new Date(data.endDate),
+        agencyId: data.agencyId,
+        artistId: data.artistId,
+        distributionPercentage: parseFloat(data.distributionPercentage),
+        status: data.status,
+        conditions: data.conditions.trim()
       });
 
+       showUpdateSuccess();
       setEditingContract(null);
-      setEditContract({
-        startDate: "",
-        endDate: "",
-        agencyId: "",
-        artistId: "",
-        distributionPercentage: "",
-        status: ContractStatus.ACTIVO,
-        conditions: "",
-      });
-
+      setEditingContract(null);
       await fetchContracts();
-      setTimeout(() => setMessage(null), 5000);
     } catch (err: any) {
-      console.error("Error al actualizar contrato:", err);
-      setMessage({
-        type: "error",
-        text: err.message || "Error al actualizar el contrato",
-      });
+       showUpdateError(err.message);
     }
   };
 
-  // Manejar eliminación de contrato
-  const handleDelete = async () => {
+  // Manejar eliminación
+  const handleDelete = async (id: string | number) => {
     if (!deletingContract) return;
 
     try {
-      await deleteContract(deletingContract.id);
-      setMessage({
-        type: "success",
-        text: `Contrato eliminado exitosamente`,
-      });
+      await deleteContract(id as string);
+      showDeleteSuccess();
+      setDeletingContract(null);
       setDeletingContract(null);
       await fetchContracts();
-      setTimeout(() => setMessage(null), 5000);
     } catch (err: any) {
-      setMessage({
-        type: "error",
-        text: err.message || "Error al eliminar el contrato",
-      });
+      showDeleteError(err.message);
+
     }
   };
 
-  // Recargar datos manualmente
-  const handleReload = async () => {
-    clearError();
-    try {
-      await fetchContracts();
-      setMessage({
-        type: "success",
-        text: "Datos actualizados correctamente",
-      });
-      setTimeout(() => setMessage(null), 3000);
-    } catch (err: any) {
-      setMessage({
-        type: "error",
-        text: err.message || "Error al recargar los datos",
-      });
-    }
+  // Funciones auxiliares
+  const formatDate = (date: Date | string) => {
+    if (!date) return "N/A";
+    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    dateObj.setDate(dateObj.getDate() + 1);
+    return dateObj.toLocaleDateString("es-ES");
   };
 
-  // Iniciar edición
-  const startEdit = (contract: any) => {
-    setEditingContract(contract);
-    setEditContract({
-      startDate: contract.startDate.split("T")[0],
-      endDate: contract.endDate.split("T")[0],
-      agencyId: contract.agencyId,
-      artistId: contract.artistId,
-      distributionPercentage: contract.distributionPercentage.toString(),
-      status: contract.status,
-      conditions: contract.conditions,
-    });
-  };
-
-  // Iniciar eliminación
-  const startDelete = (contract: any) => {
-    setDeletingContract(contract);
-  };
-
-  // Limpiar filtro
-  const handleClearFilter = () => {
-    setFilter("");
-  };
-
-  // Alternar ordenamiento
-  const toggleSortOrder = () => {
-    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-  };
-
-  // Formatear fecha para mostrar
-  const formatDate = (dateString: string) => {
-    if (!dateString) return "N/A";
-  
-  const date = new Date(dateString);
-  // Sumar un día
-  date.setDate(date.getDate() + 1);
-  
-  return date.toLocaleDateString("es-ES");
-    };
-
-  // Traducir estados
   const getStatusText = (status: ContractStatus) => {
     const statusMap = {
       [ContractStatus.ACTIVO]: "Activo",
@@ -468,762 +363,224 @@ const ContractManagement: React.FC = () => {
     return statusMap[status] || status;
   };
 
-  // Obtener fecha actual en formato YYYY-MM-DD
-  const getTodayDate = (): string => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, "0");
-    const day = String(today.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  };
-
-  // Calcular días restantes
-  const getDaysRemaining = (endDate: string) => {
-    const end = new Date(endDate);
+  const getDaysRemaining = (endDate: Date | string) => {
+    const end = typeof endDate === 'string' ? new Date(endDate) : endDate;
     const today = new Date();
     const diffTime = end.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
   };
 
-  // Handle agency selection
-  const handleAgencySelect = (agencyId: string) => {
-    setNewContract({
-      ...newContract,
-      agencyId: agencyId,
-    });
-    setShowAgencyDropdown(false);
+
+  // Definir columnas para la tabla
+  const columns: Column<ContractResponseDto>[] = [
+    {
+      key: "artist.stageName",
+      title: "Artista",
+      sortable: true,
+      width: "15%",
+      align: "center",
+      render: (item) => {
+        if (item.artist && typeof item.artist === 'object') {
+          return item.artist.stageName;
+        }
+        // Si no está poblado, buscar en el contexto
+        const artist = artists.find(a => a.apprenticeId === item.artist.apprenticeId);
+        return artist ? artist.stageName : "No asignado";
+      }
+    },
+    {
+      key: "agency.nameAgency",
+      title: "Agencia",
+      sortable: true,
+      width: "15%",
+      align: "center",
+      render: (item) => {
+        if (item.agency && typeof item.agency === 'object') {
+          return item.agency.nameAgency;
+        }
+        // Si no está poblado, buscar en el contexto
+        const agency = agencies.find(a => a.nameAgency === item.agency.nameAgency);
+        return agency ? agency.nameAgency : "No asignada";
+      }
+    },
+    {
+      key: "startDate",
+      title: "Fecha Inicio",
+      sortable: true,
+      width: "12%",
+      align: "center",
+      render: (item) => formatDate(item.startDate)
+    },
+    {
+      key: "endDate",
+      title: "Fecha Fin",
+      sortable: true,
+      width: "12%",
+      align: "center",
+      render: (item) => formatDate(item.endDate)
+    },
+    {
+      key: "daysRemaining",
+      title: "Días Restantes",
+      sortable: false,
+      width: "12%",
+      align: "center",
+      render: (item) => {
+        const days = getDaysRemaining(item.endDate);
+        return (
+          <span className={`days-remaining ${
+            days < 30 ? "warning" : days < 0 ? "expired" : ""
+          }`}>
+            {days >= 0 ? `${days} días` : "Expirado"}
+          </span>
+        );
+      }
+    },
+    {
+      key: "distributionPercentage",
+      title: "Distribución",
+      sortable: true,
+      width: "10%",
+      align: "center",
+      render: (item) => `${item.distributionPercentage}%`
+    },
+    {
+      key: "status",
+      title: "Estado",
+      sortable: true,
+      width: "12%",
+      align: "center",
+      render: (item) => (
+        <span className={`status-badge status-${item.status.toLowerCase()}`}>
+          {getStatusText(item.status)}
+        </span>
+      )
+    }
+  ];
+
+  // Función para renderizar detalles en modal de eliminación
+  const renderContractDetails = (contract: ContractResponseDto) => {
+    const artistName = contract.artist && typeof contract.artist === 'object' 
+      ? contract.artist.stageName
+      : artists.find(a => a.apprenticeId === contract.artist.apprenticeId)?.stageName || "No asignado";
+    
+    const agencyName = contract.agency && typeof contract.agency === 'object' 
+      ? contract.agency.nameAgency
+      : agencies.find(a => a.nameAgency === contract.agency.nameAgency)?.nameAgency || "No asignada";
+    
+    return (
+      <div className="contract-details">
+        <div className="detail-item">
+          <strong>Artista:</strong> <span>{artistName}</span>
+        </div>
+        <div className="detail-item">
+          <strong>Agencia:</strong> <span>{agencyName}</span>
+        </div>
+        <div className="detail-item">
+          <strong>Fecha de inicio:</strong> <span>{formatDate(contract.startDate)}</span>
+        </div>
+        <div className="detail-item">
+          <strong>Fecha de fin:</strong> <span>{formatDate(contract.endDate)}</span>
+        </div>
+        <div className="detail-item">
+          <strong>Distribución:</strong> <span>{contract.distributionPercentage}%</span>
+        </div>
+        <div className="detail-item">
+          <strong>Estado:</strong> <span>{getStatusText(contract.status)}</span>
+        </div>
+        <div className="detail-item">
+          <strong>Condiciones:</strong> <span>{contract.conditions}</span>
+        </div>
+      </div>
+    );
   };
 
  
-
-  // Handle artist selection
-  const handleArtistSelect = (artistId: string) => {
-    setNewContract({
-      ...newContract,
-      artistId: artistId,
-    });
-    setShowArtistDropdown(false);
-  };
-
-
   return (
     <section id="contract_manager" className="content-section active">
-      <div className="profile-header">
-        <div className="profile-info">
-          <h1>Gestión de Contratos</h1>
-          <p className="section-description">
-            Administre todos los contratos del sistema
-          </p>
-        </div>
-      </div>
 
-      <div className="detail-card">
-        {/* Mensajes globales */}
-        {message && (
-          <div className={`message ${message.type}`}>{message.text}</div>
-        )}
+  <GenericTable<ContractResponseDto>
+    title="Gestión de Contratos"
+    description="Administre todos los contratos del sistema"
+    data={contracts}
+    columns={columns}
+    loading={loading}
+    onReload={() => {
+      fetchContracts();
+      fetchAgencies();
+      fetchArtists();
+    }}
+    showCreateForm={showCreateModal}
+    onShowCreateChange={setShowCreateModal}
+    editingItem={editingContract}
+    onEditingChange={setEditingContract}
+    deletingItem={deletingContract}
+    onDeletingChange={setDeletingContract}
+    itemsPerPage={30}
+    className="contract-table"
+     notification={notification || undefined}
+        onNotificationClose={() => setNotification(null)}
+        
+  />
 
-        {error && <div className="message error">{error}</div>}
-
-        {/* Controles superiores */}
-        <div className="manager-controls">
-          <div className="controls-left">
-            <button
-              className="create-button"
-              onClick={() => setShowCreateForm(true)}
-              disabled={loading}
-            >
-              <span className="button-icon">
-                <Icon name="plus" size={20} />
-              </span>
-              Nuevo Contrato
-            </button>
-          </div>
-
-          <div className="controls-right">
-            <div className="filter-group">
-              <input
-                type="text"
-                className="form-input search-input"
-                placeholder="Filtrar por artista o agencia..."
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                disabled={loading}
-              />
-              {filter && (
-                <button
-                  className="clear-filter-btn"
-                  onClick={handleClearFilter}
-                  title="Limpiar filtro"
-                >
-                  ×
-                </button>
-              )}
-            </div>
-
-            <div className="sort-group">
-              <select
-                className="form-select sort-select"
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
-                disabled={loading}
-              >
-                <option value="artist">Ordenar por artista</option>
-                <option value="agency">Ordenar por agencia</option>
-                <option value="startDate">Ordenar por fecha inicio</option>
-                <option value="endDate">Ordenar por fecha fin</option>
-                <option value="status">Ordenar por estado</option>
-              </select>
-              <button
-                className="sort-order-btn"
-                onClick={toggleSortOrder}
-                disabled={loading}
-                title={
-                  sortOrder === "asc" ? "Orden ascendente" : "Orden descendente"
-                }
-              >
-                {sortOrder === "asc" ? (
-                  <Icon name="down" size={18} />
-                ) : (
-                  <Icon name="up" size={18} />
-                )}
-              </button>
-            </div>
-
-            <button
-              className="reload-button"
-              onClick={handleReload}
-              disabled={loading}
-              title="Recargar datos"
-            >
-              {loading ? "⟳" : "↻"}
-            </button>
-          </div>
-        </div>
-
-        {/* Contador de resultados */}
-        {dataLoaded && (
-          <div className="results-info">
-            <span className="results-count">
-              {filteredAndSortedContracts.length} de {contracts.length}{" "}
-              contratos
-            </span>
-            <span className="sort-info">
-              Orden:{" "}
-              {sortBy === "artist"
-                ? "Artista"
-                : sortBy === "agency"
-                ? "Agencia"
-                : sortBy === "startDate"
-                ? "Fecha Inicio"
-                : sortBy === "endDate"
-                ? "Fecha Fin"
-                : "Estado"}{" "}
-              •{sortOrder === "asc" ? " Ascendente" : " Descendente"}
-            </span>
-          </div>
-        )}
-
-        {/* Grid de contratos */}
-        <div className="contracts-grid">
-          {!dataLoaded ? (
-            <div className="loading-state">
-              <div className="loading-spinner"></div>
-              <p>Cargando contratos...</p>
-            </div>
-          ) : loading ? (
-            <div className="loading-state">
-              <div className="loading-spinner"></div>
-              <p>Actualizando...</p>
-            </div>
-          ) : filteredAndSortedContracts.length === 0 ? (
-            <div className="empty-state">
-              <div className="empty-icon">📄</div>
-              <h3>No hay contratos</h3>
-              <p>
-                {filter
-                  ? `No se encontraron resultados para "${filter}"`
-                  : "Comience agregando el primer contrato"}
-              </p>
-              {!filter && (
-                <button
-                  className="create-button"
-                  onClick={() => setShowCreateForm(true)}
-                  disabled={loading}
-                >
-                  <span className="button-icon">
-                    <Icon name="plus" size={20} />
-                  </span>
-                  Crear Primer Contrato
-                </button>
-              )}
-            </div>
-          ) : (
-            <div className="table-container">
-              <table className="contracts-table">
-                <thead>
-                  <tr>
-                    <th>Artista</th>
-                    <th>Agencia</th>
-                    <th>Fecha Inicio</th>
-                    <th>Fecha Fin</th>
-                    <th>Días Restantes</th>
-                    <th>Distribución</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedContracts.map((contract) => {
-                    const daysRemaining = getDaysRemaining(
-                      contract.endDate.toString()
-                    );
-
-                    return (
-                      <tr key={contract.id} className="contract-row">
-                        <td className="contract-artist-cell">
-                          <div className="contract-artist">
-                            {contract.artist.stageName}
-                          </div>
-                        </td>
-                        <td>
-                          <div className="detail-value">
-                            {contract.agency.nameAgency}
-                          </div>
-                        </td>
-                        <td>
-                          <div className="detail-value">
-                            {formatDate(contract.startDate.toString())}
-                          </div>
-                        </td>
-                        <td>
-                          <div className="detail-value">
-                            {formatDate(contract.endDate.toString())}
-                          </div>
-                        </td>
-                        <td>
-                          <div
-                            className={`days-remaining ${
-                              daysRemaining < 30
-                                ? "warning"
-                                : daysRemaining < 0
-                                ? "expired"
-                                : ""
-                            }`}
-                          >
-                            {daysRemaining >= 0
-                              ? `${daysRemaining} días`
-                              : "Expirado"}
-                          </div>
-                        </td>
-                        <td>
-                          <div className="detail-value">
-                            {contract.distributionPercentage}%
-                          </div>
-                        </td>
-                        <td>
-                          <span
-                            className={`status-badge status-${contract.status.toLowerCase()}`}
-                          >
-                            {getStatusText(contract.status)}
-                          </span>
-                        </td>
-                        <td>
-                          <div className="table-actions">
-                            <button
-                              className="action-btn edit-btn"
-                              onClick={() => startEdit(contract)}
-                              title="Editar contrato"
-                              disabled={loading}
-                            >
-                              <Icon name="edit" size={18} />
-                            </button>
-                            <button
-                              className="action-btn delete-btn"
-                              onClick={() => startDelete(contract)}
-                              title="Eliminar contrato"
-                              disabled={loading}
-                            >
-                              <Icon name="trash" size={18} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-              {/* PAGINACIÓN */}
-              {totalPages > 1 && (
-                <div className="pagination-container">
-                  <button
-                    className="pagination-btn"
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage(currentPage - 1)}
-                  >
-                    ◀ Anterior
-                  </button>
-
-                  <span className="pagination-info">
-                    Página {currentPage} de {totalPages}
-                  </span>
-
-                  <button
-                    className="pagination-btn"
-                    disabled={currentPage === totalPages}
-                    onClick={() => setCurrentPage(currentPage + 1)}
-                  >
-                    Siguiente ▶
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Modal de creación */}
-      {showCreateForm && (
-        <div className="modal-overlay contract-modal">
-          <div className="modal-content">
-            <h3>Crear Nuevo Contrato</h3>
-            <form onSubmit={handleCreate}>
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">Artista *</label>
-                  <div className="dropdown-container" ref={artistDropdownRef}>
-                    <button
-                      type="button"
-                      className="dropdown-toggle"
-                      onClick={() => setShowArtistDropdown(!showArtistDropdown)}
-                    >
-                      <span>
-                        {newContract.artistId
-                          ? getArtistName(newContract.artistId)
-                          : "Seleccionar artista"}
-                      </span>
-                      <Icon
-                        name={showArtistDropdown ? "up" : "down"}
-                        size={16}
-                      />
-                    </button>
-
-                    {showArtistDropdown && (
-                      <div className="dropdown-menu">
-                        <div className="dropdown-list">
-                          {artists.map((artist) => (
-                            <div
-                              key={artist.id}
-                              className={`dropdown-item ${
-                                newContract.artistId === artist.id
-                                  ? "selected"
-                                  : ""
-                              }`}
-                              onClick={() => handleArtistSelect(artist.id)}
-                            >
-                              {artist.stageName}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  {artists.length === 0 && (
-                    <div className="no-items">No hay artistas disponibles</div>
-                  )}
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Agencia *</label>
-                  <div className="dropdown-container" ref={agencyDropdownRef}>
-                    <button
-                      type="button"
-                      className="dropdown-toggle"
-                      onClick={() => setShowAgencyDropdown(!showAgencyDropdown)}
-                    >
-                      <span>
-                        {newContract.agencyId
-                          ? getAgencyName(newContract.agencyId)
-                          : "Seleccionar agencia"}
-                      </span>
-                      <Icon
-                        name={showAgencyDropdown ? "up" : "down"}
-                        size={16}
-                      />
-                    </button>
-
-                    {showAgencyDropdown && (
-                      <div className="dropdown-menu">
-                        <div className="dropdown-list">
-                          {agencies.map((agency) => (
-                            <div
-                              key={agency.id}
-                              className={`dropdown-item ${
-                                newContract.agencyId === agency.id
-                                  ? "selected"
-                                  : ""
-                              }`}
-                              onClick={() => handleAgencySelect(agency.id)}
-                            >
-                              {agency.nameAgency} - {agency.place}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  {agencies.length === 0 && (
-                    <div className="no-items">No hay agencias disponibles</div>
-                  )}
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">Fecha de inicio *</label>
-                  <input
-                    type="date"
-                    className="form-input"
-                    value={newContract.startDate}
-                    onChange={(e) =>
-                      setNewContract({
-                        ...newContract,
-                        startDate: e.target.value,
-                      })
-                    }
-                    required
-                    min={getTodayDate()}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Fecha de fin *</label>
-                  <input
-                    type="date"
-                    className="form-input"
-                    value={newContract.endDate}
-                    onChange={(e) =>
-                      setNewContract({
-                        ...newContract,
-                        endDate: e.target.value,
-                      })
-                    }
-                    required
-                    min={newContract.startDate || getTodayDate()}
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">
-                    Porcentaje de distribución *
-                  </label>
-                  <input
-                    type="number"
-                    className="form-input"
-                    placeholder="Ej: 30"
-                    value={newContract.distributionPercentage}
-                    onChange={(e) =>
-                      setNewContract({
-                        ...newContract,
-                        distributionPercentage: e.target.value,
-                      })
-                    }
-                    required
-                    min="0"
-                    max="100"
-                    step="0.1"
-                  />
-                  <span className="input-suffix">%</span>
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Estado</label>
-                  <select
-                    className="form-select"
-                    value={newContract.status}
-                    onChange={(e) =>
-                      setNewContract({
-                        ...newContract,
-                        status: e.target.value as ContractStatus,
-                      })
-                    }
-                  >
-                    <option value={ContractStatus.ACTIVO}>Activo</option>
-                    <option value={ContractStatus.EN_RENOVACION}>
-                      En renovación
-                    </option>
-                    <option value={ContractStatus.RESCINDIDO}>
-                      Rescindido
-                    </option>
-                    <option value={ContractStatus.FINALIZADO}>
-                      Finalizado
-                    </option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group full-width">
-                  <label className="form-label">Condiciones *</label>
-                  <textarea
-                    className="form-textarea"
-                    placeholder="Describe las condiciones del contrato..."
-                    value={newContract.conditions}
-                    onChange={(e) =>
-                      setNewContract({
-                        ...newContract,
-                        conditions: e.target.value,
-                      })
-                    }
-                    required
-                    rows={4}
-                  />
-                </div>
-              </div>
-
-              <div className="modal-actions">
-                <button
-                  type="submit"
-                  className="submit-button"
-                  disabled={
-                    loading ||
-                    !newContract.startDate ||
-                    !newContract.endDate ||
-                    !newContract.agencyId ||
-                    !newContract.artistId ||
-                    !newContract.distributionPercentage ||
-                    !newContract.conditions.trim()
-                  }
-                >
-                  {loading ? "Creando..." : "Crear Contrato"}
-                </button>
-                <button
-                  type="button"
-                  className="cancel-button"
-                  onClick={() => {
-                    setShowCreateForm(false);
-                    setNewContract({
-                      startDate: "",
-                      endDate: "",
-                      agencyId: "",
-                      artistId: "",
-                      distributionPercentage: "",
-                      status: ContractStatus.ACTIVO,
-                      conditions: "",
-                    });
-                  }}
-                  disabled={loading}
-                >
-                  Cancelar
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+      {/* Modal de creación usando componente genérico */}
+      {showCreateModal && (
+        <CreateModal
+          title="Crear Nuevo Contrato"
+          fields={contractFields}
+          initialData={initialCreateData}
+          onSubmit={handleCreate}
+          onClose={() => setShowCreateModal(false)}
+          loading={loading}
+          submitText="Crear Contrato"
+        />
       )}
 
-      {/* Modal de edición */}
+      {/* Modal de edición usando componente genérico */}
       {editingContract && (
-        <div className="modal-overlay contract-modal">
-          <div className="modal-content">
-            <h3>Editar Contrato</h3>
-            
-            
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Fecha de inicio *</label>
-                <input
-                  type="date"
-                  className="form-input"
-                  value={editContract.startDate}
-                  onChange={(e) =>
-                    setEditContract({
-                      ...editContract,
-                      startDate: e.target.value,
-                    })
-                  }
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Fecha de fin *</label>
-                <input
-                  type="date"
-                  className="form-input"
-                  value={editContract.endDate}
-                  onChange={(e) =>
-                    setEditContract({
-                      ...editContract,
-                      endDate: e.target.value,
-                    })
-                  }
-                  required
-                  min={editContract.startDate}
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">
-                  Porcentaje de distribución *
-                </label>
-                <input
-                  type="number"
-                  className="form-input"
-                  value={editContract.distributionPercentage}
-                  onChange={(e) =>
-                    setEditContract({
-                      ...editContract,
-                      distributionPercentage: e.target.value,
-                    })
-                  }
-                  required
-                  min="0"
-                  max="100"
-                  step="0.1"
-                />
-                <span className="input-suffix">%</span>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Estado</label>
-                <select
-                  className="form-select"
-                  value={editContract.status}
-                  onChange={(e) =>
-                    setEditContract({
-                      ...editContract,
-                      status: e.target.value as ContractStatus,
-                    })
-                  }
-                >
-                  <option value={ContractStatus.ACTIVO}>Activo</option>
-                  <option value={ContractStatus.EN_RENOVACION}>
-                    En renovación
-                  </option>
-                  <option value={ContractStatus.RESCINDIDO}>Rescindido</option>
-                  <option value={ContractStatus.FINALIZADO}>Finalizado</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group full-width">
-                <label className="form-label">Condiciones *</label>
-                <textarea
-                  className="form-textarea"
-                  value={editContract.conditions}
-                  onChange={(e) =>
-                    setEditContract({
-                      ...editContract,
-                      conditions: e.target.value,
-                    })
-                  }
-                  required
-                  rows={4}
-                />
-              </div>
-            </div>
-
-            <div className="modal-actions">
-              <button
-                className="submit-button"
-                onClick={handleUpdate}
-                disabled={
-                  loading ||
-                  !editContract.startDate ||
-                  !editContract.endDate ||
-                  !editContract.distributionPercentage ||
-                  !editContract.conditions.trim()
-                }
-              >
-                {loading ? "Actualizando..." : "Actualizar"}
-              </button>
-              <button
-                className="cancel-button"
-                onClick={() => {
-                  setEditingContract(null);
-                  setEditContract({
-                    startDate: "",
-                    endDate: "",
-                    agencyId: "",
-                    artistId: "",
-                    distributionPercentage: "",
-                    status: ContractStatus.ACTIVO,
-                    conditions: "",
-                  });
-                }}
-                disabled={loading}
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        </div>
+        <EditModal
+          title="Editar Contrato"
+          fields={contractEditFields}
+          initialData={{
+            artistId: editingContract.artist.apprenticeId,
+            agencyId: editingContract.agency.nameAgency || editingContract.agency,
+            startDate: editingContract.startDate ? 
+              (new Date(editingContract.startDate).toISOString().split("T")[0]) 
+              : "",
+            endDate: editingContract.endDate ? 
+              (new Date(editingContract.endDate).toISOString().split("T")[0]) 
+              : "",
+            distributionPercentage: editingContract.distributionPercentage.toString(),
+            status: editingContract.status,
+            conditions: editingContract.conditions
+          }}
+          itemId={editingContract.id}
+          onSubmit={handleUpdate}
+          onClose={() => setEditingContract(null)}
+          loading={loading}
+          submitText="Actualizar Contrato"
+           contractInfo={{
+            artist: getArtistName(editingContract),
+            agency: getAgencyName(editingContract)
+          }}
+        />
       )}
-      {/* Modal de confirmación de eliminación */}
+
+      {/* Modal de eliminación usando componente genérico */}
       {deletingContract && (
-        <div className="modal-overlay contract-modal">
-          <div className="modal-content">
-            <h3>¿Eliminar Contrato?</h3>
-            <div className="delete-confirmation">
-              <p>¿Está seguro de que desea eliminar este contrato?</p>
-              <div className="contract-details">
-                <div className="detail-item">
-                  <strong>Artista:</strong>{" "}
-                  {getArtistName(deletingContract.artistId)}
-                </div>
-                <div className="detail-item">
-                  <strong>Agencia:</strong>{" "}
-                  {getAgencyName(deletingContract.agencyId)}
-                </div>
-                <div className="detail-item">
-                  <strong>Fecha de inicio:</strong>{" "}
-                  {formatDate(deletingContract.startDate)}
-                </div>
-                <div className="detail-item">
-                  <strong>Fecha de fin:</strong>{" "}
-                  {formatDate(deletingContract.endDate)}
-                </div>
-                <div className="detail-item">
-                  <strong>Distribución:</strong>{" "}
-                  {deletingContract.distributionPercentage}%
-                </div>
-                <div className="detail-item">
-                  <strong>Estado:</strong>{" "}
-                  {getStatusText(deletingContract.status)}
-                </div>
-                <div className="detail-item">
-                  <strong>Condiciones:</strong> {deletingContract.conditions}
-                </div>
-              </div>
-              <p className="warning-text">
-                ⚠️ Esta acción no se puede deshacer.
-              </p>
-            </div>
-            <div className="modal-actions">
-              <button
-                className="submit-button delete-button"
-                onClick={handleDelete}
-                disabled={loading}
-              >
-                {loading ? "Eliminando..." : "Sí, Eliminar"}
-              </button>
-              <button
-                className="cancel-button"
-                onClick={() => setDeletingContract(null)}
-                disabled={loading}
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        </div>
+        <DeleteModal<ContractResponseDto>
+          title="¿Eliminar Contrato?"
+          item={deletingContract}
+          itemName="Contrato"
+          itemId={deletingContract.id}
+          onConfirm={handleDelete}
+          onClose={() => setDeletingContract(null)}
+          loading={loading}
+          confirmText="Sí, Eliminar"
+          warningMessage="⚠️ Esta acción no se puede deshacer."
+          renderDetails={renderContractDetails}
+        />
       )}
     </section>
   );

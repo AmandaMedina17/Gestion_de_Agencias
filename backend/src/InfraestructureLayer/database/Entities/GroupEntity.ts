@@ -6,7 +6,7 @@ import {
   OneToMany,
   JoinColumn,
 } from "typeorm";
-import { GroupStatus } from "../../../DomainLayer/Enums";
+import { GroupStatus } from "@domain/Enums";
 import { AgencyEntity } from "./AgencyEntity";
 import { AlbumEntity } from "./AlbumEntity";
 import { GroupActivityEntity } from "./GroupActivity";
@@ -29,22 +29,25 @@ export class GroupEntity {
   })
   status!: GroupStatus;
 
-  @Column()
-  concept!: string;
-
-  @Column()
-  visualconcept!: string;
-
   @Column({ type: "date" })
   debutDate!: Date;
 
   @Column()
-  memberNumber!: number;
-
-  @Column()
   is_created!: boolean;
 
-  @ManyToOne(() => AgencyEntity, (agency) => agency.groups) //Hacer simetrico en agencia
+  @Column()
+  concept!: string;
+
+  // @Column()
+  // visualconcept!: string;
+
+  @Column({ name: "agency_id" })
+  agencyId!: string; 
+
+  @ManyToOne(() => AgencyEntity, (agency) => agency.groups, {
+    nullable: false, // Un grupo debe pertenecer a una agencia
+  })
+  @JoinColumn({ name: "agency_id" }) 
   agency!: AgencyEntity;
 
   // Un grupo puede tener cero o muchos álbumes

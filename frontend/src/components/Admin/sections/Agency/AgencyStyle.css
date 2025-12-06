@@ -130,7 +130,7 @@
   border-radius: 12px;
   border: 1px solid #e9ecef;
   overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   width: 100%;
 }
 
@@ -157,7 +157,7 @@
   border-bottom: 1px solid #e9ecef;
   vertical-align: middle;
   text-align: center;
-  font-size: 1.05rem
+  font-size: 1.05rem;
 }
 
 .agency-row {
@@ -179,13 +179,13 @@
   font-size: 1rem;
 }
 
-.table-actions {
+.table-actions-botons {
   display: flex;
   gap: 0.5rem;
   justify-content: center;
 }
 
-.table-actions .action-btn {
+.table-actions-botons .action-btn {
   width: 35px;
   height: 35px;
   display: flex;
@@ -199,12 +199,12 @@
   transition: all 0.2s;
 }
 
-.table-actions .edit-btn:hover {
+.table-actions-botons .edit-btn:hover {
   background: #80d0fb6b;
   transform: scale(1.1);
 }
 
-.table-actions .delete-btn:hover {
+.table-actions-botons .delete-btn:hover {
   background: #80d0fb6b;
   transform: scale(1.1);
 }
@@ -239,7 +239,7 @@
   background: white;
   padding: 2rem;
   border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   max-width: 700px;
   width: 100%;
   max-height: 90vh;
@@ -362,42 +362,42 @@
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .controls-right {
     justify-content: space-between;
   }
-  
+
   .search-input {
     min-width: 200px;
   }
-  
+
   .table-container {
     overflow-x: auto;
   }
-  
+
   .agencies-table {
     min-width: 600px;
   }
-  
+
   .agencies-table th,
   .agencies-table td {
     padding: 0.75rem 0.5rem;
   }
-  
+
   .agencies-table th {
     font-size: 0.8rem;
   }
-  
+
   .agency-name {
     font-size: 0.9rem;
   }
-  
-  .table-actions {
+
+  .table-actions-botons {
     flex-direction: column;
     gap: 0.25rem;
   }
-  
-  .table-actions .action-btn {
+
+  .table-actions-botons .action-btn {
     width: 30px;
     height: 30px;
     font-size: 0.9rem;
@@ -406,7 +406,7 @@
   .agency-modal .form-row {
     grid-template-columns: 1fr;
   }
-  
+
   .agency-modal .modal-actions {
     flex-direction: column;
   }
@@ -433,7 +433,8 @@
 }
 
 /* Formularios */
-.form-input, .form-select {
+.form-input,
+.form-select {
   width: 100%;
   padding: 0.75rem;
   border: 1px solid #dee2e6;
@@ -442,7 +443,8 @@
   transition: border-color 0.2s;
 }
 
-.form-input:focus, .form-select:focus {
+.form-input:focus,
+.form-select:focus {
   outline: none;
   border-color: #007bff;
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);

@@ -3,15 +3,15 @@ import React, { useState, useEffect } from "react";
 import { useApprentice } from "../../../../context/ApprenticeContext";
 import { useApprenticeEvaluation } from "../../../../context/EvaluationContext";
 import { Icon } from "../../../icons";
-import './EvaluationStyle.css';
+import "./EvaluationStyle.css";
 
 // Enum para los valores de evaluación
-export enum EvaluationValue{
-    EXCELENTE = "EXCELENTE",
-    BIEN = "BIEN",
-    REGULAR = "REGULAR",
-    MAL = "MAL",
-    INSUFICIENTE = "INSUFICIENTE"
+export enum EvaluationValue {
+  EXCELENTE = "EXCELENTE",
+  BIEN = "BIEN",
+  REGULAR = "REGULAR",
+  MAL = "MAL",
+  INSUFICIENTE = "INSUFICIENTE",
 }
 
 const EvaluationManagement: React.FC = () => {
@@ -37,7 +37,9 @@ const EvaluationManagement: React.FC = () => {
 
   // Estados principales
   const [filter, setFilter] = useState("");
-  const [sortBy, setSortBy] = useState<"apprentice" | "date" | "evaluation">("date");
+  const [sortBy, setSortBy] = useState<"apprentice" | "date" | "evaluation">(
+    "date"
+  );
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingEvaluation, setEditingEvaluation] = useState<any>(null);
@@ -76,7 +78,13 @@ const EvaluationManagement: React.FC = () => {
     };
 
     loadInitialData();
-  }, [dataLoaded, clearApprenticeError, clearEvaluationError, fetchApprentices, fetchEvaluations]);
+  }, [
+    dataLoaded,
+    clearApprenticeError,
+    clearEvaluationError,
+    fetchApprentices,
+    fetchEvaluations,
+  ]);
 
   // Resetear página cuando cambien filtro u orden
   useEffect(() => {
@@ -91,9 +99,13 @@ const EvaluationManagement: React.FC = () => {
 
     // Aplicar filtro por nombre de aprendiz
     if (filter) {
-      filtered = evaluations.filter(evaluation => {
-        const apprentice = apprentices.find(a => a.id === evaluation.apprentice);
-        return apprentice?.fullName.toLowerCase().includes(filter.toLowerCase());
+      filtered = evaluations.filter((evaluation) => {
+        const apprentice = apprentices.find(
+          (a) => a.id === evaluation.apprentice
+        );
+        return apprentice?.fullName
+          .toLowerCase()
+          .includes(filter.toLowerCase());
       });
     }
 
@@ -103,8 +115,12 @@ const EvaluationManagement: React.FC = () => {
 
       switch (sortBy) {
         case "apprentice":
-          const apprenticeA = apprentices.find(app => app.id === a.apprentice);
-          const apprenticeB = apprentices.find(app => app.id === b.apprentice);
+          const apprenticeA = apprentices.find(
+            (app) => app.id === a.apprentice
+          );
+          const apprenticeB = apprentices.find(
+            (app) => app.id === b.apprentice
+          );
           aValue = apprenticeA?.fullName || "";
           bValue = apprenticeB?.fullName || "";
           break;
@@ -128,14 +144,19 @@ const EvaluationManagement: React.FC = () => {
   }, [evaluations, filter, sortBy, sortOrder, dataLoaded, apprentices]);
 
   // PAGINACIÓN: calcular páginas y slice
-  const totalPages = Math.ceil(filteredAndSortedEvaluations.length / itemsPerPage);
+  const totalPages = Math.ceil(
+    filteredAndSortedEvaluations.length / itemsPerPage
+  );
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedEvaluations = filteredAndSortedEvaluations.slice(startIndex, startIndex + itemsPerPage);
+  const paginatedEvaluations = filteredAndSortedEvaluations.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
 
   // Obtener nombre del aprendiz por ID
   const getApprenticeName = (apprenticeId: string) => {
     if (!apprenticeId) return "No asignado";
-    const apprentice = apprentices.find(a => a.id === apprenticeId);
+    const apprentice = apprentices.find((a) => a.id === apprenticeId);
     return apprentice ? apprentice.fullName : "No encontrado";
   };
 
@@ -151,8 +172,8 @@ const EvaluationManagement: React.FC = () => {
   const getTodayDateString = (): string => {
     const today = new Date();
     const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
 
@@ -213,7 +234,7 @@ const EvaluationManagement: React.FC = () => {
 
     try {
       const dateForBackend = new Date(newEvaluation.date);
-      
+
       await createEvaluation({
         apprentice: newEvaluation.apprentice,
         date: dateForBackend,
@@ -352,8 +373,12 @@ const EvaluationManagement: React.FC = () => {
           <div className={`message ${message.type}`}>{message.text}</div>
         )}
 
-        {apprenticeError && <div className="message error">{apprenticeError}</div>}
-        {evaluationError && <div className="message error">{evaluationError}</div>}
+        {apprenticeError && (
+          <div className="message error">{apprenticeError}</div>
+        )}
+        {evaluationError && (
+          <div className="message error">{evaluationError}</div>
+        )}
 
         {/* Controles superiores */}
         <div className="manager-controls">
@@ -363,7 +388,9 @@ const EvaluationManagement: React.FC = () => {
               onClick={() => setShowCreateForm(true)}
               disabled={evaluationLoading}
             >
-              <span className="button-icon"><Icon name="plus" size={20} /></span>
+              <span className="button-icon">
+                <Icon name="plus" size={20} />
+              </span>
               Nueva Evaluación
             </button>
           </div>
@@ -407,7 +434,11 @@ const EvaluationManagement: React.FC = () => {
                   sortOrder === "asc" ? "Orden ascendente" : "Orden descendente"
                 }
               >
-                {sortOrder === "asc" ? <Icon name="down" size={18} /> : <Icon name="up" size={18} />}
+                {sortOrder === "asc" ? (
+                  <Icon name="down" size={18} />
+                ) : (
+                  <Icon name="up" size={18} />
+                )}
               </button>
             </div>
 
@@ -426,16 +457,16 @@ const EvaluationManagement: React.FC = () => {
         {dataLoaded && (
           <div className="results-info">
             <span className="results-count">
-              {filteredAndSortedEvaluations.length} de {evaluations.length} {" "}
+              {filteredAndSortedEvaluations.length} de {evaluations.length}{" "}
               evaluaciones
             </span>
             <span className="sort-info">
-              Orden: {" "}
+              Orden:{" "}
               {sortBy === "apprentice"
                 ? "Aprendiz"
                 : sortBy === "date"
                 ? "Fecha"
-                : "Evaluación"} {" "}
+                : "Evaluación"}{" "}
               •{sortOrder === "asc" ? " Ascendente" : " Descendente"}
             </span>
           </div>
@@ -467,7 +498,9 @@ const EvaluationManagement: React.FC = () => {
                   className="create-button"
                   onClick={() => setShowCreateForm(true)}
                 >
-                  <span className="button-icon"><Icon name="plus" size={20} /></span>
+                  <span className="button-icon">
+                    <Icon name="plus" size={20} />
+                  </span>
                   Crear Primera Evaluación
                 </button>
               )}
@@ -493,12 +526,16 @@ const EvaluationManagement: React.FC = () => {
                         {formatDate(evaluation.date)}
                       </td>
                       <td className="text-center">
-                        <span className={`evaluation-badge ${getEvaluationClass(evaluation.evaluation)}`}>
+                        <span
+                          className={`evaluation-badge ${getEvaluationClass(
+                            evaluation.evaluation
+                          )}`}
+                        >
                           {getEvaluationText(evaluation.evaluation)}
                         </span>
                       </td>
                       <td className="text-center">
-                        <div className="table-actions">
+                        <div className="table-actions-botons">
                           <button
                             className="action-btn edit-btn"
                             onClick={() => startEdit(evaluation)}
@@ -521,7 +558,7 @@ const EvaluationManagement: React.FC = () => {
                   ))}
                 </tbody>
               </table>
-              
+
               {/* PAGINACIÓN */}
               {totalPages > 1 && (
                 <div className="pagination-container">
@@ -563,7 +600,12 @@ const EvaluationManagement: React.FC = () => {
                   <select
                     className="form-select"
                     value={newEvaluation.apprentice}
-                    onChange={(e) => setNewEvaluation({...newEvaluation, apprentice: e.target.value})}
+                    onChange={(e) =>
+                      setNewEvaluation({
+                        ...newEvaluation,
+                        apprentice: e.target.value,
+                      })
+                    }
                     required
                   >
                     <option value="">Seleccione un aprendiz</option>
@@ -581,7 +623,12 @@ const EvaluationManagement: React.FC = () => {
                     type="date"
                     className="form-input"
                     value={newEvaluation.date}
-                    onChange={(e) => setNewEvaluation({...newEvaluation, date: e.target.value})}
+                    onChange={(e) =>
+                      setNewEvaluation({
+                        ...newEvaluation,
+                        date: e.target.value,
+                      })
+                    }
                     required
                     max={getTodayDateString()}
                   />
@@ -594,13 +641,20 @@ const EvaluationManagement: React.FC = () => {
                   <select
                     className="form-select"
                     value={newEvaluation.evaluation}
-                    onChange={(e) => setNewEvaluation({...newEvaluation, evaluation: e.target.value as EvaluationValue})}
+                    onChange={(e) =>
+                      setNewEvaluation({
+                        ...newEvaluation,
+                        evaluation: e.target.value as EvaluationValue,
+                      })
+                    }
                     required
                   >
                     <option value={EvaluationValue.EXCELENTE}>Excelente</option>
                     <option value={EvaluationValue.BIEN}>Bueno</option>
                     <option value={EvaluationValue.REGULAR}>Regular</option>
-                    <option value={EvaluationValue.INSUFICIENTE}>Insuficiente</option>
+                    <option value={EvaluationValue.INSUFICIENTE}>
+                      Insuficiente
+                    </option>
                     <option value={EvaluationValue.MAL}>Mal</option>
                   </select>
                 </div>
@@ -646,27 +700,32 @@ const EvaluationManagement: React.FC = () => {
             <h3>Editar Evaluación</h3>
             <div className="evaluation-details">
               <div className="detail-item">
-                <strong>Aprendiz:</strong> {getApprenticeName(editingEvaluation.apprentice)}
+                <strong>Aprendiz:</strong>{" "}
+                {getApprenticeName(editingEvaluation.apprentice)}
               </div>
               <div className="detail-item">
                 <strong>Fecha:</strong> {formatDate(editingEvaluation.date)}
               </div>
             </div>
-            
+
             <div className="form-group">
               <label className="form-label">Evaluación</label>
               <select
                 className="form-select"
                 value={editingEvaluation.evaluation}
-                onChange={(e) => setEditingEvaluation({
-                  ...editingEvaluation,
-                  evaluation: e.target.value as EvaluationValue
-                })}
+                onChange={(e) =>
+                  setEditingEvaluation({
+                    ...editingEvaluation,
+                    evaluation: e.target.value as EvaluationValue,
+                  })
+                }
               >
                 <option value={EvaluationValue.EXCELENTE}>Excelente</option>
                 <option value={EvaluationValue.BIEN}>Bueno</option>
                 <option value={EvaluationValue.REGULAR}>Regular</option>
-                <option value={EvaluationValue.INSUFICIENTE}>Insuficiente</option>
+                <option value={EvaluationValue.INSUFICIENTE}>
+                  Insuficiente
+                </option>
                 <option value={EvaluationValue.MAL}>Mal</option>
               </select>
             </div>
@@ -700,13 +759,15 @@ const EvaluationManagement: React.FC = () => {
               <p>¿Está seguro de que desea eliminar esta evaluación?</p>
               <div className="evaluation-details">
                 <div className="detail-item">
-                  <strong>Aprendiz:</strong> {getApprenticeName(deletingEvaluation.apprentice)}
+                  <strong>Aprendiz:</strong>{" "}
+                  {getApprenticeName(deletingEvaluation.apprentice)}
                 </div>
                 <div className="detail-item">
                   <strong>Fecha:</strong> {formatDate(deletingEvaluation.date)}
                 </div>
                 <div className="detail-item">
-                  <strong>Evaluación:</strong> {getEvaluationText(deletingEvaluation.evaluation)}
+                  <strong>Evaluación:</strong>{" "}
+                  {getEvaluationText(deletingEvaluation.evaluation)}
                 </div>
               </div>
               <p className="warning-text">
