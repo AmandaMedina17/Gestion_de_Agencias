@@ -1,6 +1,10 @@
+import { CreateAwardDto } from '@application/DTOs/AwardDto/create.award.dto';
+import { ResponseAwardDto } from '@application/DTOs/AwardDto/response.award.dto';
+import { UpdateAwardDto } from '@application/DTOs/AwardDto/update.award.dto';
 import { AwardDtoMapper } from '@application/DTOs/dtoMappers/award.dto.mapper';
 import { AwardService } from '@application/services/award/award.service';
-import { AWARD_REPOSITORY } from '@domain/Repositories/IAwardRepository';
+import { IAwardRepository } from '@domain/Repositories/IAwardRepository';
+import { IRepository } from '@domain/Repositories/IRepository';
 import { AwardEntity } from '@infrastructure/database/Entities/AwardEntity';
 import { AwardMapper } from '@infrastructure/database/Mappers/AwardMapper';
 import { AwardRepository } from '@infrastructure/database/Repositories/AwardRepository';
@@ -12,18 +16,20 @@ import { AwardController } from '@presentation/Controllers/award/award.controlle
     imports: [
       TypeOrmModule.forFeature([AwardEntity])
     ],
+    
     controllers: [AwardController],
     providers: [
       AwardMapper,
       {
-        provide:AWARD_REPOSITORY,    
+        provide:IAwardRepository,    
         useClass: AwardRepository
       },
       AwardDtoMapper,
-      AwardService
+      AwardService,
+      
     ],
     exports: [
-        AWARD_REPOSITORY
+        IAwardRepository
     ]
   })
   export class AwardModule {}

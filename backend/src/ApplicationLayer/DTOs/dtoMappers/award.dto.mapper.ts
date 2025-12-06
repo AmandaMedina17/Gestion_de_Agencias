@@ -15,16 +15,15 @@ export class AwardDtoMapper extends BaseDtoMapper<Award, CreateAwardDto, Respons
       if(!dto.name)
         throw new Error("Name of Award is missing")
     
-    
-  
-      return Award.create(dto.name,dto.date)
+      return Award.create(dto.name,dto.date,dto.albumId!)
     };
   
     toResponse(domain: Award): ResponseAwardDto {
         return {
             id: domain.getId(),
             name: domain.getName(),
-            date: domain.getDate()
+            date: domain.getDate(),
+            albumId : domain.getAlbumId()
         };
     }
    

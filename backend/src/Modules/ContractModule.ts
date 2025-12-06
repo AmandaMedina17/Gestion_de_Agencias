@@ -15,7 +15,7 @@ import { ArtistModule } from './ArtistModule';
 import { AgencyModule } from './AgencyModule';
 import { AgencyEntity } from '@infrastructure/database/Entities/AgencyEntity';
 import { ArtistEntity } from '@infrastructure/database/Entities/ArtistEntity';
-import { UpdateContractUseCase } from '@domain/UseCases/update_contract.use-case';
+import { UpdateContractUseCase } from '@application/UseCases/update_contract.use-case';
 import { GetArtistContractsUseCase } from '@application/UseCases/get_artist_contracts.use-case';
 
 @Module({

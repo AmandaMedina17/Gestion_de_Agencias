@@ -1,5 +1,5 @@
 import { Transform } from "class-transformer"
-import { IsDate, IsNotEmpty, IsNumber, IsString } from "class-validator"
+import { IsDate, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator"
 
 export class CreateAwardDto{
       
@@ -11,5 +11,9 @@ export class CreateAwardDto{
     @IsDate()
     @Transform(({ value }) => new Date(value)) 
     date!: Date
+
+    @IsOptional()
+    @IsString()
+    albumId?: string 
  
 }  
