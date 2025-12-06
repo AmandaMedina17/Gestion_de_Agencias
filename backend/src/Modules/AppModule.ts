@@ -14,6 +14,7 @@ import { ContractModule } from './ContractModule';
 import { BillboardListModule } from './billboard-list/billboard-list.module';
 import { SongModule } from './song/song.module';
 import { AlbumModule } from './album/album.module';
+import { AwardModule } from './award/award.module';
 import { GroupModule } from './GroupModule';
 
 @Module({
@@ -31,6 +32,7 @@ import { GroupModule } from './GroupModule';
     BillboardListModule,
     SongModule,
     AlbumModule,
+    AwardModule,
     GroupModule
   ],
   controllers: [AppController],
