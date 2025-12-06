@@ -9,6 +9,7 @@ import { AgencyModule } from './AgencyModule';
 import { IGroupRepository } from '@domain/Repositories/IGroupRepository';
 import { GroupRepository } from '@infrastructure/database/Repositories/GroupRepository';
 import { CreateGroupUseCase } from '@application/UseCases/create_group.use-case';
+import { UpdateGroupUseCase } from '@application/UseCases/update_group.use-case';
 
 @Module({
   imports: [
@@ -24,7 +25,8 @@ import { CreateGroupUseCase } from '@application/UseCases/create_group.use-case'
       provide: IGroupRepository,    
       useClass: GroupRepository
     },
-    CreateGroupUseCase
+    CreateGroupUseCase,
+    UpdateGroupUseCase
     ],
     exports: [
     IGroupRepository,

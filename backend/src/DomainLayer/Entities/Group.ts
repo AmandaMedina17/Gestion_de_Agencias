@@ -25,23 +25,95 @@ export class Group implements IUpdatable{
     }
     this.validate();
   }
+
   update(updateDto: UpdateData): void {
-    throw new Error("Method not implemented.");
+
+    if (updateDto.name) {
+      this.validateName(updateDto.name)
+      this.name = updateDto.name
+    }
+
+    if (updateDto.status) {
+      this.updateStatus(updateDto.status as GroupStatus)
+    }
+
+    if (updateDto.debut_date){
+      this.updateDebutDate(updateDto.debut_date)
+    }
+
+    if (updateDto.concept !== undefined) {
+      this.validateConcept(updateDto.concept)
+      this.concept = updateDto.concept
+    }
+
+    if (updateDto.is_created !== undefined) {
+      this.updateCreationStatus(updateDto.is_created)
+    }
+
+    if (updateDto.agencyId) {
+      this.agencyId = updateDto.agency_id
+    }
+
+  }
+
+  private updateStatus(newStatus: GroupStatus): void {
+    
+    if (this.status === GroupStatus.DISUELTO && newStatus !== GroupStatus.DISUELTO) {
+      throw new Error("Un grupo disuelto no puede reactivarse");
+    }
+
+    if (newStatus === GroupStatus.ACTIVO && this.getNumberOfMembers() < 2) {
+      throw new Error("Un grupo activo debe tener al menos 2 miembros");
+    }
+
+    this.status = newStatus;
+  }
+
+    private updateCreationStatus(newStatus: boolean): void {
+    
+      if(this.is_created == true && newStatus == false){
+        throw new Error("Un grupo ya creado no puede volver a estado 'no creado'");
+      }
+
+      this.is_created = newStatus;
+  }
+
+  private updateDebutDate(newDate: Date): void {
+
+    // No permitir cambiar a una fecha futura si el grupo ya debutó
+    const today = new Date();
+    if (this.debut_date < today && newDate > today && this.is_created) {
+      throw new Error("No se puede posponer la fecha de debut de un grupo que ya debutó");
+    }
+
+    this.debut_date = newDate;
+  }
+
+  private validateName(name: string): void {
+    if (!name || name.trim().length < 2) {
+      throw new Error("El nombre del grupo debe tener al menos 2 caracteres");
+    }
+    if (name.length > 200) {
+      throw new Error("El nombre del grupo no puede exceder 200 caracteres");
+    }
+    this.name = name.trim();
+  }
+
+  private validateConcept(newConcept: string): void {
+    if (!newConcept || newConcept.trim().length === 0) {
+      throw new Error("El concepto del grupo es requerido");
+    }
   }
 
   private validate(): void {
       if (!this.id) {
         throw new Error("El ID del grupo es requerido");
       }
-      if (!this.name || this.name.length < 2) {
-        throw new Error("El nombre del grupo debe tener al menos 2 caracteres");
-      }
-      if (this.name.length > 200) {
-        throw new Error("El nombre del grupo no puede exceder 200 caracteres");
-      }
-      if (!this.concept || this.concept.length == 0) {
-        throw new Error("El concepto del grupo es requerido");
-      }
+
+      this.validateName(this.name)
+      
+      this.validateConcept(this.concept)
+
       if (!this.agencyId || this.agencyId.length == 0) {
         throw new Error("El grupo debe tener una agencia que lo represente");
       }
@@ -114,3 +186,5 @@ export class Group implements IUpdatable{
 
  
 }
+
+
