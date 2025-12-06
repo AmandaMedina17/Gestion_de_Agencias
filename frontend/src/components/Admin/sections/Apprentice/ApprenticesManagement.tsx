@@ -1,8 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { useApprentice } from "../../../../context/ApprenticeContext";
-import { useAgency } from "../../../../context/AgencyContext"; // Importar el contexto de agencias
-import { Icon } from "../../../icons";
+import { useAgency } from "../../../../context/AgencyContext";
+import GenericTable, { Column } from "../../../ui/datatable";
+import CreateModal, { FormField } from "../../../ui/reutilizables/CreateModal";
+import EditModal from "../../../ui/reutilizables/EditModal";
+import DeleteModal from "../../../ui/reutilizables/DeleteModal";
 import './ApprenticeStyle.css'
+import { ApprenticeResponseDto } from "../../../../../../backend/src/ApplicationLayer/DTOs/apprenticeDto/response-apprentice.dto";
+
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
+import IconButton from '@mui/material/IconButton';
+import CloseIcon from '@mui/icons-material/Close';
+import Stack from '@mui/material/Stack';
 
 export enum ApprenticeTrainingLevel {
   PRINCIPIANTE = "PRINCIPIANTE",
@@ -28,351 +38,227 @@ const ApprenticeManagement: React.FC = () => {
     clearError,
   } = useApprentice();
 
-  // Obtener agencias del contexto
   const { agencies, fetchAgencies } = useAgency();
-
-  // Estados principales
-  const [filter, setFilter] = useState("");
-  const [sortBy, setSortBy] = useState<"name" | "age" | "entryDate" | "status">(
-    "name"
-  );
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [editingApprentice, setEditingApprentice] = useState<any>(null);
-  const [deletingApprentice, setDeletingApprentice] = useState<any>(null);
-  const [message, setMessage] = useState<{
-    type: "success" | "error";
-    text: string;
+  
+  const [notification, setNotification] = useState<{
+    type: "success" | "error" | "info" | "warning";
+    title?: string;
+    message: string;
   } | null>(null);
-  const [dataLoaded, setDataLoaded] = useState(false);
 
-  // Estados para búsqueda en dropdown de agencias
-  const [agencySearch, setAgencySearch] = useState("");
-  const [agencySearchEdit, setAgencySearchEdit] = useState("");
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingApprentice, setEditingApprentice] = useState<ApprenticeResponseDto | null>(null);
+  const [deletingApprentice, setDeletingApprentice] = useState<ApprenticeResponseDto | null>(null);
 
-  // PAGINACIÓN
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 30;
-
-  // Estados del formulario
-  const [newApprentice, setNewApprentice] = useState({
-    fullName: "",
-    age: "",
-    entryDate: "",
-    status: ApprenticeStatus.EN_ENTRENAMIENTO,
-    trainingLevel: ApprenticeTrainingLevel.PRINCIPIANTE,
-    agencyId: "",
-  });
-
-  const [editApprentice, setEditApprentice] = useState({
-    fullName: "",
-    age: "",
-    entryDate: "",
-    status: ApprenticeStatus.EN_ENTRENAMIENTO,
-    trainingLevel: ApprenticeTrainingLevel.PRINCIPIANTE,
-    agencyId: "",
-  });
-
-  // Cargar aprendices y agencias cuando se monta el componente
   useEffect(() => {
-    const loadInitialData = async () => {
-      if (!dataLoaded) {
-        clearError();
-        try {
-          await fetchApprentices();
-          await fetchAgencies(); // Cargar las agencias
-          setDataLoaded(true);
-        } catch (err) {
-          console.error("Error loading initial data:", err);
-        }
+    const loadData = async () => {
+      try {
+        await Promise.all([
+          fetchApprentices(),
+          fetchAgencies()
+        ]);
+      } catch (err) {
+        console.error("Error loading data:", err);
       }
     };
+    loadData();
+  }, []);
 
-    loadInitialData();
-  }, [dataLoaded]);
-
-  // Resetear página cuando cambien filtro u orden
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [filter, sortBy, sortOrder]);
-
-  // Filtrar agencias basado en la búsqueda
-  const filteredAgencies = agencies.filter(agency =>
-    agency.nameAgency.toLowerCase().includes(agencySearch.toLowerCase()) ||
-    agency.place.toLowerCase().includes(agencySearch.toLowerCase())
-  );
-
-  const filteredAgenciesEdit = agencies.filter(agency =>
-    agency.nameAgency.toLowerCase().includes(agencySearchEdit.toLowerCase()) ||
-    agency.place.toLowerCase().includes(agencySearchEdit.toLowerCase())
-  );
-
-  // Obtener nombre de la agencia por ID
-  const getAgencyName = (agencyId: string) => {
-    const agency = agencies.find(a => a.id === agencyId);
+  // FUNCIÓN PARA OBTENER NOMBRE DE LA AGENCIA
+  const getAgencyName = (apprentice: ApprenticeResponseDto) => {
+    if (apprentice.agency && typeof apprentice.agency === 'object') {
+      return `${apprentice.agency} `;
+    }
+    const agency = agencies.find(a => a.id === apprentice.agency);
     return agency ? `${agency.nameAgency} - ${agency.place}` : "No asignado";
   };
 
-  // Filtrar y ordenar aprendices
-  const filteredAndSortedApprentices = React.useMemo(() => {
-    if (!dataLoaded) return [];
-
-    let filtered = apprentices;
-
-    // Aplicar filtro por nombre
-    if (filter) {
-      filtered = apprentices.filter((apprentice) =>
-        apprentice.fullName.toLowerCase().includes(filter.toLowerCase())
-      );
-    }
-
-    // Aplicar ordenamiento
-    const sorted = [...filtered].sort((a, b) => {
-      let aValue, bValue;
-
-      switch (sortBy) {
-        case "name":
-          aValue = a.fullName;
-          bValue = b.fullName;
-          break;
-        case "age":
-          aValue = a.age;
-          bValue = b.age;
-          break;
-        case "entryDate":
-          aValue = new Date(a.entryDate);
-          bValue = new Date(b.entryDate);
-          break;
-        case "status":
-          aValue = a.status;
-          bValue = b.status;
-          break;
-        default:
-          aValue = a.fullName;
-          bValue = b.fullName;
+  // Definir campos del formulario de aprendiz
+  const apprenticeFields: FormField[] = [
+    {
+      name: "fullName",
+      label: "Nombre completo",
+      type: "text",
+      placeholder: "Ej: Juan Pérez García",
+      required: true,
+      min: 2,
+      max: 100,
+      validate: (value) => {
+        if (value.length < 2) return "El nombre debe tener al menos 2 caracteres";
+        return null;
       }
-
-      if (sortOrder === "asc") {
-        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-      } else {
-        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+    },
+    {
+      name: "age",
+      label: "Edad",
+      type: "text",
+      placeholder: "Ej: 25",
+      required: true,
+      min: 16,
+      max: 100,
+      validate: (value) => {
+        if (value < 16) return "La edad mínima es 16 años";
+        if (value > 100) return "La edad máxima es 100 años";
+        return null;
       }
-    });
-
-    return sorted;
-  }, [apprentices, filter, sortBy, sortOrder, dataLoaded]);
-
-  // PAGINACIÓN: calcular páginas y slice
-  const totalPages = Math.ceil(filteredAndSortedApprentices.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedApprentices = filteredAndSortedApprentices.slice(startIndex, startIndex + itemsPerPage);
-
-  // Manejar creación de aprendiz
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    clearError();
-    setMessage(null);
-
-    if (
-      !newApprentice.fullName.trim() ||
-      !newApprentice.age ||
-      !newApprentice.entryDate ||
-      !newApprentice.agencyId
-    ) {
-      setMessage({
-        type: "error",
-        text: "Por favor, complete todos los campos obligatorios",
-      });
-      return;
+    },
+    {
+      name: "entryDate",
+      label: "Fecha de ingreso",
+      type: "date",
+      required: true,
+      validate: (value) => {
+        const date = new Date(value);
+        if (date > new Date()) return "La fecha no puede ser futura";
+        return null;
+      }
+    },
+    {
+      name: "status",
+      label: "Estado",
+      type: "autocomplete",
+      required: true,
+      options: [
+        { value: ApprenticeStatus.EN_ENTRENAMIENTO, label: "En entrenamiento" },
+        { value: ApprenticeStatus.PROCESO_DE_SELECCION, label: "Proceso de selección" },
+        { value: ApprenticeStatus.TRANSFERIDO, label: "Transferido" }
+      ]
+    },
+    {
+      name: "trainingLevel",
+      label: "Nivel de entrenamiento",
+      type: "autocomplete",
+      required: true,
+      options: [
+        { value: ApprenticeTrainingLevel.PRINCIPIANTE, label: "Principiante" },
+        { value: ApprenticeTrainingLevel.INTERMEDIO, label: "Intermedio" },
+        { value: ApprenticeTrainingLevel.AVANZADO, label: "Avanzado" }
+      ]
+    },
+    {
+      name: "agencyId",
+      label: "Agencia",
+      type: "autocomplete",
+      required: true,
+      options: agencies.map(agency => ({
+        value: agency.id,
+        label: `${agency.nameAgency} - ${agency.place}`
+      }))
     }
+  ];
 
-    if (new Date(newApprentice.entryDate) > new Date()) {
-      setMessage({
-        type: "error",
-        text: "La fecha de ingreso no puede ser futura",
-      });
-      return;
-    }
+  // Datos iniciales para creación
+  const initialCreateData = {
+    fullName: "",
+    age: "",
+    entryDate: "",
+    status: ApprenticeStatus.EN_ENTRENAMIENTO,
+    trainingLevel: ApprenticeTrainingLevel.PRINCIPIANTE,
+    agencyId: ""
+  };
 
+  // Funciones auxiliares para mostrar notificaciones
+  const showNotification = (type: "success" | "error" | "info" | "warning", title: string, message: string) => {
+    setNotification({ type, title, message });
+  };
+
+  const showSuccess = (title: string, message: string) => {
+    showNotification("success", title, message);
+  };
+
+  const showError = (title: string, message: string) => {
+    showNotification("error", title, message);
+  };
+
+  const showCreateSuccess = () => {
+    showSuccess("¡Aprendiz Creado!", "El aprendiz ha sido creado exitosamente.");
+  };
+
+  const showCreateError = (errorMessage?: string) => {
+    showError("Error al Crear", errorMessage || "No se pudo crear el aprendiz.");
+  };
+
+  const showUpdateSuccess = () => {
+    showSuccess("¡Aprendiz Actualizado!", "El aprendiz ha sido actualizado exitosamente.");
+  };
+
+  const showUpdateError = (errorMessage?: string) => {
+    showError("Error al Actualizar", errorMessage || "No se pudo actualizar el aprendiz.");
+  };
+
+  const showDeleteSuccess = () => {
+    showSuccess("¡Aprendiz Eliminado!", "El aprendiz ha sido eliminado exitosamente.");
+  };
+
+  const showDeleteError = (errorMessage?: string) => {
+    showError("Error al Eliminar", errorMessage || "No se pudo eliminar el aprendiz.");
+  };
+
+  // Manejar creación
+  const handleCreate = async (data: Record<string, any>) => {
     try {
+      console.log("Datos para crear aprendiz:", data);
+      
       await createApprentice({
-        ...newApprentice,
-        age: parseInt(newApprentice.age),
-        entryDate: new Date(newApprentice.entryDate),
-        agency: newApprentice.agencyId
+        fullName: data.fullName,
+        age: parseInt(data.age),
+        entryDate: new Date(data.entryDate),
+        status: data.status,
+        trainingLevel: data.trainingLevel,
+        agency: data.agencyId
       });
 
-      setMessage({
-        type: "success",
-        text: `Aprendiz "${newApprentice.fullName}" creado exitosamente`,
-      });
-
-      // Resetear formulario
-      setNewApprentice({
-        fullName: "",
-        age: "",
-        entryDate: "",
-        status: ApprenticeStatus.EN_ENTRENAMIENTO,
-        trainingLevel: ApprenticeTrainingLevel.PRINCIPIANTE,
-        agencyId: "",
-      });
-      setAgencySearch(""); // Limpiar búsqueda
-
-      setShowCreateForm(false);
+      showCreateSuccess();
+      setShowCreateModal(false);
       await fetchApprentices();
 
-      setTimeout(() => setMessage(null), 5000);
     } catch (err: any) {
-      setMessage({
-        type: "error",
-        text: err.message || "Error al crear el aprendiz",
-      });
+      console.error("Error al crear aprendiz:", err);
+      showCreateError(err.message);
     }
   };
 
-  // Manejar actualización de aprendiz
-  const handleUpdate = async () => {
-    if (
-      !editingApprentice ||
-      !editApprentice.fullName.trim() ||
-      !editApprentice.age ||
-      !editApprentice.entryDate
-    ) {
-      return;
-    }
-
-    if (new Date(editApprentice.entryDate) > new Date()) {
-      setMessage({
-        type: "error",
-        text: "La fecha de ingreso no puede ser futura",
-      });
-      return;
-    }
-
+  // Manejar actualización
+  const handleUpdate = async (id: string | number, data: Record<string, any>) => {
     try {
-      await updateApprentice(editingApprentice.id, {
-        ...editApprentice,
-        fullName: editApprentice.fullName.trim(),
-        age: parseInt(editApprentice.age),
-        status: editApprentice.status,
-        trainingLevel: editApprentice.trainingLevel,
-        entryDate: new Date(editApprentice.entryDate),
-        agency: editApprentice.agencyId.trim()
+      await updateApprentice(id as string, {
+        fullName: data.fullName,
+        age: parseInt(data.age),
+        entryDate: new Date(data.entryDate),
+        status: data.status,
+        trainingLevel: data.trainingLevel,
+        agency: data.agencyId
       });
 
-      setMessage({
-        type: "success",
-        text: `Aprendiz actualizado exitosamente`,
-      });
-
+      showUpdateSuccess();
       setEditingApprentice(null);
-      setEditApprentice({
-        fullName: "",
-        age: "",
-        entryDate: "",
-        status: ApprenticeStatus.EN_ENTRENAMIENTO,
-        trainingLevel: ApprenticeTrainingLevel.PRINCIPIANTE,
-        agencyId: "",
-      });
-      setAgencySearchEdit(""); // Limpiar búsqueda
-
       await fetchApprentices();
-      setTimeout(() => setMessage(null), 5000);
     } catch (err: any) {
-      setMessage({
-        type: "error",
-        text: err.message || "Error al actualizar el aprendiz",
-      });
+      showUpdateError(err.message);
     }
   };
 
-  // Manejar eliminación de aprendiz
-  const handleDelete = async () => {
-    if (!deletingApprentice) {
-      return;
-    }
+  // Manejar eliminación
+  const handleDelete = async (id: string | number) => {
+    if (!deletingApprentice) return;
 
     try {
-      await deleteApprentice(deletingApprentice.id);
-      setMessage({
-        type: "success",
-        text: `Aprendiz "${deletingApprentice.fullName}" eliminado exitosamente`,
-      });
+      await deleteApprentice(id as string);
+      showDeleteSuccess();
       setDeletingApprentice(null);
       await fetchApprentices();
-      setTimeout(() => setMessage(null), 5000);
     } catch (err: any) {
-      setMessage({
-        type: "error",
-        text: err.message || "Error al eliminar el aprendiz",
-      });
+      showDeleteError(err.message);
     }
   };
 
-  // Recargar datos manualmente
-  const handleReload = async () => {
-    clearError();
-    try {
-      await fetchApprentices();
-      setMessage({
-        type: "success",
-        text: "Datos actualizados correctamente",
-      });
-      setTimeout(() => setMessage(null), 3000);
-    } catch (err: any) {
-      setMessage({
-        type: "error",
-        text: err.message || "Error al recargar los datos",
-      });
-    }
-  };
-
-  // Iniciar edición
-  const startEdit = (apprentice: any) => {
-    setEditingApprentice(apprentice);
-    setEditApprentice({
-      fullName: apprentice.fullName,
-      age: apprentice.age.toString(),
-      entryDate: apprentice.entryDate.split("T")[0], // Formato YYYY-MM-DD
-      status: apprentice.status,
-      trainingLevel: apprentice.trainingLevel,
-      agencyId: apprentice.agencyId || "",
-    });
-    // Establecer búsqueda inicial con la agencia actual
-    if (apprentice.agencyId) {
-      const currentAgency = agencies.find(a => a.id === apprentice.agencyId);
-      if (currentAgency) {
-        setAgencySearchEdit(`${currentAgency.nameAgency} - ${currentAgency.place}`);
-      }
-    }
-  };
-
-  // Iniciar eliminación
-  const startDelete = (apprentice: any) => {
-    setDeletingApprentice(apprentice);
-  };
-
-  // Limpiar filtro
-  const handleClearFilter = () => {
-    setFilter("");
-  };
-
-  // Alternar ordenamiento
-  const toggleSortOrder = () => {
-    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-  };
-
-  // Formatear fecha para mostrar
+  // Funciones auxiliares
   const formatDate = (dateString: string) => {
-    if (!dateString) return "N/A";
-  
-  const date = new Date(dateString);
-  // Sumar un día
-  date.setDate(date.getDate() + 1);
-  
-  return date.toLocaleDateString("es-ES");
-    };
-  // Traducir estados y niveles
+    const date = new Date(dateString);
+    date.setDate(date.getDate() + 1);
+    return date.toLocaleDateString("es-ES");
+  };
+
   const getStatusText = (status: ApprenticeStatus) => {
     const statusMap = {
       [ApprenticeStatus.EN_ENTRENAMIENTO]: "En Entrenamiento",
@@ -391,657 +277,166 @@ const ApprenticeManagement: React.FC = () => {
     return levelMap[level] || level;
   };
 
-  const getTodayDate = (): string => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
+  // Definir columnas para la tabla - USANDO NOTACIÓN DE PUNTO COMO EN CONTRATO
+  const columns: Column<ApprenticeResponseDto>[] = [
+    {
+      key: "fullName",
+      title: "Nombre",
+      sortable: true,
+      width: "25%",
+      align: "center"
+    },
+    {
+      key: "age",
+      title: "Edad",
+      sortable: true,
+      width: "10%",
+      align: "center",
+      render: (item) => `${item.age} años`
+    },
+    {
+      key: "entryDate",
+      title: "Fecha Ingreso",
+      sortable: true,
+      width: "15%",
+      render: (item) => formatDate(item.entryDate.toString()),
+      align: "center"
+    },
+    {
+      key: "status",
+      title: "Estado",
+      sortable: true,
+      width: "15%",
+      align: "center",
+      render: (item) => (
+        <span className={`status-badge status-${item.status.toLowerCase()}`}>
+          {getStatusText(item.status)}
+        </span>
+      )
+    },
+    {
+      key: "trainingLevel",
+      title: "Nivel",
+      sortable: true,
+      width: "15%",
+      align: "center",
+      render: (item) => (
+        <span className={`trainingLevel-badge trainingLevel-${item.trainingLevel.toLowerCase()}`}>
+          {getTrainingLevelText(item.trainingLevel)}
+        </span>
+      )
+    },
+    {
+      key: "agency.nameAgency", // Usando notación de punto como en contrato
+      title: "Agencia",
+      sortable: true, // Ahora es ordenable
+      width: "20%",
+      align: "center",
+      render: (item) => {
+        if (item.agency && typeof item.agency === 'object') {
+          return `${item.agency}`;
+        }
+        return getAgencyName(item);
+      }
+    }
+  ];
+
+  // Función para renderizar detalles en modal de eliminación
+  const renderApprenticeDetails = (apprentice: ApprenticeResponseDto) => (
+    <div className="apprentice-details">
+      <div className="detail-item">
+        <strong>Nombre:</strong> <span>{apprentice.fullName}</span>
+      </div>
+      <div className="detail-item">
+        <strong>Edad:</strong> <span>{apprentice.age} años</span>
+      </div>
+      <div className="detail-item">
+        <strong>Fecha ingreso:</strong> <span>{formatDate(apprentice.entryDate.toString())}</span>
+      </div>
+      <div className="detail-item">
+        <strong>Estado:</strong> <span>{getStatusText(apprentice.status)}</span>
+      </div>
+      <div className="detail-item">
+        <strong>Nivel:</strong> <span>{getTrainingLevelText(apprentice.trainingLevel)}</span>
+      </div>
+      <div className="detail-item">
+        <strong>Agencia:</strong> <span>{getAgencyName(apprentice)}</span>
+      </div>
+    </div>
+  );
 
   return (
     <section id="apprentice_manager" className="content-section active">
-      <div className="profile-header">
-        <div className="profile-info">
-          <h1>Gestión de Aprendices</h1>
-          <p className="section-description">
-            Administre todos los aprendices del sistema
-          </p>
-        </div>
-      </div>
+      <GenericTable<ApprenticeResponseDto>
+        title="Gestión de Aprendices"
+        description="Administre todos los aprendices del sistema"
+        data={apprentices}
+        columns={columns}
+        loading={loading}
+        onReload={() => fetchApprentices()}
+        showCreateForm={showCreateModal}
+        onShowCreateChange={setShowCreateModal}
+        editingItem={editingApprentice}
+        onEditingChange={setEditingApprentice}
+        deletingItem={deletingApprentice}
+        onDeletingChange={setDeletingApprentice}
+        itemsPerPage={20}
+        className="apprentice-table"
+        notification={notification || undefined}
+        onNotificationClose={() => setNotification(null)}
+      />
 
-      <div className="detail-card">
-        {/* Mensajes globales */}
-        {message && (
-          <div className={`message ${message.type}`}>{message.text}</div>
-        )}
+      {/* Modal de creación usando componente genérico */}
+      {showCreateModal && (
+        <CreateModal
+          title="Crear Nuevo Aprendiz"
+          fields={apprenticeFields}
+          initialData={initialCreateData}
+          onSubmit={handleCreate}
+          onClose={() => setShowCreateModal(false)}
+          loading={loading}
+          submitText="Crear Aprendiz"
+        />
+      )}
 
-        {error && <div className="message error">{error}</div>}
+      {/* Modal de edición usando componente genérico */}
+      {editingApprentice && (
+        <EditModal
+          title="Editar Aprendiz"
+          fields={apprenticeFields}
+          initialData={{
+            fullName: editingApprentice.fullName,
+            age: editingApprentice.age.toString(),
+            entryDate: editingApprentice.entryDate.toString().split("T")[0],
+            status: editingApprentice.status,
+            trainingLevel: editingApprentice.trainingLevel,
+            agencyId: editingApprentice.agency || ""
+          }}
+          itemId={editingApprentice.id}
+          onSubmit={handleUpdate}
+          onClose={() => setEditingApprentice(null)}
+          loading={loading}
+          submitText="Actualizar Aprendiz"
+          
+        />
+      )}
 
-        {/* Controles superiores */}
-        <div className="manager-controls">
-          <div className="controls-left">
-            <button
-              className="create-button"
-              onClick={() => setShowCreateForm(true)}
-              disabled={loading}
-            >
-              <span className="button-icon"><Icon name="plus" size={20} /></span>
-              Nuevo Aprendiz
-            </button>
-          </div>
-
-          <div className="controls-right">
-            <div className="filter-group">
-              <input
-                type="text"
-                className="form-input search-input"
-                placeholder="Filtrar por nombre..."
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                disabled={loading}
-              />
-              {filter && (
-                <button
-                  className="clear-filter-btn"
-                  onClick={handleClearFilter}
-                  title="Limpiar filtro"
-                >
-                  ×
-                </button>
-              )}
-            </div>
-
-            <div className="sort-group">
-              <select
-                className="form-select sort-select"
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
-                disabled={loading}
-              >
-                <option value="name">Ordenar por nombre</option>
-                <option value="age">Ordenar por edad</option>
-                <option value="entryDate">Ordenar por fecha ingreso</option>
-                <option value="status">Ordenar por estado</option>
-              </select>
-              <button
-                className="sort-order-btn"
-                onClick={toggleSortOrder}
-                disabled={loading}
-                title={
-                  sortOrder === "asc" ? "Orden ascendente" : "Orden descendente"
-                }
-              >
-                {sortOrder === "asc" ? <Icon name="down" size={18} />: <Icon name="up" size={18} />}
-              </button>
-            </div>
-
-            <button
-              className="reload-button"
-              onClick={handleReload}
-              disabled={loading}
-              title="Recargar datos"
-            >
-              {loading ? "⟳" : "↻"}
-            </button>
-          </div>
-        </div>
-
-        {/* Contador de resultados */}
-        {dataLoaded && (
-          <div className="results-info">
-            <span className="results-count">
-              {filteredAndSortedApprentices.length} de {apprentices.length} {" "}
-              aprendices
-            </span>
-            <span className="sort-info">
-              Orden: {" "}
-              {sortBy === "name"
-                ? "Nombre"
-                : sortBy === "age"
-                ? "Edad"
-                : sortBy === "entryDate"
-                ? "Fecha Ingreso"
-                : "Estado"} {" "}
-              •{sortOrder === "asc" ? " Ascendente" : " Descendente"}
-            </span>
-          </div>
-        )}
-
-        {/* Grid de aprendices */}
-        <div className="apprentices-grid">
-          {!dataLoaded ? (
-            <div className="loading-state">
-              <div className="loading-spinner"></div>
-              <p>Cargando aprendices...</p>
-            </div>
-          ) : loading ? (
-            <div className="loading-state">
-              <div className="loading-spinner"></div>
-              <p>Actualizando...</p>
-            </div>
-          ) : filteredAndSortedApprentices.length === 0 ? (
-            <div className="empty-state">
-              <div className="empty-icon">🎓</div>
-              <h3>No hay aprendices</h3>
-              <p>
-                {filter
-                  ? `No se encontraron resultados para "${filter}"`
-                  : "Comience agregando el primer aprendiz"}
-              </p>
-              {!filter && (
-                <button
-                  className="create-button"
-                  onClick={() => setShowCreateForm(true)}
-                  disabled={
-                    loading ||
-                    !newApprentice.fullName.trim() ||
-                    !newApprentice.age ||
-                    !newApprentice.entryDate ||
-                    new Date(newApprentice.entryDate) > new Date()
-                  }
-                >
-                  <span className="button-icon"><Icon name="plus" size={20} /></span>
-                  Crear Primer Aprendiz
-                </button>
-              )}
-            </div>
-          ) : (
-            <div className="table-container">
-              <table className="apprentices-table">
-                <thead>
-                  <tr>
-                    <th>Nombre</th>
-                    <th>Edad</th>
-                    <th>Fecha Ingreso</th>
-                    <th>Estado</th>
-                    <th>Nivel</th>
-                    <th>Agencia</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedApprentices.map((apprentice) => (
-                    <tr key={apprentice.id} className="apprentice-row">
-                      <td className="apprentice-name-cell">
-                        <div className="apprentice-name">{apprentice.fullName}</div>
-                      </td>
-                      <td>
-                        <div className="detail-value">{apprentice.age} años</div>
-                      </td>
-                      <td>
-                        <div className="detail-value">
-                          {formatDate(apprentice.entryDate.toString())}
-                        </div>
-                      </td>
-                      <td>
-                        <span
-                          className={`status-badge status-${apprentice.status.toLowerCase()}`}
-                        >
-                          {getStatusText(apprentice.status)}
-                        </span>
-                      </td>
-                      <td>
-                        <div className={`trainingLevel-badge trainingLevel-${apprentice.trainingLevel.toLowerCase()}`}>
-                          {getTrainingLevelText(apprentice.trainingLevel)}
-                        </div>
-                      </td>
-                      <td>
-                        <div className="detail-value">
-                          {getAgencyName(apprentice.agency)}
-                        </div>
-                      </td>
-                      <td>
-                        <div className="table-actions">
-                          <button
-                            className="action-btn edit-btn"
-                            onClick={() => startEdit(apprentice)}
-                            title="Editar aprendiz"
-                            disabled={loading}
-                          >
-                            <Icon name="edit" size={18} />
-                          </button>
-                          <button
-                            className="action-btn delete-btn"
-                            onClick={() => startDelete(apprentice)}
-                            title="Eliminar aprendiz"
-                            disabled={loading}
-                          >
-                            <Icon name="trash" size={18} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {/* PAGINACIÓN */}
-              {totalPages > 1 && (
-                <div className="pagination-container">
-                  <button
-                    className="pagination-btn"
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage(currentPage - 1)}
-                  >
-                    ◀ Anterior
-                  </button>
-
-                  <span className="pagination-info">
-                    Página {currentPage} de {totalPages}
-                  </span>
-
-                  <button
-                    className="pagination-btn"
-                    disabled={currentPage === totalPages}
-                    onClick={() => setCurrentPage(currentPage + 1)}
-                  >
-                    Siguiente ▶
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-        </div>
-
-        {/* Modal de creación */}
-        {showCreateForm && (
-          <div className="modal-overlay apprentice-modal">
-            <div className="modal-content">
-              <h3>Crear Nuevo Aprendiz</h3>
-              <form onSubmit={handleCreate}>
-                <div className="form-row">
-                  <div className="form-group">
-                    <label className="form-label">Nombre completo *</label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      placeholder="Ej: Juan Pérez García"
-                      value={newApprentice.fullName}
-                      onChange={(e) =>
-                        setNewApprentice({
-                          ...newApprentice,
-                          fullName: e.target.value,
-                        })
-                      }
-                      required
-                      minLength={2}
-                      maxLength={100}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Edad *</label>
-                    <input
-                      type="number"
-                      className="form-input"
-                      placeholder="Ej: 25"
-                      value={newApprentice.age}
-                      onChange={(e) =>
-                        setNewApprentice({
-                          ...newApprentice,
-                          age: e.target.value,
-                        })
-                      }
-                      required
-                      min="16"
-                      max="100"
-                    />
-                  </div>
-                </div>
-
-                <div className="form-row">
-                  <div className="form-group">
-                    <label className="form-label">Fecha de ingreso *</label>
-                    <input
-                      type="date"
-                      className="form-input"
-                      value={newApprentice.entryDate}
-                      onChange={(e) =>
-                        setNewApprentice({
-                          ...newApprentice,
-                          entryDate: e.target.value,
-                        })
-                      }
-                      required
-                      max={getTodayDate()} 
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Estado</label>
-                    <select
-                      className="form-select"
-                      value={newApprentice.status}
-                      onChange={(e) =>
-                        setNewApprentice({
-                          ...newApprentice,
-                          status: e.target.value as ApprenticeStatus,
-                        })
-                      }
-                    >
-                      <option value={ApprenticeStatus.EN_ENTRENAMIENTO}>
-                        En entrenamiento
-                      </option>
-                      <option value={ApprenticeStatus.PROCESO_DE_SELECCION}>
-                        Proceso de selección
-                      </option>
-                      <option value={ApprenticeStatus.TRANSFERIDO}>
-                        Transferido
-                      </option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="form-row">
-                  <div className="form-group">
-                    <label className="form-label">Nivel de entrenamiento</label>
-                    <select
-                      className="form-select"
-                      value={newApprentice.trainingLevel}
-                      onChange={(e) =>
-                        setNewApprentice({
-                          ...newApprentice,
-                          trainingLevel: e.target
-                            .value as ApprenticeTrainingLevel,
-                        })
-                      }
-                    >
-                      <option value={ApprenticeTrainingLevel.PRINCIPIANTE}>
-                        Principiante
-                      </option>
-                      <option value={ApprenticeTrainingLevel.INTERMEDIO}>
-                        Intermedio
-                      </option>
-                      <option value={ApprenticeTrainingLevel.AVANZADO}>
-                        Avanzado
-                      </option>
-                    </select>
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Agencia *</label>
-                    <select
-                      className="form-select"
-                      value={newApprentice.agencyId}
-                      onChange={(e) => {
-                        const selectedId = e.target.value;
-                        setNewApprentice({
-                          ...newApprentice,
-                          agencyId: selectedId,
-                        });
-                      }}
-                      required
-                    >
-                      <option value="">Seleccione una agencia</option>
-                      {agencies.map((agency) => (
-                        <option key={agency.id} value={agency.id}>
-                          {agency.nameAgency} - {agency.place} 
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="modal-actions">
-                  <button
-                    type="submit"
-                    className="submit-button"
-                    disabled={
-                      loading ||
-                      !newApprentice.fullName.trim() ||
-                      !newApprentice.age ||
-                      !newApprentice.entryDate
-                    }
-                  >
-                    {loading ? "Creando..." : "Crear Aprendiz"}
-                  </button>
-                  <button
-                    type="button"
-                    className="cancel-button"
-                    onClick={() => {
-                      setShowCreateForm(false);
-                      setNewApprentice({
-                        fullName: "",
-                        age: "",
-                        entryDate: "",
-                        status: ApprenticeStatus.EN_ENTRENAMIENTO,
-                        trainingLevel: ApprenticeTrainingLevel.PRINCIPIANTE,
-                        agencyId: "",
-                      });
-                      setAgencySearch("");
-                    }}
-                    disabled={loading}
-                  >
-                    Cancelar
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {/* Modal de edición */}
-        {editingApprentice && (
-          <div className="modal-overlay apprentice-modal">
-            <div className="modal-content">
-              <h3>Editar Aprendiz</h3>
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">Nombre completo *</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    value={editApprentice.fullName}
-                    onChange={(e) =>
-                      setEditApprentice({
-                        ...editApprentice,
-                        fullName: e.target.value,
-                      })
-                    }
-                    required
-                    minLength={2}
-                    maxLength={100}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Edad *</label>
-                  <input
-                    type="number"
-                    className="form-input"
-                    value={editApprentice.age}
-                    onChange={(e) =>
-                      setEditApprentice({
-                        ...editApprentice,
-                        age: e.target.value,
-                      })
-                    }
-                    required
-                    min="16"
-                    max="100"
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">Fecha de ingreso *</label>
-                  <input
-                    type="date"
-                    className="form-input"
-                    value={editApprentice.entryDate}
-                    onChange={(e) =>
-                      setEditApprentice({
-                        ...editApprentice,
-                        entryDate: e.target.value,
-                      })
-                    }
-                    required
-                    max={getTodayDate()} 
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Estado</label>
-                  <select
-                    className="form-select"
-                    value={editApprentice.status}
-                    onChange={(e) =>
-                      setEditApprentice({
-                        ...editApprentice,
-                        status: e.target.value as ApprenticeStatus,
-                      })
-                    }
-                  >
-                    <option value={ApprenticeStatus.EN_ENTRENAMIENTO}>
-                      En entrenamiento
-                    </option>
-                    <option value={ApprenticeStatus.PROCESO_DE_SELECCION}>
-                      Proceso de selección
-                    </option>
-                    <option value={ApprenticeStatus.TRANSFERIDO}>
-                      Transferido
-                    </option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">Nivel de entrenamiento</label>
-                  <select
-                    className="form-select"
-                    value={editApprentice.trainingLevel}
-                    onChange={(e) =>
-                      setEditApprentice({
-                        ...editApprentice,
-                        trainingLevel: e.target
-                          .value as ApprenticeTrainingLevel,
-                      })
-                    }
-                  >
-                    <option value={ApprenticeTrainingLevel.PRINCIPIANTE}>
-                      Principiante
-                    </option>
-                    <option value={ApprenticeTrainingLevel.INTERMEDIO}>
-                      Intermedio
-                    </option>
-                    <option value={ApprenticeTrainingLevel.AVANZADO}>
-                      Avanzado
-                    </option>
-                  </select>
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Agencia</label>
-                  <select
-                    className="form-select"
-                    value={editApprentice.agencyId}
-                    onChange={(e) =>
-                      setEditApprentice({
-                        ...editApprentice,
-                        agencyId: e.target.value,
-                      })
-                    }
-                  >
-                    <option value="">No asignado</option>
-                    {agencies.map((agency) => (
-                      <option key={agency.id} value={agency.id}>
-                        {agency.nameAgency} - {agency.place} (Fundada: {formatDate(agency.dateFundation.toString())})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="modal-actions">
-                <button
-                  className="submit-button"
-                  onClick={handleUpdate}
-                  disabled={
-                    loading ||
-                    !editApprentice.fullName.trim() ||
-                    !editApprentice.age ||
-                    !editApprentice.entryDate
-                  }
-                >
-                  {loading ? "Actualizando..." : "Actualizar"}
-                </button>
-                <button
-                  className="cancel-button"
-                  onClick={() => {
-                    setEditingApprentice(null);
-                    setEditApprentice({
-                      fullName: "",
-                      age: "",
-                      entryDate: "",
-                      status: ApprenticeStatus.EN_ENTRENAMIENTO,
-                      trainingLevel: ApprenticeTrainingLevel.PRINCIPIANTE,
-                      agencyId: "",
-                    });
-                    setAgencySearchEdit("");
-                  }}
-                  disabled={loading}
-                >
-                  Cancelar
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Modal de confirmación de eliminación */}
-        {deletingApprentice && (
-          <div className="modal-overlay apprentice-modal">
-            <div className="modal-content">
-              <h3>¿Eliminar Aprendiz?</h3>
-              <div className="delete-confirmation">
-                <p>¿Está seguro de que desea eliminar este aprendiz?</p>
-                <div className="apprentice-details">
-                  <div className="detail-item">
-                    <strong>Nombre:</strong> {deletingApprentice.fullName}
-                  </div>
-                  <div className="detail-item">
-                    <strong>Edad:</strong> {deletingApprentice.age} años
-                  </div>
-                  <div className="detail-item">
-                    <strong>Fecha de ingreso:</strong> {formatDate(deletingApprentice.entryDate)}
-                  </div>
-                  <div className="detail-item">
-                    <strong>Estado:</strong> {getStatusText(deletingApprentice.status)}
-                  </div>
-                  <div className="detail-item">
-                    <strong>Nivel Entrenamiento:</strong> {getTrainingLevelText(deletingApprentice.trainingLevel)}
-                  </div>
-                  <div className="detail-item">
-                    <strong>Agencia:</strong> {getAgencyName(deletingApprentice.agencyId)}
-                  </div>
-                </div>
-                <p className="warning-text">
-                  ⚠️ Esta acción no se puede deshacer.
-                </p>
-              </div>
-              <div className="modal-actions">
-                <button
-                  className="submit-button delete-button"
-                  onClick={handleDelete}
-                  disabled={loading}
-                >
-                  {loading ? "Eliminando..." : "Sí, Eliminar"}
-                </button>
-                <button
-                  className="cancel-button"
-                  onClick={() => setDeletingApprentice(null)}
-                  disabled={loading}
-                >
-                  Cancelar
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </section>
+      {/* Modal de eliminación usando componente genérico */}
+      {deletingApprentice && (
+        <DeleteModal<ApprenticeResponseDto>
+          title="¿Eliminar Aprendiz?"
+          item={deletingApprentice}
+          itemName="Aprendiz"
+          itemId={deletingApprentice.id}
+          onConfirm={handleDelete}
+          onClose={() => setDeletingApprentice(null)}
+          loading={loading}
+          confirmText="Sí, Eliminar"
+          warningMessage="⚠️ Esta acción no se puede deshacer."
+          renderDetails={renderApprenticeDetails}
+        />
+      )}
+    </section>
   );
 };
 

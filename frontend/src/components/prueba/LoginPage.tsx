@@ -7,27 +7,49 @@ import { useAuth } from "../../context/AuthContext"   // <-- IMPORTANTE
 import "./globals.css"
 import { useNavigate } from "react-router-dom"    // <-- si usas react-router
 
-export default function Login() {
-  const navigate = useNavigate() // <-- quitar si NO usas router
 
-  const { login, loading } = useAuth()  // <-- usamos el contexto
+export enum UserRole {
+  AGENCY_MANAGER = 'AGENCY_MANAGER',
+  ARTIST = 'ARTIST',
+  ADMIN = 'ADMIN',
+}
+
+export default function Login() {
+  const navigate = useNavigate()
+
+  const { login, loading } = useAuth()  
   const [showPassword, setShowPassword] = useState(false)
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [errorMessage, setErrorMessage] = useState("")
+  const [error, setError] = useState(''); // Estado para errores
+    const [loadingg, setLoading] = useState(false); //  Estado para loading
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setErrorMessage("")
+    setLoading(true);
+    setError('');
 
     try {
       await login({ username, password })   // <-- llamada real al contexto
-
-      // Redireccionar tras login
-      navigate("/dashboard") // o donde desees
-    } catch (error: any) {
-      setErrorMessage(error.message)
-    }
+const user = JSON.parse(localStorage.getItem('user') || '{}');
+        if (user.role === UserRole.AGENCY_MANAGER) {
+          navigate('/manager');
+        } else if (user.role === UserRole.ARTIST) {
+          navigate('/artist');
+        } else if (user.role === UserRole.ADMIN) {
+          navigate('/admin');
+        } else {
+          navigate('/dashboard');
+        }
+      } catch (err: any) {
+        // 🆕 Manejar errores del backend
+        setError(err.message || 'Error al iniciar sesión');
+      } finally {
+        setLoading(false);
+      }
   }
 
   return (
