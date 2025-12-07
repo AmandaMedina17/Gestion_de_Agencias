@@ -6,6 +6,7 @@ import { Artist} from '@domain/Entities/Artist';
 import { ArtistEntity } from '../Entities/ArtistEntity';
 import { IMapper } from '../Mappers/IMapper';
 import { Group } from '@domain/Entities/Group';
+import { ArtistMapper } from '../Mappers/ArtistMapper';
 
 @Injectable()
 export class ArtistRepository

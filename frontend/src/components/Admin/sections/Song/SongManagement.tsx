@@ -1,12 +1,32 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { useSong } from "../../../../context/SongContext";
 import { useAlbum } from "../../../../context/AlbumContext";
-import { Icon } from "../../../icons";
+import GenericTable, { Column } from "../../../ui/datatable";
+import CreateModal, { FormField } from "../../../ui/reutilizables/CreateModal";
+import EditModal from "../../../ui/reutilizables/EditModal";
+import DeleteModal from "../../../ui/reutilizables/DeleteModal";
 import './SongStyle.css';
 
-import AcUnitIcon from '@mui/icons-material/AcUnit';
+// Interfaces de tipos
+interface Song {
+  id: string;
+  name: string;
+  albumId?: string;
+  album?: string;
+  idAlbum?: string;
+  releaseDate?: Date;
+  fecha: Date;
+  duration?: number;
+  trackNumber?: number;
+}
+
+interface Album {
+  id: string;
+  title: string;
+}
 
 const SongManagement: React.FC = () => {
+  // Contextos
   const {
     songs,
     fetchSongs,
@@ -20,808 +40,356 @@ const SongManagement: React.FC = () => {
 
   const { albums, fetchAlbums } = useAlbum();
 
-  // Estados principales
-  const [filter, setFilter] = useState("");
-  const [sortBy, setSortBy] = useState<"name" | "fecha" | "album">("name");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [editingSong, setEditingSong] = useState<any>(null);
-  const [deletingSong, setDeletingSong] = useState<any>(null);
-  const [message, setMessage] = useState<{
-    type: "success" | "error";
-    text: string;
+  // Estados
+  const [notification, setNotification] = useState<{
+    type: "success" | "error" | "info" | "warning";
+    title?: string;
+    message: string;
   } | null>(null);
-  const [dataLoaded, setDataLoaded] = useState(false);
 
-  // PAGINACIÓN
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 30;
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingSong, setEditingSong] = useState<Song | null>(null);
+  const [deletingSong, setDeletingSong] = useState<Song | null>(null);
 
-  // Estados del formulario
-  const [newSong, setNewSong] = useState({
-    nameSong: "",
-    idAlbum: "",
-    releaseDate: "",
-  });
-
-  const [editSong, setEditSong] = useState({
-    nameSong: "",
-    idAlbum: "",
-    releaseDate: "",
-  });
-
-  // Cargar canciones y álbumes cuando se monta el componente
+  // Cargar datos iniciales
   useEffect(() => {
-    const loadInitialData = async () => {
-      if (!dataLoaded) {
-        clearError();
-        try {
-          await fetchSongs();
-          await fetchAlbums();
-
-          // DEBUG: Verificar estructura de las canciones
-          console.log("=== DEBUG CANCIONES ===");
-          if (songs.length > 0) {
-            const firstSong = songs[0];
-            console.log("Primera canción:", firstSong);
-            console.log("Propiedades de la canción:", Object.keys(firstSong));
-            console.log("¿Tiene albumId?:", "albumId" in firstSong);
-            console.log("Valor de albumId:", firstSong.albumId);
-            console.log("¿Tiene album?:", "album" in firstSong);
-            console.log("¿Tiene idAlbum?:", "idAlbum" in firstSong);
-          }
-
-          // DEBUG: Verificar estructura de los álbumes
-          console.log("=== DEBUG ÁLBUMES ===");
-          if (albums.length > 0) {
-            console.log("Primeros 3 álbumes:", albums.slice(0, 3));
-          }
-
-          setDataLoaded(true);
-        } catch (err) {
-          console.error("Error loading initial data:", err);
-        }
+    const loadData = async () => {
+      try {
+        await Promise.all([
+          fetchSongs(),
+          fetchAlbums()
+        ]);
+      } catch (err) {
+        console.error("Error loading data:", err);
+        showError("Error al Cargar", "No se pudieron cargar los datos. Intente nuevamente.");
       }
     };
+    loadData();
+  }, []);
 
-    loadInitialData();
-  }, [dataLoaded]);
+  // Helper functions
+  const getAlbumName = (albumId: string): string => {
+    if (!albumId) return "No asignado";
+    const album = albums.find((a: Album) => a.id === albumId);
+    return album?.title || "No asignado";
+  };
 
-  // Resetear página cuando cambien filtro u orden
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [filter, sortBy, sortOrder]);
-
-  // Obtener ID del álbum de la canción - CORREGIDO
-  const getAlbumIdFromSong = (song: any): string => {
-    // Primero intentamos con albumId (del DTO)
-    if (song.albumId && typeof song.albumId === "string") {
-      return song.albumId;
-    }
-    // Luego intentamos con album (como en aprendices)
-    if (song.album && typeof song.album === "string") {
-      return song.album;
-    }
-    // Luego intentamos con idAlbum
-    if (song.idAlbum && typeof song.idAlbum === "string") {
-      return song.idAlbum;
-    }
-    // Si no hay ninguna, retornamos string vacío
-    console.warn("Canción sin ID de álbum:", song);
+  const getAlbumIdFromSong = (song: Song): string => {
+    if (song.albumId) return song.albumId;
+    if (song.album && typeof song.album === "string") return song.album;
+    if (song.idAlbum) return song.idAlbum;
     return "";
   };
 
-  // Obtener nombre del álbum por ID - CORREGIDO
-  const getAlbumName = (albumId: string) => {
-    console.log("getAlbumName recibió albumId:", albumId);
-
-    if (!albumId || albumId.trim() === "") {
-      return "No asignado";
-    }
-
-    const album = albums.find((a) => a.id === albumId);
-
-    if (album) {
-      return album.title;
-    } else {
-      console.warn(
-        `Álbum con ID "${albumId}" no encontrado en:`,
-        albums.map((a) => ({ id: a.id, title: a.title }))
-      );
-      return "No asignado";
-    }
+  // Funciones auxiliares para mostrar notificaciones
+  const showNotification = (type: "success" | "error" | "info" | "warning", title: string, message: string) => {
+    setNotification({ type, title, message });
   };
 
-  // Obtener nombre del álbum directamente de la canción - FUNCIÓN ALTERNATIVA
-  const getAlbumNameFromSong = (song: any) => {
-    const albumId = getAlbumIdFromSong(song);
-    return getAlbumName(albumId);
+  const showSuccess = (title: string, message: string) => {
+    showNotification("success", title, message);
   };
 
-  // Filtrar y ordenar canciones
-  const filteredAndSortedSongs = useMemo(() => {
-    if (!dataLoaded) return [];
+  const showError = (title: string, message: string) => {
+    showNotification("error", title, message);
+  };
 
-    let filtered = songs;
+  // Funciones específicas para operaciones
+  const showCreateSuccess = () => {
+    showSuccess("¡Canción Creada!", "La canción ha sido creada exitosamente.");
+  };
 
-    // Aplicar filtro por nombre de canción
-    if (filter) {
-      filtered = songs.filter((song) =>
-        song.name.toLowerCase().includes(filter.toLowerCase())
-      );
+  const showCreateError = (errorMessage?: string) => {
+    showError("Error al Crear", errorMessage || "No se pudo crear la canción.");
+  };
+
+  const showUpdateSuccess = () => {
+    showSuccess("¡Canción Actualizada!", "La canción ha sido actualizada exitosamente.");
+  };
+
+  const showUpdateError = (errorMessage?: string) => {
+    showError("Error al Actualizar", errorMessage || "No se pudo actualizar la canción.");
+  };
+
+  const showDeleteSuccess = () => {
+    showSuccess("¡Canción Eliminada!", "La canción ha sido eliminada exitosamente.");
+  };
+
+  const showDeleteError = (errorMessage?: string) => {
+    showError("Error al Eliminar", errorMessage || "No se pudo eliminar la canción.");
+  };
+
+  // FUNCIÓN CRÍTICA: Formatear fecha para el servidor
+  const formatDateForServer = (dateString: string): string => {
+    if (!dateString) return new Date().toISOString();
+    
+    // Crear fecha a partir del string YYYY-MM-DD
+    const date = new Date(dateString);
+    
+    // Asegurarse de que sea una fecha válida
+    if (isNaN(date.getTime())) {
+      console.warn("Fecha inválida, usando fecha actual");
+      return new Date().toISOString();
     }
+    
+    // Ajustar por timezone para que no cambie el día
+    const adjustedDate = new Date(date.getTime() + (date.getTimezoneOffset() * 60000));
+    
+    return adjustedDate.toISOString();
+  };
 
-    // Aplicar ordenamiento
-    const sorted = [...filtered].sort((a, b) => {
-      let aValue, bValue;
-
-      switch (sortBy) {
-        case "name":
-          aValue = a.name;
-          bValue = b.name;
-          break;
-        case "fecha":
-          aValue = new Date(a.fecha);
-          bValue = new Date(b.fecha);
-          break;
-        case "album":
-          aValue = getAlbumNameFromSong(a);
-          bValue = getAlbumNameFromSong(b);
-          break;
-        default:
-          aValue = a.name;
-          bValue = b.name;
-      }
-
-      if (sortOrder === "asc") {
-        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-      } else {
-        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
-      }
-    });
-
-    return sorted;
-  }, [songs, filter, sortBy, sortOrder, dataLoaded, albums]);
-
-  // PAGINACIÓN: calcular páginas y slice
-  const totalPages = Math.ceil(filteredAndSortedSongs.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedSongs = filteredAndSortedSongs.slice(
-    startIndex,
-    startIndex + itemsPerPage
-  );
-
-  // Manejar creación de canción
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    clearError();
-    setMessage(null);
-
-    if (!newSong.nameSong.trim() || !newSong.idAlbum) {
-      setMessage({
-        type: "error",
-        text: "Por favor, complete todos los campos obligatorios",
-      });
-      return;
-    }
-
+  // Manejar creación - ENVIAR COMO STRING ISO AL IGUAL QUE APPRENTICE
+  const handleCreate = async (data: Record<string, any>) => {
     try {
+      console.log("Datos para crear canción:", data);
+      console.log("Fecha convertida a Date:", new Date(data.releaseDate));
+      console.log("Fecha como ISO string:", formatDateForServer(data.releaseDate));
+      
+      // IMPORTANTE: Enviar como string ISO, igual que ApprenticeManagement
       await createSong({
-        nameSong: newSong.nameSong,
-        idAlbum: newSong.idAlbum,
-        releaseDate: newSong.releaseDate ? new Date(newSong.releaseDate) : undefined,
-        releaseDate:  new Date(newSong.releaseDate) ,
+        nameSong: data.name,
+        idAlbum: data.albumId,
       });
 
-      setMessage({
-        type: "success",
-        text: `Canción "${newSong.nameSong}" creada exitosamente`,
-      });
-
-      // Resetear formulario
-      setNewSong({
-        nameSong: "",
-        idAlbum: "",
-        releaseDate: "",
-      });
-
-      setShowCreateForm(false);
+      showCreateSuccess();
+      setShowCreateModal(false);
       await fetchSongs();
 
-      setTimeout(() => setMessage(null), 5000);
     } catch (err: any) {
-      setMessage({
-        type: "error",
-        text: err.message || "Error al crear la canción",
-      });
+      console.error("Error al crear canción:", err);
+      showCreateError(err.message || "Error desconocido al crear la canción");
     }
   };
 
-  // Manejar actualización de canción
-  const handleUpdate = async () => {
-    if (!editingSong || !editSong.nameSong.trim() || !editSong.idAlbum) {
-      return;
-    }
-
+  // Manejar actualización
+  const handleUpdate = async (id: string | number, data: Record<string, any>) => {
     try {
-      await updateSong(editingSong.id, {
-        nameSong: editSong.nameSong,
-        idAlbum: editSong.idAlbum,
-        releaseDate: new Date(editSong.releaseDate),
+      await updateSong(id as string, {
+        nameSong: data.name,
+        idAlbum: data.albumId,
+        date: new Date(data.releaseDate) // Enviar como string ISO
       });
 
-      setMessage({
-        type: "success",
-        text: `Canción actualizada exitosamente`,
-      });
-
+      showUpdateSuccess();
       setEditingSong(null);
-      setEditSong({
-        nameSong: "",
-        idAlbum: "",
-        releaseDate: "",
-      });
-
       await fetchSongs();
-      setTimeout(() => setMessage(null), 5000);
     } catch (err: any) {
-      setMessage({
-        type: "error",
-        text: err.message || "Error al actualizar la canción",
-      });
+      showUpdateError(err.message);
     }
   };
 
-  // Manejar eliminación de canción
-  const handleDelete = async () => {
-    if (!deletingSong) {
-      return;
-    }
+  // Manejar eliminación
+  const handleDelete = async (id: string | number) => {
+    if (!deletingSong) return;
 
     try {
-      await deleteSong(deletingSong.id);
-      setMessage({
-        type: "success",
-        text: `Canción "${deletingSong.name}" eliminada exitosamente`,
-      });
+      await deleteSong(id as string);
+      showDeleteSuccess();
       setDeletingSong(null);
       await fetchSongs();
-      setTimeout(() => setMessage(null), 5000);
     } catch (err: any) {
-      setMessage({
-        type: "error",
-        text: err.message || "Error al eliminar la canción",
-      });
+      showDeleteError(err.message);
     }
   };
 
-  // Recargar datos manualmente
-  const handleReload = async () => {
-    clearError();
-    setDataLoaded(false); // Forzar recarga
-    try {
-      await fetchSongs();
-      await fetchAlbums();
-      setDataLoaded(true);
-      setMessage({
-        type: "success",
-        text: "Datos actualizados correctamente",
-      });
-      setTimeout(() => setMessage(null), 3000);
-    } catch (err: any) {
-      setMessage({
-        type: "error",
-        text: err.message || "Error al recargar los datos",
-      });
-    }
-  };
-
-  // Iniciar edición
-  const startEdit = (song: any) => {
-    setEditingSong(song);
-    const albumId = getAlbumIdFromSong(song);
-    setEditSong({
-      nameSong: song.name,
-      idAlbum: albumId,
-      releaseDate: song.fecha ? song.fecha.split("T")[0] : "",
-    });
-  };
-
-  // Iniciar eliminación
-  const startDelete = (song: any) => {
-    setDeletingSong(song);
-  };
-
-  // Limpiar filtro
-  const handleClearFilter = () => {
-    setFilter("");
-  };
-
-  // Alternar ordenamiento
-  const toggleSortOrder = () => {
-    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-  };
-
-  // Formatear fecha para mostrar
-  const formatDate = (dateString: string) => {
+  // Funciones auxiliares para formatear fechas para visualización
+  const formatDateForDisplay = (dateString: string) => {
     if (!dateString) return "N/A";
-
-    const date = new Date(dateString);
-    // Sumar un día
-    date.setDate(date.getDate() + 1);
-
-    return date.toLocaleDateString("es-ES");
+    
+    try {
+      const date = new Date(dateString);
+      
+      // Validar que sea una fecha válida
+      if (isNaN(date.getTime())) {
+        return "Fecha inválida";
+      }
+      
+      return date.toLocaleDateString("es-ES", {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+    } catch (error) {
+      console.error("Error al formatear fecha:", error);
+      return "Error en fecha";
+    }
   };
 
-  // Obtener fecha máxima para el input date (hoy)
-  const getTodayDate = (): string => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, "0");
-    const day = String(today.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
+  // Definir campos del formulario para canción
+  const songFields: FormField[] = [
+    {
+      name: "name",
+      label: "Nombre de la Canción",
+      type: "text",
+      placeholder: "Ej: Billie Jean",
+      required: true,
+      min: 2,
+      max: 100,
+      validate: (value) => {
+        if (value.length < 2) return "El nombre debe tener al menos 2 caracteres";
+        return null;
+      }
+    },
+    {
+      name: "albumId",
+      label: "Álbum",
+      type: "autocomplete",
+      required: true,
+      options: albums.map(album => ({
+        value: album.id,
+        label: album.title
+      }))
+    },
+    {
+      name: "releaseDate",
+      label: "Fecha de Lanzamiento",
+      type: "date",
+      required: true,
+      validate: (value) => {
+        const date = new Date(value);
+        if (isNaN(date.getTime())) return "Fecha inválida";
+        if (date > new Date()) return "La fecha no puede ser futura";
+        return null;
+      }
+    }
+  ];
+
+  // Datos iniciales para creación (formato YYYY-MM-DD para input type="date")
+  const initialCreateData = {
+    name: "",
+    albumId: "",
+    releaseDate: new Date().toISOString().split('T')[0] // Formato YYYY-MM-DD
+  };
+
+  // Definir columnas para la tabla
+  const columns: Column<Song>[] = [
+    {
+      key: "name",
+      title: "Nombre",
+      sortable: true,
+      width: "30%",
+      align: "center"
+    },
+    {
+      key: "album",
+      title: "Álbum",
+      sortable: true,
+      width: "30%",
+      align: "center",
+      render: (item) => getAlbumName(getAlbumIdFromSong(item))
+    },
+    {
+      key: "fecha",
+      title: "Fecha Lanzamiento",
+      sortable: true,
+      width: "25%",
+      align: "center",
+      render: (item) => formatDateForDisplay(item.fecha.toString())
+    }
+  ];
+
+  // Función para renderizar detalles en modal de eliminación
+  const renderSongDetails = (song: Song) => (
+    <div className="song-details">
+      <div className="detail-item">
+        <strong>Nombre:</strong> <span>{song.name}</span>
+      </div>
+      <div className="detail-item">
+        <strong>Álbum:</strong> <span>{getAlbumName(getAlbumIdFromSong(song))}</span>
+      </div>
+      <div className="detail-item">
+        <strong>Fecha Lanzamiento:</strong> <span>{formatDateForDisplay(song.fecha.toString())}</span>
+      </div>
+    </div>
+  );
+
+  // Convertir fecha para edición (formato YYYY-MM-DD)
+  const getDateForEdit = (date: Date): string => {
+    try {
+      const d = new Date(date);
+      if (isNaN(d.getTime())) return new Date().toISOString().split('T')[0];
+      
+      // Formato YYYY-MM-DD para input type="date"
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      
+      return `${year}-${month}-${day}`;
+    } catch (error) {
+      return new Date().toISOString().split('T')[0];
+    }
   };
 
   return (
     <section id="song_manager" className="content-section active">
-      <div className="profile-header">
-        <div className="profile-info">
-          <h1>Gestión de Canciones</h1>
-          <p className="section-description">
-            Administre todas las canciones del sistema
-          </p>
-        </div>
-      </div>
+      <GenericTable<Song>
+        title="Gestión de Canciones"
+        description="Administre todas las canciones del sistema"
+        data={songs}
+        columns={columns}
+        loading={loading}
+        onReload={() => {
+          clearError();
+          fetchSongs();
+          fetchAlbums();
+        }}
+        showCreateForm={showCreateModal}
+        onShowCreateChange={setShowCreateModal}
+        editingItem={editingSong}
+        onEditingChange={setEditingSong}
+        deletingItem={deletingSong}
+        onDeletingChange={setDeletingSong}
+        itemsPerPage={20}
+        className="song-table"
+        notification={notification || undefined}
+        onNotificationClose={() => setNotification(null)}
+      />
 
-      <div className="detail-card">
-        {/* Mensajes globales */}
-        {message && (
-          <div className={`message ${message.type}`}>{message.text}</div>
-        )}
-
-        {error && <div className="message error">{error}</div>}
-
-        {/* Controles superiores */}
-        <div className="manager-controls">
-          <div className="controls-left">
-            <button
-              className="create-button"
-              onClick={() => setShowCreateForm(true)}
-              disabled={loading}
-            >
-              <span className="button-icon">
-                <AcUnitIcon></AcUnitIcon>
-              </span>
-              Nueva Canción
-            </button>
-          </div>
-
-          <div className="controls-right">
-            <div className="filter-group">
-              <input
-                type="text"
-                className="form-input search-input"
-                placeholder="Filtrar por nombre..."
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                disabled={loading}
-              />
-              {filter && (
-                <button
-                  className="clear-filter-btn"
-                  onClick={handleClearFilter}
-                  title="Limpiar filtro"
-                >
-                  ×
-                </button>
-              )}
-            </div>
-
-            <div className="sort-group">
-              <select
-                className="form-select sort-select"
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
-                disabled={loading}
-              >
-                <option value="name">Ordenar por nombre</option>
-                <option value="fecha">Ordenar por fecha lanzamiento</option>
-                <option value="album">Ordenar por álbum</option>
-              </select>
-              <button
-                className="sort-order-btn"
-                onClick={toggleSortOrder}
-                disabled={loading}
-                title={
-                  sortOrder === "asc" ? "Orden ascendente" : "Orden descendente"
-                }
-              >
-                {sortOrder === "asc" ? (
-                  <Icon name="down" size={18} />
-                ) : (
-                  <Icon name="up" size={18} />
-                )}
-              </button>
-            </div>
-
-            <button
-              className="reload-button"
-              onClick={handleReload}
-              disabled={loading}
-              title="Recargar datos"
-            >
-              {loading ? "⟳" : "↻"}
-            </button>
-          </div>
-        </div>
-
-        {/* Contador de resultados */}
-        {dataLoaded && (
-          <div className="results-info">
-            <span className="results-count">
-              {filteredAndSortedSongs.length} de {songs.length} canciones
-            </span>
-            <span className="sort-info">
-              Orden:{" "}
-              {sortBy === "name"
-                ? "Nombre"
-                : sortBy === "fecha"
-                ? "Fecha Lanzamiento"
-                : "Álbum"}{" "}
-              •{sortOrder === "asc" ? " Ascendente" : " Descendente"}
-            </span>
-          </div>
-        )}
-
-        {/* Grid de canciones */}
-        <div className="songs-grid">
-          {!dataLoaded ? (
-            <div className="loading-state">
-              <div className="loading-spinner"></div>
-              <p>Cargando canciones...</p>
-            </div>
-          ) : loading ? (
-            <div className="loading-state">
-              <div className="loading-spinner"></div>
-              <p>Actualizando...</p>
-            </div>
-          ) : filteredAndSortedSongs.length === 0 ? (
-            <div className="empty-state">
-              <div className="empty-icon">🎵</div>
-              <h3>No hay canciones</h3>
-              <p>
-                {filter
-                  ? `No se encontraron resultados para "${filter}"`
-                  : "Comience agregando la primera canción"}
-              </p>
-              {!filter && (
-                <button
-                  className="create-button"
-                  onClick={() => setShowCreateForm(true)}
-                  disabled={loading}
-                >
-                  <span className="button-icon">
-                    <Icon name="plus" size={20} />
-                  </span>
-                  Crear Primera Canción
-                </button>
-              )}
-            </div>
-          ) : (
-            <div className="table-container">
-              <table className="songs-table">
-                <thead>
-                  <tr>
-                    <th>Nombre</th>
-                    <th>Fecha Lanzamiento</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedSongs.map((song) => {
-                    // const albumName = getAlbumNameFromSong(song);
-                    return (
-                      <tr key={song.id} className="song-row">
-                        <td className="song-name-cell">
-                          <div className="song-name">{song.name}</div>
-                        </td>
-                        <td>
-                          <div className="detail-value">
-                            {albumName}
-                          </div>
-                        </td>
-                        
-                        <td>
-                          <div className="detail-value">
-                            {formatDate(song.fecha.toString())}
-                          </div>
-                        </td>
-                        <td>
-                          <div className="table-actions-botons">
-                            <button
-                              className="action-btn edit-btn"
-                              onClick={() => startEdit(song)}
-                              title="Editar canción"
-                              disabled={loading}
-                            >
-                              <Icon name="edit" size={18} />
-                            </button>
-                            <button
-                              className="action-btn delete-btn"
-                              onClick={() => startDelete(song)}
-                              title="Eliminar canción"
-                              disabled={loading}
-                            >
-                              <Icon name="trash" size={18} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-              {/* PAGINACIÓN */}
-              {totalPages > 1 && (
-                <div className="pagination-container">
-                  <button
-                    className="pagination-btn"
-                    disabled={currentPage === 1}
-                    onClick={() => setCurrentPage(currentPage - 1)}
-                  >
-                    ◀ Anterior
-                  </button>
-
-                  <span className="pagination-info">
-                    Página {currentPage} de {totalPages}
-                  </span>
-
-                  <button
-                    className="pagination-btn"
-                    disabled={currentPage === totalPages}
-                    onClick={() => setCurrentPage(currentPage + 1)}
-                  >
-                    Siguiente ▶
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Modal de creación */}
-      {showCreateForm && (
-        <div className="modal-overlay song-modal">
-          <div className="modal-content">
-            <h3>Crear Nueva Canción</h3>
-            <form onSubmit={handleCreate}>
-              <div className="form-row">
-                <div className="form-group full-width">
-                  <label className="form-label">Nombre de la Canción *</label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    placeholder="Ej: Billie Jean"
-                    value={newSong.nameSong}
-                    onChange={(e) =>
-                      setNewSong({
-                        ...newSong,
-                        nameSong: e.target.value,
-                      })
-                    }
-                    required
-                    minLength={2}
-                    maxLength={100}
-                  />
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">Fecha de Lanzamiento</label>
-                  <input
-                    type="date"
-                    className="form-input"
-                    value={newSong.releaseDate}
-                    onChange={(e) =>
-                      setNewSong({
-                        ...newSong,
-                        releaseDate: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-
-                {/* <div className="form-group">
-                  <label className="form-label">Álbum *</label>
-                  <select
-                    className="form-select"
-                    value={newSong.idAlbum}
-                    onChange={(e) =>
-                      setNewSong({
-                        ...newSong,
-                        idAlbum: e.target.value,
-                      })
-                    }
-                    required
-                  >
-                    <option value="">Seleccione un álbum</option>
-                    {albums.map((album) => (
-                      <option key={album.id} value={album.id}>
-                        {album.title}
-                      </option>
-                    ))}
-                  </select>
-                </div> */}
-              </div>
-
-              <div className="modal-actions">
-                <button
-                  type="submit"
-                  className="submit-button"
-                  disabled={
-                    loading || !newSong.nameSong.trim() || !newSong.idAlbum
-                  }
-                >
-                  {loading ? "Creando..." : "Crear Canción"}
-                </button>
-                <button
-                  type="button"
-                  className="cancel-button"
-                  onClick={() => {
-                    setShowCreateForm(false);
-                    setNewSong({
-                      nameSong: "",
-                      idAlbum: "",
-                      releaseDate: "",
-                    });
-                  }}
-                  disabled={loading}
-                >
-                  Cancelar
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+      {/* Modal de creación usando componente genérico */}
+      {showCreateModal && (
+        <CreateModal
+          title="Crear Nueva Canción"
+          fields={songFields}
+          initialData={initialCreateData}
+          onSubmit={handleCreate}
+          onClose={() => setShowCreateModal(false)}
+          loading={loading}
+          submitText="Crear Canción"
+        />
       )}
 
-      {/* Modal de edición */}
+      {/* Modal de edición usando componente genérico */}
       {editingSong && (
-        <div className="modal-overlay song-modal">
-          <div className="modal-content">
-            <h3>Editar Canción</h3>
-            <div className="form-row">
-              <div className="form-group full-width">
-                <label className="form-label">Nombre de la Canción *</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={editSong.nameSong}
-                  onChange={(e) =>
-                    setEditSong({
-                      ...editSong,
-                      nameSong: e.target.value,
-                    })
-                  }
-                  required
-                  minLength={2}
-                  maxLength={100}
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Fecha de Lanzamiento</label>
-                <input
-                  type="date"
-                  className="form-input"
-                  value={editSong.releaseDate}
-                  onChange={(e) =>
-                    setEditSong({
-                      ...editSong,
-                      releaseDate: e.target.value,
-                    })
-                  }
-                  max={getTodayDate()}
-                />
-              </div>
-
-              {/* <div className="form-group">
-                <label className="form-label">Álbum *</label>
-                <select
-                  className="form-select"
-                  value={editSong.idAlbum}
-                  onChange={(e) =>
-                    setEditSong({
-                      ...editSong,
-                      idAlbum: e.target.value,
-                    })
-                  }
-                  required
-                >
-                  <option value="">Seleccione un álbum</option>
-                  {albums.map((album) => (
-                    <option key={album.id} value={album.id}>
-                      {album.title}
-                    </option>
-                  ))}
-                </select>
-              </div> */}
-            </div>
-
-            <div className="modal-actions">
-              <button
-                className="submit-button"
-                onClick={handleUpdate}
-                disabled={
-                  loading || !editSong.nameSong.trim() || !editSong.idAlbum
-                }
-              >
-                {loading ? "Actualizando..." : "Actualizar"}
-              </button>
-              <button
-                className="cancel-button"
-                onClick={() => {
-                  setEditingSong(null);
-                  setEditSong({
-                    nameSong: "",
-                    idAlbum: "",
-                    releaseDate: "",
-                  });
-                }}
-                disabled={loading}
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        </div>
+        <EditModal
+          title="Editar Canción"
+          fields={songFields}
+          initialData={{
+            name: editingSong.name,
+            albumId: getAlbumIdFromSong(editingSong),
+            releaseDate: getDateForEdit(editingSong.fecha)
+          }}
+          itemId={editingSong.id}
+          onSubmit={handleUpdate}
+          onClose={() => setEditingSong(null)}
+          loading={loading}
+          submitText="Actualizar Canción"
+        />
       )}
 
-      {/* Modal de confirmación de eliminación */}
+      {/* Modal de eliminación usando componente genérico */}
       {deletingSong && (
-        <div className="modal-overlay song-modal">
-          <div className="modal-content">
-            <h3>¿Eliminar Canción?</h3>
-            <div className="delete-confirmation">
-              <p>¿Está seguro de que desea eliminar esta canción?</p>
-              <div className="song-details">
-                <div className="detail-item">
-                  <strong>Nombre:</strong> {deletingSong.name}
-                </div>
-                <div className="detail-item">
-                  <strong>Álbum:</strong> {getAlbumNameFromSong(deletingSong)}
-                </div>
-                <div className="detail-item">
-                  <strong>Fecha Lanzamiento:</strong>{" "}
-                  {formatDate(deletingSong.fecha)}
-                </div>
-              </div>
-              <p className="warning-text">
-                ⚠️ Esta acción no se puede deshacer.
-              </p>
-            </div>
-            <div className="modal-actions">
-              <button
-                className="submit-button delete-button"
-                onClick={handleDelete}
-                disabled={loading}
-              >
-                {loading ? "Eliminando..." : "Sí, Eliminar"}
-              </button>
-              <button
-                className="cancel-button"
-                onClick={() => setDeletingSong(null)}
-                disabled={loading}
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        </div>
+        <DeleteModal<Song>
+          title="¿Eliminar Canción?"
+          item={deletingSong}
+          itemName="Canción"
+          itemId={deletingSong.id}
+          onConfirm={handleDelete}
+          onClose={() => setDeletingSong(null)}
+          loading={loading}
+          confirmText="Sí, Eliminar"
+          warningMessage="⚠️ Esta acción no se puede deshacer."
+          renderDetails={renderSongDetails}
+        />
       )}
     </section>
   );

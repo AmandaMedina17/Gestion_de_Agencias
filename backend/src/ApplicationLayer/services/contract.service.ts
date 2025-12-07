@@ -10,6 +10,8 @@ import { CreateContractUseCase } from '@application/UseCases/create_contract.uso
 import { UpdateContractStatusUseCase } from '@application/UseCases/update_contract_status.use-case';
 import { ContractStatus } from '@domain/Enums';
 import { UpdateContractUseCase } from '@application/UseCases/update_contract.use-case';
+import { ContractDtoMapper } from '@application/DTOs/dtoMappers/contract.dtoMapper';
+import { GetArtistContractsUseCase } from '@application/UseCases/get_artist_contracts.use-case';
 
 @Injectable()
 export class ContractService extends BaseService<Contract, CreateContractDto, ContractResponseDto, UpdateContractDto> {

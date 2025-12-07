@@ -488,7 +488,6 @@ const GenericTable = <T extends { id: string | number }>({
           <span className="button-icon">
             <Icon name="plus" size={20} />
           </span>
-          Crear Nuevo
         </button>
       )}
     </div>

@@ -14,7 +14,7 @@ export class IntervalEntity {
   endDate!: Date;
 
   //Relación con las membresías de artistas
-  @OneToMany(() => ArtistGroupMembershipEntity, (membership: ArtistGroupMembershipEntity) => membership.interval)
+  @OneToMany(() => ArtistGroupMembershipEntity, (membership: ArtistGroupMembershipEntity) => membership)
   artistGroupMemberships!: ArtistGroupMembershipEntity[];
 
   @OneToMany(() => ArtistAgencyMembershipEntity, (membership: ArtistAgencyMembershipEntity) => membership.interval)
