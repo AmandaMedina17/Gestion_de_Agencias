@@ -59,10 +59,10 @@ export class AgencyController {
     return this.agencyService.relateArtistToAgency(agencyId,artistId,createArtistAgencyDto);
   }
 
-  // @Get(':id/groups')
-  // getAgencyGroups(@Param('id') id: string) {
-  //   return this.agencyService.getAgencyGroups(id);
-  // }
+  @Get(':id/groups')
+  getAgencyGroups(@Param('id') id: string) {
+    return this.agencyService.getAgencyGroups(id);
+  }
 
   // @Get(':id/activeArtists')
   // getActiveArtistsWithGroup(@Param('id') id: string){

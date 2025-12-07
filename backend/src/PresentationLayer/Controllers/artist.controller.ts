@@ -19,7 +19,12 @@ export class ArtistController {
   findAll() {
     return this.artistService.findAll();
   }
-
+  
+  @Get('agency-changes-and-groups')
+  getArtistsWithAgencyChangesAndGroups(){
+    return this.artistService.getArtistsWithAgencyChangesAndGroups();
+  }
+  
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.artistService.findOne(id);
