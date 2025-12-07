@@ -1,11 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
+import { Repository, In, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
 import { BaseRepository } from './BaseRepositoryImpl';
 import { Artist} from '@domain/Entities/Artist';
 import { ArtistEntity } from '../Entities/ArtistEntity';
 import { Group } from '@domain/Entities/Group';
 import { ArtistMapper } from '../Mappers/ArtistMapper';
+import { ArtistGroupMembershipEntity } from '../Entities/ArtistGroupMembershipEntity';
+import { GroupMapper } from '../Mappers/GroupMapper';
 
 @Injectable()
 export class ArtistRepository
@@ -15,6 +17,9 @@ export class ArtistRepository
     @InjectRepository(ArtistEntity)
     repository: Repository<ArtistEntity>,
     mapper: ArtistMapper,
+    @InjectRepository(ArtistGroupMembershipEntity)
+    private readonly membershipRepository: Repository<ArtistGroupMembershipEntity>,
+    private readonly groupMapper: GroupMapper,
     // @InjectRepository(ContractEntity)
     // private readonly contractRepo: Repository<ContractEntity>,
     // private readonly contractMapper: ContractMapper,
@@ -29,7 +34,89 @@ export class ArtistRepository
     savedArtist.apprenticeId=entity.getApprenticeId(); //<=
     return this.mapper.toDomainEntity(savedArtist);
   }
+  async getArtistCurrentGroup(artistId: string): Promise<Group | null> {
+    const now = new Date();
+    
+    // Buscar la membresía más reciente del artista
+    const latestMembership = await this.membershipRepository.findOne({
+      where: { artistId },
+      relations: ['group'],
+      order: { startDate: 'DESC' },
+    });
 
+    // Si no hay membresía, devolver null
+    if (!latestMembership) {
+      return null;
+    }
+
+    // Verificar si la membresía está activa
+    const isActive = this.isMembershipActive(latestMembership, now);
+    
+    if (!isActive) {
+      return null;
+    }
+
+    return this.groupMapper.toDomainEntity(latestMembership.group);
+  }
+
+  // Método auxiliar para verificar si una membresía está activa
+  private isMembershipActive(membership: ArtistGroupMembershipEntity, currentDate: Date): boolean {
+    // Verificar que la fecha actual sea después o igual a la fecha de inicio
+    if (membership.startDate > currentDate) {
+      return false; // La membresía aún no ha comenzado
+    }
+
+    // Verificar si tiene fecha de fin
+    if (membership.endDate) {
+      // Si tiene fecha de fin, verificar que la fecha actual sea antes o igual
+      return currentDate <= membership.endDate;
+    }
+    return true;
+  }
+
+   async getArtists_WithAgencyChangesAndGroups(): Promise<Artist[]> {
+    // Subquery para contar cambios reales de agencia
+    const agencyChangesSubQuery = this.repository
+      .createQueryBuilder('artist')
+      .select('artist.id')
+      .addSelect('COUNT(DISTINCT am.agencyId)', 'distinctAgencies')
+      .addSelect('COUNT(am.agencyId)', 'totalMemberships')
+      .leftJoin('artist.agencyMemberships', 'am')
+      .leftJoin('am.interval', 'interval')
+      .groupBy('artist.id')
+      .having('COUNT(DISTINCT am.agencyId) >= 2')  // Al menos 2 agencias diferentes
+      .andHaving('COUNT(am.agencyId) >= 3');       // Al menos 3 membresías (asegura cambios)
+
+    // Subquery para contar grupos
+    const groupsSubQuery = this.repository
+      .createQueryBuilder('artist')
+      .select('artist.id')
+      .addSelect('COUNT(DISTINCT gm.groupId)', 'groupCount')
+      .leftJoin('artist.groupMemberships', 'gm')
+      .groupBy('artist.id')
+      .having('COUNT(DISTINCT gm.groupId) > 1');
+
+    // Combinar ambas condiciones
+    const result = await this.repository
+      .createQueryBuilder('artist')
+      .innerJoin(
+        `(${agencyChangesSubQuery.getQuery()})`,
+        'ac',
+        'artist.id = ac.artist_id'
+      )
+      .innerJoin(
+        `(${groupsSubQuery.getQuery()})`,
+        'gc',
+        'artist.id = gc.artist_id'
+      )
+      .setParameters({
+        ...agencyChangesSubQuery.getParameters(),
+        ...groupsSubQuery.getParameters(),
+      })
+      .getMany();
+
+      return this.mapper.toDomainEntities(result);
+}
     // async findArtistsWithScheduleConflicts(startDate: Date, endDate: Date): Promise<Artist[]> {
     //     const artistEntities = await this.repository
     //     .createQueryBuilder('artist')

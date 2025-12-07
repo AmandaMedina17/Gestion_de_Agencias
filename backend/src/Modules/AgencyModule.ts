@@ -22,12 +22,15 @@ import { GetAgencyGroupsUseCase } from "@application/UseCases/get_agency_groups.
 import { ArtistAgencyMembershipEntity } from "@infrastructure/database/Entities/ArtistAgencyMembershipEntity";
 import { RelateArtistToAgencyUseCase } from "@application/UseCases/relate_artist_to_agency.use-case.ts";
 import { ArtistEntity } from "@infrastructure/database/Entities/ArtistEntity";
+import { GroupDtoMapper } from "@application/DTOs/dtoMappers/group.dtoMapper";
+import { GroupModule } from "./GroupModule";
+import { ArtistGroupMembershipEntity } from "@infrastructure/database/Entities/ArtistGroupMembershipEntity";
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([AgencyEntity, ArtistAgencyMembershipEntity, ArtistEntity]),
     ArtistModule,
-    ApprenticeModule
+    ApprenticeModule, 
   ],
   controllers: [AgencyController],
   providers: [
@@ -46,6 +49,7 @@ import { ArtistEntity } from "@infrastructure/database/Entities/ArtistEntity";
     AgencyDtoMapper,
     ArtistDtoMapper,
     ApprenticeDtoMapper,
+    GroupDtoMapper,
     
     // Servicio
     AgencyService,

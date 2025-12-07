@@ -222,7 +222,7 @@ export class AgencyRepositoryImpl
       relations: [
         'artistMemberships', 
         'artistMemberships.artist',
-        'artistMemberships.artist.apprenticeId'
+        // 'artistMemberships.artist.apprenticeId'
       ]
     });
 
