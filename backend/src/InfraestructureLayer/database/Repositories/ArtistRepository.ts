@@ -34,7 +34,7 @@ export class ArtistRepository
     savedArtist.apprenticeId=entity.getApprenticeId(); //<=
     return this.mapper.toDomainEntity(savedArtist);
   }
-  async getCurrentGroup(artistId: string): Promise<Group | null> {
+  async getArtistCurrentGroup(artistId: string): Promise<Group | null> {
     const now = new Date();
     
     // Buscar la membresía más reciente del artista
