@@ -15,6 +15,7 @@ export class GetAgencyApprenticesUseCase {
     // Validar que la agencia existe
     const agency = await this.agencyRepository.findById(agencyId);
     if (!agency) {
+      console.log("buscando la agencia pero no la encontre");
       throw new Error('Agency not found');
     }
 

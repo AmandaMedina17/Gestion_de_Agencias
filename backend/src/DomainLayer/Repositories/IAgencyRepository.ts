@@ -9,4 +9,5 @@ export abstract class IAgencyRepository extends IRepository<Agency> {
   abstract getAgencyApprentices(id: string): Promise<Apprentice[]>;
   abstract getAgencyArtists(id: string): Promise<Artist[]>;
   abstract findActiveArtistsByAgency(agencyId: string): Promise<Artist[]>;
+  abstract addArtistToAgency(artistId: string, agencyId: string, startDate: Date, endDate?: Date): Promise<void>;
 }

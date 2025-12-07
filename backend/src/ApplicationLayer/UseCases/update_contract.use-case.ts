@@ -11,27 +11,18 @@ export class UpdateContractUseCase {
   ) {}
 
   async execute(contractId: string, updateContractDto: UpdateContractDto): Promise<Contract> {
-    // 1. Buscar el contrato existente
+    // Buscar el contrato existente
     const existingContract = await this.contractRepository.findById(contractId);
     
     if (!existingContract) {
       throw new NotFoundException(`Contract with ID ${contractId} not found`);
     }
 
-    // 2. Validar que no se intenten modificar agencyId o artistId
-    this.validateNoAgencyArtistChange(updateContractDto, existingContract);
-
-    // 3. Aplicar las actualizaciones al contrato
+    // Aplicar las actualizaciones al contrato
     this.applyUpdates(existingContract, updateContractDto);
 
-    // 4. Guardar el contrato actualizado
+    // Guardar el contrato actualizado
     return await this.contractRepository.update(existingContract);
-  }
-
-  private validateNoAgencyArtistChange(updateContractDto: UpdateContractDto, existingContract : Contract): void {
-    if (updateContractDto.agencyId || updateContractDto.artistId) {
-      throw new Error('Cannot change agency or artist in an existing contract. Create a new contract instead.');
-    }
   }
 
   private applyUpdates(contract: Contract, updateContractDto: UpdateContractDto): void {

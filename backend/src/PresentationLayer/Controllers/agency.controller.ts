@@ -11,6 +11,7 @@ import {
 import { AgencyService } from '@application/services/agency.service';
 import {UpdateAgencyDto } from '@application/DTOs/agencyDto/update-agency.dto';
 import { CreateAgencyDto } from '@application/DTOs/agencyDto/create-agency.dto';
+import { CreateArtistAgencyDto } from '@application/DTOs/artist_agencyDto/create-artist-agency.dto';
 
 @Controller('agencies')
 export class AgencyController {
@@ -47,6 +48,15 @@ export class AgencyController {
   @Get(':id/apprentices')
   getAgencyApprentices(@Param('id') id: string) {
     return this.agencyService.getAgencyApprentices(id);
+  }
+
+  @Post(':agencyId/artists/:artistId')
+  addArtistToAgency(
+    @Param('agencyId') agencyId: string,
+    @Param('artistId') artistId: string,
+    @Body(ValidationPipe) createArtistAgencyDto: CreateArtistAgencyDto
+  ) {
+    return this.agencyService.relateArtistToAgency(agencyId,artistId,createArtistAgencyDto);
   }
 
   // @Get(':id/groups')

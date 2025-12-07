@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryColumn, ManyToOne, JoinColumn, Column } from 'typeorm';
 import { ArtistEntity } from './ArtistEntity';
 import { AgencyEntity } from './AgencyEntity';
 
@@ -11,8 +11,11 @@ export class ArtistAgencyMembershipEntity {
     @PrimaryColumn({ name: 'agency_id' })
     agencyId!: string;
 
-    @PrimaryColumn({ name: 'interval_id' })
-    intervalId!: string;
+    @PrimaryColumn({ type: 'date' })
+    startDate!: Date;
+
+    @PrimaryColumn({ type: 'date' })
+    endDate!: Date;
 
     // Relación con el artista
     @ManyToOne(() => ArtistEntity, (artist: ArtistEntity) => artist.agencyMemberships)
@@ -24,8 +27,4 @@ export class ArtistAgencyMembershipEntity {
     @JoinColumn({ name: 'agency_id' })
     agency!: AgencyEntity;
 
-    // Relación con el intervalo
-    // @ManyToOne(() => IntervalEntity, (interval: IntervalEntity) => interval.artistAgencyMemberships)
-    // @JoinColumn({ name: 'interval_id' })
-    // interval!: IntervalEntity;
 }

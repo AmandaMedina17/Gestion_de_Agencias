@@ -19,10 +19,13 @@ import { GetAgencyArtistsUseCase } from "@application/UseCases/get_agency_artist
 import { ApprenticeModule } from "./ApprenticeModule";
 import { ApprenticeDtoMapper } from "@application/DTOs/dtoMappers/apprentice.dtoMapper";
 import { GetAgencyGroupsUseCase } from "@application/UseCases/get_agency_groups.use-case";
+import { ArtistAgencyMembershipEntity } from "@infrastructure/database/Entities/ArtistAgencyMembershipEntity";
+import { RelateArtistToAgencyUseCase } from "@application/UseCases/relate_artist_to_agency.use-case.ts";
+import { ArtistEntity } from "@infrastructure/database/Entities/ArtistEntity";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([AgencyEntity]),
+    TypeOrmModule.forFeature([AgencyEntity, ArtistAgencyMembershipEntity, ArtistEntity]),
     ArtistModule,
     ApprenticeModule
   ],
@@ -50,7 +53,8 @@ import { GetAgencyGroupsUseCase } from "@application/UseCases/get_agency_groups.
     //Casos de uso
     GetAgencyApprenticesUseCase,
     GetAgencyArtistsUseCase,
-    GetAgencyGroupsUseCase
+    GetAgencyGroupsUseCase,
+    RelateArtistToAgencyUseCase,
   ],
   exports: [IAgencyRepository, AgencyDtoMapper, AgencyMapper],
 })
