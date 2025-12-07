@@ -1,5 +1,4 @@
 import { BaseDtoMapper } from '@application/DTOs/dtoMappers/DtoMapper';
-import { SongDtoMapper } from '@application/DTOs/dtoMappers/song.dto.mapper';
 import { SongService } from '@application/services/song/song.service';
 import { CreateSongUseCase } from '@application/UseCases/create_song.use-case';
 import { ISongRepository } from '@domain/Repositories/ISongRepository';
@@ -15,6 +14,7 @@ import { AlbumMapper } from '@infrastructure/database/Mappers/AlbumMapper';
 import { IAlbumRepository } from '@domain/Repositories/IAlbumRepository';
 import { AlbumRepository } from '@infrastructure/database/Repositories/AlbumRepository';
 import { AlbumEntity } from '@infrastructure/database/Entities/AlbumEntity';
+import { SongDtoMapper } from '@application/DTOs/dtoMappers/song.dtoMapper';
 
 
 @Module({

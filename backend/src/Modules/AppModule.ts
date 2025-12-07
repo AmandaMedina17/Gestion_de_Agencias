@@ -16,6 +16,7 @@ import { SongModule } from './song/song.module';
 import { AlbumModule } from './album/album.module';
 import { AwardModule } from './award/award.module';
 import { GroupModule } from './GroupModule';
+import { SongBillboardModule } from './song_billboard/song_billboard.module';
 
 @Module({
   imports: [
@@ -33,7 +34,8 @@ import { GroupModule } from './GroupModule';
     SongModule,
     AlbumModule,
     AwardModule,
-    GroupModule
+    GroupModule,
+    SongBillboardModule
   ],
   controllers: [AppController],
   providers: [AppService],
