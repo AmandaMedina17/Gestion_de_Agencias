@@ -13,7 +13,6 @@ export class Artist implements IUpdatable{
     private stageName: string,
     private birthDate: Date,
     public apprenticeId: string
-    
   ) {
 
   }
