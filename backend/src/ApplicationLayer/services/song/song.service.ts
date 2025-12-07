@@ -7,7 +7,7 @@ import { UpdateSongDto } from '@application/DTOs/songDto/update.song.dto';
 import { ISongRepository } from '@domain/Repositories/ISongRepository';
 import { CreateSongUseCase } from '@application/UseCases/create_song.use-case';
 import { UpdateSongUseCase } from '@application/UseCases/update_song.use-case';
-import { SongDtoMapper } from '@application/DTOs/dtoMappers/song.dtoMapper';
+import { SongDtoMapper } from '@application/DTOs/dtoMappers/song.dto.mapper';
 
 @Injectable()
 export class SongService extends BaseService<Song,CreateSongDto,ResponseSongDto,UpdateSongDto>{

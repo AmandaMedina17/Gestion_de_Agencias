@@ -14,7 +14,7 @@ import { AlbumMapper } from '@infrastructure/database/Mappers/AlbumMapper';
 import { IAlbumRepository } from '@domain/Repositories/IAlbumRepository';
 import { AlbumRepository } from '@infrastructure/database/Repositories/AlbumRepository';
 import { AlbumEntity } from '@infrastructure/database/Entities/AlbumEntity';
-import { SongDtoMapper } from '@application/DTOs/dtoMappers/song.dtoMapper';
+import { SongDtoMapper } from '@application/DTOs/dtoMappers/song.dto.mapper';
 
 
 @Module({
