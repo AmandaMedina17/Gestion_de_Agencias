@@ -12,6 +12,14 @@ export class AwardController {
         return this.awardService.create(createAwardDto);
     }
 
+    @Post(":awardId/:albumId")
+    assingAwardToBillboard(
+        @Param('awardId') awardId: string,
+        @Param('albumId') albumId: string
+    ) {
+        return this.awardService.addAwardToAlbum(awardId, albumId);
+    }  
+
     @Get()
     findAll() {
         return this.awardService.findAll();

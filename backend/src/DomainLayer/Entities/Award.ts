@@ -46,5 +46,9 @@ export class Award implements IUpdatable{
     public static create( name :string , date : Date, album:string) : Award{
         const id = uuidv4()
         return new Award(id, name,date,album);
-      }
+    }
+
+    public setAlbumId(albumId : string) : void {
+        this.albumId = albumId
+    }
 }
