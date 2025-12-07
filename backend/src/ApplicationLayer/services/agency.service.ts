@@ -18,6 +18,8 @@ import { GetAgencyApprenticesUseCase } from '../UseCases/get_agency_apprentices.
 import { GetAgencyGroupsUseCase } from '../UseCases/get_agency_groups.use-case';
 import { IArtistRepository } from '@domain/Repositories/IArtistRepository';
 import { ArtistRepository } from '../../InfraestructureLayer/database/Repositories/ArtistRepository';
+import { CreateArtistAgencyDto } from '@application/DTOs/artist_agencyDto/create-artist-agency.dto';
+import { RelateArtistToAgencyUseCase } from '@application/UseCases/relate_artist_to_agency.use-case.ts';
 @Injectable()
 export class AgencyService extends BaseService<Agency, CreateAgencyDto, AgencyResponseDto, UpdateAgencyDto> {
     constructor(
@@ -32,7 +34,7 @@ export class AgencyService extends BaseService<Agency, CreateAgencyDto, AgencyRe
     private readonly getAgencyGroupsUseCase: GetAgencyGroupsUseCase,
     @Inject(IArtistRepository)
     private readonly artistRepository: IArtistRepository,
-
+     private readonly relateArtistToAgencyUseCase: RelateArtistToAgencyUseCase
 
   ) {
     super(agencyRepository, agencyDtoMapper)
@@ -70,4 +72,7 @@ export class AgencyService extends BaseService<Agency, CreateAgencyDto, AgencyRe
   
   // return result;
   // }
+  async relateArtistToAgency(agencyId: string, artistId: string, createArtistAgencyDto: CreateArtistAgencyDto): Promise<void> {
+    return await this.relateArtistToAgencyUseCase.execute(agencyId, artistId,createArtistAgencyDto);
+  }
 }
