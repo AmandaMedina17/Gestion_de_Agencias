@@ -33,9 +33,6 @@ export class ArtistEntity{
   @Column({ name: "transition_date" })
   transitionDate!: Date;
 
-  @Column({name: "group_id"})
-  groupId!: string;
-
   // Un artista puede realizar cero o muchas actividades
   @OneToMany(
     () => ArtistActivityEntity,

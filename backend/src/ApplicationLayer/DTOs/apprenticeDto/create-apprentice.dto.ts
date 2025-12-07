@@ -1,5 +1,5 @@
 import { ApprenticeStatus, ApprenticeTrainingLevel } from "../../../DomainLayer/Enums";
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsEnum, IsNotEmpty, IsString } from "class-validator";
 
 export class CreateApprenticeDto{
     @IsNotEmpty()
@@ -8,12 +8,18 @@ export class CreateApprenticeDto{
 
     age!:number;
 
+    @IsNotEmpty()
+    @IsEnum(ApprenticeStatus)
     status!: ApprenticeStatus;
 
+    @IsNotEmpty()
+    @IsEnum(ApprenticeTrainingLevel)
     trainingLevel!:ApprenticeTrainingLevel;
 
     entryDate!: Date;
 
+    @IsNotEmpty()
+    @IsString()
     agency!: string;
     
 }

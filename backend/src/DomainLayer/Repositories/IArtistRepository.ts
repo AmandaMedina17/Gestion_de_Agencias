@@ -26,5 +26,5 @@ export abstract class IArtistRepository extends IRepository<Artist> {
 
   abstract getArtist_GroupsColaborations(id: string): Promise<Group[]>;
 
-  abstract getArtistCurrentGroup(id: string): Promise<Group | null>;
+  
 }

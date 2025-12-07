@@ -1,18 +1,23 @@
 import { ArtistStatus } from "../../../DomainLayer/Enums";
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsEnum, IsNotEmpty, IsString } from "class-validator";
 
 export class CreateArtistDto{
     @IsNotEmpty()
     @IsString()
     transitionDate!: Date;
 
+    @IsNotEmpty()
+    @IsEnum(ArtistStatus)
     status!: ArtistStatus;
 
+    @IsNotEmpty()
+    @IsString()
     stageName!: string;
 
+    @IsNotEmpty()
     birthday!: Date;
 
-    groupId!: string;
-
+    @IsNotEmpty()
+    @IsString()
     apprenticeId!: string;
 }

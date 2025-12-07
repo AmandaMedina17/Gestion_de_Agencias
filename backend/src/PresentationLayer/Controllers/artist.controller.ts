@@ -4,7 +4,7 @@ import { UpdateApprenticeDto } from '@application/DTOs/apprenticeDto/update-appr
 import { CreateArtistDto } from '@application/DTOs/artistDto/create-artist.dto';
 import { UpdateArtistDto } from '@application/DTOs/artistDto/update-artist.dto';
 
-@Controller('artist')
+@Controller('artists')
 export class ArtistController {
   constructor(
     private readonly artistService: ArtistService
