@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ContractEntity } from '@infrastructure/database/Entities/ContractEntity';
-import { IMapper } from '@infrastructure/database/Mappers/IMapper';
 import { ContractMapper } from '@infrastructure/database/Mappers/ContractMapper';
 import { IContractRepository } from '@domain/Repositories/IContractRepository';
 import { ContractRepositoryImpl} from '@infrastructure/database/Repositories/ContractRepository';

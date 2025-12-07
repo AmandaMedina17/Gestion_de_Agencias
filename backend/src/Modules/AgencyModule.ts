@@ -12,7 +12,7 @@ import { AgencyDtoMapper } from "@application/DTOs/dtoMappers/agency.dtoMapper";
 import { ApprenticeMapper } from "@infrastructure/database/Mappers/ApprenticeMapper";
 import { ArtistMapper } from "@infrastructure/database/Mappers/ArtistMapper";
 import { GroupMapper } from "@infrastructure/database/Mappers/GroupMapper";
-import { ArtistDtoMapper } from "@application/DTOs/dtoMappers/artist.dto";
+import { ArtistDtoMapper } from "@application/DTOs/dtoMappers/artist.dtoMapper";
 import { ArtistModule } from "./ArtistModule";
 import { GetAgencyApprenticesUseCase } from "@application/UseCases/get_agency_apprentices.use-case";
 import { GetAgencyArtistsUseCase } from "@application/UseCases/get_agency_artists.use-case";

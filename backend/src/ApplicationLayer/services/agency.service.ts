@@ -9,7 +9,7 @@ import { UpdateAgencyDto } from '@application/DTOs/agencyDto/update-agency.dto';
 import { AgencyDtoMapper } from '@application/DTOs/dtoMappers/agency.dtoMapper';
 import { Artist } from '@domain/Entities/Artist';
 import { ArtistResponseDto } from '@application/DTOs/artistDto/response-artist.dto';
-import { ArtistDtoMapper } from '@application/DTOs/dtoMappers/artist.dto';
+import { ArtistDtoMapper } from '@application/DTOs/dtoMappers/artist.dtoMapper';
 import { Apprentice } from '@domain/Entities/Apprentice';
 import { ApprenticeResponseDto } from '@application/DTOs/apprenticeDto/response-apprentice.dto';
 import { GetAgencyArtistsUseCase } from '../UseCases/get_agency_artists.use-case';

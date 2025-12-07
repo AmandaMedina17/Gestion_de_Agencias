@@ -6,6 +6,5 @@ export class ArtistResponseDto{
     status!:ArtistStatus;
     stageName!:string;
     birthday!:Date;
-    groupId!:string;
     apprenticeId!:string;
 }

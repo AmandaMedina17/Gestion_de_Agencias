@@ -12,16 +12,15 @@ export class Artist implements IUpdatable{
     private status: ArtistStatus,
     private stageName: string,
     private birthDate: Date,
-    private groupId: string,
     public apprenticeId: string
     
   ) {
 
   }
 
-  static create(transitionDate: Date, status: ArtistStatus, stageName: string, birthDate: Date, groupId: string, apprenticeId: string): Artist {
+  static create(transitionDate: Date, status: ArtistStatus, stageName: string, birthDate: Date, apprenticeId: string): Artist {
     const id = uuidv4();
-    return new Artist(id, transitionDate, status, stageName, birthDate, groupId, apprenticeId);
+    return new Artist(id, transitionDate, status, stageName, birthDate, apprenticeId);
   }
 
   update(updateDto: UpdateData): void{
@@ -40,10 +39,6 @@ export class Artist implements IUpdatable{
     if(updateDto.birthday)
     {
       this.birthDate = updateDto.birthday;
-    }
-    if(updateDto.groupId)
-    {
-      this.groupId = updateDto.groupId;
     }
   }
 
@@ -71,17 +66,12 @@ export class Artist implements IUpdatable{
     return this.status;
   }
 
-  public getGroup(): string{
-    return this.groupId;
-  }
-
    public getApprenticeId(): string {
     return this.apprenticeId;
   }
 
 
-  public debut(groupId: string, debutDate: Date): void {
-    this.groupId = groupId;
+  public debut(debutDate: Date): void {
     this.transitionDate = debutDate;
     this.status = ArtistStatus.ACTIVO;
   }

@@ -3,7 +3,7 @@ import { BaseDtoMapper } from "./DtoMapper";
 import { CreateContractDto } from "../contractDto/create-contract.dto";
 import { ContractResponseDto } from "../contractDto/response-contract.dto";
 import { AgencyDtoMapper } from "./agency.dtoMapper";
-import { ArtistDtoMapper } from "./artist.dto";
+import { ArtistDtoMapper } from "./artist.dtoMapper";
 import { Injectable } from "@nestjs/common";
 
 @Injectable()

@@ -1,10 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { BaseRepository } from './BaseRepositoryImpl';
 import { Artist} from '@domain/Entities/Artist';
 import { ArtistEntity } from '../Entities/ArtistEntity';
-import { IMapper } from '../Mappers/IMapper';
 import { Group } from '@domain/Entities/Group';
 import { ArtistMapper } from '../Mappers/ArtistMapper';
 
@@ -15,7 +14,7 @@ export class ArtistRepository
   constructor(
     @InjectRepository(ArtistEntity)
     repository: Repository<ArtistEntity>,
-    mapper: ArtistMapper
+    mapper: ArtistMapper,
     // @InjectRepository(ContractEntity)
     // private readonly contractRepo: Repository<ContractEntity>,
     // private readonly contractMapper: ContractMapper,
@@ -30,36 +29,6 @@ export class ArtistRepository
     savedArtist.apprenticeId=entity.getApprenticeId(); //<=
     return this.mapper.toDomainEntity(savedArtist);
   }
-//   async getArtistCurrentGroup(id: string): Promise<Group|null> {
-//     const now = new Date();
-    
-//     // Buscar todas las membresías del artista
-//     const artistEntity = await this.repository.findOne({
-//       where: { id },
-//       relations: [
-//         'groupMemberships',
-//         'groupMemberships.group' // Cargar la relación con el grupo
-//       ]
-//     });
-
-//     if (!artistEntity || !artistEntity.groupMemberships) {
-//       return null;
-//     }
-
-//     // Filtrar las membresías activas (donde la fecha actual está entre startDate y endDate)
-//     const currentMemberships = artistEntity.groupMemberships.filter(membership => {
-//       return membership.startDate <= now && membership.endDate >= now;
-//     });
-
-//     if (currentMemberships.length === 0) {
-//       return null;
-//     }
-
-//     const currentMembership = currentMemberships[0];
-    
-//     // Convertir la entidad del grupo a objeto de dominio Group
-//     return this.groupMapper.toDomainEntity(currentMembership.group);
-// }
 
     // async findArtistsWithScheduleConflicts(startDate: Date, endDate: Date): Promise<Artist[]> {
     //     const artistEntities = await this.repository

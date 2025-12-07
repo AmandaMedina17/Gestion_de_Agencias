@@ -1,7 +1,7 @@
 import { GroupStatus } from "@domain/Enums";
 import { Injectable } from "@nestjs/common";
 import { Transform } from "class-transformer";
-import { IsBoolean, IsDate, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
+import { ArrayNotEmpty, IsArray, IsBoolean, IsDate, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, MinLength } from "class-validator";
 
 @Injectable()
 export class CreateGroupDto {
@@ -19,10 +19,6 @@ export class CreateGroupDto {
     @IsDate()
     @Transform(({ value }) => new Date(value))
     debut_date!: Date;
-
-    // @IsNotEmpty()
-    // @IsNumber()
-    // members_num!: number;
 
     @IsNotEmpty()
     @IsString()

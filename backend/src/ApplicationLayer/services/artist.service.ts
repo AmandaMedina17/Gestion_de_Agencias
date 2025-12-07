@@ -8,7 +8,7 @@ import { IArtistRepository } from "@domain/Repositories/IArtistRepository";
 // import { GetArtistContractsUseCase } from '../UseCases/get_artist_contracts.use-case';
 import { ContractDtoMapper } from '../DTOs/dtoMappers/contract.dtoMapper';
 import { ContractResponseDto } from "@application/DTOs/contractDto/response-contract.dto";
-import { ArtistDtoMapper } from "@application/DTOs/dtoMappers/artist.dto";
+import { ArtistDtoMapper } from "@application/DTOs/dtoMappers/artist.dtoMapper";
 
 @Injectable()
 export class ArtistService extends BaseService<Artist, CreateArtistDto, ArtistResponseDto, UpdateArtistDto>{
