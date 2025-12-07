@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ContractEntity } from '@infrastructure/database/Entities/ContractEntity';
-import { IMapper } from '@infrastructure/database/Mappers/IMapper';
 import { ContractMapper } from '@infrastructure/database/Mappers/ContractMapper';
 import { IContractRepository } from '@domain/Repositories/IContractRepository';
 import { ContractRepositoryImpl} from '@infrastructure/database/Repositories/ContractRepository';
@@ -15,7 +14,7 @@ import { ArtistModule } from './ArtistModule';
 import { AgencyModule } from './AgencyModule';
 import { AgencyEntity } from '@infrastructure/database/Entities/AgencyEntity';
 import { ArtistEntity } from '@infrastructure/database/Entities/ArtistEntity';
-import { UpdateContractUseCase } from '@domain/UseCases/update_contract.use-case';
+import { UpdateContractUseCase } from '@application/UseCases/update_contract.use-case';
 import { GetArtistContractsUseCase } from '@application/UseCases/get_artist_contracts.use-case';
 
 @Module({
