@@ -34,6 +34,41 @@ export class ArtistRepository
     savedArtist.apprenticeId=entity.getApprenticeId(); //<=
     return this.mapper.toDomainEntity(savedArtist);
   }
+
+  async getArtistsWithDebut(agencyId?: string): Promise<Artist[]> {
+    // Construir query para artistas que han debutado
+    const query = this.repository
+      .createQueryBuilder('artist')
+      .innerJoin('artist.groupMemberships', 'membership')
+      .where('membership.artist_debut_date IS NOT NULL')
+      .andWhere('artist.status = :status', { status: 'ACTIVO' });
+
+    if (agencyId) {
+      // Si se especifica agencia, filtrar por agencia
+      query.innerJoin('artist.agencyMemberships', 'agencyMembership')
+          .andWhere('agencyMembership.agencyId = :agencyId', { agencyId })
+          .andWhere('agencyMembership.endDate IS NULL OR agencyMembership.endDate > :now', { now: new Date() });
+    }
+
+    const artistEntities = await query.getMany();
+    return this.mapper.toDomainEntities(artistEntities);
+  }
+
+  async getArtistDebutGroups(artistId: string): Promise<Group[]> {
+    const memberships = await this.membershipRepository.find({
+      where: { 
+        artistId
+      },
+      relations: ['group']
+    });
+
+    if (!memberships.length) {
+      return [];
+    }
+
+    const groupEntities = memberships.map(m => m.group);
+    return this.groupMapper.toDomainEntities(groupEntities);
+  }
   async getArtistCurrentGroup(artistId: string): Promise<Group | null> {
     const now = new Date();
     
