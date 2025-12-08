@@ -8,11 +8,6 @@ import DeleteModal from "../../../ui/reutilizables/DeleteModal";
 import './ApprenticeStyle.css'
 import { ApprenticeResponseDto } from "../../../../../../backend/src/ApplicationLayer/DTOs/apprenticeDto/response-apprentice.dto";
 
-import Alert from '@mui/material/Alert';
-import AlertTitle from '@mui/material/AlertTitle';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
-import Stack from '@mui/material/Stack';
 
 export enum ApprenticeTrainingLevel {
   PRINCIPIANTE = "PRINCIPIANTE",

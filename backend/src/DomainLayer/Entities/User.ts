@@ -7,7 +7,8 @@ export class User {
     private username: string,
     private password: string,
     private role : UserRole,
-    private isActive: boolean
+    private isActive: boolean,
+    private agency: string
   ) {
     this.validate();
   }
@@ -17,9 +18,9 @@ export class User {
     if (!this.password) throw new Error("Password requerido");
   }
 
-  static create(username: string, password: string, role : UserRole): User {
+  static create(username: string, password: string, role : UserRole, agency:string): User {
     const id = uuidv4();
-    return new User(id, username, password, role, true);
+    return new User(id, username, password, role, true, agency);
 
   }
 
@@ -38,5 +39,9 @@ export class User {
 
   public getRole(): UserRole {
     return this.role;
+  }
+
+  public getAgency(): string{
+    return this.agency;
   }
 }
