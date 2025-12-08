@@ -5,7 +5,7 @@ import { CreateAgencyDto } from "../agencyDto/create-agency.dto";
 export class ContractResponseDto{
     id!:string;
     startDate!: Date;
-    endDate!: Date;
+    endDate?: Date | null;
     agency!: CreateAgencyDto;
     artist!: CreateArtistDto;
     distributionPercentage!: number;
