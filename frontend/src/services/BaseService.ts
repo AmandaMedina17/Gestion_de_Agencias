@@ -39,4 +39,10 @@ export class BaseService<CreateDto, ResponseDto> {
     if (!res.ok) throw new Error((await res.json()).message);
     return res.json();
   }
+
+   async getCustom<T>(endpoint: string): Promise<T> {
+    const res = await fetch(`${this.baseUrl}/${endpoint}`);
+    if (!res.ok) throw new Error(`Error: ${res.status}`);
+    return res.json();
+  }
 }

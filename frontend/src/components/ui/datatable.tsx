@@ -82,11 +82,15 @@ export interface TableProps<T> {
   className?: string;
   showHeader?: boolean;
   showPagination?: boolean;
-  hideActionsColumn?: boolean;
-
+  
+  // NUEVAS PROPS PARA CONTROLAR VISIBILIDAD
+  showActionsColumn?: boolean; // Controla si se muestra la columna de acciones
+  showCreateButton?: boolean; // Controla si se muestra el botón de crear
+  showSearch?: boolean; // Controla si se muestra el buscador
+  showReloadButton?: boolean; // Controla si se muestra el botón de recargar
+  
   // Render personalizado para acciones
-    actionsTitle?: string; // Título personalizado para la columna de acciones
-  showActions?: boolean; // Control para mostrar/ocultar acciones
+  actionsTitle?: string; // Título personalizado para la columna de acciones
   customActions?: (item: T) => React.ReactNode; // Render personalizado de acciones
   renderCustomActions?: (item: T) => React.ReactNode;
 }
@@ -127,7 +131,13 @@ const GenericTable = <T extends { id: string | number }>({
   className = "",
   showHeader = true,
   showPagination = true,
-  hideActionsColumn = false,
+  
+  // NUEVAS PROPS CON VALORES POR DEFECTO
+  showActionsColumn = true, // Por defecto sí muestra la columna de acciones
+  showCreateButton = true, // Por defecto sí muestra el botón de crear
+  showSearch = true, // Por defecto sí muestra el buscador
+  showReloadButton = true, // Por defecto sí muestra el botón de recargar
+  
   renderCustomActions,
 }: TableProps<T>) => {
   // Estados internos para modales
@@ -483,7 +493,7 @@ const GenericTable = <T extends { id: string | number }>({
           ? `No se encontraron resultados para "${filter}"`
           : "No hay registros para mostrar"}
       </p>
-      {(onAdd || onShowCreateChange || createForm) && !filter && (
+      {showCreateButton && (onAdd || onShowCreateChange || createForm) && !filter && (
         <button className="create-button" onClick={handleOpenCreateForm}>
           <span className="button-icon">
             <Icon name="plus" size={20} />
@@ -501,6 +511,20 @@ const GenericTable = <T extends { id: string | number }>({
     </div>
   );
 
+  // Determinar si hay acciones disponibles
+  const hasActions = Boolean(
+    onEdit ||
+    onDelete ||
+    onEditingChange ||
+    onDeletingChange ||
+    editForm ||
+    deleteModal ||
+    renderCustomActions
+  );
+
+  // Determinar si se debe mostrar la columna de acciones
+  const shouldShowActionsColumn = showActionsColumn && hasActions;
+
   return (
     <>
       <div className={`generic-table-container ${className}`}>
@@ -514,7 +538,7 @@ const GenericTable = <T extends { id: string | number }>({
               )}
             </div>
             <div className="header-left">
-              {(onAdd || onShowCreateChange || createForm) && (
+              {showCreateButton && (onAdd || onShowCreateChange || createForm) && (
                 <button
                   className="create-button"
                   onClick={handleOpenCreateForm}
@@ -530,28 +554,30 @@ const GenericTable = <T extends { id: string | number }>({
             <div className="header-right">
               <div className="header-controls-group">
                 {filterComponent || (
-                  <div className="filter-group">
-                    <input
-                      type="text"
-                      className="form-input search-input"
-                      placeholder="Buscar..."
-                      value={filter}
-                      onChange={(e) => setFilter(e.target.value)}
-                      disabled={loading}
-                    />
-                    {filter && (
-                      <button
-                        className="clear-filter-btn"
-                        onClick={() => setFilter("")}
-                        title="Limpiar filtro"
-                      >
-                        ×
-                      </button>
-                    )}
-                  </div>
+                  showSearch && (
+                    <div className="filter-group">
+                      <input
+                        type="text"
+                        className="form-input search-input"
+                        placeholder="Buscar..."
+                        value={filter}
+                        onChange={(e) => setFilter(e.target.value)}
+                        disabled={loading}
+                      />
+                      {filter && (
+                        <button
+                          className="clear-filter-btn"
+                          onClick={() => setFilter("")}
+                          title="Limpiar filtro"
+                        >
+                          ×
+                        </button>
+                      )}
+                    </div>
+                  )
                 )}
 
-                {onReload && (
+                {showReloadButton && onReload && (
                   <button
                     className="reload-button"
                     onClick={onReload}
@@ -610,25 +636,18 @@ const GenericTable = <T extends { id: string | number }>({
                   <tr>
                     {columns.map(renderHeaderCell)}
 
-                    {/* Columna de acciones */}
-                    {!hideActionsColumn &&
-                      (onEdit ||
-                        onDelete ||
-                        onEditingChange ||
-                        onDeletingChange ||
-                        editForm ||
-                        deleteModal ||
-                        renderCustomActions) && (
-                        <th
-                          className="table-header-cell actions-header"
-                          style={{ 
-                            width: renderCustomActions ? "180px" : "120px",
-                            textAlign: "center"
-                          }}
-                        >
-                          Acciones
-                        </th>
-                      )}
+                    {/* Columna de acciones - CONDICIONAL */}
+                    {shouldShowActionsColumn && (
+                      <th
+                        className="table-header-cell actions-header"
+                        style={{ 
+                          width: renderCustomActions ? "180px" : "120px",
+                          textAlign: "center"
+                        }}
+                      >
+                        Acciones
+                      </th>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
@@ -644,56 +663,49 @@ const GenericTable = <T extends { id: string | number }>({
                         </td>
                       ))}
 
-                      {/* Acciones */}
-                      {!hideActionsColumn &&
-                        (onEdit ||
-                          onDelete ||
-                          onEditingChange ||
-                          onDeletingChange ||
-                          editForm ||
-                          deleteModal ||
-                          renderCustomActions) && (
-                          <td className="table-cell actions-cell">
-                            <div 
-                              className="table-actions"
-                              style={{
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                                gap: "8px"
-                              }}
-                            >
-                              {renderCustomActions ? (
-                                renderCustomActions(item)
-                              ) : (
-                                <>
-                                  {(onEdit || onEditingChange || editForm) && (
-                                    <button
-                                      className="action-btns edit-btn-comp"
-                                      onClick={() => handleStartEdit(item)}
-                                      title="Editar"
-                                      disabled={loading}
-                                    >
-                                      <Icon name="edit" size={18} />
-                                    </button>
-                                  )}
-                                  {(onDelete ||
-                                    onDeletingChange ||
-                                    deleteModal) && (
-                                    <button
-                                      className="action-btns delete-btn-comp"
-                                      onClick={() => handleStartDelete(item)}
-                                      title="Eliminar"
-                                      disabled={loading}
-                                    >
-                                      <Icon name="trash" size={18} />
-                                    </button>
-                                  )}
-                                </>
-                              )}
-                            </div>
-                          </td>
-                        )}
+                      {/* Acciones - CONDICIONAL */}
+                      {shouldShowActionsColumn && (
+                        <td className="table-cell actions-cell">
+                          <div 
+                            className="table-actions"
+                            style={{
+                              display: "flex",
+                              justifyContent: "center",
+                              alignItems: "center",
+                              gap: "8px"
+                            }}
+                          >
+                            {renderCustomActions ? (
+                              renderCustomActions(item)
+                            ) : (
+                              <>
+                                {(onEdit || onEditingChange || editForm) && (
+                                  <button
+                                    className="action-btns edit-btn-comp"
+                                    onClick={() => handleStartEdit(item)}
+                                    title="Editar"
+                                    disabled={loading}
+                                  >
+                                    <Icon name="edit" size={18} />
+                                  </button>
+                                )}
+                                {(onDelete ||
+                                  onDeletingChange ||
+                                  deleteModal) && (
+                                  <button
+                                    className="action-btns delete-btn-comp"
+                                    onClick={() => handleStartDelete(item)}
+                                    title="Eliminar"
+                                    disabled={loading}
+                                  >
+                                    <Icon name="trash" size={18} />
+                                  </button>
+                                )}
+                              </>
+                            )}
+                          </div>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>

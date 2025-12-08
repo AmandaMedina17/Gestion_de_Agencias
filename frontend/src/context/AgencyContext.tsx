@@ -1,12 +1,16 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { AgencyService } from '../services/AgencyService'
+import { agencyService } from '../services/AgencyService'
 import { CreateAgencyDto } from '../../../backend/src/ApplicationLayer/DTOs/agencyDto/create-agency.dto';
 import { AgencyResponseDto } from '../../../backend/src/ApplicationLayer/DTOs/agencyDto/response-agency.dto';
+import { ArtistResponseDto } from '../../../backend/src/ApplicationLayer/DTOs/artistDto/response-artist.dto';
+import { ApprenticeResponseDto } from '../../../backend/src/ApplicationLayer/DTOs/apprenticeDto/response-apprentice.dto';
 
 
 interface AgencyContextType {
   // Estado
   agencies: AgencyResponseDto[];
+  artists: ArtistResponseDto[];
+  apprentices: ApprenticeResponseDto[];
   loading: boolean;
   error: string | null;
 
@@ -16,6 +20,8 @@ interface AgencyContextType {
   fetchAgency: (id: string) => Promise<AgencyResponseDto | null>;
   deleteAgency: (id: string) => Promise<void>;
   updateAgency: (id: string, updateData: { place: string, nameAgency: string, dateFundation: Date }) => Promise<void>;
+  fetchAgencyArtists: (agencyId: string) => Promise<void>;
+  fetchAgencyApprentices: (agencyId: string) => Promise<void>;
   clearError: () => void;
 }
 
@@ -35,6 +41,8 @@ export const useAgency = () => {
 
 export const AgencyProvider: React.FC<AgencyProviderProps> = ({ children }) => {
   const [agencies, setAgencies] = useState<AgencyResponseDto[]>([]);
+  const [artists, setArtists] = useState<ArtistResponseDto[]>([]);
+  const [apprentices, setApprentices] = useState<ApprenticeResponseDto[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -42,7 +50,7 @@ export const AgencyProvider: React.FC<AgencyProviderProps> = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const newAgency = await AgencyService.create(createDto);
+      const newAgency = await agencyService.create(createDto);
       setAgencies(prev => [...prev, newAgency]);
     } catch (err: any) {
       setError(err.message || 'Error al crear agencia');
@@ -56,7 +64,7 @@ export const AgencyProvider: React.FC<AgencyProviderProps> = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await AgencyService.findAll();
+      const data = await agencyService.findAll();
       setAgencies(data);
     } catch (err: any) {
       setError(err.message || 'Error al cargar agencias');
@@ -69,7 +77,7 @@ export const AgencyProvider: React.FC<AgencyProviderProps> = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      return await AgencyService.findOne(id);
+      return await agencyService.findOne(id);
     } catch (err: any) {
       setError(err.message || 'Error al cargar agencia');
       return null;
@@ -82,7 +90,7 @@ export const AgencyProvider: React.FC<AgencyProviderProps> = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      await AgencyService.remove(id);
+      await agencyService.remove(id);
       setAgencies(prev => prev.filter(agency => agency.id !== id));
     } catch (err: any) {
       setError(err.message || 'Error al eliminar agencia');
@@ -96,10 +104,38 @@ export const AgencyProvider: React.FC<AgencyProviderProps> = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      await AgencyService.update(id, updateData);
+      await agencyService.update(id, updateData);
       await fetchAgencies(); // Recargar la lista
     } catch (err: any) {
       setError(err.message || 'Error al actualizar la agencia');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+   const fetchAgencyArtists = async (agencyId: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const artistsData = await agencyService.getCustom<ArtistResponseDto[]>(`${agencyId}/artists`);
+      setArtists(artistsData);
+    } catch (err: any) {
+      setError(err.message || 'Error al cargar artistas de la agencia');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAgencyApprentices = async (agencyId: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const apprenticesData = await agencyService.getCustom<ApprenticeResponseDto[]>(`${agencyId}/apprentices`);
+      setApprentices(apprenticesData);
+    } catch (err: any) {
+      setError(err.message || 'Error al cargar aprendices de la agencia');
       throw err;
     } finally {
       setLoading(false);
@@ -111,6 +147,8 @@ export const AgencyProvider: React.FC<AgencyProviderProps> = ({ children }) => {
   return (
     <AgencyContext.Provider value={{
       agencies,
+       artists,
+      apprentices,
       loading,
       error,
       createAgency,
@@ -118,6 +156,8 @@ export const AgencyProvider: React.FC<AgencyProviderProps> = ({ children }) => {
       fetchAgency,
       deleteAgency,
       updateAgency,
+      fetchAgencyArtists,
+      fetchAgencyApprentices,
       clearError,
     }}>
       {children}

@@ -119,7 +119,6 @@ const SongManagement: React.FC = () => {
     showError("Error al Eliminar", errorMessage || "No se pudo eliminar la canción.");
   };
 
-  // FUNCIÓN CRÍTICA: Formatear fecha para el servidor
   const formatDateForServer = (dateString: string): string => {
     if (!dateString) return new Date().toISOString();
     
@@ -240,18 +239,7 @@ const SongManagement: React.FC = () => {
         label: album.title
       }))
     },
-    {
-      name: "releaseDate",
-      label: "Fecha de Lanzamiento",
-      type: "date",
-      required: true,
-      validate: (value) => {
-        const date = new Date(value);
-        if (isNaN(date.getTime())) return "Fecha inválida";
-        if (date > new Date()) return "La fecha no puede ser futura";
-        return null;
-      }
-    }
+    
   ];
 
   // Datos iniciales para creación (formato YYYY-MM-DD para input type="date")

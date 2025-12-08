@@ -193,7 +193,6 @@ const ApprenticeManagement: React.FC = () => {
   const handleCreate = async (data: Record<string, any>) => {
     try {
       console.log("Datos para crear aprendiz:", data);
-      console.log(new Date(data.entryDate));
       
       await createApprentice({
         fullName: data.fullName,
