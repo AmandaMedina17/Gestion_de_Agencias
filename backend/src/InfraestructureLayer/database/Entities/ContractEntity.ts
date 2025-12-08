@@ -1,5 +1,5 @@
 import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from "typeorm";
-import { ContractStatus } from "../../../DomainLayer/Enums";
+import { ContractStatus } from "@domain/Enums";
 import { AgencyEntity } from "./AgencyEntity";
 import { ArtistEntity } from "./ArtistEntity";
 
@@ -17,8 +17,8 @@ export class ContractEntity {
   @PrimaryColumn({ type: "date" })
   startDate!: Date;
 
-  @PrimaryColumn({ type: "date" })
-  endDate!: Date;
+  @Column({name: 'end_date',type: 'date', nullable: true})
+  endDate?: Date;
 
   @Column({
     type: "enum",
