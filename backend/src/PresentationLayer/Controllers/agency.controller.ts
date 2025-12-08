@@ -50,13 +50,12 @@ export class AgencyController {
     return this.agencyService.getAgencyApprentices(id);
   }
 
-  @Post(':agencyId/artists/:artistId')
+  @Post(':agencyId/artists')
   addArtistToAgency(
     @Param('agencyId') agencyId: string,
-    @Param('artistId') artistId: string,
     @Body(ValidationPipe) createArtistAgencyDto: CreateArtistAgencyDto
   ) {
-    return this.agencyService.relateArtistToAgency(agencyId,artistId,createArtistAgencyDto);
+    return this.agencyService.relateArtistToAgency(agencyId,createArtistAgencyDto);
   }
 
   @Get(':id/groups')

@@ -7,10 +7,8 @@ import { BaseService } from './base.service';
 import { BaseDtoMapper } from '@application/DTOs/dtoMappers/DtoMapper';
 import { UpdateAgencyDto } from '@application/DTOs/agencyDto/update-agency.dto';
 import { AgencyDtoMapper } from '@application/DTOs/dtoMappers/agency.dtoMapper';
-import { Artist } from '@domain/Entities/Artist';
 import { ArtistResponseDto } from '@application/DTOs/artistDto/response-artist.dto';
 import { ArtistDtoMapper } from '@application/DTOs/dtoMappers/artist.dtoMapper';
-import { Apprentice } from '@domain/Entities/Apprentice';
 import { ApprenticeResponseDto } from '@application/DTOs/apprenticeDto/response-apprentice.dto';
 import { GetAgencyArtistsUseCase } from '../UseCases/get_agency_artists.use-case';
 import { ApprenticeDtoMapper } from '../DTOs/dtoMappers/apprentice.dtoMapper';
@@ -25,6 +23,7 @@ import { ArtistDebutContractResponseDto } from '@application/DTOs/artists_debut_
 import { ContractDtoMapper } from '../DTOs/dtoMappers/contract.dtoMapper';
 import { GetArtistsWithDebutUseCase } from '../UseCases/get_artists_with_debut.use-case';
 import { IContractRepository } from '@domain/Repositories/IContractRepository';
+import { ResponseArtistAgencyDto } from '@application/DTOs/artist_agencyDto/response-artist-agency.dto';
 
 @Injectable()
 export class AgencyService extends BaseService<Agency, CreateAgencyDto, AgencyResponseDto, UpdateAgencyDto> {
@@ -84,8 +83,8 @@ export class AgencyService extends BaseService<Agency, CreateAgencyDto, AgencyRe
   return result;
   }
   
-  async relateArtistToAgency(agencyId: string, artistId: string, createArtistAgencyDto: CreateArtistAgencyDto): Promise<void> {
-    return await this.relateArtistToAgencyUseCase.execute(agencyId, artistId,createArtistAgencyDto);
+  async relateArtistToAgency(agencyId: string, createArtistAgencyDto: CreateArtistAgencyDto): Promise<ResponseArtistAgencyDto> {
+    return await this.relateArtistToAgencyUseCase.execute(agencyId,createArtistAgencyDto);
   }
 
   async getArtistsWithDebutAndActiveContracts(agencyId: string): Promise<ArtistDebutContractResponseDto[]> {
