@@ -18,7 +18,7 @@ export class ContractEntity {
   startDate!: Date;
 
   @Column({name: 'end_date',type: 'date', nullable: true})
-  endDate?: Date;
+  endDate: Date | null = null;
 
   @Column({
     type: "enum",
