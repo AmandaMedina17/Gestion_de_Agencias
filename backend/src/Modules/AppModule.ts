@@ -17,6 +17,7 @@ import { AlbumModule } from './album/album.module';
 import { AwardModule } from './award/award.module';
 import { GroupModule } from './GroupModule';
 import { ArtistActivityModule } from './ArtistActivityModule';
+import { GroupActivityModule } from './GroupActivityModule';
 
 @Module({
   imports: [
@@ -35,7 +36,8 @@ import { ArtistActivityModule } from './ArtistActivityModule';
     AlbumModule,
     AwardModule,
     GroupModule,
-    ArtistActivityModule
+    ArtistActivityModule,
+    GroupActivityModule
   ],
   controllers: [AppController],
   providers: [AppService],
