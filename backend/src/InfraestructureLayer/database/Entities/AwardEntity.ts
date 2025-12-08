@@ -16,7 +16,7 @@ export class AwardEntity {
   albumId?: string 
 
   @ManyToOne(() => AlbumEntity, (album: AlbumEntity) => album.awards, { 
-    nullable: false, 
+    nullable: true, 
     onDelete : 'SET NULL'
   })
   @JoinColumn({ name: 'album_id' })

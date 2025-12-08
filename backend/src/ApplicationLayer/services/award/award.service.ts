@@ -12,8 +12,25 @@ export class AwardService extends BaseService<Award,CreateAwardDto,ResponseAward
     constructor(
         @Inject(IAwardRepository)
         private readonly awardRepository: IAwardRepository,
-        private readonly awardDtoMapper: AwardDtoMapper
+        private readonly awardDtoMapper: AwardDtoMapper,
     ) {
         super(awardRepository, awardDtoMapper)
+    }
+
+    async addAwardToAlbum(awardId : string, albumId : string) : Promise<ResponseAwardDto>{
+        const domain  = await this.awardRepository.findById(awardId)
+        
+        if(!domain)
+            throw new Error("The award you wanna give to the song doesn't exist")
+
+        domain.setAlbumId(albumId)
+
+        return this.save(domain)
+    }
+
+    async save(entity : Award) : Promise<ResponseAwardDto> {
+    
+        const savedEntity = await this.awardRepository.save(entity)
+        return this.mapper.toResponse(savedEntity)
     }
 }

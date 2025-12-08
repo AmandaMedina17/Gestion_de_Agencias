@@ -22,12 +22,23 @@ import { GetAgencyGroupsUseCase } from "@application/UseCases/get_agency_groups.
 import { ArtistAgencyMembershipEntity } from "@infrastructure/database/Entities/ArtistAgencyMembershipEntity";
 import { RelateArtistToAgencyUseCase } from "@application/UseCases/relate_artist_to_agency.use-case.ts";
 import { ArtistEntity } from "@infrastructure/database/Entities/ArtistEntity";
+import { GroupDtoMapper } from "@application/DTOs/dtoMappers/group.dtoMapper";
+import { GroupModule } from "./GroupModule";
+import { ArtistGroupMembershipEntity } from "@infrastructure/database/Entities/ArtistGroupMembershipEntity";
+import { GetArtistsWithDebutUseCase } from "@application/UseCases/get_artists_with_debut.use-case";
+import { Contract } from "@domain/Entities/Contract";
+import { ContractModule } from "./ContractModule";
+import { ContractDtoMapper } from "@application/DTOs/dtoMappers/contract.dtoMapper";
+import { ContractEntity } from "@infrastructure/database/Entities/ContractEntity";
+import { ContractMapper } from "@infrastructure/database/Mappers/ContractMapper";
+import { IContractRepository } from "@domain/Repositories/IContractRepository";
+import { ContractRepositoryImpl } from "@infrastructure/database/Repositories/ContractRepository";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([AgencyEntity, ArtistAgencyMembershipEntity, ArtistEntity]),
+    TypeOrmModule.forFeature([AgencyEntity, ArtistAgencyMembershipEntity, ArtistEntity, ContractEntity]),
     ArtistModule,
-    ApprenticeModule
+    ApprenticeModule, 
   ],
   controllers: [AgencyController],
   providers: [
@@ -35,17 +46,23 @@ import { ArtistEntity } from "@infrastructure/database/Entities/ArtistEntity";
     GroupMapper,
     ApprenticeMapper,
     ArtistMapper,
+    ContractMapper,
     
     // Repositorio
     {
       provide: IAgencyRepository,
       useClass: AgencyRepositoryImpl,
     },
-    
+    {
+      provide: IContractRepository,
+      useClass: ContractRepositoryImpl,
+    },
     // DTO Mapper
     AgencyDtoMapper,
     ArtistDtoMapper,
     ApprenticeDtoMapper,
+    GroupDtoMapper,
+    ContractDtoMapper,
     
     // Servicio
     AgencyService,
@@ -55,6 +72,7 @@ import { ArtistEntity } from "@infrastructure/database/Entities/ArtistEntity";
     GetAgencyArtistsUseCase,
     GetAgencyGroupsUseCase,
     RelateArtistToAgencyUseCase,
+    GetArtistsWithDebutUseCase,
   ],
   exports: [IAgencyRepository, AgencyDtoMapper, AgencyMapper],
 })
