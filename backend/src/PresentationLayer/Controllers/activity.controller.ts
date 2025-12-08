@@ -3,7 +3,7 @@ import { ActivityService } from '@application/services/activity.service';
 import { CreateActivityDto } from '@application/DTOs/activityDto/create-activity.dto';
 import { UpdateActivityDto } from '@application/DTOs/activityDto/update-activity.dto';
 
-@Controller('activity')
+@Controller('activities')
 export class ActivityController {
   constructor(private readonly activityService: ActivityService) {}
 

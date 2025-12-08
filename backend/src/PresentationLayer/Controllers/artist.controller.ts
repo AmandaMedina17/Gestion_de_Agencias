@@ -4,7 +4,7 @@ import { UpdateApprenticeDto } from '@application/DTOs/apprenticeDto/update-appr
 import { CreateArtistDto } from '@application/DTOs/artistDto/create-artist.dto';
 import { UpdateArtistDto } from '@application/DTOs/artistDto/update-artist.dto';
 
-@Controller('artist')
+@Controller('artists')
 export class ArtistController {
   constructor(
     private readonly artistService: ArtistService
@@ -19,7 +19,12 @@ export class ArtistController {
   findAll() {
     return this.artistService.findAll();
   }
-
+  
+  @Get('agency-changes-and-groups')
+  getArtistsWithAgencyChangesAndGroups(){
+    return this.artistService.getArtistsWithAgencyChangesAndGroups();
+  }
+  
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.artistService.findOne(id);

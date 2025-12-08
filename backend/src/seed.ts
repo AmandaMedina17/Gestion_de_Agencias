@@ -179,7 +179,7 @@ async function bootstrap() {
         statusArtist: faker.helpers.arrayElement(Object.values(ArtistStatus)),
         birthDate: faker.date.birthdate({ min: 1990, max: 2008, mode: "year" }),
         transitionDate: faker.date.soon({ days: 800 }),
-        groupId: '', 
+         
       });
     }
 

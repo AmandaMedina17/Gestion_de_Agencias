@@ -8,7 +8,8 @@ import { IArtistRepository } from "@domain/Repositories/IArtistRepository";
 // import { GetArtistContractsUseCase } from '../UseCases/get_artist_contracts.use-case';
 import { ContractDtoMapper } from '../DTOs/dtoMappers/contract.dtoMapper';
 import { ContractResponseDto } from "@application/DTOs/contractDto/response-contract.dto";
-import { ArtistDtoMapper } from "@application/DTOs/dtoMappers/artist.dto";
+import { ArtistDtoMapper } from "@application/DTOs/dtoMappers/artist.dtoMapper";
+import { GetArtistsWithAgencyChangesAndGroupsUseCase } from '@application/UseCases/get_artists_with_agency_changes_and_groups.use-case';
 
 @Injectable()
 export class ArtistService extends BaseService<Artist, CreateArtistDto, ArtistResponseDto, UpdateArtistDto>{
@@ -16,7 +17,12 @@ export class ArtistService extends BaseService<Artist, CreateArtistDto, ArtistRe
         @Inject(IArtistRepository)
         private readonly artistRepository: IArtistRepository,
         private readonly artistDtoMapper: ArtistDtoMapper,
+        private readonly getArtistsWithAgencyChangesAndGroupsUseCase : GetArtistsWithAgencyChangesAndGroupsUseCase,
     ){
         super(artistRepository, artistDtoMapper)
+    }
+    async getArtistsWithAgencyChangesAndGroups() : Promise<ArtistResponseDto[]>{
+        const artists = await this.getArtistsWithAgencyChangesAndGroupsUseCase.execute();
+        return this.artistDtoMapper.toResponseList(artists);
     }
 }

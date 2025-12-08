@@ -11,6 +11,7 @@ import {
 import { AgencyService } from '@application/services/agency.service';
 import {UpdateAgencyDto } from '@application/DTOs/agencyDto/update-agency.dto';
 import { CreateAgencyDto } from '@application/DTOs/agencyDto/create-agency.dto';
+import { CreateArtistAgencyDto } from '@application/DTOs/artist_agencyDto/create-artist-agency.dto';
 
 @Controller('agencies')
 export class AgencyController {
@@ -49,14 +50,27 @@ export class AgencyController {
     return this.agencyService.getAgencyApprentices(id);
   }
 
-  // @Get(':id/groups')
-  // getAgencyGroups(@Param('id') id: string) {
-  //   return this.agencyService.getAgencyGroups(id);
-  // }
+  @Post(':agencyId/artists')
+  addArtistToAgency(
+    @Param('agencyId') agencyId: string,
+    @Body(ValidationPipe) createArtistAgencyDto: CreateArtistAgencyDto
+  ) {
+    return this.agencyService.relateArtistToAgency(agencyId,createArtistAgencyDto);
+  }
 
-  // @Get(':id/activeArtists')
-  // getActiveArtistsWithGroup(@Param('id') id: string){
-  //   return this.agencyService.getAgencyActiveArtistAndGruopInfo(id);
-  // }
+  @Get(':id/groups')
+  getAgencyGroups(@Param('id') id: string) {
+    return this.agencyService.getAgencyGroups(id);
+  }
+
+  @Get(':id/activeArtists')
+  getActiveArtistsWithGroup(@Param('id') id: string){
+    return this.agencyService.getAgencyActiveArtistAndGruopInfo(id);
+  }
+
+  @Get(':id/artists-with-debut-and-contracts')
+  getArtistsWithDebutAndContracts(@Param('id') id: string) {
+    return this.agencyService.getArtistsWithDebutAndActiveContracts(id);
+  }
 
 }

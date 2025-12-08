@@ -12,19 +12,33 @@ import { AgencyDtoMapper } from "@application/DTOs/dtoMappers/agency.dtoMapper";
 import { ApprenticeMapper } from "@infrastructure/database/Mappers/ApprenticeMapper";
 import { ArtistMapper } from "@infrastructure/database/Mappers/ArtistMapper";
 import { GroupMapper } from "@infrastructure/database/Mappers/GroupMapper";
-import { ArtistDtoMapper } from "@application/DTOs/dtoMappers/artist.dto";
+import { ArtistDtoMapper } from "@application/DTOs/dtoMappers/artist.dtoMapper";
 import { ArtistModule } from "./ArtistModule";
 import { GetAgencyApprenticesUseCase } from "@application/UseCases/get_agency_apprentices.use-case";
 import { GetAgencyArtistsUseCase } from "@application/UseCases/get_agency_artists.use-case";
 import { ApprenticeModule } from "./ApprenticeModule";
 import { ApprenticeDtoMapper } from "@application/DTOs/dtoMappers/apprentice.dtoMapper";
 import { GetAgencyGroupsUseCase } from "@application/UseCases/get_agency_groups.use-case";
+import { ArtistAgencyMembershipEntity } from "@infrastructure/database/Entities/ArtistAgencyMembershipEntity";
+import { RelateArtistToAgencyUseCase } from "@application/UseCases/relate_artist_to_agency.use-case.ts";
+import { ArtistEntity } from "@infrastructure/database/Entities/ArtistEntity";
+import { GroupDtoMapper } from "@application/DTOs/dtoMappers/group.dtoMapper";
+import { GroupModule } from "./GroupModule";
+import { ArtistGroupMembershipEntity } from "@infrastructure/database/Entities/ArtistGroupMembershipEntity";
+import { GetArtistsWithDebutUseCase } from "@application/UseCases/get_artists_with_debut.use-case";
+import { Contract } from "@domain/Entities/Contract";
+import { ContractModule } from "./ContractModule";
+import { ContractDtoMapper } from "@application/DTOs/dtoMappers/contract.dtoMapper";
+import { ContractEntity } from "@infrastructure/database/Entities/ContractEntity";
+import { ContractMapper } from "@infrastructure/database/Mappers/ContractMapper";
+import { IContractRepository } from "@domain/Repositories/IContractRepository";
+import { ContractRepositoryImpl } from "@infrastructure/database/Repositories/ContractRepository";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([AgencyEntity]),
+    TypeOrmModule.forFeature([AgencyEntity, ArtistAgencyMembershipEntity, ArtistEntity, ContractEntity]),
     ArtistModule,
-    ApprenticeModule
+    ApprenticeModule, 
   ],
   controllers: [AgencyController],
   providers: [
@@ -32,17 +46,23 @@ import { GetAgencyGroupsUseCase } from "@application/UseCases/get_agency_groups.
     GroupMapper,
     ApprenticeMapper,
     ArtistMapper,
+    ContractMapper,
     
     // Repositorio
     {
       provide: IAgencyRepository,
       useClass: AgencyRepositoryImpl,
     },
-    
+    {
+      provide: IContractRepository,
+      useClass: ContractRepositoryImpl,
+    },
     // DTO Mapper
     AgencyDtoMapper,
     ArtistDtoMapper,
     ApprenticeDtoMapper,
+    GroupDtoMapper,
+    ContractDtoMapper,
     
     // Servicio
     AgencyService,
@@ -50,7 +70,9 @@ import { GetAgencyGroupsUseCase } from "@application/UseCases/get_agency_groups.
     //Casos de uso
     GetAgencyApprenticesUseCase,
     GetAgencyArtistsUseCase,
-    GetAgencyGroupsUseCase
+    GetAgencyGroupsUseCase,
+    RelateArtistToAgencyUseCase,
+    GetArtistsWithDebutUseCase,
   ],
   exports: [IAgencyRepository, AgencyDtoMapper, AgencyMapper],
 })

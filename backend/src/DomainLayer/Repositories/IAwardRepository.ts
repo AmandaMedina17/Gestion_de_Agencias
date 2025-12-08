@@ -1,6 +1,7 @@
-//import { Award } from "@domain/Entities/Award";
-//import { IRepository } from "./IRepository";
+import { Award } from "@domain/Entities/Award";
+import { IRepository } from "./IRepository";
 
-//export interface IAwardRepository extends IRepository<Award>{}
-
-//export const AWARD_REPOSITORY = Symbol('IAwardRepository');
+export abstract class IAwardRepository extends IRepository<Award> {
+    abstract findByAlbumId (albumId : string) : Promise<Award[]>;
+    abstract findUnassigned(): Promise<Award[]>;
+}

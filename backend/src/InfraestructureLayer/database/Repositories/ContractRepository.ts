@@ -74,17 +74,17 @@ export class ContractRepositoryImpl implements IContractRepository {
     }
   }
   async findById(id: string): Promise<Contract | null> {
-  // Primero obtener todas las columnas necesarias
-  const entity = await this.contractRepo.findOne({
-    where: { contractID: id },
-    relations: this.getDefaultRelations(),
-  });
+    // Primero obtener todas las columnas necesarias
+    const entity = await this.contractRepo.findOne({
+      where: { contractID: id },
+      relations: this.getDefaultRelations(),
+    });
 
-  if (!entity) {
-    return null;
+    if (!entity) {
+      return null;
+    }
+    return entity ? this.contractMapper.toCompleteDomainEntity(entity) : null;
   }
-  return entity ? this.contractMapper.toCompleteDomainEntity(entity) : null;
-}
 
   async findAll(): Promise<Contract[]> {
     const entities: ContractEntity[] = await this.contractRepo.find({
@@ -102,8 +102,7 @@ async update(entity: Contract): Promise<Contract> {
           contractID: entity.getId(),
           agencyID: entity.getAgencyId().getId(),
           artistID: entity.getArtistId().getId(),
-          startDate: entity.getStartDate(),
-          endDate: entity.getEndDate()
+          startDate: entity.getStartDate()
         }
       });
 
@@ -116,10 +115,6 @@ async update(entity: Contract): Promise<Contract> {
       existingEntity.status = entity.getStatus();
       existingEntity.conditions = entity.getConditions();
       existingEntity.distributionPercentage = entity.getDistributionPercentage();
-      
-      // Si necesitas permitir cambiar fechas (peligroso porque son parte de PK)
-      // existingEntity.startDate = entity.getStartDate();
-      // existingEntity.endDate = entity.getEndDate();
 
       // 3. Guardar la actualización
       const updatedEntity = await transactionalEntityManager.save(
@@ -140,7 +135,7 @@ async update(entity: Contract): Promise<Contract> {
     }
     });
   }
-   async save(contract: Contract): Promise<Contract> {
+  async save(contract: Contract): Promise<Contract> {
     return await this.dataSource.transaction(async (transactionalEntityManager: EntityManager) => {
       try {
         // El ID del contrato ahora debe ser el contractID
@@ -160,8 +155,7 @@ async update(entity: Contract): Promise<Contract> {
           where: {
             agencyID: contract.getAgencyId().getId(),
             artistID: contract.getArtistId().getId(),
-            startDate: contract.getStartDate(),
-            endDate: contract.getEndDate()
+            startDate: contract.getStartDate()
           }
         });
         
@@ -207,8 +201,7 @@ async update(entity: Contract): Promise<Contract> {
       where: {
         agencyID: contractEntity.agencyID,
         artistID: contractEntity.artistID,
-        startDate: contractEntity.startDate,
-        endDate: contractEntity.endDate
+        startDate: contractEntity.startDate
       },
       relations: this.getDefaultRelations(),
     });
