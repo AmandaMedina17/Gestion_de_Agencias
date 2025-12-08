@@ -3,7 +3,7 @@ import { IArtistActivityRepository } from '@domain/Repositories/IArtistActivityR
 import { IArtistRepository } from '@domain/Repositories/IArtistRepository';
 import { IActivityRepository } from '@domain/Repositories/IActivityRepository';
 import { NotFoundException } from '@nestjs/common';
-import { ScheduleArtistDto } from '@application/DTOs/schedule-artistDto/schedule-artist.dto.ts';
+import { ScheduleArtistDto } from '@application/DTOs/schedule-artistDto/schedule-artist.dto';
 import { ActivityType } from '@domain/Enums';
 
 @Injectable()

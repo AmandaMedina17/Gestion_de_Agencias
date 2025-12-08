@@ -4,11 +4,11 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { ArtistModule } from "./ArtistModule";
 import { Activity } from "@domain/Entities/Activity";
 import { ActivityModule } from "./ActivityModule";
-import { ArtistActivityController } from "@presentation/Controllers/artistactivity.controller";
+import { ArtistActivityController } from "@presentation/Controllers/artist-activity.controller";
 import { ScheduleArtistUseCase } from "@application/UseCases/schedule-artist.use-case";
 import { IArtistActivityRepository } from "@domain/Repositories/IArtistActivityRepository";
 import { ArtistActivityRepository } from "@infrastructure/database/Repositories/ArtistActivityRepository";
-import { ArtistActivityService } from "@application/services/artist-scheduling.service.";
+import { ArtistActivityService } from "@application/services/artist-activity.service";
 
 @Module({
   imports: [

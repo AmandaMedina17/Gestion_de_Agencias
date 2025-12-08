@@ -1,5 +1,5 @@
-import { ScheduleArtistDto } from "@application/DTOs/schedule-artistDto/schedule-artist.dto.ts";
-import { ArtistActivityService } from "@application/services/artist-scheduling.service.";
+import { ScheduleArtistDto } from "@application/DTOs/schedule-artistDto/schedule-artist.dto";
+import { ArtistActivityService } from "@application/services/artist-activity.service";
 import { Body, Controller, Get, Param, Post, ValidationPipe } from "@nestjs/common";
 
 @Controller('artist-scheduling')

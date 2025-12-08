@@ -1,7 +1,6 @@
-// application/services/artist-scheduling.service.ts
 import { Inject, Injectable } from '@nestjs/common';
 import { ScheduleArtistUseCase } from '@application/UseCases/schedule-artist.use-case';
-import { ScheduleArtistDto } from '@application/DTOs/schedule-artistDto/schedule-artist.dto.ts';
+import { ScheduleArtistDto } from '@application/DTOs/schedule-artistDto/schedule-artist.dto';
 import { IArtistActivityRepository } from '@domain/Repositories/IArtistActivityRepository';
 import { ActivityResponseDto } from '@application/DTOs/activityDto/response-activity.dto';
 import { ActivityDtoMapper } from '@application/DTOs/dtoMappers/activity.dtoMapper';
