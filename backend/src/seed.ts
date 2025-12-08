@@ -27,7 +27,6 @@ import { DateEntity } from './InfraestructureLayer/database/Entities/DateEntity'
 import { GroupActivityEntity } from './InfraestructureLayer/database/Entities/GroupActivity';
 import { GroupEntity } from './InfraestructureLayer/database/Entities/GroupEntity';
 import { IncomeEntity } from './InfraestructureLayer/database/Entities/IncomeEntity';
-import { IntervalEntity } from './InfraestructureLayer/database/Entities/IntervalEntity';
 import { PlaceEntity } from './InfraestructureLayer/database/Entities/PlaceEntity';
 import { ResponsibleEntity } from './InfraestructureLayer/database/Entities/ResponsibleEntity';
 import { SongBillboardEntity } from './InfraestructureLayer/database/Entities/SongBillboardEntity';
@@ -65,7 +64,6 @@ async function bootstrap() {
       GroupActivityEntity,
       GroupEntity,
       IncomeEntity,
-      IntervalEntity,
       PlaceEntity,
       ResponsibleEntity,
       SongBillboardEntity,
