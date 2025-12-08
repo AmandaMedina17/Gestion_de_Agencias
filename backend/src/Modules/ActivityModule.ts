@@ -5,7 +5,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ActivityMapper } from '@infrastructure/database/Mappers/ActivityMapper';
 import { IActivityRepository } from '@domain/Repositories/IActivityRepository';
 import { ActivityRepository } from '../InfraestructureLayer/database/Repositories/ActivityRepository';
-import { BaseDtoMapper } from '@application/DTOs/dtoMappers/DtoMapper';
 import { ActivityDtoMapper } from '@application/DTOs/dtoMappers/activity.dtoMapper';
 import { ActivityEntity } from '@infrastructure/database/Entities/ActivityEntity';
 import { ActivityResponsibleEntity } from '@infrastructure/database/Entities/ActivityResponsibleEntity';
@@ -37,7 +36,7 @@ import { UpdateActivityUseCase } from '@application/UseCases/update_activity.use
     CreateActivityUseCase,
     UpdateActivityUseCase
   ],
-  exports:[IActivityRepository]
+  exports:[IActivityRepository, ActivityMapper, ActivityDtoMapper]
 
 })
 export class ActivityModule {}

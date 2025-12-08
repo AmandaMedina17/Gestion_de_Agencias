@@ -16,6 +16,8 @@ import { SongModule } from './song/song.module';
 import { AlbumModule } from './album/album.module';
 import { AwardModule } from './award/award.module';
 import { GroupModule } from './GroupModule';
+import { ArtistActivityModule } from './ArtistActivityModule';
+import { GroupActivityModule } from './GroupActivityModule';
 import { SongBillboardModule } from './song_billboard/song_billboard.module';
 
 @Module({
@@ -35,6 +37,8 @@ import { SongBillboardModule } from './song_billboard/song_billboard.module';
     AlbumModule,
     AwardModule,
     GroupModule,
+    ArtistActivityModule,
+    GroupActivityModule,
     SongBillboardModule
   ],
   controllers: [AppController],

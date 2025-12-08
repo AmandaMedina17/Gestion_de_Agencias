@@ -11,6 +11,7 @@ import { Artist } from "@domain/Entities/Artist";
 import { IArtistRepository } from "@domain/Repositories/IArtistRepository";
 import { ArtistGroupMembershipEntity } from "../Entities/ArtistGroupMembershipEntity";
 import { ArtistEntity } from "../Entities/ArtistEntity";
+import { ArtistMapper } from "../Mappers/ArtistMapper";
 
 @Injectable()
 export class GroupRepository extends BaseRepository<Group,GroupEntity> 
@@ -24,6 +25,7 @@ implements IGroupRepository{
     private readonly dataSource: DataSource,
     @InjectRepository(ArtistGroupMembershipEntity)
     private readonly membershipRepository: Repository<ArtistGroupMembershipEntity>,
+    private readonly artistMapper: ArtistMapper
   ) {
     super(repository, mapper);
   }
@@ -117,9 +119,39 @@ implements IGroupRepository{
 
   }
 
-    getGroupMembers(id: string): Promise<Artist[]> {
-        throw new Error("Method not implemented.");
+  async getGroupMembers(id: string): Promise<Artist[]> {
+    try {
+
+      // Verificar que el grupo existe
+      const groupExists = await this.findById(id);
+
+      if (!groupExists) {
+        throw new NotFoundException(`Grupo con ID ${id} no encontrado`);
+      }
+
+      // Obtener todas las membresías ACTIVAS del grupo (endDate es null)
+      const activeMemberships = await this.membershipRepository.find({
+        where: { 
+          groupId: id, 
+          endDate: IsNull()
+        },
+        relations: ['artist'], 
+        order: {
+          startDate: 'ASC'
+        }
+      });
+
+      // Extraer las entidades ArtistEntity
+      const artistEntities = activeMemberships.map(membership => membership.artist);
+
+      // Convertir a entidades de dominio Artist usando ArtistMapper
+      return this.artistMapper.toDomainEntities(artistEntities);
+      
+    } catch (error) {
+      throw new Error(`No se pudieron obtener los miembros del grupo: ${error}`);
     }
+  }
+
     getGroupColaborations(id: string): Promise<Artist[]> {
         throw new Error("Method not implemented.");
     }

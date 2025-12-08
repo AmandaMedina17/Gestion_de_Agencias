@@ -10,6 +10,9 @@ import { IGroupRepository } from "@domain/Repositories/IGroupRepository"
 import { UpdateGroupUseCase } from "@application/UseCases/update_group.use-case"
 import { AddMemberToGroupDto } from "@application/DTOs/membershipDto/add-member-to-group.dto"
 import { AddMemberToGroupUseCase } from "@application/UseCases/add_member_to_group.use-case"
+import { Artist } from "@domain/Entities/Artist"
+import { ArtistResponseDto } from "@application/DTOs/artistDto/response-artist.dto"
+import { ArtistDtoMapper } from "@application/DTOs/dtoMappers/artist.dtoMapper"
 
 @Injectable()
 export class GroupService
@@ -21,7 +24,8 @@ extends BaseService<Group, CreateGroupDto, GroupResponseDto , UpdateGroupDto> {
     private readonly groupDtoMapper: GroupDtoMapper,
     private readonly create_group_usecase: CreateGroupUseCase,
     private readonly update_group_usecase: UpdateGroupUseCase,
-    private readonly add_member_to_group_usecase: AddMemberToGroupUseCase
+    private readonly add_member_to_group_usecase: AddMemberToGroupUseCase,
+    private readonly artistDtoMapper: ArtistDtoMapper
   ) {
     super(groupRepository, groupDtoMapper)
   }
@@ -38,5 +42,10 @@ extends BaseService<Group, CreateGroupDto, GroupResponseDto , UpdateGroupDto> {
 
   async addMember(groupId: string, addMemberDto: AddMemberToGroupDto) {
     return await this.add_member_to_group_usecase.execute(groupId, addMemberDto);
+  }
+
+  async getGroupMembers(groupId: string): Promise<ArtistResponseDto[]> {
+    const members = await this.groupRepository.getGroupMembers(groupId)
+    return this.artistDtoMapper.toResponseList(members)
   }
 }
