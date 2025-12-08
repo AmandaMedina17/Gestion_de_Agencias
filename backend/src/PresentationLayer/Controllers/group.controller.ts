@@ -31,6 +31,11 @@ export class GroupController {
     return this.groupService.findOne(id);
   }
 
+  @Get(':id/members')
+  getGroupMembers(@Param('id') id: string) {
+    return this.groupService.getGroupMembers(id);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body(ValidationPipe) updateGroupDto: UpdateGroupDto) {
     return this.groupService.update(id, updateGroupDto);
