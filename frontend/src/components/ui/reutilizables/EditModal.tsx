@@ -16,6 +16,11 @@ import {
   Box,
   Typography,
   Paper,
+  Checkbox,
+  FormControlLabel,
+  RadioGroup,
+  Radio,
+  FormLabel,
 } from '@mui/material';
 
 export interface EditModalProps {
@@ -223,6 +228,49 @@ const EditModal: React.FC<EditModalProps> = ({
           </Box>
         );
 
+      case 'checkbox':
+        return (
+          <Box key={name} sx={fieldStyle}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={!!value}
+                  onChange={(e) => handleChange(name, e.target.checked)}
+                  disabled={disabled || loading}
+                  color="primary"
+                />
+              }
+              label={label}
+              required={required}
+            />
+            {error && <FormHelperText error sx={{ ml: 2 }}>{error}</FormHelperText>}
+          </Box>
+        );
+
+      case 'radio':
+        return (
+          <Box key={name} sx={fieldStyle}>
+            <FormLabel component="legend" required={required} sx={{ mb: 1, display: 'block' }}>
+              {label}
+            </FormLabel>
+            <RadioGroup
+              value={value}
+              onChange={(e) => handleChange(name, e.target.value)}
+              row
+            >
+              {options.map((option) => (
+                <FormControlLabel
+                  key={option.value}
+                  value={option.value}
+                  control={<Radio disabled={disabled || loading} />}
+                  label={option.label}
+                />
+              ))}
+            </RadioGroup>
+            {error && <FormHelperText error>{error}</FormHelperText>}
+          </Box>
+        );
+
       case 'date':
         const dateMin = name === "endDate" && formData.startDate 
           ? formData.startDate 
@@ -258,6 +306,10 @@ const EditModal: React.FC<EditModalProps> = ({
         );
 
       default:
+        // Para los tipos nativos que sí soporta FormTextField
+        const allowedTypes = ["text", "number", "email", "password"];
+        const safeType = allowedTypes.includes(type) ? type as "text" | "number" | "email" | "password" : "text";
+        
         return (
           <Box key={name} sx={fieldStyle}>
             <FormTextField
@@ -265,7 +317,7 @@ const EditModal: React.FC<EditModalProps> = ({
               label={label}
               value={value}
               onChange={handleChange}
-              type={type}
+              type={safeType}
               error={!!error}
               helperText={error}
               required={required}

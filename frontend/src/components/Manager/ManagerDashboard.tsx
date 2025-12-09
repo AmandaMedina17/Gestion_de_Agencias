@@ -143,7 +143,6 @@ const ManagerDashboard: React.FC = () => {
                   {artists.map((artist) => (
                     <tr key={artist.id}>
                       <td>{artist.stageName}</td>
-                      <td>{artist.groupId || 'Solista'}</td>
                       <td>{formatDate(artist.transitionDate)}</td>
                       <td>
                         <span className={`status-badge ${artist.status}`}>

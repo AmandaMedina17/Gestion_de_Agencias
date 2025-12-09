@@ -9,16 +9,12 @@ import DeleteModal from "../../../ui/reutilizables/DeleteModal";
 import './ContractStyle.css';
 import { ContractResponseDto } from "../../../../../../backend/src/ApplicationLayer/DTOs/contractDto/response-contract.dto";
 
-
 export enum ContractStatus {
   ACTIVO = "ACTIVO",
   FINALIZADO = "FINALIZADO",
   EN_RENOVACION = "EN_RENOVACION",
   RESCINDIDO = "RESCINDIDO",
 }
-
-
-
 
 const ContractManagement: React.FC = () => {
   const {
@@ -32,18 +28,14 @@ const ContractManagement: React.FC = () => {
     clearError,
   } = useContract();
 
-  // Obtener agencias y artistas del contexto
   const { agencies, fetchAgencies } = useAgency();
   const { artists, fetchArtists } = useArtist();
 
- 
-
-   const [notification, setNotification] = useState<{
+  const [notification, setNotification] = useState<{
     type: "success" | "error" | "info" | "warning";
     title?: string;
     message: string;
   } | null>(null);
-
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingContract, setEditingContract] = useState<ContractResponseDto | null>(null);
@@ -64,9 +56,7 @@ const ContractManagement: React.FC = () => {
     loadData();
   }, []);
 
-  
-
-   const getArtistName = (contract: ContractResponseDto) => {
+  const getArtistName = (contract: ContractResponseDto) => {
     if (contract.artist && typeof contract.artist === 'object') {
       return contract.artist.stageName;
     }
@@ -74,7 +64,6 @@ const ContractManagement: React.FC = () => {
     return artist ? artist.stageName : "No asignado";
   };
 
-  // FUNCIÓN PARA OBTENER NOMBRE DE LA AGENCIA
   const getAgencyName = (contract: ContractResponseDto) => {
     if (contract.agency && typeof contract.agency === 'object') {
       return contract.agency.nameAgency;
@@ -83,7 +72,7 @@ const ContractManagement: React.FC = () => {
     return agency ? agency.nameAgency : "No asignada";
   };
 
-  // Definir campos del formulario de contrato
+  // Definir campos del formulario de contrato - VERSIÓN ACTUALIZADA
   const contractFields: FormField[] = [
     {
       name: "artistId",
@@ -116,14 +105,31 @@ const ContractManagement: React.FC = () => {
       }
     },
     {
+      name: "contractType",
+      label: "Tipo de Contrato",
+      type: "select",
+      required: true,
+      options: [
+        { value: "indefinite", label: "Tiempo Indefinido" },
+        { value: "fixed", label: "Plazo Fijo" }
+      ],
+      validate: (value) => {
+        if (!value) return "El tipo de contrato es requerido";
+        return null;
+      }
+    },
+    {
       name: "endDate",
       label: "Fecha de fin",
       type: "date",
-      required: true,
+      required: false,
       validate: (value, formData) => {
-        if (!value) return "La fecha de fin es requerida";
-        if (formData && formData.startDate && new Date(value) <= new Date(formData.startDate)) {
-          return "La fecha de fin debe ser posterior a la fecha de inicio";
+        // Solo validar si es contrato a plazo fijo
+        if (formData?.contractType === "fixed") {
+          if (!value) return "La fecha de fin es requerida para contratos a plazo fijo";
+          if (formData && formData.startDate && new Date(value) <= new Date(formData.startDate)) {
+            return "La fecha de fin debe ser posterior a la fecha de inicio";
+          }
         }
         return null;
       }
@@ -180,14 +186,30 @@ const ContractManagement: React.FC = () => {
       }
     },
     {
+      name: "contractType",
+      label: "Tipo de Contrato",
+      type: "select",
+      required: true,
+      options: [
+        { value: "indefinite", label: "Tiempo Indefinido" },
+        { value: "fixed", label: "Plazo Fijo" }
+      ],
+      validate: (value) => {
+        if (!value) return "El tipo de contrato es requerido";
+        return null;
+      }
+    },
+    {
       name: "endDate",
       label: "Fecha de fin",
       type: "date",
-      required: true,
+      required: false,
       validate: (value, formData) => {
-        if (!value) return "La fecha de fin es requerida";
-        if (formData && formData.startDate && new Date(value) <= new Date(formData.startDate)) {
-          return "La fecha de fin debe ser posterior a la fecha de inicio";
+        if (formData?.contractType === "fixed") {
+          if (!value) return "La fecha de fin es requerida para contratos a plazo fijo";
+          if (formData && formData.startDate && new Date(value) <= new Date(formData.startDate)) {
+            return "La fecha de fin debe ser posterior a la fecha de inicio";
+          }
         }
         return null;
       }
@@ -237,6 +259,7 @@ const ContractManagement: React.FC = () => {
     artistId: "",
     agencyId: "",
     startDate: "",
+    contractType: "indefinite", // Por defecto tiempo indefinido
     endDate: "",
     distributionPercentage: "",
     status: ContractStatus.ACTIVO,
@@ -283,24 +306,27 @@ const ContractManagement: React.FC = () => {
   // Manejar creación
   const handleCreate = async (data: Record<string, any>) => {
     try {
-      console.log(data.agencyId);
-      console.log(data.artistId);
-
-      await createContract({
+      const isIndefinite = data.contractType === "indefinite";
+      
+      const contractData: any = {
         startDate: new Date(data.startDate),
-        endDate: new Date(data.endDate),
         agencyId: data.agencyId,
         artistId: data.artistId,
         distributionPercentage: parseFloat(data.distributionPercentage),
         status: data.status,
         conditions: data.conditions.trim()
-      });
+      };
+
+      // Solo agregar endDate si es contrato a plazo fijo
+      if (!isIndefinite && data.endDate) {
+        contractData.endDate = new Date(data.endDate);
+      }
+
+      await createContract(contractData);
 
       showCreateSuccess();
       setShowCreateModal(false);
-      setShowCreateModal(false);
       await fetchContracts();
-
 
     } catch (err: any) {
       showCreateError(err.message);
@@ -310,22 +336,31 @@ const ContractManagement: React.FC = () => {
   // Manejar actualización
   const handleUpdate = async (id: string | number, data: Record<string, any>) => {
     try {
-      await updateContract(id as string, {
+      const isIndefinite = data.contractType === "indefinite";
+      
+      const updateData: any = {
         startDate: new Date(data.startDate),
-        endDate: new Date(data.endDate),
         agencyId: data.agencyId,
         artistId: data.artistId,
         distributionPercentage: parseFloat(data.distributionPercentage),
         status: data.status,
         conditions: data.conditions.trim()
-      });
+      };
 
-       showUpdateSuccess();
-      setEditingContract(null);
+      // Manejar endDate según el tipo de contrato
+      if (isIndefinite) {
+        updateData.endDate = null; // O undefined, dependiendo de tu backend
+      } else if (data.endDate) {
+        updateData.endDate = new Date(data.endDate);
+      }
+
+      await updateContract(id as string, updateData);
+
+      showUpdateSuccess();
       setEditingContract(null);
       await fetchContracts();
     } catch (err: any) {
-       showUpdateError(err.message);
+      showUpdateError(err.message);
     }
   };
 
@@ -337,19 +372,16 @@ const ContractManagement: React.FC = () => {
       await deleteContract(id as string);
       showDeleteSuccess();
       setDeletingContract(null);
-      setDeletingContract(null);
       await fetchContracts();
     } catch (err: any) {
       showDeleteError(err.message);
-
     }
   };
 
   // Funciones auxiliares
-  const formatDate = (date: Date | string) => {
-    if (!date) return "N/A";
+  const formatDate = (date: Date | string | null) => {
+    if (!date) return "Tiempo indefinido";
     const dateObj = typeof date === 'string' ? new Date(date) : date;
-    dateObj.setDate(dateObj.getDate() + 1);
     return dateObj.toLocaleDateString("es-ES");
   };
 
@@ -363,14 +395,14 @@ const ContractManagement: React.FC = () => {
     return statusMap[status] || status;
   };
 
-  const getDaysRemaining = (endDate: Date | string) => {
+  const getDaysRemaining = (endDate: Date | string | null) => {
+    if (!endDate) return null; // Contrato indefinido
     const end = typeof endDate === 'string' ? new Date(endDate) : endDate;
     const today = new Date();
     const diffTime = end.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
   };
-
 
   // Definir columnas para la tabla
   const columns: Column<ContractResponseDto>[] = [
@@ -384,7 +416,6 @@ const ContractManagement: React.FC = () => {
         if (item.artist && typeof item.artist === 'object') {
           return item.artist.stageName;
         }
-        // Si no está poblado, buscar en el contexto
         const artist = artists.find(a => a.apprenticeId === item.artist.apprenticeId);
         return artist ? artist.stageName : "No asignado";
       }
@@ -399,7 +430,6 @@ const ContractManagement: React.FC = () => {
         if (item.agency && typeof item.agency === 'object') {
           return item.agency.nameAgency;
         }
-        // Si no está poblado, buscar en el contexto
         const agency = agencies.find(a => a.nameAgency === item.agency.nameAgency);
         return agency ? agency.nameAgency : "No asignada";
       }
@@ -413,30 +443,22 @@ const ContractManagement: React.FC = () => {
       render: (item) => formatDate(item.startDate)
     },
     {
+      key: "contractType",
+      title: "Tipo",
+      sortable: false,
+      width: "10%",
+      align: "center",
+      render: (item) => item.endDate ? "Plazo Fijo" : "Indefinido"
+    },
+    {
       key: "endDate",
       title: "Fecha Fin",
       sortable: true,
       width: "12%",
       align: "center",
-      render: (item) => formatDate(item.endDate)
+      render: (item) => item.endDate? formatDate(item.endDate) : "-"
     },
-    {
-      key: "daysRemaining",
-      title: "Días Restantes",
-      sortable: false,
-      width: "12%",
-      align: "center",
-      render: (item) => {
-        const days = getDaysRemaining(item.endDate);
-        return (
-          <span className={`days-remaining ${
-            days < 30 ? "warning" : days < 0 ? "expired" : ""
-          }`}>
-            {days >= 0 ? `${days} días` : "Expirado"}
-          </span>
-        );
-      }
-    },
+    
     {
       key: "distributionPercentage",
       title: "Distribución",
@@ -481,8 +503,13 @@ const ContractManagement: React.FC = () => {
           <strong>Fecha de inicio:</strong> <span>{formatDate(contract.startDate)}</span>
         </div>
         <div className="detail-item">
-          <strong>Fecha de fin:</strong> <span>{formatDate(contract.endDate)}</span>
+          <strong>Tipo de contrato:</strong> <span>{contract.endDate ? "Plazo Fijo" : "Tiempo Indefinido"}</span>
         </div>
+        {contract.endDate && (
+          <div className="detail-item">
+            <strong>Fecha de fin:</strong> <span>{formatDate(contract.endDate)}</span>
+          </div>
+        )}
         <div className="detail-item">
           <strong>Distribución:</strong> <span>{contract.distributionPercentage}%</span>
         </div>
@@ -496,35 +523,53 @@ const ContractManagement: React.FC = () => {
     );
   };
 
- 
+  // Obtener datos iniciales para edición
+  const getEditInitialData = (contract: ContractResponseDto) => {
+    const isIndefinite = !contract.endDate;
+    
+    return {
+      artistId: contract.artist.apprenticeId,
+      agencyId: contract.agency.nameAgency || contract.agency,
+      startDate: contract.startDate ? 
+        (new Date(contract.startDate).toISOString().split("T")[0]) 
+        : "",
+      contractType: isIndefinite ? "indefinite" : "fixed",
+      endDate: contract.endDate ? 
+        (new Date(contract.endDate).toISOString().split("T")[0]) 
+        : "",
+      distributionPercentage: contract.distributionPercentage.toString(),
+      status: contract.status,
+      conditions: contract.conditions
+    };
+  };
+
   return (
     <section id="contract_manager" className="content-section active">
 
-  <GenericTable<ContractResponseDto>
-    title="Gestión de Contratos"
-    description="Administre todos los contratos del sistema"
-    data={contracts}
-    columns={columns}
-    loading={loading}
-    onReload={() => {
-      fetchContracts();
-      fetchAgencies();
-      fetchArtists();
-    }}
-    showCreateForm={showCreateModal}
-    onShowCreateChange={setShowCreateModal}
-    editingItem={editingContract}
-    onEditingChange={setEditingContract}
-    deletingItem={deletingContract}
-    onDeletingChange={setDeletingContract}
-    itemsPerPage={30}
-    className="contract-table"
-     notification={notification || undefined}
+      <GenericTable<ContractResponseDto>
+        title="Gestión de Contratos"
+        description="Administre todos los contratos del sistema"
+        data={contracts}
+        columns={columns}
+        loading={loading}
+        onReload={() => {
+          fetchContracts();
+          fetchAgencies();
+          fetchArtists();
+        }}
+        showCreateForm={showCreateModal}
+        onShowCreateChange={setShowCreateModal}
+        editingItem={editingContract}
+        onEditingChange={setEditingContract}
+        deletingItem={deletingContract}
+        onDeletingChange={setDeletingContract}
+        itemsPerPage={30}
+        className="contract-table"
+        notification={notification || undefined}
         onNotificationClose={() => setNotification(null)}
-        
-  />
+      />
 
-      {/* Modal de creación usando componente genérico */}
+      {/* Modal de creación */}
       {showCreateModal && (
         <CreateModal
           title="Crear Nuevo Contrato"
@@ -537,37 +582,25 @@ const ContractManagement: React.FC = () => {
         />
       )}
 
-      {/* Modal de edición usando componente genérico */}
+      {/* Modal de edición */}
       {editingContract && (
         <EditModal
           title="Editar Contrato"
           fields={contractEditFields}
-          initialData={{
-            artistId: editingContract.artist.apprenticeId,
-            agencyId: editingContract.agency.nameAgency || editingContract.agency,
-            startDate: editingContract.startDate ? 
-              (new Date(editingContract.startDate).toISOString().split("T")[0]) 
-              : "",
-            endDate: editingContract.endDate ? 
-              (new Date(editingContract.endDate).toISOString().split("T")[0]) 
-              : "",
-            distributionPercentage: editingContract.distributionPercentage.toString(),
-            status: editingContract.status,
-            conditions: editingContract.conditions
-          }}
+          initialData={getEditInitialData(editingContract)}
           itemId={editingContract.id}
           onSubmit={handleUpdate}
           onClose={() => setEditingContract(null)}
           loading={loading}
           submitText="Actualizar Contrato"
-           contractInfo={{
+          contractInfo={{
             artist: getArtistName(editingContract),
             agency: getAgencyName(editingContract)
           }}
         />
       )}
 
-      {/* Modal de eliminación usando componente genérico */}
+      {/* Modal de eliminación */}
       {deletingContract && (
         <DeleteModal<ContractResponseDto>
           title="¿Eliminar Contrato?"

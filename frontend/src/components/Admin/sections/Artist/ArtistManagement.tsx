@@ -248,7 +248,6 @@ const ArtistManagement: React.FC = () => {
         birthday: new Date(data.birthday),
         transitionDate: new Date(data.transitionDate),
         status: data.status,
-        groupId: data.groupId.trim() || undefined,
         apprenticeId: data.apprenticeId
       });
 
@@ -379,13 +378,7 @@ const ArtistManagement: React.FC = () => {
         </span>
       )
     },
-    {
-      key: "group",
-      title: "Grupo",
-      width: "10%",
-      align: "center",
-      render: (item) => item.groupId || "N/A"
-    },
+    
     {
       key: "apprentice.fullName",
       title: "Aprendiz Asociado",
@@ -414,9 +407,7 @@ const ArtistManagement: React.FC = () => {
         <div className="detail-item">
           <strong>Estado:</strong> <span>{getStatusText(artist.status)}</span>
         </div>
-        <div className="detail-item">
-          <strong>Grupo:</strong> <span>{artist.groupId || "No asignado"}</span>
-        </div>
+       
         <div className="detail-item">
           <strong>Aprendiz Asociado:</strong> <span>{getApprenticeName(artist)}</span>
         </div>
@@ -473,7 +464,6 @@ const ArtistManagement: React.FC = () => {
             transitionDate: editingArtist.transitionDate ? 
               (new Date(editingArtist.transitionDate).toISOString().split("T")[0]) : "",
             status: editingArtist.status,
-            groupId: editingArtist.groupId || ""
           }}
           itemId={editingArtist.id}
           onSubmit={handleUpdate}

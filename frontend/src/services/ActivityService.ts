@@ -6,4 +6,4 @@ import { BaseService } from "./BaseService";
 export const activityService = new BaseService<
   CreateActivityDto,
   ActivityResponseDto
->("http://localhost:3000/activity");
+>("http://localhost:3000/activities");
