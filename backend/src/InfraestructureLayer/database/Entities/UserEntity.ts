@@ -18,4 +18,7 @@ export class UserOrmEntity {
   @Column()
   isActive!: boolean;
 
+  @Column()
+  agency!: string;
+
 }

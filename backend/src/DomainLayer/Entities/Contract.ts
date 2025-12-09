@@ -9,7 +9,7 @@ export class Contract implements IUpdatable{
   constructor(
     private readonly id: string,
     private startDate: Date,
-    private endDate: Date,
+    private endDate: Date | null,
     private readonly agency: Agency,
     private readonly artist: Artist,
     private distributionPercentage: number,
@@ -78,11 +78,11 @@ export class Contract implements IUpdatable{
     this.validate_conditions(this.conditions);
     this.validateContractDates(this.startDate,this.endDate);
   }
-  private validateContractDates(startDate: Date, endDate: Date): void {
-    if (!endDate || !startDate) {
-      throw new Error("The start date and the end date are required");
+  private validateContractDates(startDate: Date, endDate?: Date | null): void {
+    if (!startDate) {
+      throw new Error("The start date is required");
     }
-    if (startDate >= endDate) {
+    if (endDate && startDate >= endDate) {
       throw new Error("The start date cannot be before the end date ");
     }
     // // El contrato no puede empezar antes del debut del artista
@@ -149,50 +149,50 @@ export class Contract implements IUpdatable{
     return this.status === ContractStatus.RESCINDIDO;
   }
 
-  public extendContract(extensionDays: number): void {
-    if (
-      this.status !== ContractStatus.EN_RENOVACION &&
-      this.status !== ContractStatus.ACTIVO
-    ) {
-      throw new Error(
-        "Only active or renewal contracts can be extended"
-      );
-    }
-    // Crear nueva fecha extendida
-    const newEndDate = new Date(this.endDate.getDate() + extensionDays);
-    (this as any).endDate = newEndDate; //para poder modificar ya que es readonly
-    this.underRenewal();
-  }
+  // public extendContract(extensionDays: number): void {
+  //   if (
+  //     this.status !== ContractStatus.EN_RENOVACION &&
+  //     this.status !== ContractStatus.ACTIVO
+  //   ) {
+  //     throw new Error(
+  //       "Only active or renewal contracts can be extended"
+  //     );
+  //   }
+  //   // Crear nueva fecha extendida
+  //   const newEndDate = new Date(this.endDate.getDate() + extensionDays);
+  //   (this as any).endDate = newEndDate; //para poder modificar ya que es readonly
+  //   this.underRenewal();
+  // }
 
-  public shortenContract(reductionDays: number): void {
-    if (this.status !== ContractStatus.EN_RENOVACION) {
-      throw new Error("Contracts can only be shortened during renewal.");
-    }
+  // public shortenContract(reductionDays: number): void {
+  //   if (this.status !== ContractStatus.EN_RENOVACION) {
+  //     throw new Error("Contracts can only be shortened during renewal.");
+  //   }
     
-    const newEndDate = new Date(this.endDate.getDate() - reductionDays);
+  //   const newEndDate = new Date(this.endDate.getDate() - reductionDays);
 
-    // Verificar que la nueva fecha no sea anterior a la fecha de inicio
-    if (newEndDate <= this.startDate) {
-      throw new Error("The completion date cannot be earlier than the start date");
-    }
+  //   // Verificar que la nueva fecha no sea anterior a la fecha de inicio
+  //   if (newEndDate <= this.startDate) {
+  //     throw new Error("The completion date cannot be earlier than the start date");
+  //   }
     
-    (this as any).endDate = newEndDate;
-  }
+  //   (this as any).endDate = newEndDate;
+  // }
 
-  // MÉTODOS DE VIGENCIA TEMPORAL
-    public isCurrentlyActive(): boolean {
-    const now = new Date();
-    return this.isActive() && now >= this.startDate && now <= this.endDate;
-  }
+  // // MÉTODOS DE VIGENCIA TEMPORAL
+  //   public isCurrentlyActive(): boolean {
+  //   const now = new Date();
+  //   return this.isActive() && now >= this.startDate && now <= this.endDate;
+  // }
 
   public willStartInFuture(): boolean {
     return new Date() < this.startDate;
   }
 
-  public hasEnded(): boolean {
-    const now = new Date();
-    return now > this.endDate || this.isExpired() || this.isTerminated();
-  }
+  // public hasEnded(): boolean {
+  //   const now = new Date();
+  //   return now > this.endDate || this.isExpired() || this.isTerminated();
+  // }
 
   public daysUntilStart(): number {
     const now = new Date();
@@ -200,47 +200,47 @@ export class Contract implements IUpdatable{
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   }
 
-  public daysUntilEnd(): number {
-    const now = new Date();
-    const diffTime = this.endDate.getTime() - now.getTime();
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  }
+  // public daysUntilEnd(): number {
+  //   const now = new Date();
+  //   const diffTime = this.endDate.getTime() - now.getTime();
+  //   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  // }
 
-  public isActiveOnDate(date: Date): boolean {
-    return this.isActive() && date >= this.startDate && date <= this.endDate;
-  }
+  // public isActiveOnDate(date: Date): boolean {
+  //   return this.isActive() && date >= this.startDate && date <= this.endDate;
+  // }
   // MÉTODOS DE DURACIÓN
-  public getContractDurationInDays(): number {
-    const diffTime = this.endDate.getTime() - this.startDate.getTime();
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  }
+  // public getContractDurationInDays(): number {
+  //   const diffTime = this.endDate.getTime() - this.startDate.getTime();
+  //   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  // }
 
-  public getContractDurationInMonths(): number {
-    const startYear = this.startDate.getFullYear();
-    const startMonth = this.startDate.getMonth();
-    const endYear = this.endDate.getFullYear();
-    const endMonth = this.endDate.getMonth();
+  // public getContractDurationInMonths(): number {
+  //   const startYear = this.startDate.getFullYear();
+  //   const startMonth = this.startDate.getMonth();
+  //   const endYear = this.endDate.getFullYear();
+  //   const endMonth = this.endDate.getMonth();
     
-    return (endYear - startYear) * 12 + (endMonth - startMonth);
-  }
+  //   return (endYear - startYear) * 12 + (endMonth - startMonth);
+  // }
 
-  public getContractDurationInYears(): number {
-    const startYear = this.startDate.getFullYear();
-    const endYear = this.endDate.getFullYear();
-    const yearDiff = endYear - startYear;
+  // public getContractDurationInYears(): number {
+  //   const startYear = this.startDate.getFullYear();
+  //   const endYear = this.endDate.getFullYear();
+  //   const yearDiff = endYear - startYear;
     
-    // Ajustar si el mes/dura del endDate es anterior al del startDate en el mismo año
-    const startMonth = this.startDate.getMonth();
-    const endMonth = this.endDate.getMonth();
-    const startDay = this.startDate.getDate();
-    const endDay = this.endDate.getDate();
+  //   // Ajustar si el mes/dura del endDate es anterior al del startDate en el mismo año
+  //   const startMonth = this.startDate.getMonth();
+  //   const endMonth = this.endDate.getMonth();
+  //   const startDay = this.startDate.getDate();
+  //   const endDay = this.endDate.getDate();
     
-    if (endMonth < startMonth || (endMonth === startMonth && endDay < startDay)) {
-      return yearDiff - 1;
-    }
+  //   if (endMonth < startMonth || (endMonth === startMonth && endDay < startDay)) {
+  //     return yearDiff - 1;
+  //   }
     
-    return yearDiff;
-  }
+  //   return yearDiff;
+  // }
 
   // Getters
   public getId(): string {
@@ -251,7 +251,7 @@ export class Contract implements IUpdatable{
     return this.startDate;
   }
 
-  public getEndDate(): Date {
+  public getEndDate(): Date | null {
     return this.endDate;
   }
 

@@ -32,4 +32,7 @@ export abstract class IArtistRepository extends IRepository<Artist> {
 
   abstract getArtistLastGroup(id : string) : Promise<Group>
 
+  abstract getArtistsWithDebut(agencyId?: string): Promise<Artist[]> ;
+
+  abstract getArtistDebutGroups(artistId: string): Promise<Group[]>;
 }

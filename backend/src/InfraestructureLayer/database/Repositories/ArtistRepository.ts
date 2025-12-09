@@ -62,6 +62,41 @@ export class ArtistRepository
     savedArtist.apprenticeId=entity.getApprenticeId(); //<=
     return this.mapper.toDomainEntity(savedArtist);
   }
+
+  async getArtistsWithDebut(agencyId?: string): Promise<Artist[]> {
+    // Construir query para artistas que han debutado
+    const query = this.repository
+      .createQueryBuilder('artist')
+      .innerJoin('artist.groupMemberships', 'membership')
+      .where('membership.artist_debut_date IS NOT NULL')
+      .andWhere('artist.status = :status', { status: 'ACTIVO' });
+
+    if (agencyId) {
+      // Si se especifica agencia, filtrar por agencia
+      query.innerJoin('artist.agencyMemberships', 'agencyMembership')
+          .andWhere('agencyMembership.agencyId = :agencyId', { agencyId })
+          .andWhere('agencyMembership.endDate IS NULL OR agencyMembership.endDate > :now', { now: new Date() });
+    }
+
+    const artistEntities = await query.getMany();
+    return this.mapper.toDomainEntities(artistEntities);
+  }
+
+  async getArtistDebutGroups(artistId: string): Promise<Group[]> {
+    const memberships = await this.membershipRepository.find({
+      where: { 
+        artistId
+      },
+      relations: ['group']
+    });
+
+    if (!memberships.length) {
+      return [];
+    }
+
+    const groupEntities = memberships.map(m => m.group);
+    return this.groupMapper.toDomainEntities(groupEntities);
+  }
   async getArtistCurrentGroup(artistId: string): Promise<Group | null> {
     const now = new Date();
     
@@ -145,23 +180,24 @@ export class ArtistRepository
 
       return this.mapper.toDomainEntities(result);
 }
-
+  //Method for get the lastgroup of an artist 
   async getArtistLastGroup(idArtist : string) : Promise<Group>{
-    const currentGroup = await this.repository
-      .createQueryBuilder('artist')
-      .leftJoinAndSelect('artist.groupMemberships', 'membership')
-      .leftJoinAndSelect('membership.group', 'group')
-      .leftJoinAndSelect('group.agency', 'agency')
-      .where('artist.id = :artistId', {idArtist})
-      .orderBy('CASE WHEN membership.endDate IS NULL THEN 0 ELSE 1 END', 'ASC')
-      .addOrderBy('membership.startDate', 'DESC')
-      .getOne();
 
-    
-    if (!currentGroup) {
-      throw new NotFoundException(`Artista con ID ${artistId} no encontrado`);
+    const artist = this.findById(idArtist);
+
+    if (!artist)
+      throw new NotFoundException(`Artist with ID ${idArtist} not found`)
+
+    const group = this.getArtistCurrentGroup(idArtist);
+
+    if(!group){
+      var latestMembership = await this.membershipRepository.findOne({
+        where: {artistId:idArtist},
+        relations: ['group'],
+        order: {endDate: 'DESC' },
+      });
     }
-
+    return this.groupMapper.toDomainEntity(latestMembership!.group);
   }
     // async findArtistsWithScheduleConflicts(startDate: Date, endDate: Date): Promise<Artist[]> {
     //     const artistEntities = await this.repository

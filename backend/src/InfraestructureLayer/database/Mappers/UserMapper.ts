@@ -10,7 +10,8 @@ export class UserMapper extends IMapper<User, UserOrmEntity>{
         dataBaseEntity.username,
         dataBaseEntity.password,
         dataBaseEntity.role,
-        dataBaseEntity.isActive
+        dataBaseEntity.isActive,
+        dataBaseEntity.agency
     );
     }
     toDataBaseEntity(domainEntity: User): UserOrmEntity {
@@ -19,6 +20,7 @@ export class UserMapper extends IMapper<User, UserOrmEntity>{
         userOrm.username = domainEntity.getUserName();
         userOrm.password = domainEntity.getPassword();
         userOrm.role = domainEntity.getRole();
+        userOrm.agency = domainEntity.getAgency();
     
     return userOrm;
     }

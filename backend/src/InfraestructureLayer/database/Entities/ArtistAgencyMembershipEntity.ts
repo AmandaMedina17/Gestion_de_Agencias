@@ -14,9 +14,9 @@ export class ArtistAgencyMembershipEntity {
     @PrimaryColumn({ type: 'date' })
     startDate!: Date;
 
-    @PrimaryColumn({ type: 'date' })
-    endDate!: Date;
-
+    @Column({name: 'end_date',type: 'date', nullable: true})
+    endDate?: Date;
+    
     // Relación con el artista
     @ManyToOne(() => ArtistEntity, (artist: ArtistEntity) => artist.agencyMemberships)
     @JoinColumn({ name: 'artist_id' })

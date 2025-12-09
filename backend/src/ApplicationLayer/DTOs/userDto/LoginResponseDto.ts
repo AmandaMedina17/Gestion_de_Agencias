@@ -4,5 +4,6 @@ export class LoginResponseDto {
     id: string;
     username: string;
     role: string;
+    agency: string;
   };
 }

@@ -25,10 +25,18 @@ import { ArtistEntity } from "@infrastructure/database/Entities/ArtistEntity";
 import { GroupDtoMapper } from "@application/DTOs/dtoMappers/group.dtoMapper";
 import { GroupModule } from "./GroupModule";
 import { ArtistGroupMembershipEntity } from "@infrastructure/database/Entities/ArtistGroupMembershipEntity";
+import { GetArtistsWithDebutUseCase } from "@application/UseCases/get_artists_with_debut.use-case";
+import { Contract } from "@domain/Entities/Contract";
+import { ContractModule } from "./ContractModule";
+import { ContractDtoMapper } from "@application/DTOs/dtoMappers/contract.dtoMapper";
+import { ContractEntity } from "@infrastructure/database/Entities/ContractEntity";
+import { ContractMapper } from "@infrastructure/database/Mappers/ContractMapper";
+import { IContractRepository } from "@domain/Repositories/IContractRepository";
+import { ContractRepositoryImpl } from "@infrastructure/database/Repositories/ContractRepository";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([AgencyEntity, ArtistAgencyMembershipEntity, ArtistEntity]),
+    TypeOrmModule.forFeature([AgencyEntity, ArtistAgencyMembershipEntity, ArtistEntity, ContractEntity]),
     ArtistModule,
     ApprenticeModule, 
   ],
@@ -38,18 +46,23 @@ import { ArtistGroupMembershipEntity } from "@infrastructure/database/Entities/A
     GroupMapper,
     ApprenticeMapper,
     ArtistMapper,
+    ContractMapper,
     
     // Repositorio
     {
       provide: IAgencyRepository,
       useClass: AgencyRepositoryImpl,
     },
-    
+    {
+      provide: IContractRepository,
+      useClass: ContractRepositoryImpl,
+    },
     // DTO Mapper
     AgencyDtoMapper,
     ArtistDtoMapper,
     ApprenticeDtoMapper,
     GroupDtoMapper,
+    ContractDtoMapper,
     
     // Servicio
     AgencyService,
@@ -59,6 +72,7 @@ import { ArtistGroupMembershipEntity } from "@infrastructure/database/Entities/A
     GetAgencyArtistsUseCase,
     GetAgencyGroupsUseCase,
     RelateArtistToAgencyUseCase,
+    GetArtistsWithDebutUseCase,
   ],
   exports: [IAgencyRepository, AgencyDtoMapper, AgencyMapper],
 })
