@@ -28,9 +28,17 @@ export abstract class IArtistRepository extends IRepository<Artist> {
 
   abstract getArtistCurrentGroup(id: string): Promise<Group>;
 
-  abstract getArtists_WithAgencyChangesAndGroups(): Promise<Artist[]>;
+  abstract getArtists_WithAgencyChangesAndGroups(agencyId: string): Promise<Artist[]>;
 
   abstract getArtistsWithDebut(agencyId?: string): Promise<Artist[]> ;
 
   abstract getArtistDebutGroups(artistId: string): Promise<Group[]>;
+
+  abstract getArtistDebutHistory(agencyId: string): Promise<Array<{
+    group: Group,
+    role: string,
+    debutDate: Date,
+    startDate: Date,
+    endDate: Date | null,
+  }>>
 }
