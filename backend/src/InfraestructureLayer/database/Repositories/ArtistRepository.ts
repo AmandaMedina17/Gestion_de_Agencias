@@ -1,6 +1,6 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
+import { Repository, In, LessThanOrEqual, MoreThanOrEqual, createQueryBuilder } from 'typeorm';
 import { BaseRepository } from './BaseRepositoryImpl';
 import { Artist} from '@domain/Entities/Artist';
 import { ArtistEntity } from '../Entities/ArtistEntity';
@@ -8,10 +8,14 @@ import { Group } from '@domain/Entities/Group';
 import { ArtistMapper } from '../Mappers/ArtistMapper';
 import { ArtistGroupMembershipEntity } from '../Entities/ArtistGroupMembershipEntity';
 import { GroupMapper } from '../Mappers/GroupMapper';
+import { IArtistRepository } from '@domain/Repositories/IArtistRepository';
+import { Agency } from '@domain/Entities/Agency';
+import { Album } from '@domain/Entities/Album';
+import { Contract } from '@domain/Entities/Contract';
 
 @Injectable()
 export class ArtistRepository
-  extends BaseRepository<Artist, ArtistEntity>
+  extends BaseRepository<Artist, ArtistEntity> implements IArtistRepository
 {
   constructor(
     @InjectRepository(ArtistEntity)
@@ -25,6 +29,30 @@ export class ArtistRepository
     // private readonly contractMapper: ContractMapper,
   ) {
     super(repository, mapper);
+  }
+  findArtistsWithScheduleConflicts(startDate: Date, endDate: Date): Promise<Artist[]> {
+    throw new Error('Method not implemented.');
+  }
+  getArtistAgencies(id: string): Promise<Agency[]> {
+    throw new Error('Method not implemented.');
+  }
+  getArtistAlbums(id: string): Promise<Album[]> {
+    throw new Error('Method not implemented.');
+  }
+  getCurrentArtistContracts(id: string): Promise<Contract[]> {
+    throw new Error('Method not implemented.');
+  }
+  getArtistGroups(id: string): Promise<Group[]> {
+    throw new Error('Method not implemented.');
+  }
+  getArtistDebutsInOrders(id: string): Promise<any[]> {
+    throw new Error('Method not implemented.');
+  }
+  getArtist_ArtistColaborations(id: string): Promise<Artist[]> {
+    throw new Error('Method not implemented.');
+  }
+  getArtist_GroupsColaborations(id: string): Promise<Group[]> {
+    throw new Error('Method not implemented.');
   }
 
   async save(entity: Artist): Promise<Artist> {
@@ -117,6 +145,24 @@ export class ArtistRepository
 
       return this.mapper.toDomainEntities(result);
 }
+
+  async getArtistLastGroup(idArtist : string) : Promise<Group>{
+    const currentGroup = await this.repository
+      .createQueryBuilder('artist')
+      .leftJoinAndSelect('artist.groupMemberships', 'membership')
+      .leftJoinAndSelect('membership.group', 'group')
+      .leftJoinAndSelect('group.agency', 'agency')
+      .where('artist.id = :artistId', {idArtist})
+      .orderBy('CASE WHEN membership.endDate IS NULL THEN 0 ELSE 1 END', 'ASC')
+      .addOrderBy('membership.startDate', 'DESC')
+      .getOne();
+
+    
+    if (!currentGroup) {
+      throw new NotFoundException(`Artista con ID ${artistId} no encontrado`);
+    }
+
+  }
     // async findArtistsWithScheduleConflicts(startDate: Date, endDate: Date): Promise<Artist[]> {
     //     const artistEntities = await this.repository
     //     .createQueryBuilder('artist')
