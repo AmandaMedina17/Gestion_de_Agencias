@@ -21,18 +21,18 @@ export class AddMemberToGroupUseCase {
       throw new Error(`Grupo con ID ${groupId} no encontrado`);
     }
 
-    // Validar que el artista existe
-    const artist = await this.artistRepository.findById(addMemberDto.artistId);
-    if (!artist) {
-      throw new Error(`Artista con ID ${addMemberDto.artistId} no encontrado`);
-    }
+    // // Validar que el artista existe
+    // const artist = await this.artistRepository.findById(addMemberDto.artistId);
+    // if (!artist) {
+    //   throw new Error(`Artista con ID ${addMemberDto.artistId} no encontrado`);
+    // }
 
-     // Validar que el artista no esté en otro grupo 
-    const artistGroup = await this.groupRepository.getArtistCurrentGroup(artist.getId())
+    //  // Validar que el artista no esté en otro grupo 
+    // const artistGroup = await this.groupRepository.getArtistCurrentGroup(artist.getId())
     
-    if (artistGroup) {
-      throw new Error(`El artista ya es miembro activo del grupo: ${artistGroup.getName()}`);
-    }
+    // if (artistGroup) {
+    //   throw new Error(`El artista ya es miembro activo del grupo: ${artistGroup.getName()}`);
+    // }
 
     const actual_date: Date = new Date();
 

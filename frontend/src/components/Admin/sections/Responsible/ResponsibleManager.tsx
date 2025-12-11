@@ -221,9 +221,7 @@ const ResponsibleManagement: React.FC = () => {
       align: "center",
       render: (item) => (
         <div className="responsible-name-cell">
-          <div className="responsible-initials">
-            {getInitials(item.name)}
-          </div>
+          
           <div className="responsible-name">{item.name}</div>
         </div>
       )

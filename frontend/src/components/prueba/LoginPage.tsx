@@ -3,9 +3,9 @@
 import type React from "react"
 import { useState } from "react"
 import { Eye, EyeOff, User, Lock, Sparkles } from "lucide-react"
-import { useAuth } from "../../context/AuthContext"   // <-- IMPORTANTE
+import { useAuth } from "../../context/AuthContext" 
 import "./globals.css"
-import { useNavigate } from "react-router-dom"    // <-- si usas react-router
+import { useNavigate } from "react-router-dom"   
 
 
 export enum UserRole {
@@ -33,7 +33,7 @@ export default function Login() {
     setError('');
 
     try {
-      await login({ username, password })   // <-- llamada real al contexto
+      await login({ username, password })  
 const user = JSON.parse(localStorage.getItem('user') || '{}');
         if (user.role === UserRole.AGENCY_MANAGER) {
           navigate('/manager');
@@ -45,7 +45,6 @@ const user = JSON.parse(localStorage.getItem('user') || '{}');
           navigate('/dashboard');
         }
       } catch (err: any) {
-        // 🆕 Manejar errores del backend
         setError(err.message || 'Error al iniciar sesión');
       } finally {
         setLoading(false);
@@ -79,7 +78,7 @@ const user = JSON.parse(localStorage.getItem('user') || '{}');
               </div>
               <div className="feature-item">
                 <div className="feature-dot"></div>
-                <span>Control de eventos</span>
+                <span>Control de actividades</span>
               </div>
               <div className="feature-item">
                 <div className="feature-dot"></div>

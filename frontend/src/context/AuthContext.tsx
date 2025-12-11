@@ -5,7 +5,7 @@ interface User {
   id: string;
   username: string;
   role: string;
-  agency: string; // <-- Agregamos la agencia
+  agency: string; 
 }
 
 interface AuthContextType {

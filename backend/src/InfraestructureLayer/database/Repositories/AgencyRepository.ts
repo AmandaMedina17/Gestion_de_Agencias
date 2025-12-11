@@ -54,18 +54,18 @@ export class AgencyRepositoryImpl
 
     // 2. Verificar que la fecha de inicio sea posterior a la fecha de debut del artista
     // Buscar la membresía de grupo más temprana (debut)
-    const earliestGroupMembership = artist.groupMemberships?.reduce((earliest, current) => {
-      if (!earliest || current.startDate < earliest.startDate) {
-        return current;
-      }
-      return earliest;
-    }, null as ArtistGroupMembershipEntity | null);
+    // const earliestGroupMembership = artist.groupMemberships?.reduce((earliest, current) => {
+    //   if (!earliest || current.startDate < earliest.startDate) {
+    //     return current;
+    //   }
+    //   return earliest;
+    // }, null as ArtistGroupMembershipEntity | null);
 
-    if (earliestGroupMembership && startDate < earliestGroupMembership.startDate) {
-      throw new BadRequestException(
-        `Artist cannot join an agency (${startDate.toISOString().split('T')[0]}) before their debut date (${earliestGroupMembership.startDate.toISOString().split('T')[0]})`
-      );
-    }
+    // if (earliestGroupMembership && startDate < earliestGroupMembership.startDate) {
+    //   throw new BadRequestException(
+    //     `Artist cannot join an agency (${startDate.toDateString().split('T')[0]}) before their debut date (${earliestGroupMembership.startDate.toDateString().split('T')[0]})`
+    //   );
+    // }
 
     // 3. Verificar que el artista no esté en NINGUNA agencia en el mismo período
     const existingMembership = await this.artistAgencyMembershipRepository
@@ -139,7 +139,7 @@ export class AgencyRepositoryImpl
     // Verificar que la fecha de salida sea posterior a la fecha de inicio
     if (endDate < activeMembership.startDate) {
       throw new BadRequestException(
-        `End date (${endDate.toISOString().split('T')[0]}) cannot be before start date (${activeMembership.startDate.toISOString().split('T')[0]})`
+        `End date (${endDate.toDateString().split('T')[0]}) cannot be before start date (${activeMembership.startDate.toDateString().split('T')[0]})`
       );
     }
 

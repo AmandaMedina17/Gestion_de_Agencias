@@ -52,16 +52,16 @@ export class ScheduleGroupUseCase {
     }
 
     // Verificar conflictos de los miembros del grupo
-    const memberConflicts = await this.groupActivityRepository.checkGroupMembersConflicts(
-      groupId,
-      activityId
-    );
+    // const memberConflicts = await this.groupActivityRepository.checkGroupMembersConflicts(
+    //   groupId,
+    //   activityId
+    // );
 
-    if (memberConflicts.length > 0) {
-      throw new ConflictException(
-        `Algunos miembros del grupo tienen conflictos de horario: ${memberConflicts.length} artistas afectados`
-      );
-    }
+    // if (memberConflicts.length > 0) {
+    //   throw new ConflictException(
+    //     `Algunos miembros del grupo tienen conflictos de horario: ${memberConflicts.length} artistas afectados`
+    //   );
+    // }
 
     // 6. Programar el grupo
     await this.groupActivityRepository.scheduleGroup(

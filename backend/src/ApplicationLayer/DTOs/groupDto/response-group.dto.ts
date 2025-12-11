@@ -1,4 +1,4 @@
-import { GroupStatus } from "@domain/Enums";
+import { GroupStatus } from "../../../DomainLayer/Enums";
 
 export class GroupResponseDto{
     id!: string;

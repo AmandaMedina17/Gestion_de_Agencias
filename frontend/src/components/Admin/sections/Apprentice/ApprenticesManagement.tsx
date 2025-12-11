@@ -301,7 +301,7 @@ const ApprenticeManagement: React.FC = () => {
       key: "status",
       title: "Estado",
       sortable: true,
-      width: "15%",
+      width: "18%",
       align: "center",
       render: (item) => (
         <span className={`status-badge status-${item.status.toLowerCase()}`}>

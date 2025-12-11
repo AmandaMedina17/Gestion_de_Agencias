@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../../context/AuthContext';
-import { agencyService } from '../../../services/AgencyService';
-import { ArtistResponseDto } from '../../../../../backend/src/ApplicationLayer/DTOs/artistDto/response-artist.dto';
-import { AgencyResponseDto } from '../../../../../backend/src/ApplicationLayer/DTOs/agencyDto/response-agency.dto';
+import { useAgency } from '../../../context/AgencyContext';
+import { agencyService } from '../../../services/AgencyService'; 
 import GenericTable from '../../ui/datatable';
 import { Column } from '../../ui/datatable';
 import Chip from '@mui/material/Chip';
@@ -11,83 +10,206 @@ import Typography from '@mui/material/Typography';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import MicIcon from '@mui/icons-material/Mic';
 import CakeIcon from '@mui/icons-material/Cake';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import GroupsIcon from '@mui/icons-material/Groups';
-import PersonIcon from '@mui/icons-material/Person';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import './AgencyApprentices.css';
+import AddArtistToAgencyModal from './addArtistToAgencyModal';
 
-// Enums locales
-export enum ArtistStatus {
-  ACTIVO = "ACTIVO",
-  EN_PAUSA = "EN_PAUSA",
-  INACTIVO = "INACTIVO",
+interface ArtistWithGroup {
+  id: string;
+  artist: any;
+  group: any | null;
 }
 
-interface AgencyArtistsViewProps {
-  showActions?: boolean;
-  readOnly?: boolean;
-  onArtistSelect?: (artist: ArtistResponseDto) => void;
-}
-
-const AgencyArtistsView: React.FC<AgencyArtistsViewProps> = ({
-  showActions = true,
-  readOnly = false,
-  onArtistSelect,
-}) => {
+const AgencyArtistsView: React.FC = () => {
   const { user } = useAuth();
-  const [artists, setArtists] = useState<ArtistResponseDto[]>([]);
-  const [agencyInfo, setAgencyInfo] = useState<AgencyResponseDto | null>(null);
+  const { 
+    fetchArtistsWithGroup, 
+    fetchAgency,
+    addArtistToAgency,
+    artistsWithGroup, 
+    loading: agencyLoading, 
+    error: agencyError, 
+    clearError: clearAgencyError 
+  } = useAgency();
+
+  const [agencyInfo, setAgencyInfo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [localArtists, setLocalArtists] = useState<ArtistWithGroup[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [notification, setNotification] = useState<{
     type: 'success' | 'error' | 'info' | 'warning';
-    title?: string;
     message: string;
   } | null>(null);
+  
+  const [addArtistModalOpen, setAddArtistModalOpen] = useState(false);
 
   const agencyId = user?.agency;
 
-  // Cargar artistas e información de la agencia
-  const fetchArtists = async () => {
+  // Función principal para cargar datos
+  const loadData = async () => {
     if (!agencyId) {
       setError('No se pudo identificar la agencia');
       setLoading(false);
       return;
     }
 
+    console.log('=== INICIANDO CARGA DE DATOS ===');
+    console.log('Agency ID:', agencyId);
+    
     setLoading(true);
     setError(null);
+    clearAgencyError();
     
     try {
-      const artistsData = await agencyService.getAgencyArtists(agencyId);
-      setArtists(artistsData);
+      // Cargar artistas con grupos directamente del backend
+      const artistsResponse = await agencyService.getActiveArtistsWithGroup(agencyId);
+      console.log('Respuesta directa del backend:', artistsResponse);
       
+      // Procesar la respuesta directamente en el componente
+      const processedArtists = processArtistResponse(artistsResponse);
+      console.log('Artistas procesados:', processedArtists);
+      
+      setLocalArtists(processedArtists);
+      
+      // También intentar usar el contexto
       try {
-        const agencyData = await agencyService.findOne(agencyId);
-        setAgencyInfo(agencyData);
-      } catch (agencyErr) {
-        console.warn('No se pudo cargar información adicional de la agencia:', agencyErr);
+        const contextArtists = await fetchArtistsWithGroup(agencyId);
+        console.log('Artistas del contexto:', contextArtists);
+      } catch (contextErr) {
+        console.warn('Error cargando del contexto:', contextErr);
       }
+      
+      // Cargar información de la agencia
+      try {
+        const agencyData = await fetchAgency(agencyId);
+        if (agencyData) {
+          setAgencyInfo(agencyData);
+          console.log('Información de agencia cargada:', agencyData);
+        }
+      } catch (agencyErr) {
+        console.warn('No se pudo cargar información de la agencia:', agencyErr);
+      }
+      
     } catch (err: any) {
-      setError(err.message || 'Error al cargar los artistas');
-      console.error('Error fetching artists:', err);
+      console.error('Error en loadData:', err);
+      setError(err.message || 'Error al cargar los datos');
     } finally {
       setLoading(false);
+      console.log('=== CARGA FINALIZADA ===');
     }
+  };
+
+  // Función para procesar la respuesta del backend
+  const processArtistResponse = (response: any): ArtistWithGroup[] => {
+    if (!response) {
+      console.log('Respuesta vacía');
+      return [];
+    }
+    
+    console.log('Procesando respuesta del backend...');
+    console.log('Tipo de respuesta:', typeof response);
+    
+    // Si es array, procesar cada elemento
+    if (Array.isArray(response)) {
+      console.log('Es un array de longitud:', response.length);
+
+      console.log("Aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+      console.log(response);
+      
+      return response.map((item, index) => {
+        console.log(`Procesando elemento ${index}:`, item);
+        
+        // CASO ESPECIAL: Si el item es un array de 2 elementos [artista, grupo]
+        if (Array.isArray(item) && item.length === 2) {
+          const artist = item[0];
+          const group = item[1];
+          
+          console.log(`  Artista:`, artist);
+          console.log(`  Grupo:`, group);
+          
+          return {
+            id: artist?.id || `artist-${index}`,
+            artist: artist,
+            group: group
+          };
+        }
+        
+        // Caso 1: Estructura artista-grupo separada
+        if (item.artist && item.group) {
+          return {
+            id: item.artist.id || `artist-${index}`,
+            artist: item.artist,
+            group: item.group
+          };
+        }
+        
+        // Caso 2: Artista con propiedades de grupo integradas
+        if (item.stageName) {
+          
+          const artistWithGroup: ArtistWithGroup = {
+            id: item.id || `artist-${index}`,
+            artist: {
+              id: item.id,
+              stageName: item.stageName,
+              birthday: item.birthday,
+              transitionDate: item.transitionDate,
+              status: item.status,
+              apprenticeId: item.apprenticeId
+            },
+            group: null
+          };
+          
+          // Si tiene propiedades de grupo
+          if (item.groupId || item.groupName) {
+            artistWithGroup.group = {
+              id: item.groupId,
+              name: item.groupName,
+              status: item.groupStatus,
+              concept: item.groupConcept
+            };
+          }
+          
+          return artistWithGroup;
+        }
+        
+        // Caso 3: Item simple
+        console.log('  Caso 3: Item simple:', item);
+        return {
+          id: item.id || `item-${index}`,
+          artist: item,
+          group: null
+        };
+      });
+    }
+    
+    console.log('No se pudo procesar la respuesta, estructura no reconocida');
+    return [];
   };
 
   useEffect(() => {
     if (agencyId) {
-      fetchArtists();
+      console.log('Agency ID detectado, cargando datos...');
+      loadData();
+    } else {
+      console.log('No hay agency ID disponible');
     }
   }, [agencyId]);
 
-  // Calcular edad a partir de la fecha de cumpleaños
-  const calculateAge = (birthday: Date | string): number => {
+  // Sincronizar con el contexto cuando cambie
+  useEffect(() => {
+    console.log('artistsWithGroup del contexto actualizado:', artistsWithGroup);
+    if (artistsWithGroup && artistsWithGroup.length > 0) {
+      setLocalArtists(artistsWithGroup);
+    }
+  }, [artistsWithGroup]);
+
+  // Funciones auxiliares
+  const calculateAge = (birthday: string | Date): number => {
     if (!birthday) return 0;
     try {
       const birthDate = new Date(birthday);
@@ -103,8 +225,7 @@ const AgencyArtistsView: React.FC<AgencyArtistsViewProps> = ({
     }
   };
 
-  // Formatear fecha
-  const formatDate = (date: Date | string) => {
+  const formatDate = (date: string | Date) => {
     if (!date) return 'N/A';
     try {
       return format(new Date(date), 'dd/MM/yyyy', { locale: es });
@@ -113,226 +234,179 @@ const AgencyArtistsView: React.FC<AgencyArtistsViewProps> = ({
     }
   };
 
-  // Formatear fecha con hora
-  const formatDateTime = (date: Date | string) => {
-    if (!date) return 'N/A';
-    try {
-      return format(new Date(date), 'dd/MM/yyyy HH:mm', { locale: es });
-    } catch {
-      return 'Fecha inválida';
-    }
-  };
-
-  // Obtener texto del estado
-  const getStatusText = (status: ArtistStatus) => {
-    switch (status) {
-      case ArtistStatus.ACTIVO: return 'Activo';
-      case ArtistStatus.EN_PAUSA: return 'En pausa';
-      case ArtistStatus.INACTIVO: return 'Inactivo';
-      default: return status;
-    }
-  };
-
-  // Obtener color del estado
-  const getStatusColor = (status: ArtistStatus) => {
-    switch (status) {
-      case ArtistStatus.ACTIVO: return 'success';
-      case ArtistStatus.EN_PAUSA: return 'warning';
-      case ArtistStatus.INACTIVO: return 'error';
-      default: return 'default';
-    }
-  };
-
-  // Renderizar el estado
-  const renderStatus = (status: ArtistStatus) => (
-    <Chip
-      label={getStatusText(status)}
-      color={getStatusColor(status)}
-      size="small"
-      variant="outlined"
-      sx={{ fontWeight: 500 }}
-    />
-  );
-
-  // Definir columnas basadas en el DTO
-  const getArtistColumns = (): Column<ArtistResponseDto>[] => [
-    {
-      key: 'stageName',
-      title: 'Nombre Artístico',
-      sortable: true,
-      width: '180px',
-      render: (item) => (
-        <div className="artist-name-cell">
-          <Box display="flex" alignItems="center" gap={1}>
-            <MicIcon fontSize="small" color="primary" />
-            <div>
-              <Typography variant="body1" fontWeight="bold">
-                {item.stageName}
-              </Typography>
-              {item.apprenticeId && (
-                <Typography variant="caption" color="text.secondary" display="block">
-                  ID Aprendiz: {item.apprenticeId.substring(0, 8)}...
-                </Typography>
-              )}
-            </div>
-          </Box>
-        </div>
-      ),
+  // Columnas de la tabla
+  // Columnas de la tabla - VERSIÓN CORREGIDA
+const getArtistColumns = (): Column<ArtistWithGroup>[] => [
+  {
+    key: 'id',
+    title: 'Nombre Artístico',
+    sortable: true,
+    width: '200px',
+    align: 'center',
+    render: (item) => {
+      const artistData = item.artist;
+      const actualArtist = Array.isArray(artistData) ? artistData[0] : artistData;
+      const artistName = actualArtist?.stageName || 'Sin nombre';
+      
+      return (
+        <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
+            <Typography variant="body1" fontWeight="bold"  textAlign='center'>
+              {artistName}
+            </Typography>
+        </Box>
+      );
     },
-    {
-      key: 'birthday',
-      title: 'Información Personal',
-      sortable: true,
-      width: '150px',
-      render: (item) => (
-        <div className="artist-info-cell">
-          {item.birthday && (
-            <Box display="flex" alignItems="center" gap={1} mb={1}>
-              <CakeIcon fontSize="small" color="action" />
-              <div>
-                <Typography variant="body2">
-                  {formatDate(item.birthday)}
+  },
+  {
+    key: 'artist.birthday',
+    title: 'Edad',
+    sortable: true,
+    width: '100px',
+    align: 'center',
+    render: (item) => {
+      const artistData = item.artist;
+      const actualArtist = Array.isArray(artistData) ? artistData[0] : artistData;
+      const age = calculateAge(actualArtist?.birthday);
+      
+      return (
+        <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
+          <Typography>{age} años</Typography>
+        </Box>
+      );
+    },
+  },
+  {
+    key: 'artist.status',
+    title: 'Estado',
+    sortable: true,
+    width: '120px',
+    align: 'center',
+    render: (item) => {
+      const artistData = item.artist;
+      const actualArtist = Array.isArray(artistData) ? artistData[0] : artistData;
+      const status = actualArtist?.status;
+      let color: 'success' | 'warning' | 'error' | 'default' = 'default';
+      let label = status || 'Desconocido';
+      
+      if (status === 'ACTIVO') {
+        color = 'success';
+        label = 'Activo';
+      } else if (status === 'EN_PAUSA') {
+        color = 'warning';
+        label = 'En pausa';
+      } else if (status === 'INACTIVO') {
+        color = 'error';
+        label = 'Inactivo';
+      }
+      
+      return (
+        <Chip
+          label={label}
+          color={color}
+          size="small"
+          variant="outlined"
+        />
+      );
+    },
+  },
+  {
+    key: 'group',
+    title: 'Grupo',
+    sortable: true,
+    width: '150px',
+    align: 'center',
+    render: (item) => {
+      const hasGroup = item.group && (item.group.name || item.group.groupName);
+      
+      return (
+        <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
+          {hasGroup ? (
+            <>
+              <GroupsIcon fontSize="small" color="primary" />
+              <Box textAlign="center">
+                <Typography variant="body2" fontWeight="medium">
+                  {item.group.name || item.group.groupName}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  {calculateAge(item.birthday)} años
+                  {item.group.status || ''}
                 </Typography>
-              </div>
-            </Box>
-          )}
-          {item.groupId && (
-            <Box display="flex" alignItems="center" gap={1}>
-              <GroupsIcon fontSize="small" color="action" />
-              <Typography variant="caption" color="text.secondary">
-                Grupo: {item.groupId.substring(0, 8)}...
+              </Box>
+            </>
+          ) : (
+            <>
+              <GroupsIcon fontSize="small" color="disabled" />
+              <Typography variant="body2" color="text.disabled">
+                Sin grupo
               </Typography>
-            </Box>
+            </>
           )}
-        </div>
-      ),
-    },
-    {
-      key: 'transitionDate',
-      title: 'Fecha de Transición',
-      sortable: true,
-      width: '140px',
-      align: 'center',
-      render: (item) => (
-        <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
-          <CalendarTodayIcon fontSize="small" color="action" />
-          <div>
-            <Typography variant="body2" fontWeight="medium">
-              {formatDate(item.transitionDate)}
-            </Typography>
-            <Typography variant="caption" color="text.secondary" display="block">
-              {item.transitionDate && new Date(item.transitionDate).toLocaleTimeString('es-ES', { 
-                hour: '2-digit', 
-                minute: '2-digit' 
-              })}
-            </Typography>
-          </div>
         </Box>
-      ),
+      );
     },
-    {
-      key: 'status',
-      title: 'Estado',
-      sortable: true,
-      width: '120px',
-      align: 'center',
-      render: (item) => renderStatus(item.status as ArtistStatus),
-    },
-  ];
+  },
+];
 
-  const handleViewDetails = (artist: ArtistResponseDto) => {
-    if (onArtistSelect) {
-      onArtistSelect(artist);
-    } else {
-      setNotification({
-        type: 'info',
-        title: 'Detalles del Artista',
-        message: `Ver detalles de ${artist.stageName}`,
-      });
-    }
+  const handleAddArtistClick = () => {
+    setAddArtistModalOpen(true);
   };
 
-  const handleNotificationClose = () => {
-    setNotification(null);
+  const handleArtistAdded = () => {
+    // Recargar datos después de agregar
+    loadData();
+    setNotification({
+      type: 'success',
+      message: 'Artista agregado exitosamente a la agencia',
+    });
+    
+    setTimeout(() => setNotification(null), 3000);
   };
+
+  const displayError = error || agencyError;
 
   if (!agencyId) {
     return (
       <Alert severity="warning" sx={{ mt: 2 }}>
-        No tienes una agencia asignada. Contacta al administrador para que te asigne una.
+        No tienes una agencia asignada.
       </Alert>
     );
   }
 
-  // Calcular estadísticas
-  const statsByStatus = [
-    {
-      label: 'Activos',
-      value: artists.filter(a => a.status === ArtistStatus.ACTIVO).length,
-      color: '#2e7d32',
-      status: ArtistStatus.ACTIVO,
-      icon: '🎤',
-    },
-    {
-      label: 'En Pausa',
-      value: artists.filter(a => a.status === ArtistStatus.EN_PAUSA).length,
-      color: '#ed6c02',
-      status: ArtistStatus.EN_PAUSA,
-      icon: '⏸️',
-    },
-    {
-      label: 'Inactivos',
-      value: artists.filter(a => a.status === ArtistStatus.INACTIVO).length,
-      color: '#d32f2f',
-      status: ArtistStatus.INACTIVO,
-      icon: '🚫',
-    },
-  ];
-
-  // Calcular edad promedio
-  const averageAge = artists.length > 0 
-    ? artists.reduce((sum, artist) => sum + calculateAge(artist.birthday), 0) / artists.length
-    : 0;
-
-  // Calcular años desde transición
-  const calculateYearsSinceTransition = (transitionDate: Date | string): number => {
-    if (!transitionDate) return 0;
-    try {
-      const transition = new Date(transitionDate);
-      const today = new Date();
-      return today.getFullYear() - transition.getFullYear();
-    } catch {
-      return 0;
-    }
-  };
-
-  const averageExperience = artists.length > 0
-    ? artists.reduce((sum, artist) => sum + calculateYearsSinceTransition(artist.transitionDate), 0) / artists.length
-    : 0;
+  const artistsCount = localArtists.length;
+  const artistsWithGroupCount = localArtists.filter(item => 
+    item.group && (item.group.name || item.group.groupName)
+  ).length;
 
   return (
     <div className="agency-artists-view">
       <Box sx={{ mb: 3 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-          <div>
-            <Typography variant="h5" component="h2" gutterBottom fontWeight="bold">
-              Artistas de la Agencia
+          <Box>
+            <Typography variant="h5" gutterBottom fontWeight="bold">
+              Artistas activos de la agencia
             </Typography>
             {agencyInfo && (
               <Typography variant="subtitle1" color="text.secondary">
                 {agencyInfo.nameAgency} - {agencyInfo.place}
               </Typography>
             )}
-          </div>
+          </Box>
           
           <Box display="flex" gap={2}>
             <Button
+              startIcon={<PersonAddIcon />}
+              onClick={handleAddArtistClick}
+              disabled={loading || agencyLoading}
+              variant="contained"
+              size="small"
+              color="primary"
+            >
+              Agregar Artista
+            </Button>
+            
+            <Button
               startIcon={<RefreshIcon />}
-              onClick={fetchArtists}
-              disabled={loading}
+              onClick={loadData}
+              disabled={loading || agencyLoading}
               variant="outlined"
               size="small"
             >
@@ -341,121 +415,49 @@ const AgencyArtistsView: React.FC<AgencyArtistsViewProps> = ({
           </Box>
         </Box>
 
-        {/* Estadísticas generales */}
-        {artists.length > 0 && (
-          <Box mb={3}>
-            <Box display="flex" gap={2} mb={2} className="stats-container">
-              <div className="stat-card total">
-                <Typography variant="body2" color="text.secondary">
-                  Total Artistas
-                </Typography>
-                <Typography variant="h5" className="stat-value">
-                  {artists.length}
-                </Typography>
-                <Box display="flex" justifyContent="space-between" mt={1}>
-                  <Typography variant="caption" color="text.secondary">
-                    Edad promedio
-                  </Typography>
-                  <Typography variant="caption" fontWeight="bold">
-                    {averageAge.toFixed(1)} años
-                  </Typography>
-                </Box>
-                <Box display="flex" justifyContent="space-between">
-                  <Typography variant="caption" color="text.secondary">
-                    Experiencia promedio
-                  </Typography>
-                  <Typography variant="caption" fontWeight="bold">
-                    {averageExperience.toFixed(1)} años
-                  </Typography>
-                </Box>
-              </div>
-              
-              {/* Estadísticas por estado */}
-              {statsByStatus.map((stat, index) => (
-                <div key={index} className="stat-card" style={{ borderLeft: `4px solid ${stat.color}` }}>
-                  <Box display="flex" alignItems="center" gap={1} mb={1}>
-                    <span style={{ fontSize: '20px' }}>{stat.icon}</span>
-                    <Typography variant="body2" color="text.secondary" fontWeight="medium">
-                      {stat.label}
-                    </Typography>
-                  </Box>
-                  <Typography 
-                    variant="h5" 
-                    className="stat-value" 
-                    style={{ color: stat.color }}
-                  >
-                    {stat.value}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {artists.length > 0 ? ((stat.value / artists.length) * 100).toFixed(0) : 0}%
-                  </Typography>
-                </div>
-              ))}
-            </Box>
-          </Box>
+        {displayError && (
+          <Alert 
+            severity="error" 
+            sx={{ mb: 2 }} 
+            onClose={() => {
+              setError(null);
+              clearAgencyError();
+            }}
+          >
+            {displayError}
+          </Alert>
         )}
 
-        {/* Distribución por años de experiencia */}
-        {artists.length > 0 && (
-          <Box mb={3}>
-            <Typography variant="subtitle2" color="text.secondary" gutterBottom fontWeight="medium">
-              Distribución por Años de Experiencia
-            </Typography>
-            <Box display="flex" gap={2} mb={2} className="experience-container">
-              {[
-                { label: '0-1 años', range: [0, 1], icon: '🆕', color: '#1976d2' },
-                { label: '2-5 años', range: [2, 5], icon: '📈', color: '#2e7d32' },
-                { label: '6-10 años', range: [6, 10], icon: '🏆', color: '#ed6c02' },
-                { label: '+10 años', range: [11, Infinity], icon: '👑', color: '#7b1fa2' },
-              ].map((range, index) => {
-                const count = artists.filter(artist => {
-                  const experience = calculateYearsSinceTransition(artist.transitionDate);
-                  return experience >= range.range[0] && experience <= range.range[1];
-                }).length;
-                
-                return (
-                  <div key={index} className="experience-card" style={{ borderLeft: `4px solid ${range.color}` }}>
-                    <Box display="flex" alignItems="center" gap={1} mb={1}>
-                      <span style={{ fontSize: '20px' }}>{range.icon}</span>
-                      <Typography variant="body2" color="text.secondary" fontWeight="medium">
-                        {range.label}
-                      </Typography>
-                    </Box>
-                    <Typography 
-                      variant="h5" 
-                      className="stat-value" 
-                      style={{ color: range.color }}
-                    >
-                      {count}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {artists.length > 0 ? ((count / artists.length) * 100).toFixed(0) : 0}%
-                    </Typography>
-                  </div>
-                );
-              })}
-            </Box>
-          </Box>
+        {notification && (
+          <Alert severity={notification.type} sx={{ mb: 2 }}>
+            {notification.message}
+          </Alert>
         )}
+
       </Box>
 
+      {/* Modal para agregar artista */}
+      {agencyInfo && (
+        <AddArtistToAgencyModal
+          open={addArtistModalOpen}
+          onClose={() => setAddArtistModalOpen(false)}
+          agencyId={agencyId}
+          agencyName={agencyInfo.nameAgency}
+          onArtistAdded={handleArtistAdded}
+        />
+      )}
+
       {/* Tabla de artistas */}
-      <GenericTable<ArtistResponseDto>
-        data={artists}
+      <GenericTable<ArtistWithGroup>
+        data={localArtists}
         columns={getArtistColumns()}
         title=""
-        loading={loading}
+        loading={loading || agencyLoading}
         itemsPerPage={10}
-        showHeader={false}
-        showCreateButton={false}
-        showActionsColumn={showActions && !readOnly}
         showSearch={true}
-        showReloadButton={false}
-        onReload={fetchArtists}
+        onReload={loadData}
         notification={notification || undefined}
-        onNotificationClose={handleNotificationClose}
-        className="artists-table"
-        
+        onNotificationClose={() => setNotification(null)}
         emptyState={
           <Box sx={{ textAlign: 'center', py: 4 }}>
             <Typography variant="h6" color="text.secondary" gutterBottom>
@@ -467,45 +469,28 @@ const AgencyArtistsView: React.FC<AgencyArtistsViewProps> = ({
                 : 'No hay artistas registrados'
               }
             </Typography>
-          </Box>
-        }
-        
-        loadingComponent={
-          <Box sx={{ textAlign: 'center', py: 4 }}>
-            <Typography variant="body2" color="text.secondary">
-              Cargando artistas...
-            </Typography>
-          </Box>
-        }
-        
-        renderCustomActions={showActions && !readOnly ? (artist) => (
-          <div className="artist-actions">
             <Button
-              size="small"
-              variant="outlined"
-              onClick={() => handleViewDetails(artist)}
-              sx={{ 
-                fontSize: '0.75rem',
-                textTransform: 'none',
-                fontWeight: 'medium'
-              }}
+              variant="contained"
+              startIcon={<PersonAddIcon />}
+              onClick={handleAddArtistClick}
+              sx={{ mt: 2 }}
             >
-              Ver Detalles
+              Agregar primer artista
             </Button>
-          </div>
-        ) : undefined}
+          </Box>
+        }
       />
 
       <Box sx={{ mt: 3, pt: 2, borderTop: 1, borderColor: 'divider' }}>
         <Typography variant="caption" color="text.secondary">
-          Mostrando {artists.length} artistas de tu agencia asignada
+          Mostrando {artistsCount} artistas
           {agencyInfo && ` • ${agencyInfo.nameAgency} (${agencyInfo.place})`}
-          {artists.length > 0 && (
+          {artistsCount > 0 && (
             <>
               {' • '}
               <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
-                <CakeIcon fontSize="inherit" />
-                <span>Edad promedio: {averageAge.toFixed(1)} años</span>
+                <GroupsIcon fontSize="inherit" />
+                <span>Con grupo: {artistsWithGroupCount}</span>
               </Box>
             </>
           )}

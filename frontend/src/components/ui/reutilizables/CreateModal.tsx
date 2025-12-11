@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import CustomAutocomplete from "./CustomAutocomplete";
-import FormTextField from "./FormTextField"; // Asegúrate de que la ruta sea correcta
+import FormTextField from "./FormTextField";
 import { Icon } from "../../icons";
 import '../datatable.css'
 
@@ -12,12 +12,17 @@ import {
   InputLabel,
   Select,
   FormHelperText,
+  Checkbox,
+  FormControlLabel,
+  RadioGroup,
+  Radio,
+  FormLabel,
 } from '@mui/material';
 
 export interface FormField {
   name: string;
   label: string;
-  type: "text" | "number" | "date" | "select" | "email" | "password" | "textarea" | "autocomplete";
+  type: "text" | "number" | "date" | "select" | "email" | "password" | "textarea" | "checkbox" | "autocomplete" | "radio";
   placeholder?: string;
   required?: boolean;
   min?: number;
@@ -201,7 +206,7 @@ const CreateModal: React.FC<CreateModalProps> = ({
               placeholder={placeholder}
               fullWidth
               InputLabelProps={{
-                shrink: true, // Esto asegura que la etiqueta siempre esté en posición
+                shrink: true,
               }}
               sx={{
                 marginTop: '16px',
@@ -219,34 +224,52 @@ const CreateModal: React.FC<CreateModalProps> = ({
           </div>
         );
 
+      case 'checkbox':
+        return (
+          <div key={name} className="form-group">
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={!!value}
+                  onChange={(e) => handleChange(name, e.target.checked)}
+                  disabled={disabled || loading}
+                  color="primary"
+                />
+              }
+              label={label}
+              required={required}
+            />
+            {error && <FormHelperText error>{error}</FormHelperText>}
+          </div>
+        );
+
+      case 'radio':
+        return (
+          <div key={name} className="form-group">
+            <FormLabel component="legend" required={required}>{label}</FormLabel>
+            <RadioGroup
+              value={value}
+              onChange={(e) => handleChange(name, e.target.value)}
+              row
+            >
+              {options.map((option) => (
+                <FormControlLabel
+                  key={option.value}
+                  value={option.value}
+                  control={<Radio disabled={disabled || loading} />}
+                  label={option.label}
+                />
+              ))}
+            </RadioGroup>
+            {error && <FormHelperText error>{error}</FormHelperText>}
+          </div>
+        );
+
       case 'date':
-      const dateMin = name === "endDate" && formData.startDate 
-        ? formData.startDate 
-        : undefined;
-      
-      return (
-        <div key={name} className="form-group">
-          <FormTextField
-            name={name}
-            label={label}
-            value={value}
-            onChange={handleChange}
-            type="date"
-            error={!!error}
-            helperText={error}
-            required={required}
-            disabled={disabled || loading}
-            shrinkLabel={true}
-            variant="outlined"
-            fullWidth
-            InputLabelProps={{
-              shrink: true,
-            }}
-            min={dateMin}
-          />
-        </div>
-      );
-      default:
+        const dateMin = name === "endDate" && formData.startDate 
+          ? formData.startDate 
+          : undefined;
+        
         return (
           <div key={name} className="form-group">
             <FormTextField
@@ -254,7 +277,35 @@ const CreateModal: React.FC<CreateModalProps> = ({
               label={label}
               value={value}
               onChange={handleChange}
-              type={type}
+              type="date"
+              error={!!error}
+              helperText={error}
+              required={required}
+              disabled={disabled || loading}
+              shrinkLabel={true}
+              variant="outlined"
+              fullWidth
+              InputLabelProps={{
+                shrink: true,
+              }}
+              min={dateMin}
+            />
+          </div>
+        );
+
+      default:
+        // Para los tipos nativos que sí soporta FormTextField
+        const allowedTypes = ["text", "number", "email", "password"];
+        const safeType = allowedTypes.includes(type) ? type as "text" | "number" | "email" | "password" : "text";
+        
+        return (
+          <div key={name} className="form-group">
+            <FormTextField
+              name={name}
+              label={label}
+              value={value}
+              onChange={handleChange}
+              type={safeType}
               error={!!error}
               helperText={error}
               required={required}

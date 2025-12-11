@@ -3,6 +3,7 @@ import AgencyManagement from "./sections/Agency/AgencyManagement";
 import AlbumManagement from "./sections/Album/AlbumManagement";
 import ApprenticesManagement from "./sections/Apprentice/ApprenticesManagement";
 import ArtistManagement from "./sections/Artist/ArtistManagement";
+import AwardManagement from "./sections/Award/AwardManagement";
 import BillboardListManagement from "./sections/BillboardList/BillboardManagement";
 import ContractManagement from "./sections/Contract/ContractManagement";
 import EvaluationManagement from "./sections/Evaluation/EvaluationsManagement";
@@ -21,5 +22,6 @@ export const sectionComponents = {
   contract_management: ContractManagement,
   billboard_management: BillboardListManagement,
   songs_management: SongManagement,
-  albums_management: AlbumManagement
+  albums_management: AlbumManagement,
+  award_management: AwardManagement
 };
