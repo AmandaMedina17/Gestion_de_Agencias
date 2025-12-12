@@ -20,7 +20,7 @@ export class GroupActivityService {
   }
 
   async getGroupActivities(dto: GetGroupCalendaryDto): Promise<ActivityResponseDto[]> {
-    const activities = await this.groupActivityRepository.getActivitiesByGroup(dto.groupId, dto.start_date, dto.end_date);
+    const activities = await this.groupActivityRepository.getActivitiesByGroupId(dto.groupId, dto.start_date, dto.end_date);
     return this.activityDtoMapper.toResponseList(activities)
   }
   
