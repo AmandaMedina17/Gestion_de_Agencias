@@ -181,6 +181,10 @@ export class Group implements IUpdatable {
 
   }
 
+  public set_created(){
+    this.is_created = true;
+  }
+
   // Getters
   public getMembersIds(): string[] {
     return [...this._members];
