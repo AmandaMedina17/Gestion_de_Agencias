@@ -37,9 +37,11 @@ import { IGroupRepository } from "@domain/Repositories/IGroupRepository";
 import { GroupEntity } from "@infrastructure/database/Entities/GroupEntity";
 import { CreateArtistCollaborationUseCase } from '../ApplicationLayer/UseCases/create_artist_collaboration.use-case';
 import { CreateArtistGroupCollaborationUseCase } from "@application/UseCases/create_artist_group_collaboration.use-case";
+import { CreateArtistUseCase } from "@application/UseCases/create_artist.use-case";
+import { ApprenticeModule } from "./ApprenticeModule";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ArtistEntity,ContractEntity, ArtistGroupMembershipEntity, ActivityEntity,ArtistActivityEntity,AgencyEntity, ArtistCollaborationEntity,ArtistGroupCollaborationEntity, GroupEntity])],
+  imports: [TypeOrmModule.forFeature([ArtistEntity,ContractEntity, ArtistGroupMembershipEntity, ActivityEntity,ArtistActivityEntity,AgencyEntity, ArtistCollaborationEntity,ArtistGroupCollaborationEntity, GroupEntity]), ApprenticeModule],
   controllers: [ArtistController],
   providers: [
     ArtistMapper,
@@ -77,6 +79,7 @@ import { CreateArtistGroupCollaborationUseCase } from "@application/UseCases/cre
     GetArtistsWithAgencyChangesAndGroupsUseCase,
     CreateArtistCollaborationUseCase,
     CreateArtistGroupCollaborationUseCase,
+    CreateArtistUseCase,
   ],
   exports: [IArtistRepository, ArtistDtoMapper, ArtistMapper],
 })
