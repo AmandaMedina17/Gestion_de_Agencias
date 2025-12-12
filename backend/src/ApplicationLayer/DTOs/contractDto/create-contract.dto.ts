@@ -8,8 +8,6 @@ export class CreateContractDto{
     @Transform(({ value }) => new Date(value)) //Convierte string a Date automáticamente
     startDate!: Date;
 
-    @IsNotEmpty()
-    @IsDate()
     @Transform(({ value }) => new Date(value)) //Convierte string a Date automáticamente
     endDate!: Date;
 

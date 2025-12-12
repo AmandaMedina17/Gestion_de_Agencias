@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useAlbum } from "../../../../context/AlbumContext";
 import GenericTable, { Column } from "../../../ui/datatable";
-import CreateModal, { FormField } from "../../../ui/reutilizables/CreateModal";
-import EditModal from "../../../ui/reutilizables/EditModal";
-import DeleteModal from "../../../ui/reutilizables/DeleteModal";
-import './AlbumStyle.css';
+import CreateModal, { FormField } from "../../../ui/reusable/CreateModal";
+import EditModal from "../../../ui/reusable/EditModal";
+import DeleteModal from "../../../ui/reusable/DeleteModal";
+import "./AlbumStyle.css";
 import { ResponseAlbumDto as AlbumResponseDto } from "../../../../../../backend/src/ApplicationLayer/DTOs/albumDto/response.album.dto";
 
 export enum AlbumStatus {
@@ -31,8 +31,12 @@ const AlbumManagement: React.FC = () => {
   } | null>(null);
 
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editingAlbum, setEditingAlbum] = useState<AlbumResponseDto | null>(null);
-  const [deletingAlbum, setDeletingAlbum] = useState<AlbumResponseDto | null>(null);
+  const [editingAlbum, setEditingAlbum] = useState<AlbumResponseDto | null>(
+    null
+  );
+  const [deletingAlbum, setDeletingAlbum] = useState<AlbumResponseDto | null>(
+    null
+  );
 
   useEffect(() => {
     const loadData = async () => {
@@ -46,7 +50,11 @@ const AlbumManagement: React.FC = () => {
   }, []);
 
   // Funciones auxiliares para mostrar notificaciones
-  const showNotification = (type: "success" | "error" | "info" | "warning", title: string, message: string) => {
+  const showNotification = (
+    type: "success" | "error" | "info" | "warning",
+    title: string,
+    message: string
+  ) => {
     setNotification({ type, title, message });
   };
 
@@ -67,19 +75,31 @@ const AlbumManagement: React.FC = () => {
   };
 
   const showUpdateSuccess = () => {
-    showSuccess("¡Álbum Actualizado!", "El álbum ha sido actualizado exitosamente.");
+    showSuccess(
+      "¡Álbum Actualizado!",
+      "El álbum ha sido actualizado exitosamente."
+    );
   };
 
   const showUpdateError = (errorMessage?: string) => {
-    showError("Error al Actualizar", errorMessage || "No se pudo actualizar el álbum.");
+    showError(
+      "Error al Actualizar",
+      errorMessage || "No se pudo actualizar el álbum."
+    );
   };
 
   const showDeleteSuccess = () => {
-    showSuccess("¡Álbum Eliminado!", "El álbum ha sido eliminado exitosamente.");
+    showSuccess(
+      "¡Álbum Eliminado!",
+      "El álbum ha sido eliminado exitosamente."
+    );
   };
 
   const showDeleteError = (errorMessage?: string) => {
-    showError("Error al Eliminar", errorMessage || "No se pudo eliminar el álbum.");
+    showError(
+      "Error al Eliminar",
+      errorMessage || "No se pudo eliminar el álbum."
+    );
   };
 
   // Definir campos del formulario de álbum
@@ -97,7 +117,7 @@ const AlbumManagement: React.FC = () => {
         if (value.length < 2) return "Debe tener al menos 2 caracteres";
         if (value.length > 150) return "No puede exceder 150 caracteres";
         return null;
-      }
+      },
     },
     {
       name: "mainProducer",
@@ -112,7 +132,7 @@ const AlbumManagement: React.FC = () => {
         if (value.length < 2) return "Debe tener al menos 2 caracteres";
         if (value.length > 100) return "No puede exceder 100 caracteres";
         return null;
-      }
+      },
     },
     {
       name: "releaseDate",
@@ -125,7 +145,7 @@ const AlbumManagement: React.FC = () => {
           if (date > new Date()) return "La fecha no puede ser futura";
         }
         return null;
-      }
+      },
     },
     {
       name: "copiesSold",
@@ -139,11 +159,12 @@ const AlbumManagement: React.FC = () => {
           const numValue = parseFloat(value);
           if (isNaN(numValue)) return "Debe ser un número válido";
           if (numValue < 0) return "No puede ser negativo";
-          if (numValue > 1000000000) return "No puede exceder 1,000,000,000 copias";
+          if (numValue > 1000000000)
+            return "No puede exceder 1,000,000,000 copias";
         }
         return null;
-      }
-    }
+      },
+    },
   ];
 
   const albumEditFields: FormField[] = [
@@ -158,7 +179,7 @@ const AlbumManagement: React.FC = () => {
         if (!value.trim()) return "El título del álbum es requerido";
         if (value.length < 2) return "Debe tener al menos 2 caracteres";
         return null;
-      }
+      },
     },
     {
       name: "mainProducer",
@@ -171,7 +192,7 @@ const AlbumManagement: React.FC = () => {
         if (!value.trim()) return "El productor principal es requerido";
         if (value.length < 2) return "Debe tener al menos 2 caracteres";
         return null;
-      }
+      },
     },
     {
       name: "releaseDate",
@@ -184,7 +205,7 @@ const AlbumManagement: React.FC = () => {
           if (date > new Date()) return "La fecha no puede ser futura";
         }
         return null;
-      }
+      },
     },
     {
       name: "copiesSold",
@@ -199,8 +220,8 @@ const AlbumManagement: React.FC = () => {
           if (numValue < 0) return "No puede ser negativo";
         }
         return null;
-      }
-    }
+      },
+    },
   ];
 
   // Datos iniciales para creación
@@ -208,7 +229,7 @@ const AlbumManagement: React.FC = () => {
     title: "",
     mainProducer: "",
     releaseDate: "",
-    copiesSold: ""
+    copiesSold: "",
   };
 
   // Manejar creación
@@ -224,14 +245,16 @@ const AlbumManagement: React.FC = () => {
       showCreateSuccess();
       setShowCreateModal(false);
       await fetchAlbums();
-
     } catch (err: any) {
       showCreateError(err.message);
     }
   };
 
   // Manejar actualización
-  const handleUpdate = async (id: string | number, data: Record<string, any>) => {
+  const handleUpdate = async (
+    id: string | number,
+    data: Record<string, any>
+  ) => {
     try {
       await updateAlbum(id as string, {
         title: data.title.trim(),
@@ -265,7 +288,7 @@ const AlbumManagement: React.FC = () => {
   // Funciones auxiliares
   const formatDate = (date: Date | string) => {
     if (!date) return "No establecida";
-    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    const dateObj = typeof date === "string" ? new Date(date) : date;
     dateObj.setDate(dateObj.getDate() + 1);
     return dateObj.toLocaleDateString("es-ES");
   };
@@ -276,10 +299,11 @@ const AlbumManagement: React.FC = () => {
 
   const getYearsSinceRelease = (releaseDate: Date | string) => {
     if (!releaseDate) return "N/A";
-    const release = typeof releaseDate === 'string' ? new Date(releaseDate) : releaseDate;
+    const release =
+      typeof releaseDate === "string" ? new Date(releaseDate) : releaseDate;
     const today = new Date();
     const years = today.getFullYear() - release.getFullYear();
-    return `${years} año${years !== 1 ? 's' : ''}`;
+    return `${years} año${years !== 1 ? "s" : ""}`;
   };
 
   // Definir columnas para la tabla
@@ -289,14 +313,14 @@ const AlbumManagement: React.FC = () => {
       title: "Título",
       sortable: true,
       width: "25%",
-      align: "center"
+      align: "center",
     },
     {
       key: "mainProducer",
       title: "Productor Principal",
       sortable: true,
       width: "20%",
-      align: "center"
+      align: "center",
     },
     {
       key: "releaseDate",
@@ -304,7 +328,7 @@ const AlbumManagement: React.FC = () => {
       sortable: true,
       width: "15%",
       align: "center",
-      render: (item) => formatDate(item.releaseDate)
+      render: (item) => formatDate(item.releaseDate),
     },
     {
       key: "yearsSinceRelease",
@@ -312,7 +336,7 @@ const AlbumManagement: React.FC = () => {
       sortable: false,
       width: "10%",
       align: "center",
-      render: (item) => getYearsSinceRelease(item.releaseDate)
+      render: (item) => getYearsSinceRelease(item.releaseDate),
     },
     {
       key: "copiesSold",
@@ -320,7 +344,7 @@ const AlbumManagement: React.FC = () => {
       sortable: true,
       width: "15%",
       align: "center",
-      render: (item) => `${formatNumber(item.copiesSold)} copias`
+      render: (item) => `${formatNumber(item.copiesSold)} copias`,
     },
     {
       key: "totalTracks",
@@ -332,41 +356,47 @@ const AlbumManagement: React.FC = () => {
         const tracks = item.numberOfTracks || 0;
         return (
           <span className="tracks-count">
-            {tracks} pista{tracks !== 1 ? 's' : ''}
+            {tracks} pista{tracks !== 1 ? "s" : ""}
           </span>
         );
-      }
-    }
+      },
+    },
   ];
 
   // Función para renderizar detalles en modal de eliminación
   const renderAlbumDetails = (album: AlbumResponseDto) => {
     const tracks = album.numberOfTracks || 0;
-    
+
     return (
       <div className="album-details">
         <div className="detail-item">
           <strong>Título:</strong> <span>{album.title}</span>
         </div>
         <div className="detail-item">
-          <strong>Productor Principal:</strong> <span>{album.mainProducer}</span>
+          <strong>Productor Principal:</strong>{" "}
+          <span>{album.mainProducer}</span>
         </div>
         <div className="detail-item">
-          <strong>Fecha de Lanzamiento:</strong> <span>{formatDate(album.releaseDate)}</span>
+          <strong>Fecha de Lanzamiento:</strong>{" "}
+          <span>{formatDate(album.releaseDate)}</span>
         </div>
         <div className="detail-item">
-          <strong>Antigüedad:</strong> <span>{getYearsSinceRelease(album.releaseDate)}</span>
+          <strong>Antigüedad:</strong>{" "}
+          <span>{getYearsSinceRelease(album.releaseDate)}</span>
         </div>
         <div className="detail-item">
-          <strong>Copias Vendidas:</strong> <span>{formatNumber(album.copiesSold)} copias</span>
+          <strong>Copias Vendidas:</strong>{" "}
+          <span>{formatNumber(album.copiesSold)} copias</span>
         </div>
         <div className="detail-item">
-          <strong>Total de Pistas:</strong> <span>{tracks} pista{tracks !== 1 ? 's' : ''}</span>
+          <strong>Total de Pistas:</strong>{" "}
+          <span>
+            {tracks} pista{tracks !== 1 ? "s" : ""}
+          </span>
         </div>
         {tracks > 0 && (
           <div className="detail-item tracks-list">
             <strong>Pistas:</strong>
-            
           </div>
         )}
       </div>
@@ -415,9 +445,10 @@ const AlbumManagement: React.FC = () => {
           initialData={{
             title: editingAlbum.title,
             mainProducer: editingAlbum.mainProducer,
-            releaseDate: editingAlbum.releaseDate ? 
-              (new Date(editingAlbum.releaseDate).toISOString().split("T")[0]) : "",
-            copiesSold: editingAlbum.copiesSold.toString()
+            releaseDate: editingAlbum.releaseDate
+              ? new Date(editingAlbum.releaseDate).toISOString().split("T")[0]
+              : "",
+            copiesSold: editingAlbum.copiesSold.toString(),
           }}
           itemId={editingAlbum.id}
           onSubmit={handleUpdate}

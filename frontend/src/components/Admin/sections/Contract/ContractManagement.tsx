@@ -3,10 +3,10 @@ import { useContract } from "../../../../context/ContractContext";
 import { useAgency } from "../../../../context/AgencyContext";
 import { useArtist } from "../../../../context/ArtistContext";
 import GenericTable, { Column } from "../../../ui/datatable";
-import CreateModal, { FormField } from "../../../ui/reutilizables/CreateModal";
-import EditModal from "../../../ui/reutilizables/EditModal";
-import DeleteModal from "../../../ui/reutilizables/DeleteModal";
-import './ContractStyle.css';
+import CreateModal, { FormField } from "../../../ui/reusable/CreateModal";
+import EditModal from "../../../ui/reusable/EditModal";
+import DeleteModal from "../../../ui/reusable/DeleteModal";
+import "./ContractStyle.css";
 import { ContractResponseDto } from "../../../../../../backend/src/ApplicationLayer/DTOs/contractDto/response-contract.dto";
 
 export enum ContractStatus {
@@ -38,17 +38,15 @@ const ContractManagement: React.FC = () => {
   } | null>(null);
 
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editingContract, setEditingContract] = useState<ContractResponseDto | null>(null);
-  const [deletingContract, setDeletingContract] = useState<ContractResponseDto | null>(null);
+  const [editingContract, setEditingContract] =
+    useState<ContractResponseDto | null>(null);
+  const [deletingContract, setDeletingContract] =
+    useState<ContractResponseDto | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        await Promise.all([
-          fetchContracts(),
-          fetchAgencies(),
-          fetchArtists()
-        ]);
+        await Promise.all([fetchContracts(), fetchAgencies(), fetchArtists()]);
       } catch (err) {
         console.error("Error loading data:", err);
       }
@@ -57,18 +55,22 @@ const ContractManagement: React.FC = () => {
   }, []);
 
   const getArtistName = (contract: ContractResponseDto) => {
-    if (contract.artist && typeof contract.artist === 'object') {
+    if (contract.artist && typeof contract.artist === "object") {
       return contract.artist.stageName;
     }
-    const artist = artists.find(a => a.apprenticeId === contract.artist.apprenticeId);
+    const artist = artists.find(
+      (a) => a.apprenticeId === contract.artist.apprenticeId
+    );
     return artist ? artist.stageName : "No asignado";
   };
 
   const getAgencyName = (contract: ContractResponseDto) => {
-    if (contract.agency && typeof contract.agency === 'object') {
+    if (contract.agency && typeof contract.agency === "object") {
       return contract.agency.nameAgency;
     }
-    const agency = agencies.find(a => a.nameAgency === contract.agency.nameAgency);
+    const agency = agencies.find(
+      (a) => a.nameAgency === contract.agency.nameAgency
+    );
     return agency ? agency.nameAgency : "No asignada";
   };
 
@@ -79,20 +81,20 @@ const ContractManagement: React.FC = () => {
       label: "Artista",
       type: "autocomplete",
       required: true,
-      options: artists.map(artist => ({
+      options: artists.map((artist) => ({
         value: artist.id,
-        label: artist.stageName
-      }))
+        label: artist.stageName,
+      })),
     },
     {
       name: "agencyId",
       label: "Agencia",
       type: "autocomplete",
       required: true,
-      options: agencies.map(agency => ({
+      options: agencies.map((agency) => ({
         value: agency.id,
-        label: `${agency.nameAgency} - ${agency.place}`
-      }))
+        label: `${agency.nameAgency} - ${agency.place}`,
+      })),
     },
     {
       name: "startDate",
@@ -102,7 +104,7 @@ const ContractManagement: React.FC = () => {
       validate: (value) => {
         if (!value) return "La fecha de inicio es requerida";
         return null;
-      }
+      },
     },
     {
       name: "contractType",
@@ -111,12 +113,12 @@ const ContractManagement: React.FC = () => {
       required: true,
       options: [
         { value: "indefinite", label: "Tiempo Indefinido" },
-        { value: "fixed", label: "Plazo Fijo" }
+        { value: "fixed", label: "Plazo Fijo" },
       ],
       validate: (value) => {
         if (!value) return "El tipo de contrato es requerido";
         return null;
-      }
+      },
     },
     {
       name: "endDate",
@@ -126,13 +128,18 @@ const ContractManagement: React.FC = () => {
       validate: (value, formData) => {
         // Solo validar si es contrato a plazo fijo
         if (formData?.contractType === "fixed") {
-          if (!value) return "La fecha de fin es requerida para contratos a plazo fijo";
-          if (formData && formData.startDate && new Date(value) <= new Date(formData.startDate)) {
+          if (!value)
+            return "La fecha de fin es requerida para contratos a plazo fijo";
+          if (
+            formData &&
+            formData.startDate &&
+            new Date(value) <= new Date(formData.startDate)
+          ) {
             return "La fecha de fin debe ser posterior a la fecha de inicio";
           }
         }
         return null;
-      }
+      },
     },
     {
       name: "distributionPercentage",
@@ -146,7 +153,7 @@ const ContractManagement: React.FC = () => {
         if (isNaN(numValue)) return "Debe ser un número válido";
         if (numValue < 0 || numValue > 100) return "Debe estar entre 0 y 100";
         return null;
-      }
+      },
     },
     {
       name: "status",
@@ -157,8 +164,8 @@ const ContractManagement: React.FC = () => {
         { value: ContractStatus.ACTIVO, label: "Activo" },
         { value: ContractStatus.EN_RENOVACION, label: "En renovación" },
         { value: ContractStatus.RESCINDIDO, label: "Rescindido" },
-        { value: ContractStatus.FINALIZADO, label: "Finalizado" }
-      ]
+        { value: ContractStatus.FINALIZADO, label: "Finalizado" },
+      ],
     },
     {
       name: "conditions",
@@ -170,8 +177,8 @@ const ContractManagement: React.FC = () => {
       validate: (value) => {
         if (!value.trim()) return "Las condiciones son requeridas";
         return null;
-      }
-    }
+      },
+    },
   ];
 
   const contractEditFields: FormField[] = [
@@ -183,7 +190,7 @@ const ContractManagement: React.FC = () => {
       validate: (value) => {
         if (!value) return "La fecha de inicio es requerida";
         return null;
-      }
+      },
     },
     {
       name: "contractType",
@@ -192,12 +199,12 @@ const ContractManagement: React.FC = () => {
       required: true,
       options: [
         { value: "indefinite", label: "Tiempo Indefinido" },
-        { value: "fixed", label: "Plazo Fijo" }
+        { value: "fixed", label: "Plazo Fijo" },
       ],
       validate: (value) => {
         if (!value) return "El tipo de contrato es requerido";
         return null;
-      }
+      },
     },
     {
       name: "endDate",
@@ -206,13 +213,18 @@ const ContractManagement: React.FC = () => {
       required: false,
       validate: (value, formData) => {
         if (formData?.contractType === "fixed") {
-          if (!value) return "La fecha de fin es requerida para contratos a plazo fijo";
-          if (formData && formData.startDate && new Date(value) <= new Date(formData.startDate)) {
+          if (!value)
+            return "La fecha de fin es requerida para contratos a plazo fijo";
+          if (
+            formData &&
+            formData.startDate &&
+            new Date(value) <= new Date(formData.startDate)
+          ) {
             return "La fecha de fin debe ser posterior a la fecha de inicio";
           }
         }
         return null;
-      }
+      },
     },
     {
       name: "distributionPercentage",
@@ -226,7 +238,7 @@ const ContractManagement: React.FC = () => {
         if (isNaN(numValue)) return "Debe ser un número válido";
         if (numValue < 0 || numValue > 100) return "Debe estar entre 0 y 100";
         return null;
-      }
+      },
     },
     {
       name: "status",
@@ -237,8 +249,8 @@ const ContractManagement: React.FC = () => {
         { value: ContractStatus.ACTIVO, label: "Activo" },
         { value: ContractStatus.EN_RENOVACION, label: "En renovación" },
         { value: ContractStatus.RESCINDIDO, label: "Rescindido" },
-        { value: ContractStatus.FINALIZADO, label: "Finalizado" }
-      ]
+        { value: ContractStatus.FINALIZADO, label: "Finalizado" },
+      ],
     },
     {
       name: "conditions",
@@ -250,8 +262,8 @@ const ContractManagement: React.FC = () => {
       validate: (value) => {
         if (!value.trim()) return "Las condiciones son requeridas";
         return null;
-      }
-    }
+      },
+    },
   ];
 
   // Datos iniciales para creación
@@ -263,11 +275,15 @@ const ContractManagement: React.FC = () => {
     endDate: "",
     distributionPercentage: "",
     status: ContractStatus.ACTIVO,
-    conditions: ""
+    conditions: "",
   };
 
   // Funciones auxiliares para mostrar notificaciones
-  const showNotification = (type: "success" | "error" | "info" | "warning", title: string, message: string) => {
+  const showNotification = (
+    type: "success" | "error" | "info" | "warning",
+    title: string,
+    message: string
+  ) => {
     setNotification({ type, title, message });
   };
 
@@ -280,41 +296,59 @@ const ContractManagement: React.FC = () => {
   };
 
   const showCreateSuccess = () => {
-    showSuccess("¡Contrato Creado!", "El contrato ha sido creado exitosamente.");
+    showSuccess(
+      "¡Contrato Creado!",
+      "El contrato ha sido creado exitosamente."
+    );
   };
 
   const showCreateError = (errorMessage?: string) => {
-    showError("Error al Crear", errorMessage || "No se pudo crear el contrato.");
+    showError(
+      "Error al Crear",
+      errorMessage || "No se pudo crear el contrato."
+    );
   };
 
   const showUpdateSuccess = () => {
-    showSuccess("¡Contrato Actualizado!", "El contrato ha sido actualizado exitosamente.");
+    showSuccess(
+      "¡Contrato Actualizado!",
+      "El contrato ha sido actualizado exitosamente."
+    );
   };
 
   const showUpdateError = (errorMessage?: string) => {
-    showError("Error al Actualizar", errorMessage || "No se pudo actualizar el contrato.");
+    showError(
+      "Error al Actualizar",
+      errorMessage || "No se pudo actualizar el contrato."
+    );
   };
 
   const showDeleteSuccess = () => {
-    showSuccess("¡Contrato Eliminado!", "El contrato ha sido eliminado exitosamente.");
+    showSuccess(
+      "¡Contrato Eliminado!",
+      "El contrato ha sido eliminado exitosamente."
+    );
   };
 
   const showDeleteError = (errorMessage?: string) => {
-    showError("Error al Eliminar", errorMessage || "No se pudo eliminar el contrato.");
+    showError(
+      "Error al Eliminar",
+      errorMessage || "No se pudo eliminar el contrato."
+    );
   };
 
   // Manejar creación
   const handleCreate = async (data: Record<string, any>) => {
     try {
       const isIndefinite = data.contractType === "indefinite";
-      
+
       const contractData: any = {
         startDate: new Date(data.startDate),
         agencyId: data.agencyId,
         artistId: data.artistId,
         distributionPercentage: parseFloat(data.distributionPercentage),
         status: data.status,
-        conditions: data.conditions.trim()
+        conditions: data.conditions.trim(),
       };
 
       // Solo agregar endDate si es contrato a plazo fijo
@@ -327,24 +361,26 @@ const ContractManagement: React.FC = () => {
       showCreateSuccess();
       setShowCreateModal(false);
       await fetchContracts();
-
     } catch (err: any) {
       showCreateError(err.message);
     }
   };
 
   // Manejar actualización
-  const handleUpdate = async (id: string | number, data: Record<string, any>) => {
+  const handleUpdate = async (
+    id: string | number,
+    data: Record<string, any>
+  ) => {
     try {
       const isIndefinite = data.contractType === "indefinite";
-      
+
       const updateData: any = {
         startDate: new Date(data.startDate),
         agencyId: data.agencyId,
         artistId: data.artistId,
         distributionPercentage: parseFloat(data.distributionPercentage),
         status: data.status,
-        conditions: data.conditions.trim()
+        conditions: data.conditions.trim(),
       };
 
       // Manejar endDate según el tipo de contrato
@@ -381,7 +417,7 @@ const ContractManagement: React.FC = () => {
   // Funciones auxiliares
   const formatDate = (date: Date | string | null) => {
     if (!date) return "Tiempo indefinido";
-    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    const dateObj = typeof date === "string" ? new Date(date) : date;
     return dateObj.toLocaleDateString("es-ES");
   };
 
@@ -397,7 +433,7 @@ const ContractManagement: React.FC = () => {
 
   const getDaysRemaining = (endDate: Date | string | null) => {
     if (!endDate) return null; // Contrato indefinido
-    const end = typeof endDate === 'string' ? new Date(endDate) : endDate;
+    const end = typeof endDate === "string" ? new Date(endDate) : endDate;
     const today = new Date();
     const diffTime = end.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -413,12 +449,14 @@ const ContractManagement: React.FC = () => {
       width: "15%",
       align: "center",
       render: (item) => {
-        if (item.artist && typeof item.artist === 'object') {
+        if (item.artist && typeof item.artist === "object") {
           return item.artist.stageName;
         }
-        const artist = artists.find(a => a.apprenticeId === item.artist.apprenticeId);
+        const artist = artists.find(
+          (a) => a.apprenticeId === item.artist.apprenticeId
+        );
         return artist ? artist.stageName : "No asignado";
-      }
+      },
     },
     {
       key: "agency.nameAgency",
@@ -427,12 +465,14 @@ const ContractManagement: React.FC = () => {
       width: "15%",
       align: "center",
       render: (item) => {
-        if (item.agency && typeof item.agency === 'object') {
+        if (item.agency && typeof item.agency === "object") {
           return item.agency.nameAgency;
         }
-        const agency = agencies.find(a => a.nameAgency === item.agency.nameAgency);
+        const agency = agencies.find(
+          (a) => a.nameAgency === item.agency.nameAgency
+        );
         return agency ? agency.nameAgency : "No asignada";
-      }
+      },
     },
     {
       key: "startDate",
@@ -440,15 +480,7 @@ const ContractManagement: React.FC = () => {
       sortable: true,
       width: "12%",
       align: "center",
-      render: (item) => formatDate(item.startDate)
-    },
-    {
-      key: "contractType",
-      title: "Tipo",
-      sortable: false,
-      width: "10%",
-      align: "center",
-      render: (item) => item.endDate ? "Plazo Fijo" : "Indefinido"
+      render: (item) => formatDate(item.startDate),
     },
     {
       key: "endDate",
@@ -456,16 +488,16 @@ const ContractManagement: React.FC = () => {
       sortable: true,
       width: "12%",
       align: "center",
-      render: (item) => item.endDate? formatDate(item.endDate) : "-"
+      render: (item) => (item.endDate ? formatDate(item.endDate) : "-"),
     },
-    
+
     {
       key: "distributionPercentage",
       title: "Distribución",
       sortable: true,
       width: "10%",
       align: "center",
-      render: (item) => `${item.distributionPercentage}%`
+      render: (item) => `${item.distributionPercentage}%`,
     },
     {
       key: "status",
@@ -474,23 +506,27 @@ const ContractManagement: React.FC = () => {
       width: "12%",
       align: "center",
       render: (item) => (
-        <span className={`status-badge status-${item.status.toLowerCase()}`}>
+        <span className={`status-contract-badge status-contract-${item.status.toLowerCase()}`}>
           {getStatusText(item.status)}
         </span>
-      )
-    }
+      ),
+    },
   ];
 
   // Función para renderizar detalles en modal de eliminación
   const renderContractDetails = (contract: ContractResponseDto) => {
-    const artistName = contract.artist && typeof contract.artist === 'object' 
-      ? contract.artist.stageName
-      : artists.find(a => a.apprenticeId === contract.artist.apprenticeId)?.stageName || "No asignado";
-    
-    const agencyName = contract.agency && typeof contract.agency === 'object' 
-      ? contract.agency.nameAgency
-      : agencies.find(a => a.nameAgency === contract.agency.nameAgency)?.nameAgency || "No asignada";
-    
+    const artistName =
+      contract.artist && typeof contract.artist === "object"
+        ? contract.artist.stageName
+        : artists.find((a) => a.apprenticeId === contract.artist.apprenticeId)
+            ?.stageName || "No asignado";
+
+    const agencyName =
+      contract.agency && typeof contract.agency === "object"
+        ? contract.agency.nameAgency
+        : agencies.find((a) => a.nameAgency === contract.agency.nameAgency)
+            ?.nameAgency || "No asignada";
+
     return (
       <div className="contract-details">
         <div className="detail-item">
@@ -500,18 +536,22 @@ const ContractManagement: React.FC = () => {
           <strong>Agencia:</strong> <span>{agencyName}</span>
         </div>
         <div className="detail-item">
-          <strong>Fecha de inicio:</strong> <span>{formatDate(contract.startDate)}</span>
+          <strong>Fecha de inicio:</strong>{" "}
+          <span>{formatDate(contract.startDate)}</span>
         </div>
         <div className="detail-item">
-          <strong>Tipo de contrato:</strong> <span>{contract.endDate ? "Plazo Fijo" : "Tiempo Indefinido"}</span>
+          <strong>Tipo de contrato:</strong>{" "}
+          <span>{contract.endDate ? "Plazo Fijo" : "Tiempo Indefinido"}</span>
         </div>
         {contract.endDate && (
           <div className="detail-item">
-            <strong>Fecha de fin:</strong> <span>{formatDate(contract.endDate)}</span>
+            <strong>Fecha de fin:</strong>{" "}
+            <span>{formatDate(contract.endDate)}</span>
           </div>
         )}
         <div className="detail-item">
-          <strong>Distribución:</strong> <span>{contract.distributionPercentage}%</span>
+          <strong>Distribución:</strong>{" "}
+          <span>{contract.distributionPercentage}%</span>
         </div>
         <div className="detail-item">
           <strong>Estado:</strong> <span>{getStatusText(contract.status)}</span>
@@ -526,26 +566,25 @@ const ContractManagement: React.FC = () => {
   // Obtener datos iniciales para edición
   const getEditInitialData = (contract: ContractResponseDto) => {
     const isIndefinite = !contract.endDate;
-    
+
     return {
       artistId: contract.artist.apprenticeId,
       agencyId: contract.agency.nameAgency || contract.agency,
-      startDate: contract.startDate ? 
-        (new Date(contract.startDate).toISOString().split("T")[0]) 
+      startDate: contract.startDate
+        ? new Date(contract.startDate).toISOString().split("T")[0]
         : "",
       contractType: isIndefinite ? "indefinite" : "fixed",
-      endDate: contract.endDate ? 
-        (new Date(contract.endDate).toISOString().split("T")[0]) 
+      endDate: contract.endDate
+        ? new Date(contract.endDate).toISOString().split("T")[0]
         : "",
       distributionPercentage: contract.distributionPercentage.toString(),
       status: contract.status,
-      conditions: contract.conditions
+      conditions: contract.conditions,
     };
   };
 
   return (
     <section id="contract_manager" className="content-section active">
-
       <GenericTable<ContractResponseDto>
         title="Gestión de Contratos"
         description="Administre todos los contratos del sistema"
@@ -595,7 +634,7 @@ const ContractManagement: React.FC = () => {
           submitText="Actualizar Contrato"
           contractInfo={{
             artist: getArtistName(editingContract),
-            agency: getAgencyName(editingContract)
+            agency: getAgencyName(editingContract),
           }}
         />
       )}

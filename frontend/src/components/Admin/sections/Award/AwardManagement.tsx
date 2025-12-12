@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useAward } from "../../../../context/AwardContext";
 import GenericTable, { Column } from "../../../ui/datatable";
-import CreateModal, { FormField } from "../../../ui/reutilizables/CreateModal";
-import EditModal from "../../../ui/reutilizables/EditModal";
-import DeleteModal from "../../../ui/reutilizables/DeleteModal";
+import CreateModal, { FormField } from "../../../ui/reusable/CreateModal";
+import EditModal from "../../../ui/reusable/EditModal";
+import DeleteModal from "../../../ui/reusable/DeleteModal";
 // import './AwardManagement.css'
 import { ResponseAwardDto } from "../../../../../../backend/src/ApplicationLayer/DTOs/AwardDto/response.award.dto";
 
@@ -18,7 +18,7 @@ const AwardManagement: React.FC = () => {
     error,
     clearError,
   } = useAward();
-  
+
   const [notification, setNotification] = useState<{
     type: "success" | "error" | "info" | "warning";
     title?: string;
@@ -26,8 +26,12 @@ const AwardManagement: React.FC = () => {
   } | null>(null);
 
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editingAward, setEditingAward] = useState<ResponseAwardDto | null>(null);
-  const [deletingAward, setDeletingAward] = useState<ResponseAwardDto | null>(null);
+  const [editingAward, setEditingAward] = useState<ResponseAwardDto | null>(
+    null
+  );
+  const [deletingAward, setDeletingAward] = useState<ResponseAwardDto | null>(
+    null
+  );
 
   useEffect(() => {
     const loadData = async () => {
@@ -51,9 +55,10 @@ const AwardManagement: React.FC = () => {
       min: 2,
       max: 100,
       validate: (value) => {
-        if (value.length < 2) return "El nombre del premio debe tener al menos 2 caracteres";
+        if (value.length < 2)
+          return "El nombre del premio debe tener al menos 2 caracteres";
         return null;
-      }
+      },
     },
     {
       name: "date",
@@ -64,20 +69,23 @@ const AwardManagement: React.FC = () => {
         const date = new Date(value);
         if (date > new Date()) return "La fecha no puede ser futura";
         return null;
-      }
+      },
     },
-    
   ];
 
   // Datos iniciales para creación
   const initialCreateData = {
     name: "",
-    date: new Date().toISOString().split('T')[0],
-    albumId: ""
+    date: new Date().toISOString().split("T")[0],
+    albumId: "",
   };
 
   // Funciones auxiliares para mostrar notificaciones
-  const showNotification = (type: "success" | "error" | "info" | "warning", title: string, message: string) => {
+  const showNotification = (
+    type: "success" | "error" | "info" | "warning",
+    title: string,
+    message: string
+  ) => {
     setNotification({ type, title, message });
   };
 
@@ -94,40 +102,54 @@ const AwardManagement: React.FC = () => {
   };
 
   const showCreateError = (errorMessage?: string) => {
-    showError("Error al Crear Premio", errorMessage || "No se pudo crear el premio.");
+    showError(
+      "Error al Crear Premio",
+      errorMessage || "No se pudo crear el premio."
+    );
   };
 
   const showUpdateSuccess = () => {
-    showSuccess("¡Premio Actualizado!", "El premio ha sido actualizado exitosamente.");
+    showSuccess(
+      "¡Premio Actualizado!",
+      "El premio ha sido actualizado exitosamente."
+    );
   };
 
   const showUpdateError = (errorMessage?: string) => {
-    showError("Error al Actualizar Premio", errorMessage || "No se pudo actualizar el premio.");
+    showError(
+      "Error al Actualizar Premio",
+      errorMessage || "No se pudo actualizar el premio."
+    );
   };
 
   const showDeleteSuccess = () => {
-    showSuccess("¡Premio Eliminado!", "El premio ha sido eliminado exitosamente.");
+    showSuccess(
+      "¡Premio Eliminado!",
+      "El premio ha sido eliminado exitosamente."
+    );
   };
 
   const showDeleteError = (errorMessage?: string) => {
-    showError("Error al Eliminar Premio", errorMessage || "No se pudo eliminar el premio.");
+    showError(
+      "Error al Eliminar Premio",
+      errorMessage || "No se pudo eliminar el premio."
+    );
   };
 
   // Manejar creación
   const handleCreate = async (data: Record<string, any>) => {
     try {
       console.log("Datos para crear premio:", data);
-      
+
       await createAward({
         name: data.name,
         date: new Date(data.date),
-        albumId: data.albumId || undefined
+        albumId: data.albumId || undefined,
       });
 
       showCreateSuccess();
       setShowCreateModal(false);
       await fetchAwards();
-
     } catch (err: any) {
       console.error("Error al crear premio:", err);
       showCreateError(err.message);
@@ -135,12 +157,15 @@ const AwardManagement: React.FC = () => {
   };
 
   // Manejar actualización
-  const handleUpdate = async (id: string | number, data: Record<string, any>) => {
+  const handleUpdate = async (
+    id: string | number,
+    data: Record<string, any>
+  ) => {
     try {
       await updateAward(id as string, {
         name: data.name,
         date: new Date(data.date),
-        albumId: data.albumId || undefined
+        albumId: data.albumId || undefined,
       });
 
       showUpdateSuccess();
@@ -184,16 +209,16 @@ const AwardManagement: React.FC = () => {
       title: "Nombre del Premio",
       sortable: true,
       width: "40%",
-      align: "center"
+      align: "center",
     },
-   
+
     {
       key: "date",
       title: "Fecha",
       sortable: true,
       width: "20%",
       render: (item) => formatDate(item.date.toString()),
-      align: "center"
+      align: "center",
     },
     {
       key: "albumId",
@@ -205,15 +230,15 @@ const AwardManagement: React.FC = () => {
         if (item.albumId) {
           return (
             <span className="album-id">
-              {item.albumId.length > 20 
-                ? `${item.albumId.substring(0, 20)}...` 
+              {item.albumId.length > 20
+                ? `${item.albumId.substring(0, 20)}...`
                 : item.albumId}
             </span>
           );
         }
         return <span className="no-album">No asociado</span>;
-      }
-    }
+      },
+    },
   ];
 
   // Función para renderizar detalles en modal de eliminación
@@ -229,13 +254,14 @@ const AwardManagement: React.FC = () => {
         <strong>Año:</strong> <span>{formatYear(award.date.toString())}</span>
       </div>
       <div className="detail-item">
-        <strong>ID del Álbum:</strong> 
+        <strong>ID del Álbum:</strong>
         <span className={award.albumId ? "album-id-detail" : "no-album-detail"}>
           {award.albumId || "No asociado a ningún álbum"}
         </span>
       </div>
       <div className="detail-item">
-        <strong>ID del Premio:</strong> <span className="award-id">{award.id}</span>
+        <strong>ID del Premio:</strong>{" "}
+        <span className="award-id">{award.id}</span>
       </div>
     </div>
   );
@@ -282,7 +308,7 @@ const AwardManagement: React.FC = () => {
           initialData={{
             name: editingAward.name,
             date: editingAward.date.toString().split("T")[0],
-            albumId: editingAward.albumId || ""
+            albumId: editingAward.albumId || "",
           }}
           itemId={editingAward.id}
           onSubmit={handleUpdate}
