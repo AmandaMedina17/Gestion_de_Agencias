@@ -1,12 +1,11 @@
-import { GroupStatus } from "../Enums";
+import { ArtistRole, GroupStatus } from "../Enums";
 import { v4 as uuidv4 } from 'uuid';
-import { Artist } from "./Artist";
 import { IUpdatable } from "@domain/UpdatableInterface";
 import { UpdateData } from "@domain/UpdateData";
 
-export class Group implements IUpdatable{
+export class Group implements IUpdatable {
   
-  private _members: Artist[] = []; // Lista interna de miembros
+  private _members: string[] = [];
 
   constructor(
     private readonly id: string,
@@ -14,11 +13,11 @@ export class Group implements IUpdatable{
     private status: GroupStatus,
     private debut_date: Date,
     private concept: string,
-    // private visual_concept 
     private is_created: boolean,
     private agencyId: string,
-    // private proposedByArtistId?: string,
-    members?: Artist[] 
+    private num_members: number = 0,
+    members?: string[],
+    // private proposedByArtistId?: string
   ) {
     if (members) {
       this._members = members;
@@ -119,42 +118,82 @@ export class Group implements IUpdatable{
       }
   }
 
-  static create( name: string, status: GroupStatus, debut_date: Date, concept: string, is_created: boolean, agencyId: string) : Group {
+  static create( name: string, status: GroupStatus, debut_date: Date, 
+    concept: string, is_created: boolean, agencyId: string) : Group {
     const id = uuidv4();
     return new Group(id, name, status, debut_date, concept, is_created, agencyId);
   }
 
-  public set_created(){
-    this.is_created = true;
-  }
-  public getNumberOfMembers(): number {
-    return this._members.length;
-  }
+  // Método para agregar un miembro (con rol y fecha de inicio)
+  public addMember(memberId: string, role: ArtistRole, startDate: Date = new Date()): MembershipInfo {
 
-   // Método para agregar un miembro
-  public addMember(member: Artist): void {
     // Validar que el miembro no esté ya en el grupo
-    if (this._members.some(m => m.getId() === member.getId())) {
+    if (this._members.some(m => m === memberId)) {
       throw new Error("El miembro ya pertenece a este grupo");
     }
-   
-    this._members.push(member);
+
+    // Validar que el miembro no esté ya en el grupo
+    if (this.num_members >= 10) {
+      throw new Error("La cantidad de miembros de un grupo no puede exceder 10");
+    }
+
+    // Agregar a la lista de miembros activos
+    this._members.push(memberId);
+
+    // Calcular fecha de debut
+    // La fecha de debut es la mayor entre:
+    // 1. La fecha de inicio de membresía
+    // 2. La fecha de debut del grupo (si aún no ha debutado)
+    const artist_debut_date = this.debut_date > startDate ? this.debut_date : startDate;
+    
+    // Actualizar cantidad de miembros del grupo
+    this.num_members += 1
+
+    //Retornar Membresía
+    return {
+      groupId: this.id,
+      artistId: memberId,
+      start_date: startDate,
+      role: role,
+      artistDebutDate: artist_debut_date
+    };
+    
   }
 
-  // Método para remover un miembro
-  public removeMember(memberId: string): void {
-    const member = this._members.find(m => m.getId() === memberId);
-    if (member) {
-      // Validar que no queden con menos de 2 miembros
-      if (this.getNumberOfMembers() < 2) {
-        throw new Error("El grupo debe tener al menos 2 miembros activos, no se puede eliminar otro miembro, marque el grupo como disuelto");
-      }
+  // Método para remover un miembro (con fecha de salida y razón)
+  public removeMember(memberId: string, leaveDate: Date = new Date()): void {
 
-      this._members = this._members.filter(m => m.getId() !== memberId);
+    const memberIndex = this._members.findIndex(m => m === memberId);
+    
+    if (memberIndex === -1) {
+      throw new Error(`El artista ${memberId} no es miembro de este grupo`);
     }
+
+    // Validar que no queden con menos de 2 miembros si el grupo está activo
+    // if (this.status === GroupStatus.ACTIVO && this._members.length <= 2) {
+    //   throw new Error("El grupo debe tener al menos 2 miembros activos, marque el grupo como disuelto");
+    // }
+
+    // Remover de la lista de miembros activos
+    this._members.splice(memberIndex, 1);
+
+    this.num_members -= 1
+
   }
 
   // Getters
+  public getMembersIds(): string[] {
+    return [...this._members];
+  }
+
+  public isMemberActive(artistId: string): boolean {
+    return this._members.some(m => m === artistId);
+  }
+
+  // public getProposedByArtistId(): string | undefined {
+  //   return this.proposedByArtistId;
+  // }
+
   public getId(): string {
     return this.id;
   }
@@ -183,11 +222,20 @@ export class Group implements IUpdatable{
     return this.agencyId;
   }
 
-  // public getArtist(): string | undefined {
-  //   return this.proposedByArtistId;
-  // }
+    public getNumberOfMembers(): number {
+    return this.num_members;
+  }
 
- 
 }
+
+interface MembershipInfo {
+  groupId: string;
+  artistId: string;
+  start_date: Date;
+  role: ArtistRole;
+  artistDebutDate: Date;
+  endDate?: Date
+}
+
 
 

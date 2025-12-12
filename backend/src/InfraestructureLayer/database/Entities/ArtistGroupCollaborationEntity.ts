@@ -21,7 +21,7 @@ export class ArtistGroupCollaborationEntity {
     artist!: ArtistEntity;
 
     // Relación con el grupo
-    @ManyToOne(() => GroupEntity, (group: GroupEntity) => group.artistCollaborations)
+    @ManyToOne(() => GroupEntity, (group: GroupEntity) => group.artistCollaborations, {onDelete: 'CASCADE'})
     @JoinColumn({ name: 'group_id' })
     group!: GroupEntity;
 

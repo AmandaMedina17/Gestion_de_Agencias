@@ -22,6 +22,9 @@ export class GroupEntity {
   @Column()
   name!: string;
 
+  @Column()
+  num_members!: number
+
   @Column({
     type: "enum",
     enum: GroupStatus,
