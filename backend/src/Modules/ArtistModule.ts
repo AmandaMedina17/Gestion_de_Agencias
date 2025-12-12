@@ -21,7 +21,6 @@ import { ActivityDtoMapper } from "@application/DTOs/dtoMappers/activity.dtoMapp
 import { ContractDtoMapper } from "@application/DTOs/dtoMappers/contract.dtoMapper";
 import { ContractRepositoryImpl } from "@infrastructure/database/Repositories/ContractRepository";
 import { AgencyDtoMapper } from "@application/DTOs/dtoMappers/agency.dtoMapper";
-import { AgencyModule } from "./AgencyModule";
 import { ResponsibleDtoMapper } from "@application/DTOs/dtoMappers/responsible.dtoMapper";
 import { PlaceDtoMapper } from "@application/DTOs/dtoMappers/place.dtoMapper";
 import { AgencyEntity } from "@infrastructure/database/Entities/AgencyEntity";
@@ -33,9 +32,14 @@ import { PlaceMapper } from "@infrastructure/database/Mappers/PlaceMapper";
 import { AlbumMapper } from "@infrastructure/database/Mappers/AlbumMapper";
 import { ArtistCollaborationEntity } from "@infrastructure/database/Entities/ArtistCollaborationEntity";
 import { ArtistGroupCollaborationEntity } from "@infrastructure/database/Entities/ArtistGroupCollaborationEntity";
+import { GroupRepository } from "@infrastructure/database/Repositories/GroupRepository";
+import { IGroupRepository } from "@domain/Repositories/IGroupRepository";
+import { GroupEntity } from "@infrastructure/database/Entities/GroupEntity";
+import { CreateArtistCollaborationUseCase } from '../ApplicationLayer/UseCases/create_artist_collaboration.use-case';
+import { CreateArtistGroupCollaborationUseCase } from "@application/UseCases/create_artist_group_collaboration.use-case";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ArtistEntity,ContractEntity, ArtistGroupMembershipEntity, ActivityEntity,ArtistActivityEntity,AgencyEntity, ArtistCollaborationEntity,ArtistGroupCollaborationEntity])],
+  imports: [TypeOrmModule.forFeature([ArtistEntity,ContractEntity, ArtistGroupMembershipEntity, ActivityEntity,ArtistActivityEntity,AgencyEntity, ArtistCollaborationEntity,ArtistGroupCollaborationEntity, GroupEntity])],
   controllers: [ArtistController],
   providers: [
     ArtistMapper,
@@ -58,6 +62,10 @@ import { ArtistGroupCollaborationEntity } from "@infrastructure/database/Entitie
       useClass: ArtistRepository,
     },
     {
+      provide: IGroupRepository,
+      useClass: GroupRepository,
+    },
+    {
       provide: IContractRepository,
       useClass: ContractRepositoryImpl,
     },
@@ -67,6 +75,8 @@ import { ArtistGroupCollaborationEntity } from "@infrastructure/database/Entitie
     },
     ArtistService,
     GetArtistsWithAgencyChangesAndGroupsUseCase,
+    CreateArtistCollaborationUseCase,
+    CreateArtistGroupCollaborationUseCase,
   ],
   exports: [IArtistRepository, ArtistDtoMapper, ArtistMapper],
 })

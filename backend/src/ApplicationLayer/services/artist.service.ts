@@ -15,6 +15,10 @@ import { ArtistCollaborationResponseDto } from "@application/DTOs/artistCollabor
 import { ArtistGroupCollaborationResponseDto } from "@application/DTOs/artist_groupCollaborationDto/response-artist-group-collaboration.dto";
 import { CreateArtistGroupCollaborationDto } from "@application/DTOs/artist_groupCollaborationDto/create-artist-group-collaboration.dto";
 import { CreateArtistCollaborationDto } from "@application/DTOs/artistCollaborationsDto/create-artist-collaboration.dto";
+import { IGroupRepository } from "@domain/Repositories/IGroupRepository";
+import { GroupRepository } from '../../InfraestructureLayer/database/Repositories/GroupRepository';
+import { CreateArtistCollaborationUseCase } from "@application/UseCases/create_artist_collaboration.use-case";
+import { CreateArtistGroupCollaborationUseCase } from "@application/UseCases/create_artist_group_collaboration.use-case";
 
 @Injectable()
 export class ArtistService extends BaseService<Artist, CreateArtistDto, ArtistResponseDto, UpdateArtistDto>{
@@ -25,7 +29,11 @@ export class ArtistService extends BaseService<Artist, CreateArtistDto, ArtistRe
         private readonly contractDtoMapper:ContractDtoMapper,
         private readonly activityDtoMapper: ActivityDtoMapper,
         private readonly groupDtoMapper: GroupDtoMapper,
+        @Inject(IGroupRepository)
+        private readonly groupRepository: IGroupRepository,
         private readonly getArtistsWithAgencyChangesAndGroupsUseCase : GetArtistsWithAgencyChangesAndGroupsUseCase,
+        private readonly createArtistCollaborationUseCase: CreateArtistCollaborationUseCase,
+        private readonly createArtistGroupCollaborationUseCase: CreateArtistGroupCollaborationUseCase,
     ){
         super(artistRepository, artistDtoMapper)
     }
@@ -63,14 +71,16 @@ export class ArtistService extends BaseService<Artist, CreateArtistDto, ArtistRe
         const response: ArtistCollaborationResponseDto[] = [];
         
         for (const coll of collaborations) {
-                const artistResponse = this.artistDtoMapper.toResponse(coll.collaborator);
-       
-            response.push({
-            artist: artistResponse,
-            date: coll.collaborationDate
-            });
+            const artist1Response = this.artistDtoMapper.toResponse(coll.artist1);
+            const artist2Response = this.artistDtoMapper.toResponse(coll.artist2);
+            
+            const collaborationResponse = new ArtistCollaborationResponseDto();
+            collaborationResponse.artist1 = artist1Response;
+            collaborationResponse.artist2 = artist2Response;
+            collaborationResponse.date = coll.collaborationDate;
+            
+            response.push(collaborationResponse);
         }
-
         return response;
     }
 
@@ -80,34 +90,42 @@ export class ArtistService extends BaseService<Artist, CreateArtistDto, ArtistRe
         const response: ArtistGroupCollaborationResponseDto[] = [];
         
         for (const coll of collaborations) {
-                const groupResponse = this.groupDtoMapper.toResponse(coll.collaborator);
-       
-            response.push({
-            group: groupResponse,
-            date: coll.collaborationDate
-            });
+            const artistResponse = this.artistDtoMapper.toResponse(coll.artist);
+            const groupResponse = this.groupDtoMapper.toResponse(coll.group);
+            
+            const collaborationResponse = new ArtistGroupCollaborationResponseDto();
+            collaborationResponse.artist = artistResponse;
+            collaborationResponse.group = groupResponse;
+            collaborationResponse.date = coll.collaborationDate;
+            
+            response.push(collaborationResponse);
         }
 
         return response;
     }
 
     async createArtistCollaboration(createArtistCollaborationDto: CreateArtistCollaborationDto) {
-    const { artist1Id, artist2Id, date } = createArtistCollaborationDto;
-    
-    // Validar que los artistas sean diferentes
-    if (artist1Id === artist2Id) {
-      throw new Error('Un artista no puede colaborar consigo mismo');
+        const {artist1, artist2, date} = await this.createArtistCollaborationUseCase.execute(createArtistCollaborationDto)
+        const artist1Dto = this.artistDtoMapper.toResponse(artist1);
+        const artist2Dto = this.artistDtoMapper.toResponse(artist2);
+        const response = new ArtistCollaborationResponseDto();
+        response.artist1 = artist1Dto;
+        response.artist2 = artist2Dto;
+        response.date = date;
+        return response;
     }
 
-    // Ordenar los IDs para evitar duplicados (opcional)
-    const [firstId, secondId] = [artist1Id, artist2Id].sort();
-    
-    return await this.artistRepository.createArtistCollaboration(firstId, secondId, date);
-  }
-
   async createArtistGroupCollaboration(createArtistGroupCollaborationDto: CreateArtistGroupCollaborationDto) {
-    const { artistId, groupId, date } = createArtistGroupCollaborationDto;
+    const { artist, group, date } = await this.createArtistGroupCollaborationUseCase.execute(createArtistGroupCollaborationDto);
     
-    return await this.artistRepository.createArtistGroupCollaboration(artistId, groupId, date);
+    // Mapear a DTOs de respuesta si es necesario
+    const artistDto = this.artistDtoMapper.toResponse(artist);
+    const groupDto = this.groupDtoMapper.toResponse(group);
+    
+    const response = new ArtistGroupCollaborationResponseDto();
+    response.artist = artistDto;
+    response.group = groupDto;
+    response.date = date;
+    return response;
   }
 }

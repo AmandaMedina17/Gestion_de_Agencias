@@ -264,81 +264,88 @@ export class ArtistRepository
     }
     
     async getArtist_ArtistColaborations(id: string): Promise<Array<{
-      collaborator: Artist;
+      artist1: Artist;
+      artist2: Artist;
       collaborationDate: Date;
     }>> {
-        const artistEntity = await this.repository.findOne({
+      const artistEntity = await this.repository.findOne({
         where: { id },
         relations: [
-            'collaborationsAsArtist1',
-            'collaborationsAsArtist1.artist2',
-            'collaborationsAsArtist2', 
-            'collaborationsAsArtist2.artist1'
+          'collaborationsAsArtist1',
+          'collaborationsAsArtist1.artist2',
+          'collaborationsAsArtist2', 
+          'collaborationsAsArtist2.artist1'
         ]
-        });
+      });
 
-        if (!artistEntity) {
-            return [];
-        }
+      if (!artistEntity) {
+        return [];
+      }
 
-        const collaborations : Array<{collaborator: Artist, collaborationDate: Date}> = [];
+      const collaborations: Array<{artist1: Artist, artist2: Artist, collaborationDate: Date}> = [];
 
-        // Artistas con los que colaboró como artist1
-        if (artistEntity.collaborationsAsArtist1) {
-          for (const collab of artistEntity.collaborationsAsArtist1) {
-            if (collab.artist2) {
-              const domainArtist = this.mapper.toDomainEntity(collab.artist2);
-              collaborations.push({
-                collaborator: domainArtist,
-                collaborationDate: collab.date
-              });
-            }
+      // Artistas con los que colaboró como artist1
+      if (artistEntity.collaborationsAsArtist1) {
+        for (const collab of artistEntity.collaborationsAsArtist1) {
+          if (collab.artist2) {
+            const domainArtist1 = this.mapper.toDomainEntity(artistEntity);
+            const domainArtist2 = this.mapper.toDomainEntity(collab.artist2);
+            collaborations.push({
+              artist1: domainArtist1,
+              artist2: domainArtist2,
+              collaborationDate: collab.date
+            });
           }
         }
+      }
 
-        // Artistas con los que colaboró como artist2
-        if (artistEntity.collaborationsAsArtist2) {
-          for (const collab of artistEntity.collaborationsAsArtist2) {
-            if (collab.artist1) {
-              const domainArtist = this.mapper.toDomainEntity(collab.artist1);
-              collaborations.push({
-                collaborator: domainArtist,
-                collaborationDate: collab.date
-              });
-            }
+      // Artistas con los que colaboró como artist2
+      if (artistEntity.collaborationsAsArtist2) {
+        for (const collab of artistEntity.collaborationsAsArtist2) {
+          if (collab.artist1) {
+            const domainArtist1 = this.mapper.toDomainEntity(collab.artist1);
+            const domainArtist2 = this.mapper.toDomainEntity(artistEntity);
+            collaborations.push({
+              artist1: domainArtist1,
+              artist2: domainArtist2,
+              collaborationDate: collab.date
+            });
           }
         }
-        return collaborations;
+      }
+      return collaborations;
     }
 
     async getArtist_GroupsColaborations(id: string): Promise<Array<{
-      collaborator: Group;
+      artist: Artist;
+      group: Group;
       collaborationDate: Date;
     }>> {
-       const artistEntity = await this.repository.findOne({
+      const artistEntity = await this.repository.findOne({
         where: { id },
         relations: ['groupCollaborations', 'groupCollaborations.group']
-        });
+      });
 
-        if (!artistEntity || !artistEntity.groupCollaborations) {
-            return [];
+      if (!artistEntity || !artistEntity.groupCollaborations) {
+        return [];
+      }
+
+      const collaborations: Array<{artist: Artist, group: Group, collaborationDate: Date}> = [];
+
+      // Obtener el artista en formato dominio una sola vez
+      const domainArtist = this.mapper.toDomainEntity(artistEntity);
+
+      for (const collaboration of artistEntity.groupCollaborations) {
+        if (collaboration.group) {
+          const domainGroup = this.groupMapper.toDomainEntity(collaboration.group);
+          
+          collaborations.push({
+            artist: domainArtist,
+            group: domainGroup,
+            collaborationDate: collaboration.date
+          });
         }
-
-        const collaborations: Array<{collaborator: Group, collaborationDate: Date}> = [];
-
-        // Procesar cada colaboración
-        for (const collaboration of artistEntity.groupCollaborations) {
-          if (collaboration.group) {
-            // Convertir el grupo a dominio
-            const domainGroup = this.groupMapper.toDomainEntity(collaboration.group);
-            
-            // Agregar al array con la fecha de colaboración
-            collaborations.push({
-              collaborator: domainGroup,
-              collaborationDate: collaboration.date
-            });
-          }
-  }
-        return collaborations;
+      }
+      return collaborations;
     }
 }

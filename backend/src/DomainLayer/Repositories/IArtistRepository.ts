@@ -17,12 +17,14 @@ export abstract class IArtistRepository extends IRepository<Artist> {
   abstract getArtistGroups(id: string): Promise<Group[]>;
 
   abstract getArtist_ArtistColaborations(id: string): Promise<Array<{
-      collaborator: Artist;
-      collaborationDate: Date;
-    }>>
+    artist1: Artist;
+    artist2: Artist;
+    collaborationDate: Date;
+  }>> 
 
   abstract getArtist_GroupsColaborations(id: string): Promise<Array<{
-      collaborator: Group;
+      artist: Artist;
+      group: Group;
       collaborationDate: Date;
     }>>
 
