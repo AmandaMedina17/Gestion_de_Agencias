@@ -29,7 +29,7 @@ export class ArtistGroupMembershipRepository implements IArtistGroupMembershipRe
     newMembership.startDate = startDate;
     newMembership.rol = role;
     newMembership.artist_debut_date = artistDebutDate;
-    newMembership.endDate = endDate === null ? undefined : endDate;
+    newMembership.endDate = endDate === undefined ? null : endDate;
     
     // Guardar la membresía
     await this.repository.save(newMembership);
