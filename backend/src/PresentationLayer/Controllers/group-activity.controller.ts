@@ -1,3 +1,4 @@
+import { GetGroupCalendaryDto } from "@application/DTOs/schedule-groupDto/group_calendary.dto";
 import { ScheduleGroupDto } from "@application/DTOs/schedule-groupDto/schedule-group.dto";
 import { GroupActivityService } from "@application/services/group-activity.service";
 import { Body, Controller, Get, Param, Post, ValidationPipe } from "@nestjs/common";
@@ -13,8 +14,8 @@ export class GroupActivityController {
     await this.group_activity_service.scheduleGroup(scheduleGroupDto);
   }
 
-  @Get(':groupId/activities')
-  getGroupActivities(@Param('groupId') groupId: string) {
-    return this.group_activity_service.getGroupActivities(groupId)
+  @Get('/activities')
+  getGroupActivities(@Body(ValidationPipe) dto: GetGroupCalendaryDto) {
+    return this.group_activity_service.getGroupActivities(dto)
   }
 }
