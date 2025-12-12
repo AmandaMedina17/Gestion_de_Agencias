@@ -30,6 +30,7 @@ import { AgencyMapper } from "@infrastructure/database/Mappers/AgencyMapper";
 import { ActivityMapper } from "@infrastructure/database/Mappers/ActivityMapper";
 import { ResponsibleMapper } from "@infrastructure/database/Mappers/ResponsibleMapper";
 import { PlaceMapper } from "@infrastructure/database/Mappers/PlaceMapper";
+import { AlbumMapper } from "@infrastructure/database/Mappers/AlbumMapper";
 
 @Module({
   imports: [TypeOrmModule.forFeature([ArtistEntity,ContractEntity, ArtistGroupMembershipEntity, ActivityEntity,ArtistActivityEntity,AgencyEntity])],
@@ -38,6 +39,7 @@ import { PlaceMapper } from "@infrastructure/database/Mappers/PlaceMapper";
     ArtistMapper,
     ArtistDtoMapper,
     GroupMapper,
+    AlbumMapper,
     ContractMapper,
     AgencyMapper,
     ActivityMapper,

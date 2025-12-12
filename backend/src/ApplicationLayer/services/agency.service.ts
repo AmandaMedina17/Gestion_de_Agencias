@@ -95,7 +95,7 @@ export class AgencyService extends BaseService<Agency, CreateAgencyDto, AgencyRe
 
     for (const artist of artistsWithDebut) {
       // 2. Obtener grupos de debut del artista
-      const debutGroups = await this.artistRepository.getArtistDebutGroups(artist.getId());
+      const debutGroups = await this.artistRepository.getArtistGroups(artist.getId());
       
       // 3. Obtener contratos activos del artista con esta agencia
       const artistContracts = await this.contractRepository.getArtistContracts(artist.getId());

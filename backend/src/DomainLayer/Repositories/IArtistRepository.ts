@@ -11,28 +11,21 @@ export abstract class IArtistRepository extends IRepository<Artist> {
     endDate: Date
   ): Promise<Artist[]>;
 
-  abstract getArtistAgencies(id: string): Promise<Agency[]>;
-
   abstract getArtistAlbums(id: string): Promise<Album[]>;
 
-  // Historial profesional de un artista:
-  abstract getCurrentArtistContracts(id: string): Promise<Contract[]>;
-
   abstract getArtistGroups(id: string): Promise<Group[]>;
-
-  abstract getArtistDebutsInOrders(id: string): Promise<any[]>; //Que hay que devolver??
 
   abstract getArtist_ArtistColaborations(id: string): Promise<Artist[]>;
 
   abstract getArtist_GroupsColaborations(id: string): Promise<Group[]>;
 
-  abstract getArtistCurrentGroup(id: string): Promise<Group>;
+  abstract getArtistCurrentGroup(id: string): Promise<Group | null>;
 
   abstract getArtists_WithAgencyChangesAndGroups(agencyId: string): Promise<Artist[]>;
 
   abstract getArtistsWithDebut(agencyId?: string): Promise<Artist[]> ;
 
-  abstract getArtistDebutGroups(artistId: string): Promise<Group[]>;
+  // abstract getArtistDebutGroups(artistId: string): Promise<Group[]>;
 
   abstract getArtistDebutHistory(agencyId: string): Promise<Array<{
     group: Group,
