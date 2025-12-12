@@ -16,6 +16,7 @@ import { ArtistGroupMembershipEntity } from '@infrastructure/database/Entities/A
 import { LeaveGroupUseCase } from '@application/UseCases/leave-group.use-case';
 import { IArtistGroupMembershipRepository } from '@domain/Repositories/IArtistGroupMembershipRepository';
 import { ArtistGroupMembershipRepository } from '@infrastructure/database/Repositories/ArtistGroupMembershipRepository';
+import { ActiveGroupUseCase } from '@application/UseCases/activate_group.use-case';
 
 @Module({
   imports: [
@@ -39,7 +40,8 @@ import { ArtistGroupMembershipRepository } from '@infrastructure/database/Reposi
     CreateGroupUseCase,
     UpdateGroupUseCase,
     AddMemberToGroupUseCase,
-    LeaveGroupUseCase
+    LeaveGroupUseCase,
+    ActiveGroupUseCase,
     ],
     exports: [
     IGroupRepository,

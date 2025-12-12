@@ -11,6 +11,7 @@ export class CreateArtistAgencyDto{
     @Transform(({ value }) => new Date(value)) //Convierte string a Date automáticamente
     startDate!: Date;
 
+    @IsOptional()
     @IsDate()
     @IsOptional()
     @Transform(({ value }) => new Date(value)) //Convierte string a Date automáticamente

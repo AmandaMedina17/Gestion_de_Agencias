@@ -4,13 +4,17 @@ import { useSongBillboard } from "../../../../context/SongBillboardContext";
 import { useSong } from "../../../../context/SongContext";
 import { useBillboardList } from "../../../../context/BillboardListContext";
 import GenericTable, { Column } from "../../../ui/datatable";
-import CreateModal, { FormField } from "../../../ui/reutilizables/CreateModal";
-import DeleteModal from "../../../ui/reutilizables/DeleteModal";
+import CreateModal, { FormField } from "../../../ui/reusable/CreateModal";
+import DeleteModal from "../../../ui/reusable/DeleteModal";
 import { Box, Button, Chip, Alert, IconButton } from "@mui/material";
 import { Add, MusicNote, TrendingUp, Delete } from "@mui/icons-material";
 
 interface BillboardTabProps {
-  onNotification?: (type: "success" | "error" | "info" | "warning", title: string, message: string) => void;
+  onNotification?: (
+    type: "success" | "error" | "info" | "warning",
+    title: string,
+    message: string
+  ) => void;
 }
 
 const BillboardTab: React.FC<BillboardTabProps> = ({ onNotification }) => {
@@ -35,7 +39,11 @@ const BillboardTab: React.FC<BillboardTabProps> = ({ onNotification }) => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        await Promise.all([fetchRecords(), fetchSongs(), fetchBillboardLists()]);
+        await Promise.all([
+          fetchRecords(),
+          fetchSongs(),
+          fetchBillboardLists(),
+        ]);
         setDataLoaded(true);
       } catch (err) {
         console.error("Error loading data:", err);
@@ -47,7 +55,11 @@ const BillboardTab: React.FC<BillboardTabProps> = ({ onNotification }) => {
     loadData();
   }, []);
 
-  const showNotification = (type: "success" | "error" | "info" | "warning", title: string, message: string) => {
+  const showNotification = (
+    type: "success" | "error" | "info" | "warning",
+    title: string,
+    message: string
+  ) => {
     if (onNotification) {
       onNotification(type, title, message);
     }
@@ -73,28 +85,28 @@ const BillboardTab: React.FC<BillboardTabProps> = ({ onNotification }) => {
       label: "Canción",
       type: "autocomplete",
       required: true,
-      options: songs.map(song => ({
+      options: songs.map((song) => ({
         value: song.id,
-        label: song.name || song.name || "Canción sin nombre"
+        label: song.name || song.name || "Canción sin nombre",
       })),
       validate: (value) => {
         if (!value) return "Debe seleccionar una canción";
         return null;
-      }
+      },
     },
     {
       name: "billboardId",
       label: "Lista Billboard",
       type: "autocomplete",
       required: true,
-      options: billboardLists.map(list => ({
+      options: billboardLists.map((list) => ({
         value: list.id,
-        label: list.nameList || "Lista sin nombre"
+        label: list.nameList || "Lista sin nombre",
       })),
       validate: (value) => {
         if (!value) return "Debe seleccionar una lista Billboard";
         return null;
-      }
+      },
     },
     {
       name: "place",
@@ -104,7 +116,7 @@ const BillboardTab: React.FC<BillboardTabProps> = ({ onNotification }) => {
       required: true,
       min: 1,
       max: 200,
-      validate: validatePosition
+      validate: validatePosition,
     },
     {
       name: "date",
@@ -116,23 +128,23 @@ const BillboardTab: React.FC<BillboardTabProps> = ({ onNotification }) => {
         if (date > new Date()) return "La fecha no puede ser futura";
         if (isNaN(date.getTime())) return "Fecha inválida";
         return null;
-      }
-    }
+      },
+    },
   ];
 
   const initialCreateData = {
     songId: "",
     billboardId: "",
     place: "",
-    date: new Date().toISOString().split('T')[0]
+    date: new Date().toISOString().split("T")[0],
   };
 
   const handleCreate = async (data: Record<string, any>) => {
     setFormError(null);
-    
+
     try {
       console.log("Datos para agregar a Billboard:", data);
-      
+
       if (!data.songId || !data.billboardId || !data.place || !data.date) {
         setFormError("Todos los campos son obligatorios");
         return;
@@ -154,19 +166,24 @@ const BillboardTab: React.FC<BillboardTabProps> = ({ onNotification }) => {
         songId: data.songId,
         billboardId: data.billboardId,
         place: placeValue,
-        date: dateValue
+        date: dateValue,
       };
 
       console.log("Enviando datos:", addDto);
-      
+
       await addSongToBillboard(addDto);
-      
-      showNotification("success", "Registro Creado", "La canción ha sido agregada al Billboard exitosamente.");
+
+      showNotification(
+        "success",
+        "Registro Creado",
+        "La canción ha sido agregada al Billboard exitosamente."
+      );
       setShowCreateModal(false);
       await fetchRecords();
     } catch (err: any) {
       console.error("Error al agregar a Billboard:", err);
-      const errorMessage = err.message || "No se pudo agregar la canción al Billboard";
+      const errorMessage =
+        err.message || "No se pudo agregar la canción al Billboard";
       setFormError(errorMessage);
       showNotification("error", "Error al Agregar", errorMessage);
     }
@@ -182,25 +199,36 @@ const BillboardTab: React.FC<BillboardTabProps> = ({ onNotification }) => {
 
     try {
       // IMPORTANTE: Usar billBoardId (con B mayúscula) según ResponseSongBillboardDto
-      await removeSongFromBillboard(deletingRecord.songId, deletingRecord.billBoardId);
-      
-      showNotification("success", "Registro Eliminado", "El registro ha sido eliminado del Billboard exitosamente.");
+      await removeSongFromBillboard(
+        deletingRecord.songId,
+        deletingRecord.billBoardId
+      );
+
+      showNotification(
+        "success",
+        "Registro Eliminado",
+        "El registro ha sido eliminado del Billboard exitosamente."
+      );
       setDeletingRecord(null);
       await fetchRecords();
     } catch (err: any) {
       console.error("Error al eliminar registro:", err);
-      showNotification("error", "Error al Eliminar", err.message || "No se pudo eliminar el registro del Billboard.");
+      showNotification(
+        "error",
+        "Error al Eliminar",
+        err.message || "No se pudo eliminar el registro del Billboard."
+      );
     }
   };
 
   const formatDate = (date: Date | string) => {
     try {
-      const dateObj = typeof date === 'string' ? new Date(date) : date;
+      const dateObj = typeof date === "string" ? new Date(date) : date;
       if (isNaN(dateObj.getTime())) return "Fecha inválida";
       return dateObj.toLocaleDateString("es-ES", {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
       });
     } catch {
       return "Fecha inválida";
@@ -216,14 +244,18 @@ const BillboardTab: React.FC<BillboardTabProps> = ({ onNotification }) => {
 
   const getSongName = (songId: string) => {
     if (!dataLoaded) return "Cargando...";
-    const song = songs.find(s => s.id === songId);
-    return song ? (song.name || song.name || "Canción sin nombre") : "Canción desconocida";
+    const song = songs.find((s) => s.id === songId);
+    return song
+      ? song.name || song.name || "Canción sin nombre"
+      : "Canción desconocida";
   };
 
   const getBillboardName = (billboardId: string) => {
     if (!dataLoaded) return "Cargando...";
-    const billboard = billboardLists.find(b => b.id === billboardId);
-    return billboard ? (billboard.nameList || "Lista sin nombre") : "Lista desconocida";
+    const billboard = billboardLists.find((b) => b.id === billboardId);
+    return billboard
+      ? billboard.nameList || "Lista sin nombre"
+      : "Lista desconocida";
   };
 
   const getRecordPosition = (record: any) => {
@@ -238,15 +270,17 @@ const BillboardTab: React.FC<BillboardTabProps> = ({ onNotification }) => {
     return `${record.songId}_${record.billBoardId}`;
   };
 
-  const combinedRecords = dataLoaded ? records.map(record => ({
-    ...record,
-    id: generateCompositeId(record), 
-    songName: getSongName(record.songId),
-    billboardName: getBillboardName(record.billBoardId),
-    billboardId: record.billBoardId, 
-    position: getRecordPosition(record),
-    entryDate: getRecordDate(record)
-  })) : [];
+  const combinedRecords = dataLoaded
+    ? records.map((record) => ({
+        ...record,
+        id: generateCompositeId(record),
+        songName: getSongName(record.songId),
+        billboardName: getBillboardName(record.billBoardId),
+        billboardId: record.billBoardId,
+        position: getRecordPosition(record),
+        entryDate: getRecordDate(record),
+      }))
+    : [];
 
   const columns: Column<any>[] = [
     {
@@ -259,12 +293,13 @@ const BillboardTab: React.FC<BillboardTabProps> = ({ onNotification }) => {
         <Box display="flex" alignItems="center" gap={2}>
           <MusicNote sx={{ color: "#4CAF50" }} />
           <Box>
-            <div style={{ fontWeight: 600, fontSize: '16px' }}>{item.songName}</div>
-            <div style={{ fontSize: '12px', color: '#666' }}>
+            <div style={{ fontWeight: 600, fontSize: "16px" }}>
+              {item.songName}
             </div>
+            <div style={{ fontSize: "12px", color: "#666" }}></div>
           </Box>
         </Box>
-      )
+      ),
     },
     {
       key: "billboardName",
@@ -274,11 +309,12 @@ const BillboardTab: React.FC<BillboardTabProps> = ({ onNotification }) => {
       align: "center",
       render: (item) => (
         <Box>
-          <div style={{ fontWeight: 600, fontSize: '16px' }}>{item.billboardName}</div>
-          <div style={{ fontSize: '12px', color: '#666' }}>
+          <div style={{ fontWeight: 600, fontSize: "16px" }}>
+            {item.billboardName}
           </div>
+          <div style={{ fontSize: "12px", color: "#666" }}></div>
         </Box>
-      )
+      ),
     },
     {
       key: "position",
@@ -293,14 +329,14 @@ const BillboardTab: React.FC<BillboardTabProps> = ({ onNotification }) => {
             label={`#${position}`}
             sx={{
               backgroundColor: getPositionColor(position),
-              color: position <= 10 ? 'white' : 'inherit',
-              fontWeight: 'bold',
-              minWidth: '60px',
-              fontSize: '14px'
+              color: position <= 10 ? "white" : "inherit",
+              fontWeight: "bold",
+              minWidth: "60px",
+              fontSize: "14px",
             }}
           />
         );
-      }
+      },
     },
     {
       key: "entryDate",
@@ -308,32 +344,33 @@ const BillboardTab: React.FC<BillboardTabProps> = ({ onNotification }) => {
       sortable: true,
       width: "15%",
       render: (item) => formatDate(item.entryDate),
-      align: "center"
+      align: "center",
     },
-   
   ];
 
   const renderRecordDetails = (record: any) => (
     <div className="billboard-record-details">
       <div className="detail-item">
-        <strong>Canción:</strong> 
+        <strong>Canción:</strong>
         <div>
           <div>{record.songName}</div>
         </div>
       </div>
       <div className="detail-item">
-        <strong>Billboard:</strong> 
+        <strong>Billboard:</strong>
         <div>
           <div>{record.billboardName}</div>
         </div>
       </div>
       <div className="detail-item">
-        <strong>Posición:</strong> 
-        <span style={{
-          color: getPositionColor(getRecordPosition(record)),
-          fontWeight: 'bold',
-          fontSize: '18px'
-        }}>
+        <strong>Posición:</strong>
+        <span
+          style={{
+            color: getPositionColor(getRecordPosition(record)),
+            fontWeight: "bold",
+            fontSize: "18px",
+          }}
+        >
           #{getRecordPosition(record)}
         </span>
       </div>
@@ -346,16 +383,11 @@ const BillboardTab: React.FC<BillboardTabProps> = ({ onNotification }) => {
   return (
     <div className="billboard-tab">
       {error && (
-        <Alert 
-          severity="error" 
-          onClose={clearError}
-          sx={{ mb: 2 }}
-        >
+        <Alert severity="error" onClose={clearError} sx={{ mb: 2 }}>
           {error}
         </Alert>
       )}
 
-      
       <GenericTable<any>
         title="Canciones en Billboard"
         description=" Gestiona las posiciones de canciones en listas Billboard"
@@ -372,13 +404,17 @@ const BillboardTab: React.FC<BillboardTabProps> = ({ onNotification }) => {
         notification={undefined}
         onNotificationClose={() => {}}
         emptyState={
-          <Box sx={{ textAlign: 'center', py: 6 }}>
-            <TrendingUp sx={{ fontSize: 60, color: '#ddd', mb: 2 }} />
-            <h3 style={{ color: '#666', marginBottom: '10px' }}>
-              {dataLoaded ? "No hay canciones en Billboard" : "Cargando datos..."}
+          <Box sx={{ textAlign: "center", py: 6 }}>
+            <TrendingUp sx={{ fontSize: 60, color: "#ddd", mb: 2 }} />
+            <h3 style={{ color: "#666", marginBottom: "10px" }}>
+              {dataLoaded
+                ? "No hay canciones en Billboard"
+                : "Cargando datos..."}
             </h3>
-            <p style={{ color: '#999', marginBottom: '20px' }}>
-              {dataLoaded ? "Agrega canciones a listas Billboard para comenzar" : "Por favor espere..."}
+            <p style={{ color: "#999", marginBottom: "20px" }}>
+              {dataLoaded
+                ? "Agrega canciones a listas Billboard para comenzar"
+                : "Por favor espere..."}
             </p>
             {dataLoaded && (
               <Button

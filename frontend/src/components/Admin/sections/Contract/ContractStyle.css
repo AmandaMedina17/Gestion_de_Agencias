@@ -1,266 +1,30 @@
-/* ContractStyle.css - Estilos específicos para la gestión de contratos */
 
-/* Contenedor de selección con búsqueda */
-.select-container {
-  position: relative;
-}
-
-.select-container .search-input {
-  margin-bottom: 0.5rem;
-}
-
-.select-container select {
-  height: auto;
-  max-height: 150px;
-  overflow-y: auto;
-}
-
-.select-container select option {
-  padding: 0.5rem;
-  border-bottom: 1px solid #f1f3f4;
-  cursor: pointer;
-}
-
-.select-container select option:hover {
-  background-color: #f8f9fa;
-}
-
-.select-container select option:checked {
-  background-color: #007bff;
-  color: white;
-}
-
-.no-results-message {
-  padding: 0.5rem;
-  text-align: center;
-  color: #6c757d;
-  font-style: italic;
-  background: #f8f9fa;
-  border-radius: 4px;
-  margin-top: 0.5rem;
-}
-
-/* Sufijo para input de porcentaje */
-.input-suffix {
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #6c757d;
-  font-weight: 500;
-}
-
-/* Textarea para condiciones */
-.form-textarea {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #dee2e6;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-family: inherit;
-  resize: vertical;
-  min-height: 100px;
-}
-
-.form-textarea:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
-}
-
-/* Indicador de días restantes */
-.days-remaining {
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-align: center;
+.status-contract-badge {
+  padding: 0.4rem 1rem !important; 
   display: inline-block;
-}
-
-.days-remaining.warning {
-  background: #fff3cd;
-  color: #856404;
-}
-
-.days-remaining.expired {
-  background: #f8d7da;
-  color: #721c24;
-}
-
-/* Badges de estado */
-.status-badge {
-  padding: 0.4rem 1rem;
-  border-radius: 20px;
-  font-size: 0.95rem;
+  border-radius: 20px; 
+  font-size: 16px !important;
   font-weight: 500;
-  text-align: center;
-  display: inline-block;
-  min-width: 120px;
+  border: 2px solid; 
 }
 
-.status-activo {
-  background: #d4edda;
-  color: #155724;
+.status-contract-activo{
+  border-color: #9ac4b6;
+  color: #254925;
 }
 
-.status-inactivo {
-  background: #fff3cd;
-  color: #856404;
+.status-contract-finalizado {
+  border-color: rgb(231, 200, 158);
+  color: #422f07;
 }
 
-.status-suspendido {
-  background: #d1ecf1;
+
+.status-contract-en_renovacion {
+  border-color: rgb(167, 197, 229);
   color: #0c5460;
 }
 
-.status-finalizado {
-  background: #f8d7da;
-  color: #721c24;
+.status-contract-rescindido {
+  border-color: rgb(250, 169, 169);
+  color: #470808;
 }
-
-/* Estilos para tabla de contratos */
-.contracts-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 1.2rem;
-}
-
-.contracts-table th {
-  background: #f8f9fa;
-  padding: 1.2rem 1rem;
-  text-align: center;
-  font-weight: 700;
-  color: #495057;
-  border-bottom: 3px solid #dee2e6;
-  font-size: 01.1rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.contracts-table td {
-  padding: 1.2rem 1rem;
-  border-bottom: 1px solid #e9ecef;
-  vertical-align: middle;
-  text-align: center;
-  font-size: 1.05rem
-}
-
-.contract-row {
-  transition: all 0.2s;
-}
-
-.contract-row:hover {
-  background: #f8f8f8;
-}
-
-.contract-artist-cell {
-  font-weight: 500;
-  color: #333;
-}
-
-.contract-artist {
-  font-weight: 600;
-  color: #333;
-  font-size: 1rem;
-}
-
-/* Modales específicos para contratos */
-.contract-modal .modal-content {
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-  max-width: 800px;
-  width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.contract-modal .form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.contract-modal .form-group {
-  margin-bottom: 0;
-}
-
-.contract-modal .full-width {
-  grid-column: 1 / -1;
-}
-
-.contract-modal .modal-actions {
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  margin-top: 1.5rem;
-}
-
-.contract-modal .delete-confirmation {
-  margin: 1.5rem 0;
-}
-
-.contract-modal .contract-details {
-  background: #f8f9fa;
-  padding: 1rem;
-  border-radius: 6px;
-  margin: 1rem 0;
-}
-
-.contract-modal .detail-item {
-  margin: 0.5rem 0;
-  font-size: 1rem;
-  display: flex;
-  justify-content: space-between;
-}
-
-.contract-modal .detail-item strong {
-  color: #6c757d;
-}
-
-.contract-modal .warning-text {
-  color: #dc3545;
-  font-weight: 500;
-  margin-top: 1rem;
-  text-align: center;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .contract-modal .form-row {
-    grid-template-columns: 1fr;
-  }
-  
-  .contracts-table {
-    min-width: 800px;
-  }
-  
-  .contracts-table th,
-  .contracts-table td {
-    padding: 0.75rem 0.5rem;
-  }
-  
-  .contracts-table th {
-    font-size: 0.8rem;
-  }
-  
-  .contract-artist {
-    font-size: 0.9rem;
-  }
-  
-  .days-remaining {
-    font-size: 0.8rem;
-    padding: 0.2rem 0.5rem;
-  }
-  
-  .status-badge {
-    font-size: 0.85rem;
-    min-width: 100px;
-    padding: 0.3rem 0.8rem;
-  }
-}
-
-/* Reutilizar estilos comunes de manager-controls, pagination, etc. del ApprenticeStyle.css */

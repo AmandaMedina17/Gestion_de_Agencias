@@ -4,10 +4,10 @@ import { useIncome } from "@/context/IncomeContext";
 import { useActivity } from "@/context/ActivityContext";
 import { useResponsible } from "@/context/ResponsibleContext";
 import GenericTable, { Column } from "../../../../ui/datatable";
-import CreateModal, { FormField } from "../../../../ui/reutilizables/CreateModal";
-import EditModal from "../../../../ui/reutilizables/EditModal";
-import DeleteModal from "../../../../ui/reutilizables/DeleteModal";
-import './IncomeStyle.css';
+import CreateModal, { FormField } from "../../../../ui/reusable/CreateModal";
+import EditModal from "../../../../ui/reusable/EditModal";
+import DeleteModal from "../../../../ui/reusable/DeleteModal";
+import "./IncomeStyle.css";
 
 export enum IncomeType {
   EFECTIVO = "EFECTIVO",
@@ -19,7 +19,7 @@ export enum IncomeType {
   MONEDA_DIGITAL = "MONEDA_DIGITAL",
   PAYPAL = "PAYPAL",
   TRANSFERENCIA_ELECTRONICA = "TRANSFERENCIA_ELECTRONICA",
-  OTRO = "OTRO"
+  OTRO = "OTRO",
 }
 
 interface IncomeResponseDto {
@@ -57,8 +57,11 @@ const IncomeManagement: React.FC = () => {
   } | null>(null);
 
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editingIncome, setEditingIncome] = useState<IncomeResponseDto | null>(null);
-  const [deletingIncome, setDeletingIncome] = useState<IncomeResponseDto | null>(null);
+  const [editingIncome, setEditingIncome] = useState<IncomeResponseDto | null>(
+    null
+  );
+  const [deletingIncome, setDeletingIncome] =
+    useState<IncomeResponseDto | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -66,7 +69,7 @@ const IncomeManagement: React.FC = () => {
         await Promise.all([
           fetchIncomes(),
           fetchActivities(),
-          fetchResponsibles()
+          fetchResponsibles(),
         ]);
       } catch (err) {
         console.error("Error loading data:", err);
@@ -76,7 +79,11 @@ const IncomeManagement: React.FC = () => {
   }, []);
 
   // Funciones auxiliares para notificaciones
-  const showNotification = (type: "success" | "error" | "info" | "warning", title: string, message: string) => {
+  const showNotification = (
+    type: "success" | "error" | "info" | "warning",
+    title: string,
+    message: string
+  ) => {
     setNotification({ type, title, message });
   };
 
@@ -97,35 +104,47 @@ const IncomeManagement: React.FC = () => {
   };
 
   const showUpdateSuccess = () => {
-    showSuccess("¡Ingreso Actualizado!", "El ingreso ha sido actualizado exitosamente.");
+    showSuccess(
+      "¡Ingreso Actualizado!",
+      "El ingreso ha sido actualizado exitosamente."
+    );
   };
 
   const showUpdateError = (errorMessage?: string) => {
-    showError("Error al Actualizar", errorMessage || "No se pudo actualizar el ingreso.");
+    showError(
+      "Error al Actualizar",
+      errorMessage || "No se pudo actualizar el ingreso."
+    );
   };
 
   const showDeleteSuccess = () => {
-    showSuccess("¡Ingreso Eliminado!", "El ingreso ha sido eliminado exitosamente.");
+    showSuccess(
+      "¡Ingreso Eliminado!",
+      "El ingreso ha sido eliminado exitosamente."
+    );
   };
 
   const showDeleteError = (errorMessage?: string) => {
-    showError("Error al Eliminar", errorMessage || "No se pudo eliminar el ingreso.");
+    showError(
+      "Error al Eliminar",
+      errorMessage || "No se pudo eliminar el ingreso."
+    );
   };
 
   // Funciones auxiliares para mostrar nombres
   const getActivityName = (income: IncomeResponseDto) => {
-    if (income.activity && typeof income.activity === 'object') {
+    if (income.activity && typeof income.activity === "object") {
       return `Actividad ${income.activity.id}`;
     }
-    const activity = activities.find(a => a.id === income.activityId);
+    const activity = activities.find((a) => a.id === income.activityId);
     return activity ? `Actividad ${activity.id}` : "No asignada";
   };
 
   const getResponsibleName = (income: IncomeResponseDto) => {
-    if (income.responsibleObj && typeof income.responsibleObj === 'object') {
+    if (income.responsibleObj && typeof income.responsibleObj === "object") {
       return income.responsibleObj.name;
     }
-    const responsible = responsibles.find(r => r.id === income.responsible);
+    const responsible = responsibles.find((r) => r.id === income.responsible);
     return responsible ? responsible.name : income.responsible;
   };
 
@@ -140,7 +159,7 @@ const IncomeManagement: React.FC = () => {
       [IncomeType.MONEDA_DIGITAL]: "Moneda Digital",
       [IncomeType.PAYPAL]: "PayPal",
       [IncomeType.TRANSFERENCIA_ELECTRONICA]: "Transferencia Electrónica",
-      [IncomeType.OTRO]: "Otro"
+      [IncomeType.OTRO]: "Otro",
     };
     return typeMap[type] || type;
   };
@@ -152,10 +171,10 @@ const IncomeManagement: React.FC = () => {
       label: "Tipo de ingreso",
       type: "autocomplete",
       required: true,
-      options: Object.values(IncomeType).map(type => ({
+      options: Object.values(IncomeType).map((type) => ({
         value: type,
-        label: getIncomeTypeText(type)
-      }))
+        label: getIncomeTypeText(type),
+      })),
     },
     {
       name: "mount",
@@ -169,7 +188,7 @@ const IncomeManagement: React.FC = () => {
         if (numValue <= 0) return "El monto debe ser mayor a 0";
         if (numValue > 1000000000) return "El monto es demasiado grande";
         return null;
-      }
+      },
     },
     {
       name: "date",
@@ -179,37 +198,37 @@ const IncomeManagement: React.FC = () => {
       validate: (value) => {
         if (!value) return "La fecha es requerida";
         return null;
-      }
+      },
     },
     {
       name: "responsible",
       label: "Responsable",
       type: "autocomplete",
       required: true,
-      options: responsibles.map(responsible => ({
+      options: responsibles.map((responsible) => ({
         value: responsible.id,
-        label: responsible.name
-      }))
+        label: responsible.name,
+      })),
     },
     {
       name: "activityId",
       label: "Actividad",
       type: "autocomplete",
       required: true,
-      options: activities.map(activity => ({
+      options: activities.map((activity) => ({
         value: activity.id,
-        label: `Actividad ${activity.id}`
-      }))
-    }
+        label: `Actividad ${activity.id}`,
+      })),
+    },
   ];
 
   // Datos iniciales para creación
   const initialCreateData = {
     incomeType: IncomeType.EFECTIVO,
     mount: "",
-    date: new Date().toISOString().split('T')[0],
+    date: new Date().toISOString().split("T")[0],
     responsible: "",
-    activityId: ""
+    activityId: "",
   };
 
   // Manejar creación
@@ -220,7 +239,7 @@ const IncomeManagement: React.FC = () => {
         mount: parseFloat(data.mount),
         date: new Date(data.date),
         responsible: data.responsible,
-        activityId: data.activityId
+        activityId: data.activityId,
       });
 
       showCreateSuccess();
@@ -232,14 +251,17 @@ const IncomeManagement: React.FC = () => {
   };
 
   // Manejar actualización
-  const handleUpdate = async (id: string | number, data: Record<string, any>) => {
+  const handleUpdate = async (
+    id: string | number,
+    data: Record<string, any>
+  ) => {
     try {
       await updateIncome(id as string, {
         type: data.incomeType,
         mount: parseFloat(data.mount),
         date: new Date(data.date),
         responsible: data.responsible,
-        activityId: data.activityId
+        activityId: data.activityId,
       });
 
       showUpdateSuccess();
@@ -267,7 +289,7 @@ const IncomeManagement: React.FC = () => {
   // Funciones auxiliares
   const formatDate = (date: Date | string) => {
     if (!date) return "N/A";
-    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    const dateObj = typeof date === "string" ? new Date(date) : date;
     dateObj.setDate(dateObj.getDate() + 1);
     return dateObj.toLocaleDateString("es-ES");
   };
@@ -276,7 +298,7 @@ const IncomeManagement: React.FC = () => {
     return new Intl.NumberFormat("es-ES", {
       style: "currency",
       currency: "USD",
-      minimumFractionDigits: 2
+      minimumFractionDigits: 2,
     }).format(amount);
   };
 
@@ -292,7 +314,7 @@ const IncomeManagement: React.FC = () => {
         <span className={`income-type type-${item.incomeType.toLowerCase()}`}>
           {getIncomeTypeText(item.incomeType)}
         </span>
-      )
+      ),
     },
     {
       key: "mount",
@@ -300,7 +322,7 @@ const IncomeManagement: React.FC = () => {
       sortable: true,
       width: "15%",
       align: "center",
-      render: (item) => formatCurrency(item.mount)
+      render: (item) => formatCurrency(item.mount),
     },
     {
       key: "date",
@@ -308,7 +330,7 @@ const IncomeManagement: React.FC = () => {
       sortable: true,
       width: "15%",
       align: "center",
-      render: (item) => formatDate(item.date)
+      render: (item) => formatDate(item.date),
     },
     {
       key: "responsible",
@@ -316,7 +338,7 @@ const IncomeManagement: React.FC = () => {
       sortable: false,
       width: "20%",
       align: "center",
-      render: (item) => getResponsibleName(item)
+      render: (item) => getResponsibleName(item),
     },
     {
       key: "activityId",
@@ -324,9 +346,8 @@ const IncomeManagement: React.FC = () => {
       sortable: false,
       width: "20%",
       align: "center",
-      render: (item) => getActivityName(item)
+      render: (item) => getActivityName(item),
     },
-    
   ];
 
   // Función para renderizar detalles en modal de eliminación
@@ -334,7 +355,8 @@ const IncomeManagement: React.FC = () => {
     return (
       <div className="income-details">
         <div className="detail-item">
-          <strong>Tipo:</strong> <span>{getIncomeTypeText(income.incomeType)}</span>
+          <strong>Tipo:</strong>{" "}
+          <span>{getIncomeTypeText(income.incomeType)}</span>
         </div>
         <div className="detail-item">
           <strong>Monto:</strong> <span>{formatCurrency(income.mount)}</span>
@@ -343,7 +365,8 @@ const IncomeManagement: React.FC = () => {
           <strong>Fecha:</strong> <span>{formatDate(income.date)}</span>
         </div>
         <div className="detail-item">
-          <strong>Responsable:</strong> <span>{getResponsibleName(income)}</span>
+          <strong>Responsable:</strong>{" "}
+          <span>{getResponsibleName(income)}</span>
         </div>
         <div className="detail-item">
           <strong>Actividad:</strong> <span>{getActivityName(income)}</span>
@@ -398,10 +421,11 @@ const IncomeManagement: React.FC = () => {
           initialData={{
             incomeType: editingIncome.incomeType,
             mount: editingIncome.mount.toString(),
-            date: editingIncome.date ? 
-              (new Date(editingIncome.date).toISOString().split('T')[0]) : "",
+            date: editingIncome.date
+              ? new Date(editingIncome.date).toISOString().split("T")[0]
+              : "",
             responsible: editingIncome.responsible,
-            activityId: editingIncome.activityId
+            activityId: editingIncome.activityId,
           }}
           itemId={editingIncome.id}
           onSubmit={handleUpdate}

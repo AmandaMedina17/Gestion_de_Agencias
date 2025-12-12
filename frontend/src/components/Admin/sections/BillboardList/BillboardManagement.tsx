@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { useBillboardList } from "../../../../context/BillboardListContext";
 import GenericTable, { Column } from "../../../ui/datatable";
-import CreateModal, { FormField } from "../../../ui/reutilizables/CreateModal";
-import EditModal from "../../../ui/reutilizables/EditModal";
-import DeleteModal from "../../../ui/reutilizables/DeleteModal";
-import './BillboardListStyle.css';
+import CreateModal, { FormField } from "../../../ui/reusable/CreateModal";
+import EditModal from "../../../ui/reusable/EditModal";
+import DeleteModal from "../../../ui/reusable/DeleteModal";
+import "./BillboardListStyle.css";
 
-import { ResponseBillboardListDto as BillboardListResponseDto} from "../../../../../../backend/src/ApplicationLayer/DTOs/billboardDto/response.billboard.dto";
+import { ResponseBillboardListDto as BillboardListResponseDto } from "../../../../../../backend/src/ApplicationLayer/DTOs/billboardDto/response.billboard.dto";
 
-import Alert from '@mui/material/Alert';
-import AlertTitle from '@mui/material/AlertTitle';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
-import Stack from '@mui/material/Stack';
+import Alert from "@mui/material/Alert";
+import AlertTitle from "@mui/material/AlertTitle";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
+import Stack from "@mui/material/Stack";
 
 export enum BillboardListScope {
   INTERNACIONAL = "INTERNACIONAL",
@@ -38,8 +38,10 @@ const BillboardListManagement: React.FC = () => {
   } | null>(null);
 
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editingList, setEditingList] = useState<BillboardListResponseDto | null>(null);
-  const [deletingList, setDeletingList] = useState<BillboardListResponseDto | null>(null);
+  const [editingList, setEditingList] =
+    useState<BillboardListResponseDto | null>(null);
+  const [deletingList, setDeletingList] =
+    useState<BillboardListResponseDto | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -63,9 +65,10 @@ const BillboardListManagement: React.FC = () => {
       min: 2,
       max: 100,
       validate: (value) => {
-        if (value.length < 2) return "El nombre debe tener al menos 2 caracteres";
+        if (value.length < 2)
+          return "El nombre debe tener al menos 2 caracteres";
         return null;
-      }
+      },
     },
     {
       name: "publicDate",
@@ -75,7 +78,7 @@ const BillboardListManagement: React.FC = () => {
       validate: (value) => {
         if (!value) return "La fecha de publicación es requerida";
         return null;
-      }
+      },
     },
     {
       name: "scope",
@@ -84,8 +87,8 @@ const BillboardListManagement: React.FC = () => {
       required: true,
       options: [
         { value: BillboardListScope.INTERNACIONAL, label: "Internacional" },
-        { value: BillboardListScope.NACIONAL, label: "Nacional" }
-      ]
+        { value: BillboardListScope.NACIONAL, label: "Nacional" },
+      ],
     },
     {
       name: "endList",
@@ -96,11 +99,13 @@ const BillboardListManagement: React.FC = () => {
       max: 1000,
       validate: (value) => {
         const numValue = parseInt(value);
-        if (numValue <= 0) return "El número de puestos de la lista debe ser mayor a 0";
-        if (numValue > 1000) return "El número de puestos de la lista no puede ser mayor a 1000";
+        if (numValue <= 0)
+          return "El número de puestos de la lista debe ser mayor a 0";
+        if (numValue > 1000)
+          return "El número de puestos de la lista no puede ser mayor a 1000";
         return null;
-      }
-    }
+      },
+    },
   ];
 
   // Datos iniciales para creación
@@ -108,11 +113,15 @@ const BillboardListManagement: React.FC = () => {
     nameList: "",
     publicDate: "",
     scope: BillboardListScope.NACIONAL,
-    endList: "100"
+    endList: "100",
   };
 
   // Funciones auxiliares para mostrar notificaciones
-  const showNotification = (type: "success" | "error" | "info" | "warning", title: string, message: string) => {
+  const showNotification = (
+    type: "success" | "error" | "info" | "warning",
+    title: string,
+    message: string
+  ) => {
     setNotification({ type, title, message });
   };
 
@@ -125,27 +134,45 @@ const BillboardListManagement: React.FC = () => {
   };
 
   const showCreateSuccess = () => {
-    showSuccess("¡Lista Billboard Creada!", "La lista Billboard ha sido creada exitosamente.");
+    showSuccess(
+      "¡Lista Billboard Creada!",
+      "La lista Billboard ha sido creada exitosamente."
+    );
   };
 
   const showCreateError = (errorMessage?: string) => {
-    showError("Error al Crear", errorMessage || "No se pudo crear la lista Billboard.");
+    showError(
+      "Error al Crear",
+      errorMessage || "No se pudo crear la lista Billboard."
+    );
   };
 
   const showUpdateSuccess = () => {
-    showSuccess("¡Lista Billboard Actualizada!", "La lista Billboard ha sido actualizada exitosamente.");
+    showSuccess(
+      "¡Lista Billboard Actualizada!",
+      "La lista Billboard ha sido actualizada exitosamente."
+    );
   };
 
   const showUpdateError = (errorMessage?: string) => {
-    showError("Error al Actualizar", errorMessage || "No se pudo actualizar la lista Billboard.");
+    showError(
+      "Error al Actualizar",
+      errorMessage || "No se pudo actualizar la lista Billboard."
+    );
   };
 
   const showDeleteSuccess = () => {
-    showSuccess("¡Lista Billboard Eliminada!", "La lista Billboard ha sido eliminada exitosamente.");
+    showSuccess(
+      "¡Lista Billboard Eliminada!",
+      "La lista Billboard ha sido eliminada exitosamente."
+    );
   };
 
   const showDeleteError = (errorMessage?: string) => {
-    showError("Error al Eliminar", errorMessage || "No se pudo eliminar la lista Billboard.");
+    showError(
+      "Error al Eliminar",
+      errorMessage || "No se pudo eliminar la lista Billboard."
+    );
   };
 
   // Manejar creación
@@ -155,26 +182,28 @@ const BillboardListManagement: React.FC = () => {
         nameList: data.nameList,
         publicDate: new Date(data.publicDate),
         scope: data.scope,
-        endList: parseInt(data.endList)
+        endList: parseInt(data.endList),
       });
 
       showCreateSuccess();
       setShowCreateModal(false);
       await fetchBillboardLists();
-
     } catch (err: any) {
       showCreateError(err.message);
     }
   };
 
   // Manejar actualización
-  const handleUpdate = async (id: string | number, data: Record<string, any>) => {
+  const handleUpdate = async (
+    id: string | number,
+    data: Record<string, any>
+  ) => {
     try {
       await updateBillboardList(id as string, {
         nameList: data.nameList,
         publicDate: new Date(data.publicDate),
         scope: data.scope,
-        endList: parseInt(data.endList)
+        endList: parseInt(data.endList),
       });
 
       showUpdateSuccess();
@@ -202,7 +231,7 @@ const BillboardListManagement: React.FC = () => {
   // Funciones auxiliares
   const formatDate = (date: Date | string) => {
     if (!date) return "N/A";
-    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    const dateObj = typeof date === "string" ? new Date(date) : date;
     dateObj.setDate(dateObj.getDate() + 1);
     return dateObj.toLocaleDateString("es-ES");
   };
@@ -222,7 +251,7 @@ const BillboardListManagement: React.FC = () => {
       title: "Nombre",
       sortable: true,
       width: "30%",
-      align: "center"
+      align: "center",
     },
     {
       key: "publicDate",
@@ -230,7 +259,7 @@ const BillboardListManagement: React.FC = () => {
       sortable: true,
       width: "20%",
       align: "center",
-      render: (item) => formatDate(item.publicDate)
+      render: (item) => formatDate(item.publicDate),
     },
     {
       key: "scope",
@@ -242,7 +271,7 @@ const BillboardListManagement: React.FC = () => {
         <span className={`scope-badge scope-${item.scope.toLowerCase()}`}>
           {getScopeText(item.scope)}
         </span>
-      )
+      ),
     },
     {
       key: "endList",
@@ -250,8 +279,8 @@ const BillboardListManagement: React.FC = () => {
       sortable: true,
       width: "15%",
       align: "center",
-      render: (item) => item.endList.toString()
-    }
+      render: (item) => item.endList.toString(),
+    },
   ];
 
   // Función para renderizar detalles en modal de eliminación
@@ -313,18 +342,17 @@ const BillboardListManagement: React.FC = () => {
           fields={billboardListFields}
           initialData={{
             nameList: editingList.nameList,
-            publicDate: editingList.publicDate ? 
-              (new Date(editingList.publicDate).toISOString().split("T")[0]) 
+            publicDate: editingList.publicDate
+              ? new Date(editingList.publicDate).toISOString().split("T")[0]
               : "",
             scope: editingList.scope,
-            endList: editingList.endList.toString()
+            endList: editingList.endList.toString(),
           }}
           itemId={editingList.id}
           onSubmit={handleUpdate}
           onClose={() => setEditingList(null)}
           loading={loading}
           submitText="Actualizar Lista"
-         
         />
       )}
 
