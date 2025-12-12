@@ -124,6 +124,9 @@ export class Group implements IUpdatable{
     return new Group(id, name, status, debut_date, concept, is_created, agencyId);
   }
 
+  public set_created(){
+    this.is_created = true;
+  }
   public getNumberOfMembers(): number {
     return this._members.length;
   }

@@ -29,7 +29,7 @@ implements IGroupRepository{
   ) {
     super(repository, mapper);
   }
-
+  
   async addMember(idGroup: string, idArtist: string, startDate: Date, rol: string, artist_debut_date: Date, endDate: Date | null): Promise<void> {
     
     await this.dataSource.transaction(async (transactionalEntityManager) => {
