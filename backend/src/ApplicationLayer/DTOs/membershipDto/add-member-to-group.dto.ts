@@ -1,17 +1,18 @@
-import { IsDate, IsDateString, IsNotEmpty, IsOptional, IsString } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { IsEnum, IsNotEmpty, IsString, IsUUID } from 'class-validator';
+
+import { ArtistRole } from '@domain/Enums';
 
 export class AddMemberToGroupDto {
+  @IsUUID()
   @IsNotEmpty()
-  @IsString()
+  groupId!: string;
+
+  @IsNotEmpty()
+  @IsUUID()
   artistId!: string;
 
   @IsNotEmpty()
-  @IsString()
-  role!: string;
+  @IsEnum(ArtistRole)
+  role!: ArtistRole;
 
-  @IsDateString()
-  @IsOptional()
-  @Transform(({ value }) => value ? new Date(value) : null)
-  endDate?: Date;
 }
