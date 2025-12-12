@@ -9,7 +9,6 @@ import { BaseDtoMapper } from "@application/DTOs/dtoMappers/DtoMapper";
 import { ContractDtoMapper } from "@application/DTOs/dtoMappers/contract.dtoMapper";
 import { ContractService} from "../ApplicationLayer/services/contract.service";
 import { CreateContractUseCase } from '@application/UseCases/create_contract.uso-case';
-import { UpdateContractStatusUseCase } from '@application/UseCases/update_contract_status.use-case';
 import { ArtistModule } from './ArtistModule';
 import { AgencyModule } from './AgencyModule';
 import { AgencyEntity } from '@infrastructure/database/Entities/AgencyEntity';
@@ -32,7 +31,6 @@ import { GetArtistContractsUseCase } from '@application/UseCases/get_artist_cont
       useClass: ContractRepositoryImpl  
     },
     CreateContractUseCase,
-    UpdateContractStatusUseCase,
     UpdateContractUseCase,
     ContractService,
     GetArtistContractsUseCase,
