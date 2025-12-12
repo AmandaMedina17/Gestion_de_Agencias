@@ -69,6 +69,42 @@ export class ArtistRepository
     const groupEntities = memberships.map(m => m.group);
     return this.groupMapper.toDomainEntities(groupEntities);
   }
+
+  async getArtistDebutHistory(artistId: string): Promise<Array<{
+    group: Group,
+    role: string,
+    debutDate: Date,
+    startDate: Date,
+    endDate: Date | null,
+  }>>{
+    // Obtener todas las membresías del artista que tengan fecha de debut
+    const memberships = await this.membershipRepository.find({
+      where: { 
+        artistId
+      },
+      relations: ['group'],
+      order: {
+        artist_debut_date: 'ASC' // Ordenar cronológicamente por fecha de debut
+      }
+    });
+
+    if (!memberships.length) {
+      return [];
+    }
+
+    // Para cada membresía, construir el objeto de historial
+    return memberships.map(membership => {
+      const group = this.groupMapper.toDomainEntity(membership.group);
+      
+      return {
+        group, // Entidad de dominio Group
+        role: membership.rol,
+        debutDate: membership.artist_debut_date,
+        startDate: membership.startDate,
+        endDate: membership.endDate,
+      };
+    });
+  }
   async getArtistCurrentGroup(artistId: string): Promise<Group | null> {
     const now = new Date();
     
@@ -109,49 +145,26 @@ export class ArtistRepository
     return true;
   }
 
-   async getArtists_WithAgencyChangesAndGroups(): Promise<Artist[]> {
-    // Subquery para contar cambios reales de agencia
-    const agencyChangesSubQuery = this.repository
+   async getArtists_WithAgencyChangesAndGroups(agencyId: string): Promise<Artist[]> {
+    // 1. Obtener artistas con membresías activas en la agencia
+    const query = this.repository
       .createQueryBuilder('artist')
-      .select('artist.id')
-      .addSelect('COUNT(DISTINCT am.agencyId)', 'distinctAgencies')
-      .addSelect('COUNT(am.agencyId)', 'totalMemberships')
-      .leftJoin('artist.agencyMemberships', 'am')
-      .leftJoin('am.interval', 'interval')
+      .innerJoin('artist.agencyMemberships', 'agency_membership')
+      .where('agency_membership.agencyId = :agencyId', { agencyId })
+      .andWhere('(agency_membership.endDate IS NULL OR agency_membership.endDate > CURRENT_DATE)')
       .groupBy('artist.id')
-      .having('COUNT(DISTINCT am.agencyId) >= 2')  // Al menos 2 agencias diferentes
-      .andHaving('COUNT(am.agencyId) >= 3');       // Al menos 3 membresías (asegura cambios)
+      .having('COUNT(DISTINCT agency_membership.agencyId) >= 2') // Al menos 2 agencias diferentes
+      .andHaving('COUNT(DISTINCT gm.groupId) > 1'); // Más de un grupo
 
-    // Subquery para contar grupos
-    const groupsSubQuery = this.repository
-      .createQueryBuilder('artist')
-      .select('artist.id')
-      .addSelect('COUNT(DISTINCT gm.groupId)', 'groupCount')
+    // Añadir join para contar grupos
+    query
       .leftJoin('artist.groupMemberships', 'gm')
-      .groupBy('artist.id')
-      .having('COUNT(DISTINCT gm.groupId) > 1');
+      .groupBy('artist.id');
 
-    // Combinar ambas condiciones
-    const result = await this.repository
-      .createQueryBuilder('artist')
-      .innerJoin(
-        `(${agencyChangesSubQuery.getQuery()})`,
-        'ac',
-        'artist.id = ac.artist_id'
-      )
-      .innerJoin(
-        `(${groupsSubQuery.getQuery()})`,
-        'gc',
-        'artist.id = gc.artist_id'
-      )
-      .setParameters({
-        ...agencyChangesSubQuery.getParameters(),
-        ...groupsSubQuery.getParameters(),
-      })
-      .getMany();
-
-      return this.mapper.toDomainEntities(result);
-}
+    // Ejecutar la consulta
+    const artistEntities = await query.getMany();
+    return this.mapper.toDomainEntities(artistEntities);
+  }
     // async findArtistsWithScheduleConflicts(startDate: Date, endDate: Date): Promise<Artist[]> {
     //     const artistEntities = await this.repository
     //     .createQueryBuilder('artist')

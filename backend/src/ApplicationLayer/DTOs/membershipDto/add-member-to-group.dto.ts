@@ -10,7 +10,7 @@ export class AddMemberToGroupDto {
   @IsString()
   role!: string;
 
-  @IsDateString()
+  // @IsDateString()
   @IsOptional()
   @Transform(({ value }) => value ? new Date(value) : null)
   endDate?: Date;

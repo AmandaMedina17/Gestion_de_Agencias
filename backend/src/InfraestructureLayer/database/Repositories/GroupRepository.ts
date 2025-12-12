@@ -66,7 +66,7 @@ implements IGroupRepository{
       newMembership.startDate = startDate;
       newMembership.rol = rol;
       newMembership.artist_debut_date = artist_debut_date;
-      newMembership.endDate = endDate === null ? undefined : endDate;
+      newMembership.endDate = endDate;
 
       // 7. Guardar la membresía
       await transactionalEntityManager.save(newMembership);

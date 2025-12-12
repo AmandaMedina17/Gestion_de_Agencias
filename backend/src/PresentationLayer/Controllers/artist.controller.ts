@@ -20,9 +20,9 @@ export class ArtistController {
     return this.artistService.findAll();
   }
   
-  @Get('agency-changes-and-groups')
-  getArtistsWithAgencyChangesAndGroups(){
-    return this.artistService.getArtistsWithAgencyChangesAndGroups();
+  @Get('agency-changes-and-groups/:agencyId')
+  getArtistsWithAgencyChangesAndGroups(@Param('agencyId') agencyId: string){
+    return this.artistService.getArtistsWithAgencyChangesAndGroups(agencyId);
   }
   
   @Get(':id')
