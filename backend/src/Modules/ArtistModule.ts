@@ -31,9 +31,11 @@ import { ActivityMapper } from "@infrastructure/database/Mappers/ActivityMapper"
 import { ResponsibleMapper } from "@infrastructure/database/Mappers/ResponsibleMapper";
 import { PlaceMapper } from "@infrastructure/database/Mappers/PlaceMapper";
 import { AlbumMapper } from "@infrastructure/database/Mappers/AlbumMapper";
+import { ArtistCollaborationEntity } from "@infrastructure/database/Entities/ArtistCollaborationEntity";
+import { ArtistGroupCollaborationEntity } from "@infrastructure/database/Entities/ArtistGroupCollaborationEntity";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ArtistEntity,ContractEntity, ArtistGroupMembershipEntity, ActivityEntity,ArtistActivityEntity,AgencyEntity])],
+  imports: [TypeOrmModule.forFeature([ArtistEntity,ContractEntity, ArtistGroupMembershipEntity, ActivityEntity,ArtistActivityEntity,AgencyEntity, ArtistCollaborationEntity,ArtistGroupCollaborationEntity])],
   controllers: [ArtistController],
   providers: [
     ArtistMapper,
