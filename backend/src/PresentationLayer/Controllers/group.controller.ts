@@ -26,6 +26,11 @@ export class GroupController {
     return this.groupService.findAll();
   }
 
+  @Get('not-created')
+  getNotCreatedGroups(){
+    return this.groupService.getNotCreatedGroups();
+  }
+  
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.groupService.findOne(id);

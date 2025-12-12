@@ -48,4 +48,10 @@ extends BaseService<Group, CreateGroupDto, GroupResponseDto , UpdateGroupDto> {
     const members = await this.groupRepository.getGroupMembers(groupId)
     return this.artistDtoMapper.toResponseList(members)
   }
+
+  async getNotCreatedGroups(){
+    const groups = await this.groupRepository.findAll();
+    const created_groups = groups.filter(group => group.isCreated() === false);
+    return this.groupDtoMapper.toResponseList(created_groups);
+  }
 }
