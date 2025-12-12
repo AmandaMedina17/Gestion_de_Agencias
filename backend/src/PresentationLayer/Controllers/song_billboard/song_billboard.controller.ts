@@ -8,7 +8,6 @@ export class SongBillboardController {
     }
     @Post()
     create(@Body(ValidationPipe) addSongToBillboard: AddSongToBillboardDto) {
-        console.log("Se llama al controller")
         return this.songBillboardService.add(addSongToBillboard);
     }
 

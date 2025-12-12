@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useAgency } from "../../../../context/AgencyContext";
 import GenericTable, { Column } from "../../../ui/datatable";
-import CreateModal, { FormField } from "../../../ui/reutilizables/CreateModal";
-import EditModal from "../../../ui/reutilizables/EditModal";
-import DeleteModal from "../../../ui/reutilizables/DeleteModal";
-import './AgencyStyle.css';
+import CreateModal, { FormField } from "../../../ui/reusable/CreateModal";
+import EditModal from "../../../ui/reusable/EditModal";
+import DeleteModal from "../../../ui/reusable/DeleteModal";
+import "./AgencyStyle.css";
 import { AgencyResponseDto } from "../../../../../../backend/src/ApplicationLayer/DTOs/agencyDto/response-agency.dto";
 
-import Alert from '@mui/material/Alert';
-import AlertTitle from '@mui/material/AlertTitle';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
-import Stack from '@mui/material/Stack';
+import Alert from "@mui/material/Alert";
+import AlertTitle from "@mui/material/AlertTitle";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
+import Stack from "@mui/material/Stack";
 
 const AgencyManagement: React.FC = () => {
   const {
@@ -32,8 +32,11 @@ const AgencyManagement: React.FC = () => {
   } | null>(null);
 
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editingAgency, setEditingAgency] = useState<AgencyResponseDto | null>(null);
-  const [deletingAgency, setDeletingAgency] = useState<AgencyResponseDto | null>(null);
+  const [editingAgency, setEditingAgency] = useState<AgencyResponseDto | null>(
+    null
+  );
+  const [deletingAgency, setDeletingAgency] =
+    useState<AgencyResponseDto | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -57,9 +60,10 @@ const AgencyManagement: React.FC = () => {
       min: 2,
       max: 100,
       validate: (value) => {
-        if (value.length < 2) return "El nombre debe tener al menos 2 caracteres";
+        if (value.length < 2)
+          return "El nombre debe tener al menos 2 caracteres";
         return null;
-      }
+      },
     },
     {
       name: "place",
@@ -70,9 +74,10 @@ const AgencyManagement: React.FC = () => {
       min: 2,
       max: 100,
       validate: (value) => {
-        if (value.length < 2) return "El lugar debe tener al menos 2 caracteres";
+        if (value.length < 2)
+          return "El lugar debe tener al menos 2 caracteres";
         return null;
-      }
+      },
     },
     {
       name: "dateFundation",
@@ -83,19 +88,23 @@ const AgencyManagement: React.FC = () => {
         const date = new Date(value);
         if (date > new Date()) return "La fecha no puede ser futura";
         return null;
-      }
-    }
+      },
+    },
   ];
 
   // Datos iniciales para creación
   const initialCreateData = {
     nameAgency: "",
     place: "",
-    dateFundation: ""
+    dateFundation: "",
   };
 
   // Funciones auxiliares para mostrar notificaciones
-  const showNotification = (type: "success" | "error" | "info" | "warning", title: string, message: string) => {
+  const showNotification = (
+    type: "success" | "error" | "info" | "warning",
+    title: string,
+    message: string
+  ) => {
     setNotification({ type, title, message });
   };
 
@@ -116,19 +125,31 @@ const AgencyManagement: React.FC = () => {
   };
 
   const showUpdateSuccess = () => {
-    showSuccess("¡Agencia Actualizada!", "La agencia ha sido actualizada exitosamente.");
+    showSuccess(
+      "¡Agencia Actualizada!",
+      "La agencia ha sido actualizada exitosamente."
+    );
   };
 
   const showUpdateError = (errorMessage?: string) => {
-    showError("Error al Actualizar", errorMessage || "No se pudo actualizar la agencia.");
+    showError(
+      "Error al Actualizar",
+      errorMessage || "No se pudo actualizar la agencia."
+    );
   };
 
   const showDeleteSuccess = () => {
-    showSuccess("¡Agencia Eliminada!", "La agencia ha sido eliminada exitosamente.");
+    showSuccess(
+      "¡Agencia Eliminada!",
+      "La agencia ha sido eliminada exitosamente."
+    );
   };
 
   const showDeleteError = (errorMessage?: string) => {
-    showError("Error al Eliminar", errorMessage || "No se pudo eliminar la agencia.");
+    showError(
+      "Error al Eliminar",
+      errorMessage || "No se pudo eliminar la agencia."
+    );
   };
 
   // Manejar creación
@@ -137,25 +158,27 @@ const AgencyManagement: React.FC = () => {
       await createAgency({
         nameAgency: data.nameAgency,
         place: data.place,
-        dateFundation: new Date(data.dateFundation)
+        dateFundation: new Date(data.dateFundation),
       });
 
       showCreateSuccess();
       setShowCreateModal(false);
       await fetchAgencies();
-
     } catch (err: any) {
       showCreateError(err.message);
     }
   };
 
   // Manejar actualización
-  const handleUpdate = async (id: string | number, data: Record<string, any>) => {
+  const handleUpdate = async (
+    id: string | number,
+    data: Record<string, any>
+  ) => {
     try {
       await updateAgency(id as string, {
         nameAgency: data.nameAgency,
         place: data.place,
-        dateFundation: new Date(data.dateFundation)
+        dateFundation: new Date(data.dateFundation),
       });
 
       showUpdateSuccess();
@@ -183,14 +206,14 @@ const AgencyManagement: React.FC = () => {
   // Funciones auxiliares
   const formatDate = (date: Date | string) => {
     if (!date) return "N/A";
-    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    const dateObj = typeof date === "string" ? new Date(date) : date;
     dateObj.setDate(dateObj.getDate() + 1);
     return dateObj.toLocaleDateString("es-ES");
   };
 
   const calculateAntiquity = (date: Date | string) => {
     if (!date) return 0;
-    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    const dateObj = typeof date === "string" ? new Date(date) : date;
     const today = new Date();
     const diffTime = today.getTime() - dateObj.getTime();
     return Math.floor(diffTime / (1000 * 3600 * 24 * 365.25));
@@ -203,14 +226,14 @@ const AgencyManagement: React.FC = () => {
       title: "Nombre",
       sortable: true,
       width: "25%",
-      align: "center"
+      align: "center",
     },
     {
       key: "place",
       title: "Lugar",
       sortable: true,
       width: "25%",
-      align: "center"
+      align: "center",
     },
     {
       key: "dateFundation",
@@ -218,7 +241,7 @@ const AgencyManagement: React.FC = () => {
       sortable: true,
       width: "20%",
       align: "center",
-      render: (item) => formatDate(item.dateFundation)
+      render: (item) => formatDate(item.dateFundation),
     },
     {
       key: "antiquity",
@@ -226,8 +249,8 @@ const AgencyManagement: React.FC = () => {
       sortable: false,
       width: "15%",
       align: "center",
-      render: (item) => `${calculateAntiquity(item.dateFundation)} años`
-    }
+      render: (item) => `${calculateAntiquity(item.dateFundation)} años`,
+    },
   ];
 
   // Función para renderizar detalles en modal de eliminación
@@ -240,10 +263,12 @@ const AgencyManagement: React.FC = () => {
         <strong>Lugar:</strong> <span>{agency.place}</span>
       </div>
       <div className="detail-item">
-        <strong>Fecha de fundación:</strong> <span>{formatDate(agency.dateFundation)}</span>
+        <strong>Fecha de fundación:</strong>{" "}
+        <span>{formatDate(agency.dateFundation)}</span>
       </div>
       <div className="detail-item">
-        <strong>Antigüedad:</strong> <span>{calculateAntiquity(agency.dateFundation)} años</span>
+        <strong>Antigüedad:</strong>{" "}
+        <span>{calculateAntiquity(agency.dateFundation)} años</span>
       </div>
     </div>
   );
@@ -290,16 +315,17 @@ const AgencyManagement: React.FC = () => {
           initialData={{
             nameAgency: editingAgency.nameAgency,
             place: editingAgency.place,
-            dateFundation: editingAgency.dateFundation ? 
-              (new Date(editingAgency.dateFundation).toISOString().split("T")[0]) 
-              : ""
+            dateFundation: editingAgency.dateFundation
+              ? new Date(editingAgency.dateFundation)
+                  .toISOString()
+                  .split("T")[0]
+              : "",
           }}
           itemId={editingAgency.id}
           onSubmit={handleUpdate}
           onClose={() => setEditingAgency(null)}
           loading={loading}
           submitText="Actualizar Agencia"
-          
         />
       )}
 

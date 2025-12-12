@@ -3,15 +3,19 @@ import React, { useState, useEffect } from "react";
 import { useAward } from "../../../../context/AwardContext";
 import { useAlbum } from "../../../../context/AlbumContext";
 import GenericTable, { Column } from "../../../ui/datatable";
-import CreateModal, { FormField } from "../../../ui/reutilizables/CreateModal";
-import EditModal from "../../../ui/reutilizables/EditModal";
-import DeleteModal from "../../../ui/reutilizables/DeleteModal";
+import CreateModal, { FormField } from "../../../ui/reusable/CreateModal";
+import EditModal from "../../../ui/reusable/EditModal";
+import DeleteModal from "../../../ui/reusable/DeleteModal";
 import { ResponseAwardDto } from "../../../../../../backend/src/ApplicationLayer/DTOs/AwardDto/response.award.dto";
 import { Box, Button, Chip } from "@mui/material";
 import { Add, AttachFile } from "@mui/icons-material";
 
 interface AwardTabProps {
-  onNotification?: (type: "success" | "error" | "info" | "warning", title: string, message: string) => void;
+  onNotification?: (
+    type: "success" | "error" | "info" | "warning",
+    title: string,
+    message: string
+  ) => void;
 }
 
 const AwardTab: React.FC<AwardTabProps> = ({ onNotification }) => {
@@ -28,11 +32,17 @@ const AwardTab: React.FC<AwardTabProps> = ({ onNotification }) => {
   } = useAward();
 
   const { albums, fetchAlbums } = useAlbum();
-  
+
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editingAward, setEditingAward] = useState<ResponseAwardDto | null>(null);
-  const [deletingAward, setDeletingAward] = useState<ResponseAwardDto | null>(null);
-  const [assigningAward, setAssigningAward] = useState<ResponseAwardDto | null>(null);
+  const [editingAward, setEditingAward] = useState<ResponseAwardDto | null>(
+    null
+  );
+  const [deletingAward, setDeletingAward] = useState<ResponseAwardDto | null>(
+    null
+  );
+  const [assigningAward, setAssigningAward] = useState<ResponseAwardDto | null>(
+    null
+  );
   const [albumIdToAssign, setAlbumIdToAssign] = useState("");
 
   useEffect(() => {
@@ -60,9 +70,10 @@ const AwardTab: React.FC<AwardTabProps> = ({ onNotification }) => {
       min: 2,
       max: 100,
       validate: (value) => {
-        if (value.length < 2) return "El nombre del premio debe tener al menos 2 caracteres";
+        if (value.length < 2)
+          return "El nombre del premio debe tener al menos 2 caracteres";
         return null;
-      }
+      },
     },
     {
       name: "date",
@@ -73,18 +84,22 @@ const AwardTab: React.FC<AwardTabProps> = ({ onNotification }) => {
         const date = new Date(value);
         if (date > new Date()) return "La fecha no puede ser futura";
         return null;
-      }
-    }
+      },
+    },
   ];
 
   // Datos iniciales para creación
   const initialCreateData = {
     name: "",
-    date: new Date().toISOString().split('T')[0]
+    date: new Date().toISOString().split("T")[0],
   };
 
   // Función para mostrar notificaciones
-  const showNotification = (type: "success" | "error" | "info" | "warning", title: string, message: string) => {
+  const showNotification = (
+    type: "success" | "error" | "info" | "warning",
+    title: string,
+    message: string
+  ) => {
     if (onNotification) {
       onNotification(type, title, message);
     }
@@ -96,12 +111,20 @@ const AwardTab: React.FC<AwardTabProps> = ({ onNotification }) => {
 
     try {
       await assignAwardToAlbum(assigningAward.id, albumIdToAssign);
-      showNotification("success", "Premio Asignado", "El premio ha sido asignado al álbum exitosamente.");
+      showNotification(
+        "success",
+        "Premio Asignado",
+        "El premio ha sido asignado al álbum exitosamente."
+      );
       setAssigningAward(null);
       setAlbumIdToAssign("");
       await fetchAwards();
     } catch (err: any) {
-      showNotification("error", "Error al Asignar Premio", err.message || "No se pudo asignar el premio al álbum.");
+      showNotification(
+        "error",
+        "Error al Asignar Premio",
+        err.message || "No se pudo asignar el premio al álbum."
+      );
     }
   };
 
@@ -109,9 +132,9 @@ const AwardTab: React.FC<AwardTabProps> = ({ onNotification }) => {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("es-ES", {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
@@ -122,7 +145,7 @@ const AwardTab: React.FC<AwardTabProps> = ({ onNotification }) => {
 
   const getAlbumName = (albumId: string | undefined) => {
     if (!albumId) return null;
-    const album = albums.find(a => a.id === albumId);
+    const album = albums.find((a) => a.id === albumId);
     return album ? album.title : "Álbum desconocido";
   };
 
@@ -136,11 +159,13 @@ const AwardTab: React.FC<AwardTabProps> = ({ onNotification }) => {
       render: (item) => (
         <Box display="flex" alignItems="center" gap={2}>
           <Box>
-            <div style={{ fontWeight: 600, fontSize: '16px' }}>{item.name}</div>
-            <div style={{ fontSize: '12px', color: '#666' }}>ID: {item.id.substring(0, 8)}...</div>
+            <div style={{ fontWeight: 600, fontSize: "16px" }}>{item.name}</div>
+            <div style={{ fontSize: "12px", color: "#666" }}>
+              ID: {item.id.substring(0, 8)}...
+            </div>
           </Box>
         </Box>
-      )
+      ),
     },
     {
       key: "date",
@@ -149,11 +174,15 @@ const AwardTab: React.FC<AwardTabProps> = ({ onNotification }) => {
       width: "20%",
       render: (item) => (
         <Box textAlign="center">
-          <div style={{ fontWeight: 600 }}>{formatYear(item.date.toString())}</div>
-          <div style={{ fontSize: '12px', color: '#666' }}>{formatDate(item.date.toString())}</div>
+          <div style={{ fontWeight: 600 }}>
+            {formatYear(item.date.toString())}
+          </div>
+          <div style={{ fontSize: "12px", color: "#666" }}>
+            {formatDate(item.date.toString())}
+          </div>
         </Box>
       ),
-      align: "center"
+      align: "center",
     },
     {
       key: "albumId",
@@ -165,16 +194,16 @@ const AwardTab: React.FC<AwardTabProps> = ({ onNotification }) => {
         return (
           <Box textAlign="center">
             {albumName ? (
-              <Chip 
-                label={albumName} 
-                color="success" 
+              <Chip
+                label={albumName}
+                color="success"
                 size="small"
                 variant="outlined"
               />
             ) : (
-              <Chip 
-                label="Sin asignar" 
-                color="default" 
+              <Chip
+                label="Sin asignar"
+                color="default"
                 size="small"
                 variant="outlined"
               />
@@ -182,7 +211,7 @@ const AwardTab: React.FC<AwardTabProps> = ({ onNotification }) => {
           </Box>
         );
       },
-      align: "center"
+      align: "center",
     },
     {
       key: "actions",
@@ -203,14 +232,12 @@ const AwardTab: React.FC<AwardTabProps> = ({ onNotification }) => {
           </Button>
         </Box>
       ),
-      align: "center"
-    }
+      align: "center",
+    },
   ];
-
 
   return (
     <div className="award-tab">
-      
       <GenericTable<ResponseAwardDto>
         title="Premios de Álbumes"
         description="Gestiona y asigna premios a los álbumes de la agencia"
@@ -229,9 +256,9 @@ const AwardTab: React.FC<AwardTabProps> = ({ onNotification }) => {
         notification={undefined}
         onNotificationClose={() => {}}
         emptyState={
-          <div style={{ textAlign: 'center', padding: '40px' }}>
-            <h3 style={{ color: '#666' }}>No hay premios registrados</h3>
-            <p style={{ color: '#999' }}>Crea tu primer premio para comenzar</p>
+          <div style={{ textAlign: "center", padding: "40px" }}>
+            <h3 style={{ color: "#666" }}>No hay premios registrados</h3>
+            <p style={{ color: "#999" }}>Crea tu primer premio para comenzar</p>
             <Button
               variant="contained"
               startIcon={<Add />}
@@ -244,22 +271,27 @@ const AwardTab: React.FC<AwardTabProps> = ({ onNotification }) => {
         }
       />
 
-
-
       {/* Modal para asignar premio a álbum */}
       {assigningAward && (
         <div className="modal-overlay">
           <div className="modal-content">
             <div className="modal-header">
               <h3>Asignar Premio a Álbum</h3>
-              <button className="modal-close" onClick={() => {
-                setAssigningAward(null);
-                setAlbumIdToAssign("");
-              }}>×</button>
+              <button
+                className="modal-close"
+                onClick={() => {
+                  setAssigningAward(null);
+                  setAlbumIdToAssign("");
+                }}
+              >
+                ×
+              </button>
             </div>
             <div className="modal-body">
-              <p>Asignando el premio: <strong>{assigningAward.name}</strong></p>
-              
+              <p>
+                Asignando el premio: <strong>{assigningAward.name}</strong>
+              </p>
+
               <div className="form-group">
                 <label htmlFor="albumId">Seleccionar Álbum:</label>
                 <select
@@ -269,14 +301,15 @@ const AwardTab: React.FC<AwardTabProps> = ({ onNotification }) => {
                   className="form-input"
                 >
                   <option value="">Seleccione un álbum</option>
-                  {albums.map(album => (
+                  {albums.map((album) => (
                     <option key={album.id} value={album.id}>
-                      {album.title} - {new Date(album.releaseDate).getFullYear()}
+                      {album.title} -{" "}
+                      {new Date(album.releaseDate).getFullYear()}
                     </option>
                   ))}
                 </select>
               </div>
-              
+
               <div className="current-assignment">
                 <p>
                   <strong>Asignación actual:</strong>{" "}

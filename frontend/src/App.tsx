@@ -20,8 +20,8 @@ import { useAuth } from './context/AuthContext';
 import { AlbumProvider } from './context/AlbumContext';
 import { SongProvider } from './context/SongContext';
 import { GroupProvider } from './context/GroupContext';
-import LoginPage from './components/prueba/LoginPage'
-import './components/prueba/LoginPage'
+import LoginPage from './components/Login/LoginPage'
+import './components/Login/LoginPage'
 import { ActivitySchedulingProvider } from './context/ActivitySchedulingContext';
 import ArtistManagement from './components/Admin/sections/Artist/ArtistManagement';
 import { AwardProvider } from './context/AwardContext';
