@@ -3,6 +3,7 @@ import { GroupService } from '@application/services/group.service';
 import { CreateGroupDto } from '@application/DTOs/groupDto/create-group.dto';
 import { UpdateGroupDto } from '@application/DTOs/groupDto/update-group.dto';
 import { AddMemberToGroupDto } from '@application/DTOs/membershipDto/add-member-to-group.dto';
+import { LeaveGroupDto } from '@application/DTOs/membershipDto/leave-group.dto';
 
 @Controller('groups')
 export class GroupController {
@@ -13,13 +14,20 @@ export class GroupController {
     return this.groupService.create(createGroupDto);
   }
 
-  @Post(':id/members')
+  @Post('addMember')
   addMember(
-    @Param('id') groupId: string,
     @Body(ValidationPipe) addMemberDto: AddMemberToGroupDto,
   ) {
-    return this.groupService.addMember(groupId, addMemberDto);
+    return this.groupService.addMember(addMemberDto);
   }
+
+  @Post('removeMember')
+  removeMember(
+    @Body(ValidationPipe) removeMemberDto: LeaveGroupDto,
+  ) {
+    return this.groupService.removeMember(removeMemberDto);
+  }
+
 
   @Get()
   findAll() {
