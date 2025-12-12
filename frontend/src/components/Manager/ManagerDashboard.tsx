@@ -8,6 +8,7 @@ import { AgencyResponseDto } from '../../../../backend/src/ApplicationLayer/DTOs
 import { ArtistStatus } from '../Admin/sections/Artist/ArtistManagement';
 import { ApprenticeStatus } from '../Admin/sections/Apprentice/ApprenticesManagement';
 import { sectionComponents } from './ManagerSectionMap';
+import '../Admin/AdminDashboard.css'
 
 const ManagerDashboard: React.FC = () => {
   const [activeSection, setActiveSection] = useState('profile');

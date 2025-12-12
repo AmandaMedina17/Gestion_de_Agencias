@@ -26,6 +26,7 @@ import { ActivitySchedulingProvider } from './context/ActivitySchedulingContext'
 import ArtistManagement from './components/Admin/sections/Artist/ArtistManagement';
 import { AwardProvider } from './context/AwardContext';
 import { SongBillboardProvider } from './context/SongBillboardContext';
+import ArtistDashboard from './components/Artist/ArtistDashboard';
 
 // const PrivateRoute = ({ children, allowedRoles }: { children: React.ReactNode, allowedRoles: string[] }) => {
 //   const { user, isAuthenticated } = useAuth();
@@ -80,7 +81,7 @@ function App() {
                                         <Route 
                                           path="/artist" 
                                           element={
-                                            <ArtistManagement />
+                                            <ArtistDashboard />
                                           } 
                                         />
                                       </Routes>

@@ -1,4 +1,3 @@
-// GroupContext.tsx
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { groupService } from '../services/GroupService';
 import { CreateGroupDto } from '../../../backend/src/ApplicationLayer/DTOs/groupDto/create-group.dto';
@@ -12,6 +11,7 @@ import { ArtistResponseDto } from '../../../backend/src/ApplicationLayer/DTOs/ar
 interface GroupContextType {
   // Estado
   groups: GroupResponseDto[];
+  notCreatedGroups: GroupResponseDto[]; // Nuevo estado para grupos no creados
   loading: boolean;
   error: string | null;
   
@@ -23,6 +23,7 @@ interface GroupContextType {
   // Acciones
   createGroup: (createDto: CreateGroupDto) => Promise<void>;
   fetchGroups: () => Promise<void>;
+  fetchNotCreatedGroups: () => Promise<void>; // Nueva función
   fetchGroup: (id: string) => Promise<GroupResponseDto | null>;
   deleteGroup: (id: string) => Promise<void>;
   updateGroup: (id: string, updateData: { 
@@ -33,9 +34,10 @@ interface GroupContextType {
     is_created: boolean,
     agencyId: string 
   }) => Promise<void>;
+  activateGroup: (id: string) => Promise<void>; // Nueva función para aceptar grupo
   clearError: () => void;
 
-  // Nuevas acciones para miembros
+  // Acciones para miembros
   addMemberToGroup: (groupId: string, addMemberDto: AddMemberToGroupDto) => Promise<ResponseMembershipDto>;
   getGroupMembers: (groupId: string) => Promise<ArtistResponseDto[]>;
   removeMemberFromGroup: (groupId: string, artistId: string) => Promise<void>;
@@ -60,6 +62,7 @@ export const useGroup = () => {
 
 export const GroupProvider: React.FC<GroupProviderProps> = ({ children }) => {
   const [groups, setGroups] = useState<GroupResponseDto[]>([]);
+  const [notCreatedGroups, setNotCreatedGroups] = useState<GroupResponseDto[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
@@ -74,6 +77,10 @@ export const GroupProvider: React.FC<GroupProviderProps> = ({ children }) => {
     try {
       const newGroup = await groupService.create(createDto);
       setGroups(prev => [...prev, newGroup]);
+      // Si el grupo no está creado, también lo agregamos a notCreatedGroups
+      if (!newGroup.is_created) {
+        setNotCreatedGroups(prev => [...prev, newGroup]);
+      }
     } catch (err: any) {
       setError(err.message || 'Error al crear grupo');
       throw err;
@@ -88,8 +95,24 @@ export const GroupProvider: React.FC<GroupProviderProps> = ({ children }) => {
     try {
       const data = await groupService.findAll();
       setGroups(data);
+      // Filtrar grupos no creados
+      const notCreated = data.filter(group => !group.is_created);
+      setNotCreatedGroups(notCreated);
     } catch (err: any) {
       setError(err.message || 'Error al cargar grupos');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchNotCreatedGroups = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await groupService.getNotCreatedGroups();
+      setNotCreatedGroups(data);
+    } catch (err: any) {
+      setError(err.message || 'Error al cargar grupos no creados');
     } finally {
       setLoading(false);
     }
@@ -114,6 +137,7 @@ export const GroupProvider: React.FC<GroupProviderProps> = ({ children }) => {
     try {
       await groupService.remove(id);
       setGroups(prev => prev.filter(group => group.id !== id));
+      setNotCreatedGroups(prev => prev.filter(group => group.id !== id));
     } catch (err: any) {
       setError(err.message || 'Error al eliminar grupo');
       throw err;
@@ -133,8 +157,24 @@ export const GroupProvider: React.FC<GroupProviderProps> = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      await groupService.update(id, updateData);
-      await fetchGroups(); // Recargar la lista
+      const updatedGroup = await groupService.update(id, updateData);
+      
+      // Actualizar en grupos generales
+      setGroups(prev => prev.map(group => 
+        group.id === id ? { ...updatedGroup } : group
+      ));
+      
+      // Actualizar en grupos no creados
+      if (updatedGroup.is_created) {
+        // Si ahora está creado, lo removemos de notCreatedGroups
+        setNotCreatedGroups(prev => prev.filter(group => group.id !== id));
+      } else {
+        // Si sigue sin crear, lo actualizamos
+        setNotCreatedGroups(prev => prev.map(group => 
+          group.id === id ? { ...updatedGroup } : group
+        ));
+      }
+      
     } catch (err: any) {
       setError(err.message || 'Error al actualizar el grupo');
       throw err;
@@ -143,7 +183,29 @@ export const GroupProvider: React.FC<GroupProviderProps> = ({ children }) => {
     }
   };
 
-  // Nuevas funciones para manejar miembros
+  const activateGroup = async (id: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const activatedGroup = await groupService.activateGroup(id);
+      
+      // Actualizar en grupos generales
+      setGroups(prev => prev.map(group => 
+        group.id === id ? { ...activatedGroup, is_created: true } : group
+      ));
+      
+      // Remover de grupos no creados
+      setNotCreatedGroups(prev => prev.filter(group => group.id !== id));
+      
+    } catch (err: any) {
+      setError(err.message || 'Error al activar el grupo');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Funciones para manejar miembros
 
   const addMemberToGroup = async (groupId: string, addMemberDto: AddMemberToGroupDto) => {
     setMembersLoading(true);
@@ -173,7 +235,6 @@ export const GroupProvider: React.FC<GroupProviderProps> = ({ children }) => {
     setMembersError(null);
     try {
       const members = await groupService.getGroupMembers(groupId);
-      //setCurrentGroupMembers(members);
       return members;
     } catch (err: any) {
       setMembersError(err.message || 'Error al cargar miembros del grupo');
@@ -227,6 +288,7 @@ export const GroupProvider: React.FC<GroupProviderProps> = ({ children }) => {
   return (
     <GroupContext.Provider value={{
       groups,
+      notCreatedGroups,
       loading,
       error,
       currentGroupMembers,
@@ -234,9 +296,11 @@ export const GroupProvider: React.FC<GroupProviderProps> = ({ children }) => {
       membersError,
       createGroup,
       fetchGroups,
+      fetchNotCreatedGroups,
       fetchGroup,
       deleteGroup,
       updateGroup,
+      activateGroup,
       addMemberToGroup,
       getGroupMembers,
       removeMemberFromGroup,
