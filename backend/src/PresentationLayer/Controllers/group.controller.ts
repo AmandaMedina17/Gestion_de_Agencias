@@ -30,7 +30,7 @@ export class GroupController {
   getNotCreatedGroups(){
     return this.groupService.getNotCreatedGroups();
   }
-  
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.groupService.findOne(id);
@@ -44,6 +44,11 @@ export class GroupController {
   @Patch(':id')
   update(@Param('id') id: string, @Body(ValidationPipe) updateGroupDto: UpdateGroupDto) {
     return this.groupService.update(id, updateGroupDto);
+  }
+
+  @Patch(':id/activate')
+  activateGroup(@Param('id') id: string){
+    return this.groupService.activateGroup(id);
   }
 
   @Delete(':id')

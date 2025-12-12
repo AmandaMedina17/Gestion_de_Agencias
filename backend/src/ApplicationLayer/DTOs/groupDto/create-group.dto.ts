@@ -25,7 +25,6 @@ export class CreateGroupDto {
     @MinLength(1)
     concept!: string;
 
-    // visual_concept!: 
 
     @IsNotEmpty()
     @IsBoolean()

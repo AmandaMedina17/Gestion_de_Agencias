@@ -13,6 +13,7 @@ import { UpdateGroupUseCase } from '@application/UseCases/update_group.use-case'
 import { AddMemberToGroupUseCase } from '@application/UseCases/add_member_to_group.use-case';
 import { ArtistModule } from './ArtistModule';
 import { ArtistGroupMembershipEntity } from '@infrastructure/database/Entities/ArtistGroupMembershipEntity';
+import { ActiveGroupUseCase } from '@application/UseCases/activate_group.use-case';
 
 @Module({
   imports: [
@@ -31,7 +32,8 @@ import { ArtistGroupMembershipEntity } from '@infrastructure/database/Entities/A
     },
     CreateGroupUseCase,
     UpdateGroupUseCase,
-    AddMemberToGroupUseCase
+    AddMemberToGroupUseCase,
+    ActiveGroupUseCase,
     ],
     exports: [
     IGroupRepository,
