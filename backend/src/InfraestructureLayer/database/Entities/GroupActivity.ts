@@ -11,7 +11,7 @@ export class GroupActivityEntity {
     activityId!: string;
 
     // Relación con GroupEntity
-    @ManyToOne(() => GroupEntity, (group: GroupEntity) => group.groupActivities)
+    @ManyToOne(() => GroupEntity, (group: GroupEntity) => group.groupActivities, {onDelete: 'CASCADE'})
     @JoinColumn({ name: 'group_id' })
     group!: GroupEntity;
 
