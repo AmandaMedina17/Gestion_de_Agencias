@@ -19,6 +19,7 @@ import { IGroupRepository } from "@domain/Repositories/IGroupRepository";
 import { GroupRepository } from '../../InfraestructureLayer/database/Repositories/GroupRepository';
 import { CreateArtistCollaborationUseCase } from "@application/UseCases/create_artist_collaboration.use-case";
 import { CreateArtistGroupCollaborationUseCase } from "@application/UseCases/create_artist_group_collaboration.use-case";
+import { CreateArtistUseCase } from "@application/UseCases/create_artist.use-case";
 
 @Injectable()
 export class ArtistService extends BaseService<Artist, CreateArtistDto, ArtistResponseDto, UpdateArtistDto>{
@@ -34,8 +35,14 @@ export class ArtistService extends BaseService<Artist, CreateArtistDto, ArtistRe
         private readonly getArtistsWithAgencyChangesAndGroupsUseCase : GetArtistsWithAgencyChangesAndGroupsUseCase,
         private readonly createArtistCollaborationUseCase: CreateArtistCollaborationUseCase,
         private readonly createArtistGroupCollaborationUseCase: CreateArtistGroupCollaborationUseCase,
+        private readonly createArtistUseCase : CreateArtistUseCase,
     ){
         super(artistRepository, artistDtoMapper)
+    }
+
+    async create(createDto: CreateArtistDto): Promise<ArtistResponseDto> {
+        const artist = await this.createArtistUseCase.execute(createDto);
+        return this.artistDtoMapper.toResponse(artist);
     }
     async getArtistsWithAgencyChangesAndGroups(agencyId: string): Promise<ArtistDebutHistoryWithActivitiesAndContractsResponseDto[]> {
         const artistsData = await this.getArtistsWithAgencyChangesAndGroupsUseCase.execute(agencyId);
