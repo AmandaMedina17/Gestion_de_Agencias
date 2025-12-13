@@ -6,16 +6,21 @@ import { ActivityResponseDto } from '../../../backend/src/ApplicationLayer/DTOs/
 
 interface ActivitySchedulingContextType {
   // Estado
-  artistActivities: ActivityResponseDto[];
-  groupActivities: ActivityResponseDto[];
+  artistActivities: any[];
+  groupActivities: any[];
   loading: boolean;
   error: string | null;
 
-  // Acciones
+  // Acciones básicas
   scheduleArtistActivity: (scheduleArtistDto: ScheduleArtistDto) => Promise<void>;
   scheduleGroupActivity: (scheduleGroupDto: ScheduleGroupDto) => Promise<void>;
-  getArtistActivities: (artistId: string) => Promise<ActivityResponseDto[]>;
-  getGroupActivities: (groupId: string) => Promise<ActivityResponseDto[]>;
+  getArtistActivities: (artistId: string, startDate?: Date, endDate?: Date) => Promise<any[]>;
+  getGroupActivities: (groupId: string, startDate?: Date, endDate?: Date) => Promise<any[]>;
+  
+  // Acciones adicionales para obtener todas las actividades
+  getAllArtistActivities: (artistId: string) => Promise<any[]>;
+  getAllGroupActivities: (groupId: string) => Promise<any[]>;
+  
   clearError: () => void;
 }
 
@@ -65,7 +70,8 @@ export const ActivitySchedulingProvider: React.FC<ActivitySchedulingProviderProp
     }
   };
 
-  const getArtistActivities = async (artistId: string): Promise<any[]> => {
+  // Obtener actividades de artista con filtro de fechas (opcional)
+  const getArtistActivities = async (artistId: string, startDate?: Date, endDate?: Date): Promise<any[]> => {
     setLoading(true);
     setError(null);
     try {
@@ -80,11 +86,44 @@ export const ActivitySchedulingProvider: React.FC<ActivitySchedulingProviderProp
     }
   };
 
-  const getGroupActivities = async (groupId: string): Promise<any[]> => {
+  // Obtener actividades de grupo con filtro de fechas (opcional)
+  const getGroupActivities = async (groupId: string, startDate?: Date, endDate?: Date): Promise<any[]> => {
     setLoading(true);
     setError(null);
     try {
-      const activities = await activitySchedulingService.getGroupActivities(groupId);
+      const activities = await activitySchedulingService.getGroupActivities(groupId, startDate, endDate);
+      setGroupActivities(activities);
+      return activities;
+    } catch (err: any) {
+      setError(err.message || 'Error al cargar actividades del grupo');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Obtener TODAS las actividades de artista (sin filtro de fecha)
+  const getAllArtistActivities = async (artistId: string): Promise<any[]> => {
+    setLoading(true);
+    setError(null);
+    try {
+      const activities = await activitySchedulingService.getArtistActivities(artistId);
+      setArtistActivities(activities);
+      return activities;
+    } catch (err: any) {
+      setError(err.message || 'Error al cargar actividades del artista');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Obtener TODAS las actividades de grupo (sin filtro de fecha)
+  const getAllGroupActivities = async (groupId: string): Promise<any[]> => {
+    setLoading(true);
+    setError(null);
+    try {
+      const activities = await activitySchedulingService.getAllGroupActivities(groupId);
       setGroupActivities(activities);
       return activities;
     } catch (err: any) {
@@ -109,6 +148,8 @@ export const ActivitySchedulingProvider: React.FC<ActivitySchedulingProviderProp
       scheduleGroupActivity,
       getArtistActivities,
       getGroupActivities,
+      getAllArtistActivities,
+      getAllGroupActivities,
       clearError,
     }}>
       {children}

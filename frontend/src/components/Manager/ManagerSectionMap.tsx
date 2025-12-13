@@ -1,6 +1,7 @@
 import ActivitySchedulingView from "./sections/ActivitySchedulingView";
 import AgencyArtistsView from "./sections/AgencyArtists";
 import AgencyApprenticesView from "./sections/ApprenticesByAgency";
+import CollaborationManagement from "./sections/CollaborationManagement";
 import GroupManagement from "./sections/Group";
 import SuccessManagement from "./sections/Success/SuccessManagement";
 
@@ -9,5 +10,6 @@ export const sectionComponents = {
     active_artists: AgencyArtistsView,
     group_management: GroupManagement,
     activities_management: ActivitySchedulingView,
-    success_management: SuccessManagement
+    success_management: SuccessManagement,
+    collaboration_management: CollaborationManagement
 };

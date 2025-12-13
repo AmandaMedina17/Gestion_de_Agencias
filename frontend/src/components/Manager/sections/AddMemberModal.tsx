@@ -11,19 +11,29 @@ import {
   Button,
 } from '@mui/material';
 
+// Definir el enum de roles de artista
+export enum ArtistRole {
+  LIDER = "LIDER",
+  VOCALISTA = "VOCALISTA", 
+  RAPERO = "RAPERO",
+  BAILARIN = "BAILARIN",
+  VISUAL = "VISUAL",
+  MAKNAE = "MAKNAE"
+}
+
 interface Trainee {
   id: string;
   name: string;
   lastName: string;
   artistId?: string;
-  // otros campos del aprendiz
+  fullName: string;
 }
 
 interface AddMemberModalProps {
   group: GroupResponseDto;
   trainees: Trainee[];
   onClose: () => void;
-  onAddMember: (traineeId: string, role: string, endDate?: Date) => Promise<void>;
+  onAddMember: (traineeId: string, role: ArtistRole, endDate?: Date) => Promise<void>;
 }
 
 const AddMemberModal: React.FC<AddMemberModalProps> = ({
@@ -33,20 +43,18 @@ const AddMemberModal: React.FC<AddMemberModalProps> = ({
   onAddMember,
 }) => {
   const [selectedTrainee, setSelectedTrainee] = useState<Trainee | null>(null);
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState<ArtistRole | "">("");
   const [endDate, setEndDate] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const roles = [
-    "Vocalista Principal",
-    "Vocalista",
-    "Rapero Principal",
-    "Rapero",
-    "Bailarín Principal",
-    "Bailarín",
-    "Líder",
-    "Maknae",
-    "Centro Visual",
+  // Mapeo de roles para mostrar en español
+  const roleOptions = [
+    { value: ArtistRole.LIDER, label: "Lider" },
+    { value: ArtistRole.VOCALISTA, label: "Vocalista" },
+    { value: ArtistRole.RAPERO, label: "Rapero" },
+    { value: ArtistRole.BAILARIN, label: "Bailarín" },
+    { value: ArtistRole.VISUAL, label: "Visual" },
+    { value: ArtistRole.MAKNAE, label: "Maknae" },
   ];
 
   const handleSubmit = async () => {
@@ -59,7 +67,7 @@ const AddMemberModal: React.FC<AddMemberModalProps> = ({
     try {
       await onAddMember(
         selectedTrainee.id,
-        role,
+        role as ArtistRole,
         endDate ? new Date(endDate) : undefined
       );
       onClose();
@@ -134,7 +142,7 @@ const AddMemberModal: React.FC<AddMemberModalProps> = ({
             select
             label="Rol en el Grupo"
             value={role}
-            onChange={(e) => setRole(e.target.value)}
+            onChange={(e) => setRole(e.target.value as ArtistRole)}
             fullWidth
             required
             sx={{ mt: 3 }}
@@ -142,9 +150,9 @@ const AddMemberModal: React.FC<AddMemberModalProps> = ({
             <MenuItem value="">
               <em>Seleccione un rol</em>
             </MenuItem>
-            {roles.map((roleOption) => (
-              <MenuItem key={roleOption} value={roleOption}>
-                {roleOption}
+            {roleOptions.map((roleOption) => (
+              <MenuItem key={roleOption.value} value={roleOption.value}>
+                {roleOption.label}
               </MenuItem>
             ))}
           </TextField>
@@ -168,6 +176,21 @@ const AddMemberModal: React.FC<AddMemberModalProps> = ({
               </Typography>
             </Paper>
           )}
+
+          {/* Información adicional sobre los roles */}
+          <Paper sx={{ p: 2, mt: 3, bgcolor: 'info.light' }}>
+            <Typography variant="body2" color="info.dark" sx={{ mb: 1 }}>
+              <strong>Información sobre roles:</strong>
+            </Typography>
+            <Typography variant="caption" color="info.dark">
+              <strong>Líder:</strong> Responsable del grupo<br />
+              <strong>Vocalista:</strong> Especializado en canto<br />
+              <strong>Rapero:</strong> Especializado en rap<br />
+              <strong>Bailarín:</strong> Especializado en baile<br />
+              <strong>Visual:</strong> Centro visual del grupo<br />
+              <strong>Maknae:</strong> Miembro más joven del grupo
+            </Typography>
+          </Paper>
         </Box>
 
         <div className="modal-actions" style={{ marginTop: "20px" }}>
