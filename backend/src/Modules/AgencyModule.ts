@@ -33,10 +33,14 @@ import { ContractEntity } from "@infrastructure/database/Entities/ContractEntity
 import { ContractMapper } from "@infrastructure/database/Mappers/ContractMapper";
 import { IContractRepository } from "@domain/Repositories/IContractRepository";
 import { ContractRepositoryImpl } from "@infrastructure/database/Repositories/ContractRepository";
+import { GetAgencyCollaborationsUseCase } from '../ApplicationLayer/UseCases/get_agency_collaborations.use-case';
+import { IGroupRepository } from "@domain/Repositories/IGroupRepository";
+import { GroupRepository } from "@infrastructure/database/Repositories/GroupRepository";
+import { GroupEntity } from "@infrastructure/database/Entities/GroupEntity";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([AgencyEntity, ArtistAgencyMembershipEntity, ArtistEntity, ContractEntity]),
+    TypeOrmModule.forFeature([AgencyEntity, ArtistAgencyMembershipEntity, ArtistEntity, ContractEntity, GroupEntity, ArtistGroupMembershipEntity]),
     ArtistModule,
     ApprenticeModule, 
   ],
@@ -57,6 +61,10 @@ import { ContractRepositoryImpl } from "@infrastructure/database/Repositories/Co
       provide: IContractRepository,
       useClass: ContractRepositoryImpl,
     },
+    {
+      provide: IGroupRepository,
+      useClass: GroupRepository,
+    },
     // DTO Mapper
     AgencyDtoMapper,
     ArtistDtoMapper,
@@ -73,6 +81,7 @@ import { ContractRepositoryImpl } from "@infrastructure/database/Repositories/Co
     GetAgencyGroupsUseCase,
     RelateArtistToAgencyUseCase,
     GetArtistsWithDebutUseCase,
+    GetAgencyCollaborationsUseCase,
   ],
   exports: [IAgencyRepository, AgencyDtoMapper, AgencyMapper],
 })

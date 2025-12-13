@@ -73,4 +73,9 @@ export class AgencyController {
     return this.agencyService.getArtistsWithDebutAndActiveContracts(id);
   }
 
+   @Get(':id/collaborations')
+    getAgencyCollaborations(@Param('id') id: string) {
+    return this.agencyService.getAgencyCollaborations(id);
+  }
+
 }
