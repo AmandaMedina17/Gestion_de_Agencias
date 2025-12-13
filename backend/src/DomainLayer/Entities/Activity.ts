@@ -22,7 +22,7 @@ export class Activity implements IUpdatable{
     }
     if(updateDto.type)
     {
-      this.type = updateDto.type;
+      throw new Error("The activity type cannot be modified");
     }
     if(updateDto.responsibles)
     {
