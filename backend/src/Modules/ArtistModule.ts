@@ -39,6 +39,7 @@ import { CreateArtistCollaborationUseCase } from '../ApplicationLayer/UseCases/c
 import { CreateArtistGroupCollaborationUseCase } from "@application/UseCases/create_artist_group_collaboration.use-case";
 import { CreateArtistUseCase } from "@application/UseCases/create_artist.use-case";
 import { ApprenticeModule } from "./ApprenticeModule";
+import { GetProfessionalHistoryUseCase } from "@application/UseCases/get_artist_professional_history.use-case";
 
 @Module({
   imports: [TypeOrmModule.forFeature([ArtistEntity,ContractEntity, ArtistGroupMembershipEntity, ActivityEntity,ArtistActivityEntity,AgencyEntity, ArtistCollaborationEntity,ArtistGroupCollaborationEntity, GroupEntity]), ApprenticeModule],
@@ -80,6 +81,7 @@ import { ApprenticeModule } from "./ApprenticeModule";
     CreateArtistCollaborationUseCase,
     CreateArtistGroupCollaborationUseCase,
     CreateArtistUseCase,
+    GetProfessionalHistoryUseCase,
   ],
   exports: [IArtistRepository, ArtistDtoMapper, ArtistMapper],
 })
