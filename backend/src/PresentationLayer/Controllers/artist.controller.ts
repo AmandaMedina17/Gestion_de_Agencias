@@ -6,6 +6,7 @@ import { UpdateArtistDto } from '@application/DTOs/artistDto/update-artist.dto';
 import { CreateArtistCollaborationDto } from '@application/DTOs/artistCollaborationsDto/create-artist-collaboration.dto';
 import { CreateArtistGroupCollaborationDto } from '@application/DTOs/artist_groupCollaborationDto/create-artist-group-collaboration.dto';
 import { ProfessionalHistoryResponseDto } from '@application/DTOs/professional_historyDto/response-professional-history.dto';
+import { GroupResponseDto } from '@application/DTOs/groupDto/response-group.dto';
 
 @Controller('artists')
 export class ArtistController {
@@ -55,6 +56,11 @@ export class ArtistController {
   @Get(':id/professional-history')
   getProfessionalHistory(@Param('id') id: string): Promise<ProfessionalHistoryResponseDto> {
     return this.artistService.getProfessionalHistory(id);
+  }
+
+  @Get(':id/groups')
+  getGroups(@Param('id') id: string): Promise<GroupResponseDto[]>{
+    return this.artistService.getArtistGroups(id);
   }
 
   @Get(':id/group-collaborations')

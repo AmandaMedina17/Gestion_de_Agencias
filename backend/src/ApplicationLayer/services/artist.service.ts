@@ -22,6 +22,7 @@ import { CreateArtistGroupCollaborationUseCase } from "@application/UseCases/cre
 import { CreateArtistUseCase } from "@application/UseCases/create_artist.use-case";
 import { ProfessionalHistoryResponseDto } from "@application/DTOs/professional_historyDto/response-professional-history.dto";
 import { GetProfessionalHistoryUseCase } from "@application/UseCases/get_artist_professional_history.use-case";
+import { GroupResponseDto } from "@application/DTOs/groupDto/response-group.dto";
 
 @Injectable()
 export class ArtistService extends BaseService<Artist, CreateArtistDto, ArtistResponseDto, UpdateArtistDto>{
@@ -143,4 +144,13 @@ export class ArtistService extends BaseService<Artist, CreateArtistDto, ArtistRe
         return await this.getProfessionalHistoryUseCase.execute(artistId);
     }
 
+    async getArtistGroups(artistId: string): Promise<GroupResponseDto[]>{
+        const artist = await this.artistRepository.findById(artistId);
+        
+        if(!artist){
+            throw new Error("Artist not found");
+        }
+        const groups = await this.artistRepository.getArtistGroups(artistId);
+        return groups.map(group => this.groupDtoMapper.toResponse(group));  
+    }
 }
