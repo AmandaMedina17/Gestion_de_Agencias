@@ -4,8 +4,7 @@ import { useAgency } from "../../../context/AgencyContext";
 import { useAuth } from "../../../context/AuthContext";
 import GenericTable, { Column } from "../../ui/datatable";
 import CreateModal, { FormField } from "../../ui/reusable/CreateModal";
-import "./Group.css";
-import Icon from "../../icons/Icon";
+import "../../Manager/sections/Group.css";
 import { GroupResponseDto } from "../../../../../backend/src/ApplicationLayer/DTOs/groupDto/response-group.dto";
 
 export enum GroupStatus {

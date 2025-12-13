@@ -633,7 +633,6 @@ const GroupManagement: React.FC = () => {
       align: "center",
       render: (item) => formatDate(item.debut_date),
     },
-    
     {
       key: "members_num",
       title: "N° Miembros",
@@ -705,56 +704,71 @@ const GroupManagement: React.FC = () => {
     ),
   };
 
+  // Columnas para grupos no creados (sin acciones en columna separada)
   const notCreatedColumns: Column<GroupResponseDto>[] = [
-  {
-    key: "name",
-    title: "Nombre del Grupo",
-    sortable: true,
-    width: "20%",
-    align: "center",
-    render: (item) => (
-      <div className="group-name-cell">
-        <strong>{item.name}</strong>
-        <div className="group-concept">
-          {item.concept.substring(0, 50)}...
+    {
+      key: "name",
+      title: "Nombre del Grupo",
+      sortable: true,
+      width: "25%",
+      align: "center",
+      render: (item) => (
+        <div className="group-name-cell">
+          <strong>{item.name}</strong>
+          <div className="group-concept">
+            {item.concept.substring(0, 50)}...
+          </div>
         </div>
-      </div>
-    ),
-  },
-  {
-    key: "status",
-    title: "Estado",
-    sortable: true,
-    width: "15%",
-    align: "center",
-    render: (item) => (
-      <span className={`status-badge status-${getStatusClass(item.status)}`}>
-        {getStatusText(item.status)}
-      </span>
-    ),
-  },
-  {
-    key: "debut_date",
-    title: "Fecha de Debut Propuesta",
-    sortable: true,
-    width: "20%",
-    align: "center",
-    render: (item) => formatDate(item.debut_date),
-  },
-  {
-    key: "agency",
-    title: "Agencia",
-    width: "20%",
-    align: "center",
-    render: (item) => getAgencyName(item),
-  },
-  {
-    key: "actions",
-    title: "Acciones",
-    sortable: false,
-    width: "25%",
-    align: "center",
-    render: (item) => (
+      ),
+    },
+    {
+      key: "status",
+      title: "Estado",
+      sortable: true,
+      width: "15%",
+      align: "center",
+      render: (item) => (
+        <span className={`status-badge status-${getStatusClass(item.status)}`}>
+          {getStatusText(item.status)}
+        </span>
+      ),
+    },
+    {
+      key: "debut_date",
+      title: "Fecha de Debut Propuesta",
+      sortable: true,
+      width: "20%",
+      align: "center",
+      render: (item) => formatDate(item.debut_date),
+    },
+    {
+      key: "agency",
+      title: "Agencia",
+      width: "20%",
+      align: "center",
+      render: (item) => getAgencyName(item),
+    },
+  ];
+
+  // Función para manejar la aceptación del grupo
+  const handleAcceptGroup = async (group: GroupResponseDto) => {
+    try {
+      await activateGroup(group.id);
+      showSuccess("¡Grupo Aceptado!", "El grupo ha sido marcado como creado exitosamente.");
+      
+      // Actualizar la lista de grupos
+      await fetchGroups();
+      
+      // Cambiar a la pestaña de grupos creados
+      setActiveTab(0);
+    } catch (err: any) {
+      showError("Error al Aceptar", err.message || "No se pudo aceptar el grupo.");
+    }
+  };
+
+  // Función para renderizar acciones personalizadas para grupos NO creados
+  const renderNotCreatedActions = (item: GroupResponseDto) => {
+    return (
       <div className="not-created-actions">
         <button
           className="action-btn accept-btn"
@@ -792,51 +806,11 @@ const GroupManagement: React.FC = () => {
           <Icon name="trash" size={16} />
         </button>
       </div>
-    ),
-  },
-];
+    );
+  };
 
-  // Función para renderizar acciones personalizadas
-  const renderCustomActions = (item: GroupResponseDto) => {
-  // Si el grupo no está creado, mostramos botón para aceptarlo
-    if (!item.is_created) {
-      return (
-        <div className="group-actions">
-          <button
-            className="action-btn accept-btn"
-            onClick={() => handleAcceptGroup(item)}
-            title="Aceptar grupo"
-            disabled={groupLoading}
-            style={{ 
-              backgroundColor: '#4CAF50',
-              color: 'white',
-              marginRight: '8px'
-            }}
-          >
-            <Icon name="check" size={18} />
-            <span style={{ marginLeft: '4px' }}>Aceptar</span>
-          </button>
-          <button
-            className="action-btn edit-btn-comp"
-            onClick={() => setEditingGroup(item)}
-            title="Editar grupo"
-            disabled={groupLoading}
-          >
-            <Icon name="edit" size={18} />
-          </button>
-          <button
-            className="action-btn delete-btn-comp"
-            onClick={() => setDeletingGroup(item)}
-            title="Eliminar grupo"
-            disabled={groupLoading}
-          >
-            <Icon name="trash" size={18} />
-          </button>
-        </div>
-      );
-    }
-
-    // Para grupos creados, mostramos solo editar y eliminar
+  // Función para renderizar acciones personalizadas para grupos creados
+  const renderCreatedActions = (item: GroupResponseDto) => {
     return (
       <div className="group-actions">
         <button
@@ -857,21 +831,6 @@ const GroupManagement: React.FC = () => {
         </button>
       </div>
     );
-  };
-
-  const handleAcceptGroup = async (group: GroupResponseDto) => {
-    try {
-      await activateGroup(group.id);
-      showSuccess("¡Grupo Aceptado!", "El grupo ha sido marcado como creado exitosamente.");
-      
-      // Actualizar la lista de grupos
-      await fetchGroups();
-      
-      // Cambiar a la pestaña de grupos creados
-      setActiveTab(0);
-    } catch (err: any) {
-      showError("Error al Aceptar", err.message || "No se pudo aceptar el grupo.");
-    }
   };
 
   // Función para renderizar detalles en modal de eliminación
@@ -988,11 +947,11 @@ const GroupManagement: React.FC = () => {
             className="group-table"
             notification={notification || undefined}
             onNotificationClose={() => setNotification(null)}
-            showActionsColumn={true}
+            showActionsColumn={true} // Mostrar columna de acciones
             showCreateButton={true}
             showSearch={true}
             showReloadButton={true}
-            renderCustomActions={renderCustomActions}
+            renderCustomActions={renderCreatedActions} // Acciones específicas para creados
           />
         </TabPanel>
 
@@ -1020,11 +979,11 @@ const GroupManagement: React.FC = () => {
             className="group-table"
             notification={notification || undefined}
             onNotificationClose={() => setNotification(null)}
-            showActionsColumn={true}
+            showActionsColumn={true} // Mostrar columna de acciones
             showCreateButton={true}
             showSearch={true}
             showReloadButton={true}
-            renderCustomActions={renderCustomActions}
+            renderCustomActions={renderNotCreatedActions} // Acciones específicas para no creados
           />
         </TabPanel>
       </Paper>
