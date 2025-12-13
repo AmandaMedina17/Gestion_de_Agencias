@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import ArtistSidebar from './ArtistSidebar';
 import { sectionComponents } from './ArtistSectionMap';
-import './ArtistDashboard.css'
+import '../Admin/AdminDashboard.css'
 
 const ArtistDashboard: React.FC = () => {
   const [activeSection, setActiveSection] = useState('activities');

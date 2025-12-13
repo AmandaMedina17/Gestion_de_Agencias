@@ -111,7 +111,7 @@
 .action-btn {
   position: relative;
 }
-
+/* 
 .action-btnn::after {
   content: attr(title);
   position: absolute;
@@ -129,7 +129,7 @@
   transition: opacity 0.2s ease;
   z-index: 100;
   pointer-events: none;
-}
+} */
 
 .action-btnn:hover::after {
   opacity: 1;
@@ -292,4 +292,60 @@
 
 .modal-action-btn.secondary:hover {
   background-color: #e0e0e0;
+}
+
+
+/* Estilos para las acciones de la tabla */
+.group-actions, .not-created-actions {
+  display: flex !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  flex-wrap: nowrap !important;
+  width: 80% !important;
+}
+
+
+.accept-btn {
+  background-color: #f0f0f0 !important;
+  color: rgb(0, 0, 0) !important;
+  padding: 6px 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  white-space: nowrap !important;
+}
+
+/* Estilos para la celda de acciones en la tabla */
+.MuiDataGrid-cell.actions-cell {
+  padding: 4px !important;
+}
+
+.MuiDataGrid-cell.actions-cell > div {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+  min-height: 40px !important;
+}
+
+/* Si estás usando DataGrid de MUI */
+.MuiDataGrid-cell--withRenderer {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+
+.action-btnn {
+  
+  background-color: #f0f0f0 !important;
+  color: #333 !important;
+}
+
+.action-btnn:hover:not(:disabled) {
+  background-color: #b0f0ae !important;
+}
+
+.accept-btn:hover:not(:disabled){
+  background-color: #b0f0ae !important;
 }

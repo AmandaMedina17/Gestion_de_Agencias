@@ -109,7 +109,7 @@ const user = JSON.parse(localStorage.getItem('user') || '{}');
               <div className="form-group">
                 <label className="form-label">Usuario</label>
                 <div className="input-wrapper">
-                  <User className="input-icon" />
+                  {/* <User className="input-icon" /> */}
                   <input
                     type="text"
                     placeholder="Nombre de usuario"
@@ -124,7 +124,7 @@ const user = JSON.parse(localStorage.getItem('user') || '{}');
               <div className="form-group">
                 <label className="form-label">Contraseña</label>
                 <div className="input-wrapper">
-                  <Lock className="input-icon" />
+                  {/* <Lock className="input-icon" /> */}
                   <input
                     type={showPassword ? "text" : "password"}
                     placeholder="Tu contraseña"
