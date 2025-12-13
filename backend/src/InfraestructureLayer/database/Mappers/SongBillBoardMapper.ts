@@ -1,24 +1,39 @@
-import { BaseDtoMapper } from "@application/DTOs/dtoMappers/DtoMapper";
+
 import { SongBillboardEntity } from "../Entities/SongBillboardEntity";
-import { AddSongToBillboardDto } from "@application/DTOs/SongBillboardDto/add.sonBillboard.dto";
-import { ResponseSongBillboardDto } from "@application/DTOs/SongBillboardDto/response.songBillboard.dto";
 import { Injectable } from "@nestjs/common";
+import { SongMapper } from "./SongMapper";
+import { BillboardListMapper } from "./BillboardListMapper";
+import { SongBillboard } from "@domain/Entities/SongBillboard";
+import { IMapper } from "./IMapper";
 
 @Injectable()
-export class SongBillBoardMapper extends BaseDtoMapper<SongBillboardEntity, AddSongToBillboardDto, ResponseSongBillboardDto>{
+export class SongBillBoardMapper extends IMapper<SongBillboard,SongBillboardEntity>{
+  constructor(
+      private readonly songMapper : SongMapper,
+      private readonly billboardMapper :  BillboardListMapper,
+  ){super()}
 
-  fromDto(dto: AddSongToBillboardDto): SongBillboardEntity { 
-    throw new Error('Song creation requires complex logic. Use AddSongBillboardUseCase instead.');
-  };
+  toDomainEntity(dataBaseEntity: SongBillboardEntity): SongBillboard {
+    //console.log(dataBaseEntity)
+    
 
-  toResponse(infr: SongBillboardEntity): ResponseSongBillboardDto{
-    return {
-        songId: infr.songId,
-        billBoardId: infr.billboardListId,
-        place : infr.place,
-        date : infr.entryDate
-    };
+    return new SongBillboard(
+      this.songMapper.toDomainEntity(dataBaseEntity.song), 
+      this.billboardMapper.toDomainEntity(dataBaseEntity.billboardList),
+      dataBaseEntity.place,
+      dataBaseEntity.entryDate
+    )
   }
+  toDataBaseEntity(domainEntity: SongBillboard): SongBillboardEntity {
+      const entity = new SongBillboardEntity();
 
+      entity.songId = domainEntity.getSong().getId();
+      entity.billboardListId = domainEntity.getBillboard().getId();
+      entity.place = domainEntity.getPlace();
+      entity.entryDate = domainEntity.getEntryDate();
+
+      return entity;
+  }
+  
  
 }

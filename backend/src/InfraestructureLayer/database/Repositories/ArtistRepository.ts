@@ -1,6 +1,6 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
+import { Repository, In, LessThanOrEqual, MoreThanOrEqual, createQueryBuilder } from 'typeorm';
 import { BaseRepository } from './BaseRepositoryImpl';
 import { Artist} from '@domain/Entities/Artist';
 import { ArtistEntity } from '../Entities/ArtistEntity';
@@ -35,6 +35,30 @@ export class ArtistRepository
   
   ) {
     super(repository, mapper);
+  }
+  findArtistsWithScheduleConflicts(startDate: Date, endDate: Date): Promise<Artist[]> {
+    throw new Error('Method not implemented.');
+  }
+  getArtistAgencies(id: string): Promise<Agency[]> {
+    throw new Error('Method not implemented.');
+  }
+  getArtistAlbums(id: string): Promise<Album[]> {
+    throw new Error('Method not implemented.');
+  }
+  getCurrentArtistContracts(id: string): Promise<Contract[]> {
+    throw new Error('Method not implemented.');
+  }
+  getArtistGroups(id: string): Promise<Group[]> {
+    throw new Error('Method not implemented.');
+  }
+  getArtistDebutsInOrders(id: string): Promise<any[]> {
+    throw new Error('Method not implemented.');
+  }
+  getArtist_ArtistColaborations(id: string): Promise<Artist[]> {
+    throw new Error('Method not implemented.');
+  }
+  getArtist_GroupsColaborations(id: string): Promise<Group[]> {
+    throw new Error('Method not implemented.');
   }
 
   async createArtistCollaboration(artist1Id: string, artist2Id: string, date: Date): Promise<void> {

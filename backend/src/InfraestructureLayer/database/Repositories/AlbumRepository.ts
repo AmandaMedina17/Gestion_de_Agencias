@@ -7,6 +7,7 @@ import { BaseRepository } from "./BaseRepositoryImpl";
 import { Repository } from "typeorm";
 import { IMapper } from "../Mappers/IMapper";
 import { AlbumMapper } from "../Mappers/AlbumMapper";
+import { Song } from "@domain/Entities/Song";
 
 @Injectable()
 export class AlbumRepository extends BaseRepository<Album,AlbumEntity> implements IAlbumRepository{
@@ -16,6 +17,9 @@ export class AlbumRepository extends BaseRepository<Album,AlbumEntity> implement
         mapper: AlbumMapper
     ) {
         super(repository, mapper);
+    }
+    getHits(id: string): Promise<[Song, number][]> {
+        throw new Error("Method not implemented.");
     }
 
     async findByTitle(title: string): Promise<Album> {
