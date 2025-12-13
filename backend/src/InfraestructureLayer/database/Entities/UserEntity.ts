@@ -21,4 +21,7 @@ export class UserOrmEntity {
   @Column()
   agency!: string;
 
+  @Column()
+  artist!: string;
+
 }

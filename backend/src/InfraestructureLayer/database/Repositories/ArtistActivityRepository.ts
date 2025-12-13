@@ -60,31 +60,60 @@ export class ArtistActivityRepository implements IArtistActivityRepository {
     cancelAttendance(artistId: string, activityId: string): Promise<void> {
         throw new Error('Method not implemented.');
     }
-    
+
     async getActivitiesByArtist(artistId: string): Promise<Activity[]> {
   
-      // Encontrar todas las actividades del artista con sus relaciones completas
-      const artistActivities = await this.repository.find({
-        where: { artistId },
-        relations: [
-          'activity',
-          'activity.activityDates',
-          'activity.activityResponsibles',
-          'activity.activityResponsibles.responsible',
-          'activity.activityPlaces',
-          'activity.activityPlaces.place', 
-        ]
-      });
+    const query = `
 
-      if (!artistActivities || artistActivities.length === 0) {
-        return [];
-      }
+      WITH artist_memberships AS (
+        SELECT 
+          group_id,
+          "startDate",
+          end_date
+        FROM artist_group_membership 
+        WHERE artist_id = $1
+      )
+      SELECT DISTINCT a.* 
+      FROM activity_entity a
+      -- Actividades individuales 
+      INNER JOIN artist_activity aa ON a.id = aa.activity_id
+      WHERE aa.artist_id = $1
 
-      // Extraer solo las actividades
-      const activityEntities = artistActivities.map(aa => aa.activity);
+      UNION
 
-      // Mapear a dominio
-      return activityEntities.map(a => this.activityMapper.toDomainWithRelations(a));
-    }
+      -- Actividades grupales CON validación de fechas
+      SELECT DISTINCT a.* 
+      FROM activity_entity a
+      INNER JOIN group_activity ga ON a.id = ga.activity_id
+      INNER JOIN artist_memberships am ON ga.group_id = am.group_id
+      INNER JOIN activity_date ad ON a.id = ad.activity_id
+      WHERE 
+        -- La fecha de actividad debe estar dentro del periodo de membresía
+        ad.date >= am."startDate"
+        AND (am.end_date IS NULL OR ad.date <= am.end_date)
+    `;
+
+    const activities = await this.repository.manager.query(query, [artistId]);
+    
+    // Obtener relaciones completas para cada actividad
+    const activitiesWithRelations = await Promise.all(
+      activities.map(async (activity: ActivityEntity) => {
+        return await this.repository.manager.findOne(ActivityEntity, {
+          where: { id: activity.id },
+          relations: [
+            'activityDates',
+            'activityResponsibles',
+            'activityResponsibles.responsible',
+            'activityPlaces',
+            'activityPlaces.place',
+          ]
+        });
+      })
+    );
+
+    return activitiesWithRelations
+      .filter(a => a !== null)
+      .map(a => this.activityMapper.toDomainWithRelations(a));
+  }
     
 }

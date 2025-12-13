@@ -5,5 +5,6 @@ export class LoginResponseDto {
     username: string;
     role: string;
     agency: string;
+    artist: string;
   };
 }

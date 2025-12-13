@@ -28,29 +28,29 @@ const ManagerSidebar: React.FC<ManagerSidebarProps> = ({
 
   const menuItems = [
         {   id: 'active_apprentice', 
-            label: '🎤 Aprendices', 
+            label: ' Aprendices', 
             tooltip: 'Datos de Aprendices',
         },
         {   id: 'active_artists', 
-            label: '🎤 Artistas', 
+            label: ' Artistas', 
             tooltip: 'Datos de Artista',
         },
-        {   id: 'group_calendar', 
-            label: '📆 Calendario de Grupos', 
-            tooltip: 'Detalles de las Actividades Grupales',
+        {   id: 'group_management', 
+            label: 'Grupos de agencia', 
+            tooltip: 'Detalles de los grupos',
         },
-        // {   id: 'agencies_management', 
-        //     label: 'Gestión de Agencias', 
-        //     tooltip: 'Registrar, modificar y eliminar agencias',
-        // },
-        // {   id: 'groups_management',    
-        //     label: 'Gestión de Grupos', 
-        //     tooltip: 'Registrar, modificar y eliminar grupos',
-        // },
-        // {   id: 'songs_management', 
-        //     label: 'Gestión de Canciones', 
-        //     tooltip: 'Registrar, modificar y eliminar canciones',
-        // },
+        {   id: 'activities_management', 
+            label: 'Gestión de Actividades', 
+            tooltip: 'Programar actividades para grupo y artista',
+        },
+        {   id: 'success_management',    
+            label: 'Gestión de Éxitos', 
+            tooltip: 'Registrar éxitos',
+        },
+        {   id: 'collaboration_management', 
+            label: 'Gestión de Colaboraciones', 
+            tooltip: 'Registrar, modificar y eliminar colaboraciones',
+        },
         // {   id: 'albums_management', 
         //     label: 'Gestión de Albumes', 
         //     tooltip: 'Registrar, modificar y eliminar albumes',
@@ -81,13 +81,6 @@ const ManagerSidebar: React.FC<ManagerSidebarProps> = ({
         // },
     ];
 
-  // const menuItems = [
-  //   { id: 'group_calendar', label: '📆 Calendario de Grupos', tooltip: 'Detalles de las Actividades Grupales' },
-  //   { id: 'artist_calendar', label: '📖 Calendario de Artistas', tooltip: 'Detalles de Actividades de los Artistas' },
-  //   { id: 'artist_income', label: '💰 Ingresos de Artistas', tooltip: 'Ingresos y éxitos' },
-  //   { id: 'artist_mobility', label: '🔄 Movilidad de Artistas', tooltip: 'Historial de Artistas transferidos de Agencia y Grupos' },
-  //   { id: 'elite_artists', label: '👩🏼‍🎤 Artistas Élite', tooltip: 'Historial de Artistas que pertenecieron a grupos disueltos y carrera exitosa' }
-  // ];
 
   return (
     <div className={`sidebar ${isOpen ? 'show' : ''}`} id="drop">

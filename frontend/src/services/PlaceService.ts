@@ -5,4 +5,4 @@ import { PlaceResponseDto } from "../../../backend/src/ApplicationLayer/DTOs/pla
 export const placeService = new BaseService<
   CreatePlaceDto,
   PlaceResponseDto
->("http://localhost:3000/place");
+>("http://localhost:3000/places");

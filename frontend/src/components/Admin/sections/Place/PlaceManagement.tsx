@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { usePlace } from "../../../../context/PlaceContext";
 import GenericTable, { Column } from "../../../ui/datatable";
-import CreateModal, { FormField } from "../../../ui/reutilizables/CreateModal";
-import EditModal from "../../../ui/reutilizables/EditModal";
-import DeleteModal from "../../../ui/reutilizables/DeleteModal";
-import './PlaceStyle.css';
+import CreateModal, { FormField } from "../../../ui/reusable/CreateModal";
+import EditModal from "../../../ui/reusable/EditModal";
+import DeleteModal from "../../../ui/reusable/DeleteModal";
+import "./PlaceStyle.css";
 
-import Alert from '@mui/material/Alert';
-import AlertTitle from '@mui/material/AlertTitle';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
-import Stack from '@mui/material/Stack';
+import Alert from "@mui/material/Alert";
+import AlertTitle from "@mui/material/AlertTitle";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
+import Stack from "@mui/material/Stack";
 
 export interface PlaceResponseDto {
   id: string;
@@ -38,8 +38,12 @@ const PlaceManagement: React.FC = () => {
   } | null>(null);
 
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editingPlace, setEditingPlace] = useState<PlaceResponseDto | null>(null);
-  const [deletingPlace, setDeletingPlace] = useState<PlaceResponseDto | null>(null);
+  const [editingPlace, setEditingPlace] = useState<PlaceResponseDto | null>(
+    null
+  );
+  const [deletingPlace, setDeletingPlace] = useState<PlaceResponseDto | null>(
+    null
+  );
 
   // Cargar lugares al montar el componente
   useEffect(() => {
@@ -51,16 +55,20 @@ const PlaceManagement: React.FC = () => {
         setNotification({
           type: "error",
           title: "Error",
-          message: "Error al cargar los lugares"
+          message: "Error al cargar los lugares",
         });
       }
     };
-    
+
     loadData();
   }, []);
 
   // Funciones auxiliares para mostrar notificaciones
-  const showNotification = (type: "success" | "error" | "info" | "warning", title: string, message: string) => {
+  const showNotification = (
+    type: "success" | "error" | "info" | "warning",
+    title: string,
+    message: string
+  ) => {
     setNotification({ type, title, message });
   };
 
@@ -81,19 +89,31 @@ const PlaceManagement: React.FC = () => {
   };
 
   const showUpdateSuccess = () => {
-    showSuccess("¡Lugar Actualizado!", "El lugar ha sido actualizado exitosamente.");
+    showSuccess(
+      "¡Lugar Actualizado!",
+      "El lugar ha sido actualizado exitosamente."
+    );
   };
 
   const showUpdateError = (errorMessage?: string) => {
-    showError("Error al Actualizar", errorMessage || "No se pudo actualizar el lugar.");
+    showError(
+      "Error al Actualizar",
+      errorMessage || "No se pudo actualizar el lugar."
+    );
   };
 
   const showDeleteSuccess = () => {
-    showSuccess("¡Lugar Eliminado!", "El lugar ha sido eliminado exitosamente.");
+    showSuccess(
+      "¡Lugar Eliminado!",
+      "El lugar ha sido eliminado exitosamente."
+    );
   };
 
   const showDeleteError = (errorMessage?: string) => {
-    showError("Error al Eliminar", errorMessage || "No se pudo eliminar el lugar.");
+    showError(
+      "Error al Eliminar",
+      errorMessage || "No se pudo eliminar el lugar."
+    );
   };
 
   // Definir campos del formulario para lugar
@@ -107,16 +127,18 @@ const PlaceManagement: React.FC = () => {
       min: 2,
       max: 100,
       validate: (value) => {
-        if (value.length < 2) return "El nombre debe tener al menos 2 caracteres";
-        if (value.length > 100) return "El nombre no puede exceder 100 caracteres";
+        if (value.length < 2)
+          return "El nombre debe tener al menos 2 caracteres";
+        if (value.length > 100)
+          return "El nombre no puede exceder 100 caracteres";
         return null;
-      }
-    }
+      },
+    },
   ];
 
   // Datos iniciales para creación
   const initialCreateData = {
-    name: ""
+    name: "",
   };
 
   // Manejar creación de lugar
@@ -126,28 +148,29 @@ const PlaceManagement: React.FC = () => {
 
     try {
       await createPlace({ name: data.name.trim() });
-      
+
       showCreateSuccess();
       setShowCreateModal(false);
       await fetchPlaces();
-      
     } catch (err: any) {
       showCreateError(err.message);
     }
   };
 
   // Manejar actualización de lugar
-  const handleUpdate = async (id: string | number, data: Record<string, any>) => {
+  const handleUpdate = async (
+    id: string | number,
+    data: Record<string, any>
+  ) => {
     clearError();
     setNotification(null);
 
     try {
       await updatePlace(id as string, { name: data.name.trim() });
-      
+
       showUpdateSuccess();
       setEditingPlace(null);
       await fetchPlaces();
-      
     } catch (err: any) {
       showUpdateError(err.message);
     }
@@ -159,11 +182,10 @@ const PlaceManagement: React.FC = () => {
 
     try {
       await deletePlace(id as string);
-      
+
       showDeleteSuccess();
       setDeletingPlace(null);
       await fetchPlaces();
-      
     } catch (err: any) {
       showDeleteError(err.message);
     }
@@ -176,9 +198,8 @@ const PlaceManagement: React.FC = () => {
       title: "Nombre del Lugar",
       sortable: true,
       width: "70%",
-      align: "center"
+      align: "center",
     },
-    
   ];
 
   // Función para formatear fecha
@@ -188,9 +209,9 @@ const PlaceManagement: React.FC = () => {
       const date = new Date(dateString);
       date.setDate(date.getDate() + 1);
       return date.toLocaleDateString("es-ES", {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
+        year: "numeric",
+        month: "short",
+        day: "numeric",
       });
     } catch {
       return dateString;
@@ -250,7 +271,7 @@ const PlaceManagement: React.FC = () => {
           title="Editar Lugar"
           fields={placeFields}
           initialData={{
-            name: editingPlace.name
+            name: editingPlace.name,
           }}
           itemId={editingPlace.id}
           onSubmit={handleUpdate}
@@ -258,7 +279,6 @@ const PlaceManagement: React.FC = () => {
           loading={loading}
           submitText="Actualizar Lugar"
           cancelText="Cancelar"
-          
         />
       )}
 

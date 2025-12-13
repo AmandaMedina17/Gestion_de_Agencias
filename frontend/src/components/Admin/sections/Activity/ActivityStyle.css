@@ -1,28 +1,21 @@
-/* ActivityStyle.css - Estilos para los botones */
-
-/* Botón base - igual para todos */
-.action-btn {
- background: none;
+.income-btn-comp {
+  background: none;
   border: none;
-  padding: 0.4rem;
-  border-radius: 9px;
+  padding: 0.5rem;
+  border-radius: 4px;
   cursor: pointer;
   font-size: 1rem;
   transition: background 0.2s;
-}
-
-/* BOTÓN DE INGRESOS - NUEVO ESTILO VERDE */
-.income-btn-comp {
-  background: linear-gradient(135deg, #c3f5c3 0%, #c6f0c6 100%);
+  background: rgb(243, 243, 243) !important;
   color: black;
 }
 
 .income-btn-comp:hover {
+  background-color: rgb(191, 253, 191) !important;
   transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 4px 12px rgba(196, 253, 196, 0.779);
+  box-shadow: 0 4px 12px rgba(103, 213, 112, 0.4);
 }
 
-/* Contenedor del botón de ingresos para centrar */
 .income-action-container {
   display: flex;
   justify-content: center;
@@ -31,7 +24,6 @@
   height: 100%;
 }
 
-/* Icono dentro del botón */
 .action-btn .btn-icon {
   font-size: 14px;
   display: flex;
@@ -39,7 +31,6 @@
   justify-content: center;
 }
 
-/* Texto dentro del botón */
 .action-btn .btn-text {
   font-size: 11px;
   font-weight: 500;
@@ -47,11 +38,31 @@
   white-space: nowrap;
 }
 
-/* Para que los botones se vean bien en todas las filas */
 .activity-table td {
   vertical-align: middle;
 }
 
 .activity-table tr {
   height: 60px;
+}
+
+
+
+.type-income {
+  padding: 0.4rem 1rem !important; 
+  display: inline-block;
+  border-radius: 20px; 
+  font-size: 14px !important;
+  font-weight: 500;
+  border: 2px solid; 
+}
+
+.grupal {
+  border-color: #9ac4b6;
+  color: #254925;
+}
+
+.individual {
+  border-color: rgb(167, 197, 229);
+  color: #0c5460;
 }

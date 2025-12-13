@@ -413,12 +413,14 @@
 }
 
 .incomes-table td {
+  text-align: center;
   padding: 0.75rem 1rem;
   border-bottom: 1px solid #e9ecef;
   vertical-align: middle;
 }
 
 .income-row {
+  align-items: center;
   transition: background-color 0.2s;
 }
 
@@ -764,14 +766,12 @@
 }
 
 .income-actions .edit-btn-inc {
-  background: #fff3cd;
-  border: 1px solid #ffeaa7;
-  color: #856404;
+  background: rgb(243, 243, 243);
 }
 
 .income-actions .edit-btn-inc:hover {
-  background: #ffeaa7;
-  transform: scale(1.1);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 4px 12px rgba(243, 247, 176, 0.4) !important;
 }
 
 .income-actions .delete-btn-inc {

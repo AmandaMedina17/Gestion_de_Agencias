@@ -5,7 +5,8 @@ interface User {
   id: string;
   username: string;
   role: string;
-  agency: string; // <-- Agregamos la agencia
+  agency: string; 
+  artist: string;
 }
 
 interface AuthContextType {
@@ -77,7 +78,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         id: user.id,
         username: user.username,
         role: user.role,
-        agency: user.agency, // <-- Guardar la agencia
+        agency: user.agency,
+        artist: user.artist
       });
       setIsAuthenticated(true);
       

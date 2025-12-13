@@ -15,7 +15,7 @@ export class GroupDtoMapper extends BaseDtoMapper<Group, CreateGroupDto, GroupRe
             name: domain.getName(),
             status: domain.getStatus(),
             debut_date: domain.getDebutDate(),
-            members_num: 0, //domain.getNumberOfMembers(),
+            members_num: domain.getNumberOfMembers(),
             concept: domain.getConcept(),
             is_created: domain.isCreated(),
             agencyID: domain.getAgency()

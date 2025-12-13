@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useArtist } from "../../../../context/ArtistContext";
 import { useApprentice } from "../../../../context/ApprenticeContext";
 import GenericTable, { Column } from "../../../ui/datatable";
-import CreateModal, { FormField } from "../../../ui/reutilizables/CreateModal";
-import EditModal from "../../../ui/reutilizables/EditModal";
-import DeleteModal from "../../../ui/reutilizables/DeleteModal";
-import './ArtistStyle.css';
+import CreateModal, { FormField } from "../../../ui/reusable/CreateModal";
+import EditModal from "../../../ui/reusable/EditModal";
+import DeleteModal from "../../../ui/reusable/DeleteModal";
+import "./ArtistStyle.css";
 import { ArtistResponseDto } from "../../../../../../backend/src/ApplicationLayer/DTOs/artistDto/response-artist.dto";
 
 export enum ArtistStatus {
@@ -35,16 +35,16 @@ const ArtistManagement: React.FC = () => {
   } | null>(null);
 
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editingArtist, setEditingArtist] = useState<ArtistResponseDto | null>(null);
-  const [deletingArtist, setDeletingArtist] = useState<ArtistResponseDto | null>(null);
+  const [editingArtist, setEditingArtist] = useState<ArtistResponseDto | null>(
+    null
+  );
+  const [deletingArtist, setDeletingArtist] =
+    useState<ArtistResponseDto | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        await Promise.all([
-          fetchArtists(),
-          fetchApprentices()
-        ]);
+        await Promise.all([fetchArtists(), fetchApprentices()]);
       } catch (err) {
         console.error("Error loading data:", err);
       }
@@ -54,15 +54,19 @@ const ArtistManagement: React.FC = () => {
 
   // Obtener nombre del aprendiz
   const getApprenticeName = (artist: ArtistResponseDto) => {
-    if (artist.apprenticeId && typeof artist.apprenticeId === 'object') {
+    if (artist.apprenticeId && typeof artist.apprenticeId === "object") {
       return artist.stageName;
     }
-    const apprentice = apprentices.find(a => a.id === artist.apprenticeId);
+    const apprentice = apprentices.find((a) => a.id === artist.apprenticeId);
     return apprentice ? apprentice.fullName : "No asignado";
   };
 
   // Funciones auxiliares para mostrar notificaciones
-  const showNotification = (type: "success" | "error" | "info" | "warning", title: string, message: string) => {
+  const showNotification = (
+    type: "success" | "error" | "info" | "warning",
+    title: string,
+    message: string
+  ) => {
     setNotification({ type, title, message });
   };
 
@@ -83,19 +87,31 @@ const ArtistManagement: React.FC = () => {
   };
 
   const showUpdateSuccess = () => {
-    showSuccess("¡Artista Actualizado!", "El artista ha sido actualizado exitosamente.");
+    showSuccess(
+      "¡Artista Actualizado!",
+      "El artista ha sido actualizado exitosamente."
+    );
   };
 
   const showUpdateError = (errorMessage?: string) => {
-    showError("Error al Actualizar", errorMessage || "No se pudo actualizar el artista.");
+    showError(
+      "Error al Actualizar",
+      errorMessage || "No se pudo actualizar el artista."
+    );
   };
 
   const showDeleteSuccess = () => {
-    showSuccess("¡Artista Eliminado!", "El artista ha sido eliminado exitosamente.");
+    showSuccess(
+      "¡Artista Eliminado!",
+      "El artista ha sido eliminado exitosamente."
+    );
   };
 
   const showDeleteError = (errorMessage?: string) => {
-    showError("Error al Eliminar", errorMessage || "No se pudo eliminar el artista.");
+    showError(
+      "Error al Eliminar",
+      errorMessage || "No se pudo eliminar el artista."
+    );
   };
 
   // Definir campos del formulario de artista
@@ -113,7 +129,7 @@ const ArtistManagement: React.FC = () => {
         if (value.length < 2) return "Debe tener al menos 2 caracteres";
         if (value.length > 100) return "No puede exceder 100 caracteres";
         return null;
-      }
+      },
     },
     {
       name: "birthday",
@@ -125,7 +141,7 @@ const ArtistManagement: React.FC = () => {
         const date = new Date(value);
         if (date > new Date()) return "La fecha no puede ser futura";
         return null;
-      }
+      },
     },
     {
       name: "transitionDate",
@@ -137,7 +153,7 @@ const ArtistManagement: React.FC = () => {
         const date = new Date(value);
         if (date > new Date()) return "La fecha no puede ser futura";
         return null;
-      }
+      },
     },
     {
       name: "status",
@@ -147,8 +163,8 @@ const ArtistManagement: React.FC = () => {
       options: [
         { value: ArtistStatus.ACTIVO, label: "Activo" },
         { value: ArtistStatus.EN_PAUSA, label: "En Pausa" },
-        { value: ArtistStatus.INACTIVO, label: "Inactivo" }
-      ]
+        { value: ArtistStatus.INACTIVO, label: "Inactivo" },
+      ],
     },
     {
       name: "groupId",
@@ -159,18 +175,18 @@ const ArtistManagement: React.FC = () => {
       validate: (value) => {
         if (value && value.length > 50) return "No puede exceder 50 caracteres";
         return null;
-      }
+      },
     },
     {
       name: "apprenticeId",
       label: "Aprendiz Asociado",
       type: "autocomplete",
       required: true,
-      options: apprentices.map(apprentice => ({
+      options: apprentices.map((apprentice) => ({
         value: apprentice.id,
-        label: `${apprentice.fullName}`
-      }))
-    }
+        label: `${apprentice.fullName}`,
+      })),
+    },
   ];
 
   const artistEditFields: FormField[] = [
@@ -185,7 +201,7 @@ const ArtistManagement: React.FC = () => {
         if (!value.trim()) return "El nombre artístico es requerido";
         if (value.length < 2) return "Debe tener al menos 2 caracteres";
         return null;
-      }
+      },
     },
     {
       name: "birthday",
@@ -197,7 +213,7 @@ const ArtistManagement: React.FC = () => {
         const date = new Date(value);
         if (date > new Date()) return "La fecha no puede ser futura";
         return null;
-      }
+      },
     },
     {
       name: "transitionDate",
@@ -209,7 +225,7 @@ const ArtistManagement: React.FC = () => {
         const date = new Date(value);
         if (date > new Date()) return "La fecha no puede ser futura";
         return null;
-      }
+      },
     },
     {
       name: "status",
@@ -219,15 +235,25 @@ const ArtistManagement: React.FC = () => {
       options: [
         { value: ArtistStatus.ACTIVO, label: "Activo" },
         { value: ArtistStatus.EN_PAUSA, label: "En Pausa" },
-        { value: ArtistStatus.INACTIVO, label: "Inactivo" }
-      ]
+        { value: ArtistStatus.INACTIVO, label: "Inactivo" },
+      ],
     },
     {
       name: "groupId",
       label: "ID de Grupo (opcional)",
       type: "text",
-      required: false
-    }
+      required: false,
+    },
+    {
+    name: "apprenticeId",
+    label: "Aprendiz Asociado",
+    type: "autocomplete",
+    required: true,
+    options: apprentices.map((apprentice) => ({
+      value: apprentice.id,
+      label: `${apprentice.fullName}`,
+    })),
+  },
   ];
 
   // Datos iniciales para creación
@@ -237,7 +263,7 @@ const ArtistManagement: React.FC = () => {
     transitionDate: "",
     status: ArtistStatus.ACTIVO,
     groupId: "",
-    apprenticeId: ""
+    apprenticeId: "",
   };
 
   // Manejar creación
@@ -248,29 +274,30 @@ const ArtistManagement: React.FC = () => {
         birthday: new Date(data.birthday),
         transitionDate: new Date(data.transitionDate),
         status: data.status,
-        groupId: data.groupId.trim() || undefined,
-        apprenticeId: data.apprenticeId
+        apprenticeId: data.apprenticeId,
       });
 
       showCreateSuccess();
       setShowCreateModal(false);
       await fetchArtists();
-
     } catch (err: any) {
       showCreateError(err.message);
     }
   };
 
   // Manejar actualización
-  const handleUpdate = async (id: string | number, data: Record<string, any>) => {
+  const handleUpdate = async (
+    id: string | number,
+    data: Record<string, any>
+  ) => {
     try {
       await updateArtist(id as string, {
         stageName: data.stageName.trim(),
         birthday: new Date(data.birthday),
         transitionDate: new Date(data.transitionDate),
         status: data.status,
-        groupId: data.groupId.trim() || undefined,
-        apprenticeId: data.apprenticeId
+        groupId: data.goupId? data.groupId.trim() : undefined,
+        apprenticeId: data.apprenticeId,
       });
 
       showUpdateSuccess();
@@ -298,7 +325,7 @@ const ArtistManagement: React.FC = () => {
   // Funciones auxiliares
   const formatDate = (date: Date | string) => {
     if (!date) return "N/A";
-    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    const dateObj = typeof date === "string" ? new Date(date) : date;
     dateObj.setDate(dateObj.getDate() + 1);
     return dateObj.toLocaleDateString("es-ES");
   };
@@ -324,11 +351,15 @@ const ArtistManagement: React.FC = () => {
   // Calcular edad
   const calculateAge = (birthday: Date | string) => {
     if (!birthday) return "N/A";
-    const birthDate = typeof birthday === 'string' ? new Date(birthday) : birthday;
+    const birthDate =
+      typeof birthday === "string" ? new Date(birthday) : birthday;
     const today = new Date();
     let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
       age--;
     }
     return age;
@@ -341,7 +372,7 @@ const ArtistManagement: React.FC = () => {
       title: "Nombre Artístico",
       sortable: true,
       width: "18%",
-      align: "center"
+      align: "center",
     },
     {
       key: "birthday",
@@ -349,7 +380,7 @@ const ArtistManagement: React.FC = () => {
       sortable: true,
       width: "14%",
       align: "center",
-      render: (item) => formatDate(item.birthday)
+      render: (item) => formatDate(item.birthday),
     },
     {
       key: "age",
@@ -357,7 +388,7 @@ const ArtistManagement: React.FC = () => {
       sortable: false,
       width: "8%",
       align: "center",
-      render: (item) => calculateAge(item.birthday)
+      render: (item) => calculateAge(item.birthday),
     },
     {
       key: "transitionDate",
@@ -365,7 +396,7 @@ const ArtistManagement: React.FC = () => {
       sortable: true,
       width: "14%",
       align: "center",
-      render: (item) => formatDate(item.transitionDate)
+      render: (item) => formatDate(item.transitionDate),
     },
     {
       key: "status",
@@ -374,25 +405,19 @@ const ArtistManagement: React.FC = () => {
       width: "12%",
       align: "center",
       render: (item) => (
-        <span className={`status-badge status-${getStatusClass(item.status)}`}>
+        <span className={`status-artist-badge status-artist-${getStatusClass(item.status)}`}>
           {getStatusText(item.status)}
         </span>
-      )
+      ),
     },
-    {
-      key: "group",
-      title: "Grupo",
-      width: "10%",
-      align: "center",
-      render: (item) => item.groupId || "N/A"
-    },
+
     {
       key: "apprentice.fullName",
       title: "Aprendiz Asociado",
       width: "24%",
       align: "center",
-      render: (item) => getApprenticeName(item)
-    }
+      render: (item) => getApprenticeName(item),
+    },
   ];
 
   // Función para renderizar detalles en modal de eliminación
@@ -403,22 +428,24 @@ const ArtistManagement: React.FC = () => {
           <strong>Nombre Artístico:</strong> <span>{artist.stageName}</span>
         </div>
         <div className="detail-item">
-          <strong>Fecha Nacimiento:</strong> <span>{formatDate(artist.birthday)}</span>
+          <strong>Fecha Nacimiento:</strong>{" "}
+          <span>{formatDate(artist.birthday)}</span>
         </div>
         <div className="detail-item">
-          <strong>Edad:</strong> <span>{calculateAge(artist.birthday)} años</span>
+          <strong>Edad:</strong>{" "}
+          <span>{calculateAge(artist.birthday)} años</span>
         </div>
         <div className="detail-item">
-          <strong>Fecha Transición:</strong> <span>{formatDate(artist.transitionDate)}</span>
+          <strong>Fecha Transición:</strong>{" "}
+          <span>{formatDate(artist.transitionDate)}</span>
         </div>
         <div className="detail-item">
           <strong>Estado:</strong> <span>{getStatusText(artist.status)}</span>
         </div>
+
         <div className="detail-item">
-          <strong>Grupo:</strong> <span>{artist.groupId || "No asignado"}</span>
-        </div>
-        <div className="detail-item">
-          <strong>Aprendiz Asociado:</strong> <span>{getApprenticeName(artist)}</span>
+          <strong>Aprendiz Asociado:</strong>{" "}
+          <span>{getApprenticeName(artist)}</span>
         </div>
       </div>
     );
@@ -468,19 +495,22 @@ const ArtistManagement: React.FC = () => {
           fields={artistEditFields}
           initialData={{
             stageName: editingArtist.stageName,
-            birthday: editingArtist.birthday ? 
-              (new Date(editingArtist.birthday).toISOString().split("T")[0]) : "",
-            transitionDate: editingArtist.transitionDate ? 
-              (new Date(editingArtist.transitionDate).toISOString().split("T")[0]) : "",
+            birthday: editingArtist.birthday
+              ? new Date(editingArtist.birthday).toISOString().split("T")[0]
+              : "",
+            transitionDate: editingArtist.transitionDate
+              ? new Date(editingArtist.transitionDate)
+                  .toISOString()
+                  .split("T")[0]
+              : "",
             status: editingArtist.status,
-            groupId: editingArtist.groupId || ""
+             apprenticeId: editingArtist.apprenticeId,
           }}
           itemId={editingArtist.id}
           onSubmit={handleUpdate}
           onClose={() => setEditingArtist(null)}
           loading={loading}
           submitText="Actualizar Artista"
-          
         />
       )}
 

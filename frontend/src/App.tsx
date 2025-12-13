@@ -19,8 +19,15 @@ import { BillboardListProvider } from './context/BillboardListContext';
 import { useAuth } from './context/AuthContext';
 import { AlbumProvider } from './context/AlbumContext';
 import { SongProvider } from './context/SongContext';
-import LoginPage from './components/prueba/LoginPage'
-import './components/prueba/LoginPage'
+import { GroupProvider } from './context/GroupContext';
+import LoginPage from './components/Login/LoginPage'
+import './components/Login/LoginPage'
+import { ActivitySchedulingProvider } from './context/ActivitySchedulingContext';
+import ArtistManagement from './components/Admin/sections/Artist/ArtistManagement';
+import { AwardProvider } from './context/AwardContext';
+import { SongBillboardProvider } from './context/SongBillboardContext';
+import ArtistDashboard from './components/Artist/ArtistDashboard';
+import { CollaborationProvider } from './context/CollaborationContext';
 
 // const PrivateRoute = ({ children, allowedRoles }: { children: React.ReactNode, allowedRoles: string[] }) => {
 //   const { user, isAuthenticated } = useAuth();
@@ -38,52 +45,67 @@ import './components/prueba/LoginPage'
 
 function App() {
   return (
-    <SongProvider>
-      <AlbumProvider>
-        <BillboardListProvider>
-          <IncomeProvider>
-            <ContractProvider>
-              <AgencyProvider>
-                <ActivityProvider>
-                  <ApprenticeEvaluationProvider>
-                    <ArtistProvider>
-                      <ApprenticeProvider>
-                        <PlaceProvider>
-                          <AuthProvider>
-                            <Router>
-                              <div className="App">
-                                <Routes>
-                                  <Route path="/" element={<LoginPage />} />
-                                  <Route 
-                                    path="/admin" 
-                                    element={
-                                      <ResponsibleProvider> {/* Solo en admin */}
-                                        <AdminDashboard />
-                                      </ResponsibleProvider>
-                                    } 
-                                  />
-                                  <Route 
-                                    path="/manager" 
-                                    element={
-                                      <ManagerDashboard />
-                                    } 
-                                  />
-                                </Routes>
-                              </div>
-                            </Router>
-                          </AuthProvider>
-                        </PlaceProvider>
-                      </ApprenticeProvider>
-                    </ArtistProvider>
-                  </ApprenticeEvaluationProvider>
-                </ActivityProvider>
-              </AgencyProvider>
-            </ContractProvider>
-          </IncomeProvider>
-        </BillboardListProvider>
-      </AlbumProvider>
-    </SongProvider>
-   
+    <CollaborationProvider>
+    <SongBillboardProvider>
+    <AwardProvider>
+      <ActivitySchedulingProvider>
+        <GroupProvider>
+          <SongProvider>
+            <AlbumProvider>
+              <BillboardListProvider>
+                <IncomeProvider>
+                  <ContractProvider>
+                    <AgencyProvider>
+                      <ActivityProvider>
+                        <ApprenticeEvaluationProvider>
+                          <ArtistProvider>
+                            <ApprenticeProvider>
+                              <PlaceProvider>
+                                <AuthProvider>
+                                  <Router>
+                                    <div className="App">
+                                      <Routes>
+                                        <Route path="/" element={<LoginPage />} />
+                                        <Route 
+                                          path="/admin" 
+                                          element={
+                                            <ResponsibleProvider> {/* Solo en admin */}
+                                              <AdminDashboard />
+                                            </ResponsibleProvider>
+                                          } 
+                                        />
+                                        <Route 
+                                          path="/manager" 
+                                          element={
+                                            <ManagerDashboard />
+                                          } 
+                                        />
+                                        <Route 
+                                          path="/artist" 
+                                          element={
+                                            <ArtistDashboard />
+                                          } 
+                                        />
+                                      </Routes>
+                                    </div>
+                                  </Router>
+                                </AuthProvider>
+                              </PlaceProvider>
+                            </ApprenticeProvider>
+                          </ArtistProvider>
+                        </ApprenticeEvaluationProvider>
+                      </ActivityProvider>
+                    </AgencyProvider>
+                  </ContractProvider>
+                </IncomeProvider>
+              </BillboardListProvider>
+            </AlbumProvider>
+          </SongProvider>
+        </GroupProvider>
+    </ActivitySchedulingProvider>
+   </AwardProvider>
+   </SongBillboardProvider>
+   </CollaborationProvider>
   );
 }
 

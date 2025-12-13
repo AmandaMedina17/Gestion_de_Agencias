@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useSong } from "../../../../context/SongContext";
 import { useAlbum } from "../../../../context/AlbumContext";
 import GenericTable, { Column } from "../../../ui/datatable";
-import CreateModal, { FormField } from "../../../ui/reutilizables/CreateModal";
-import EditModal from "../../../ui/reutilizables/EditModal";
-import DeleteModal from "../../../ui/reutilizables/DeleteModal";
-import './SongStyle.css';
+import CreateModal, { FormField } from "../../../ui/reusable/CreateModal";
+import EditModal from "../../../ui/reusable/EditModal";
+import DeleteModal from "../../../ui/reusable/DeleteModal";
+import "./SongStyle.css";
 
 // Interfaces de tipos
 interface Song {
@@ -55,13 +55,13 @@ const SongManagement: React.FC = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        await Promise.all([
-          fetchSongs(),
-          fetchAlbums()
-        ]);
+        await Promise.all([fetchSongs(), fetchAlbums()]);
       } catch (err) {
         console.error("Error loading data:", err);
-        showError("Error al Cargar", "No se pudieron cargar los datos. Intente nuevamente.");
+        showError(
+          "Error al Cargar",
+          "No se pudieron cargar los datos. Intente nuevamente."
+        );
       }
     };
     loadData();
@@ -82,7 +82,11 @@ const SongManagement: React.FC = () => {
   };
 
   // Funciones auxiliares para mostrar notificaciones
-  const showNotification = (type: "success" | "error" | "info" | "warning", title: string, message: string) => {
+  const showNotification = (
+    type: "success" | "error" | "info" | "warning",
+    title: string,
+    message: string
+  ) => {
     setNotification({ type, title, message });
   };
 
@@ -104,36 +108,50 @@ const SongManagement: React.FC = () => {
   };
 
   const showUpdateSuccess = () => {
-    showSuccess("¡Canción Actualizada!", "La canción ha sido actualizada exitosamente.");
+    showSuccess(
+      "¡Canción Actualizada!",
+      "La canción ha sido actualizada exitosamente."
+    );
   };
 
   const showUpdateError = (errorMessage?: string) => {
-    showError("Error al Actualizar", errorMessage || "No se pudo actualizar la canción.");
+    showError(
+      "Error al Actualizar",
+      errorMessage || "No se pudo actualizar la canción."
+    );
   };
 
   const showDeleteSuccess = () => {
-    showSuccess("¡Canción Eliminada!", "La canción ha sido eliminada exitosamente.");
+    showSuccess(
+      "¡Canción Eliminada!",
+      "La canción ha sido eliminada exitosamente."
+    );
   };
 
   const showDeleteError = (errorMessage?: string) => {
-    showError("Error al Eliminar", errorMessage || "No se pudo eliminar la canción.");
+    showError(
+      "Error al Eliminar",
+      errorMessage || "No se pudo eliminar la canción."
+    );
   };
 
   const formatDateForServer = (dateString: string): string => {
     if (!dateString) return new Date().toISOString();
-    
+
     // Crear fecha a partir del string YYYY-MM-DD
     const date = new Date(dateString);
-    
+
     // Asegurarse de que sea una fecha válida
     if (isNaN(date.getTime())) {
       console.warn("Fecha inválida, usando fecha actual");
       return new Date().toISOString();
     }
-    
+
     // Ajustar por timezone para que no cambie el día
-    const adjustedDate = new Date(date.getTime() + (date.getTimezoneOffset() * 60000));
-    
+    const adjustedDate = new Date(
+      date.getTime() + date.getTimezoneOffset() * 60000
+    );
+
     return adjustedDate.toISOString();
   };
 
@@ -142,8 +160,11 @@ const SongManagement: React.FC = () => {
     try {
       console.log("Datos para crear canción:", data);
       console.log("Fecha convertida a Date:", new Date(data.releaseDate));
-      console.log("Fecha como ISO string:", formatDateForServer(data.releaseDate));
-      
+      console.log(
+        "Fecha como ISO string:",
+        formatDateForServer(data.releaseDate)
+      );
+
       // IMPORTANTE: Enviar como string ISO, igual que ApprenticeManagement
       await createSong({
         nameSong: data.name,
@@ -153,7 +174,6 @@ const SongManagement: React.FC = () => {
       showCreateSuccess();
       setShowCreateModal(false);
       await fetchSongs();
-
     } catch (err: any) {
       console.error("Error al crear canción:", err);
       showCreateError(err.message || "Error desconocido al crear la canción");
@@ -161,12 +181,15 @@ const SongManagement: React.FC = () => {
   };
 
   // Manejar actualización
-  const handleUpdate = async (id: string | number, data: Record<string, any>) => {
+  const handleUpdate = async (
+    id: string | number,
+    data: Record<string, any>
+  ) => {
     try {
       await updateSong(id as string, {
         nameSong: data.name,
         idAlbum: data.albumId,
-        date: new Date(data.releaseDate) // Enviar como string ISO
+        date: new Date(data.releaseDate), // Enviar como string ISO
       });
 
       showUpdateSuccess();
@@ -194,19 +217,19 @@ const SongManagement: React.FC = () => {
   // Funciones auxiliares para formatear fechas para visualización
   const formatDateForDisplay = (dateString: string) => {
     if (!dateString) return "N/A";
-    
+
     try {
       const date = new Date(dateString);
-      
+
       // Validar que sea una fecha válida
       if (isNaN(date.getTime())) {
         return "Fecha inválida";
       }
-      
+
       return date.toLocaleDateString("es-ES", {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
       });
     } catch (error) {
       console.error("Error al formatear fecha:", error);
@@ -225,28 +248,28 @@ const SongManagement: React.FC = () => {
       min: 2,
       max: 100,
       validate: (value) => {
-        if (value.length < 2) return "El nombre debe tener al menos 2 caracteres";
+        if (value.length < 2)
+          return "El nombre debe tener al menos 2 caracteres";
         return null;
-      }
+      },
     },
     {
       name: "albumId",
       label: "Álbum",
       type: "autocomplete",
       required: true,
-      options: albums.map(album => ({
+      options: albums.map((album) => ({
         value: album.id,
-        label: album.title
-      }))
+        label: album.title,
+      })),
     },
-    
   ];
 
   // Datos iniciales para creación (formato YYYY-MM-DD para input type="date")
   const initialCreateData = {
     name: "",
     albumId: "",
-    releaseDate: new Date().toISOString().split('T')[0] // Formato YYYY-MM-DD
+    releaseDate: new Date().toISOString().split("T")[0], // Formato YYYY-MM-DD
   };
 
   // Definir columnas para la tabla
@@ -256,7 +279,7 @@ const SongManagement: React.FC = () => {
       title: "Nombre",
       sortable: true,
       width: "30%",
-      align: "center"
+      align: "center",
     },
     {
       key: "album",
@@ -264,7 +287,7 @@ const SongManagement: React.FC = () => {
       sortable: true,
       width: "30%",
       align: "center",
-      render: (item) => getAlbumName(getAlbumIdFromSong(item))
+      render: (item) => getAlbumName(getAlbumIdFromSong(item)),
     },
     {
       key: "fecha",
@@ -272,8 +295,8 @@ const SongManagement: React.FC = () => {
       sortable: true,
       width: "25%",
       align: "center",
-      render: (item) => formatDateForDisplay(item.fecha.toString())
-    }
+      render: (item) => formatDateForDisplay(item.fecha.toString()),
+    },
   ];
 
   // Función para renderizar detalles en modal de eliminación
@@ -283,10 +306,12 @@ const SongManagement: React.FC = () => {
         <strong>Nombre:</strong> <span>{song.name}</span>
       </div>
       <div className="detail-item">
-        <strong>Álbum:</strong> <span>{getAlbumName(getAlbumIdFromSong(song))}</span>
+        <strong>Álbum:</strong>{" "}
+        <span>{getAlbumName(getAlbumIdFromSong(song))}</span>
       </div>
       <div className="detail-item">
-        <strong>Fecha Lanzamiento:</strong> <span>{formatDateForDisplay(song.fecha.toString())}</span>
+        <strong>Fecha Lanzamiento:</strong>{" "}
+        <span>{formatDateForDisplay(song.fecha.toString())}</span>
       </div>
     </div>
   );
@@ -295,16 +320,16 @@ const SongManagement: React.FC = () => {
   const getDateForEdit = (date: Date): string => {
     try {
       const d = new Date(date);
-      if (isNaN(d.getTime())) return new Date().toISOString().split('T')[0];
-      
+      if (isNaN(d.getTime())) return new Date().toISOString().split("T")[0];
+
       // Formato YYYY-MM-DD para input type="date"
       const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+
       return `${year}-${month}-${day}`;
     } catch (error) {
-      return new Date().toISOString().split('T')[0];
+      return new Date().toISOString().split("T")[0];
     }
   };
 
@@ -354,7 +379,7 @@ const SongManagement: React.FC = () => {
           initialData={{
             name: editingSong.name,
             albumId: getAlbumIdFromSong(editingSong),
-            releaseDate: getDateForEdit(editingSong.fecha)
+            releaseDate: getDateForEdit(editingSong.fecha),
           }}
           itemId={editingSong.id}
           onSubmit={handleUpdate}

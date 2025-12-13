@@ -4,16 +4,15 @@ import { useActivity } from "../../../../context/ActivityContext";
 import { useResponsible } from "../../../../context/ResponsibleContext";
 import { usePlace } from "../../../../context/PlaceContext";
 import GenericTable, { Column } from "../../../ui/datatable";
-import CreateModal, { FormField } from "../../../ui/reutilizables/CreateModal";
-import EditModal from "../../../ui/reutilizables/EditModal";
-import DeleteModal from "../../../ui/reutilizables/DeleteModal";
+import CreateModal, { FormField } from "../../../ui/reusable/CreateModal";
+import EditModal from "../../../ui/reusable/EditModal";
+import DeleteModal from "../../../ui/reusable/DeleteModal";
 import MultiSelect from "../../../ui/select";
 import CreateIncomeModal from "./Income/CreationIncome";
 import ViewActivityIncomesModal from "./Income/ViewActivityIncome";
 import "./ActivityStyle.css";
 import { ActivityResponseDto as BackendActivityResponseDto } from "../../../../../../backend/src/ApplicationLayer/DTOs/activityDto/response-activity.dto";
-import { Icon  } from "../../../icons";
-
+import { Icon } from "../../../icons";
 
 export enum ActivityClassification {
   CLASE_VOCAL = "CLASE_VOCAL",
@@ -88,14 +87,21 @@ const ActivityManagement: React.FC = () => {
   } | null>(null);
 
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editingActivity, setEditingActivity] = useState<ActivityResponseDto | null>(null);
-  const [deletingActivity, setDeletingActivity] = useState<ActivityResponseDto | null>(null);
+  const [editingActivity, setEditingActivity] =
+    useState<ActivityResponseDto | null>(null);
+  const [deletingActivity, setDeletingActivity] =
+    useState<ActivityResponseDto | null>(null);
   const [showIncomeModal, setShowIncomeModal] = useState(false);
-  const [newlyCreatedActivityId, setNewlyCreatedActivityId] = useState<string | null>(null);
+  const [newlyCreatedActivityId, setNewlyCreatedActivityId] = useState<
+    string | null
+  >(null);
   const [showIncomesModal, setShowIncomesModal] = useState(false);
-  const [selectedActivityForIncomes, setSelectedActivityForIncomes] = useState<ActivityResponseDto | null>(null);
+  const [selectedActivityForIncomes, setSelectedActivityForIncomes] =
+    useState<ActivityResponseDto | null>(null);
   const [dateFields, setDateFields] = useState([""]);
-  const [selectedResponsibleIds, setSelectedResponsibleIds] = useState<string[]>([]);
+  const [selectedResponsibleIds, setSelectedResponsibleIds] = useState<
+    string[]
+  >([]);
   const [selectedPlaceIds, setSelectedPlaceIds] = useState<string[]>([]);
 
   useEffect(() => {
@@ -104,7 +110,7 @@ const ActivityManagement: React.FC = () => {
         await Promise.all([
           fetchActivities(),
           fetchResponsibles(),
-          fetchPlaces()
+          fetchPlaces(),
         ]);
       } catch (err) {
         console.error("Error loading data:", err);
@@ -114,7 +120,11 @@ const ActivityManagement: React.FC = () => {
   }, []);
 
   // Funciones auxiliares para notificaciones
-  const showNotification = (type: "success" | "error" | "info" | "warning", title: string, message: string) => {
+  const showNotification = (
+    type: "success" | "error" | "info" | "warning",
+    title: string,
+    message: string
+  ) => {
     setNotification({ type, title, message });
   };
 
@@ -127,47 +137,65 @@ const ActivityManagement: React.FC = () => {
   };
 
   const showCreateSuccess = () => {
-    showSuccess("¡Actividad Creada!", "La actividad ha sido creada exitosamente.");
+    showSuccess(
+      "¡Actividad Creada!",
+      "La actividad ha sido creada exitosamente."
+    );
   };
 
   const showCreateError = (errorMessage?: string) => {
-    showError("Error al Crear", errorMessage || "No se pudo crear la actividad.");
+    showError(
+      "Error al Crear",
+      errorMessage || "No se pudo crear la actividad."
+    );
   };
 
   const showUpdateSuccess = () => {
-    showSuccess("¡Actividad Actualizada!", "La actividad ha sido actualizada exitosamente.");
+    showSuccess(
+      "¡Actividad Actualizada!",
+      "La actividad ha sido actualizada exitosamente."
+    );
   };
 
   const showUpdateError = (errorMessage?: string) => {
-    showError("Error al Actualizar", errorMessage || "No se pudo actualizar la actividad.");
+    showError(
+      "Error al Actualizar",
+      errorMessage || "No se pudo actualizar la actividad."
+    );
   };
 
   const showDeleteSuccess = () => {
-    showSuccess("¡Actividad Eliminada!", "La actividad ha sido eliminada exitosamente.");
+    showSuccess(
+      "¡Actividad Eliminada!",
+      "La actividad ha sido eliminada exitosamente."
+    );
   };
 
   const showDeleteError = (errorMessage?: string) => {
-    showError("Error al Eliminar", errorMessage || "No se pudo eliminar la actividad.");
+    showError(
+      "Error al Eliminar",
+      errorMessage || "No se pudo eliminar la actividad."
+    );
   };
 
   // Funciones auxiliares para mostrar nombres
   const getResponsibleNames = (activity: ActivityResponseDto) => {
     if (activity.responsibles && activity.responsibles.length > 0) {
-      return activity.responsibles.map(r => r.name).join(", ");
+      return activity.responsibles.map((r) => r.name).join(", ");
     }
     return "No asignado";
   };
 
   const getPlaceNames = (activity: ActivityResponseDto) => {
     if (activity.places && activity.places.length > 0) {
-      return activity.places.map(p => p.name).join(", ");
+      return activity.places.map((p) => p.name).join(", ");
     }
     return "No asignado";
   };
 
   const formatDate = (date: Date | string) => {
     if (!date) return "N/A";
-    const dateObj = typeof date === 'string' ? new Date(date) : date;
+    const dateObj = typeof date === "string" ? new Date(date) : date;
     dateObj.setDate(dateObj.getDate() + 1);
     return dateObj.toLocaleDateString("es-ES");
   };
@@ -180,10 +208,10 @@ const ActivityManagement: React.FC = () => {
       type: "autocomplete",
       placeholder: "Seleccione la clasificación de la actividad",
       required: true,
-      options: Object.values(ActivityClassification).map(value => ({
+      options: Object.values(ActivityClassification).map((value) => ({
         value,
-        label: getClassificationText(value)
-      }))
+        label: getClassificationText(value),
+      })),
     },
     {
       name: "type",
@@ -193,8 +221,8 @@ const ActivityManagement: React.FC = () => {
       required: true,
       options: [
         { value: ActivityType.INDIVIDUAL, label: "Individual" },
-        { value: ActivityType.GRUPAL, label: "Grupal" }
-      ]
+        { value: ActivityType.GRUPAL, label: "Grupal" },
+      ],
     },
     {
       name: "responsibleIds",
@@ -203,16 +231,16 @@ const ActivityManagement: React.FC = () => {
       placeholder: "Seleccione los responsables",
       required: true,
       multiple: true,
-      options: responsibles.map(responsible => ({
+      options: responsibles.map((responsible) => ({
         value: responsible.id,
-        label: responsible.name
+        label: responsible.name,
       })),
       validate: (value) => {
         if (!value || (Array.isArray(value) && value.length === 0)) {
           return "Debe seleccionar al menos un responsable";
         }
         return null;
-      }
+      },
     },
     {
       name: "placeIds",
@@ -221,17 +249,17 @@ const ActivityManagement: React.FC = () => {
       placeholder: "Seleccione los lugares",
       required: true,
       multiple: true,
-      options: places.map(place => ({
+      options: places.map((place) => ({
         value: place.id,
-        label: place.name
+        label: place.name,
       })),
       validate: (value) => {
         if (!value || (Array.isArray(value) && value.length === 0)) {
           return "Debe seleccionar al menos un lugar";
         }
         return null;
-      }
-    }
+      },
+    },
   ];
 
   // Campos del formulario para edición (sin responsables y lugares ya que se manejan diferente)
@@ -241,10 +269,10 @@ const ActivityManagement: React.FC = () => {
       label: "Clasificación",
       type: "autocomplete",
       required: true,
-      options: Object.values(ActivityClassification).map(value => ({
+      options: Object.values(ActivityClassification).map((value) => ({
         value,
-        label: getClassificationText(value)
-      }))
+        label: getClassificationText(value),
+      })),
     },
     {
       name: "type",
@@ -253,9 +281,9 @@ const ActivityManagement: React.FC = () => {
       required: true,
       options: [
         { value: ActivityType.INDIVIDUAL, label: "Individual" },
-        { value: ActivityType.GRUPAL, label: "Grupal" }
-      ]
-    }
+        { value: ActivityType.GRUPAL, label: "Grupal" },
+      ],
+    },
   ];
 
   // Datos iniciales para creación
@@ -263,22 +291,22 @@ const ActivityManagement: React.FC = () => {
     classification: ActivityClassification.EVENTO_PROMOCIONAL,
     type: ActivityType.INDIVIDUAL,
     responsibleIds: [],
-    placeIds: []
+    placeIds: [],
   };
 
   // Manejar creación de actividad
   const handleCreate = async (data: Record<string, any>) => {
     try {
       // Filtrar fechas válidas
-      const validDates = dateFields.filter(date => date.trim() !== '');
-      
+      const validDates = dateFields.filter((date) => date.trim() !== "");
+
       if (validDates.length === 0) {
         showError("Error", "Debe ingresar al menos una fecha válida");
         return;
       }
 
       // Verificar que las fechas sean futuras
-      const hasPastDate = validDates.some(date => {
+      const hasPastDate = validDates.some((date) => {
         const dateObj = new Date(date);
         // Comparar solo la fecha (sin hora)
         const today = new Date();
@@ -297,13 +325,13 @@ const ActivityManagement: React.FC = () => {
         type: data.type,
         responsibleIds: selectedResponsibleIds,
         placeIds: selectedPlaceIds,
-        dates: validDates.map(date => new Date(date))
+        dates: validDates.map((date) => new Date(date)),
       });
 
       showCreateSuccess();
       setShowCreateModal(false);
       setNewlyCreatedActivityId(createdActivity.id);
-      
+
       // Abrir modal de ingreso después de 500ms
       setTimeout(() => {
         setShowIncomeModal(true);
@@ -321,7 +349,10 @@ const ActivityManagement: React.FC = () => {
   };
 
   // Manejar actualización
-  const handleUpdate = async (id: string | number, data: Record<string, any>) => {
+  const handleUpdate = async (
+    id: string | number,
+    data: Record<string, any>
+  ) => {
     if (!editingActivity) return;
 
     try {
@@ -331,7 +362,9 @@ const ActivityManagement: React.FC = () => {
         type: data.type,
         responsibleIds: selectedResponsibleIds,
         placeIds: selectedPlaceIds,
-        dates: dateFields.filter(date => date.trim() !== '').map(date => new Date(date))
+        dates: dateFields
+          .filter((date) => date.trim() !== "")
+          .map((date) => new Date(date)),
       });
 
       showUpdateSuccess();
@@ -372,16 +405,16 @@ const ActivityManagement: React.FC = () => {
   const handleOpenEditModal = (activity: ActivityResponseDto) => {
     setEditingActivity(activity);
     // Obtener IDs de responsables y lugares
-    const responsibleIds = activity.responsibles?.map(r => r.name) || [];
-    const placeIds = activity.places?.map(p => p.name) || [];
-    
+    const responsibleIds = activity.responsibles?.map((r) => r.name) || [];
+    const placeIds = activity.places?.map((p) => p.name) || [];
+
     setSelectedResponsibleIds(responsibleIds);
     setSelectedPlaceIds(placeIds);
-    
+
     // Formatear fechas para el input
     const formattedDates = activity.dates.map((date: Date | string) => {
-      const dateObj = typeof date === 'string' ? new Date(date) : date;
-      return dateObj.toISOString().split('T')[0];
+      const dateObj = typeof date === "string" ? new Date(date) : date;
+      return dateObj.toISOString().split("T")[0];
     });
     setDateFields(formattedDates);
   };
@@ -394,7 +427,7 @@ const ActivityManagement: React.FC = () => {
       sortable: true,
       width: "20%",
       align: "center",
-      render: (item) => getClassificationText(item.classification)
+      render: (item) => getClassificationText(item.classification),
     },
     {
       key: "type",
@@ -402,7 +435,12 @@ const ActivityManagement: React.FC = () => {
       sortable: true,
       width: "15%",
       align: "center",
-      render: (item) => getTypeText(item.type)
+      render: (item) => (
+        <div className={`type-income ${item.type.toLowerCase()}`}>
+           {getTypeText(item.type)}
+        </div>
+       
+      ),
     },
     {
       key: "responsibles",
@@ -410,16 +448,64 @@ const ActivityManagement: React.FC = () => {
       sortable: false,
       width: "20%",
       align: "center",
-      render: (item) => getResponsibleNames(item)
-    },
+      render: (item) => {
+        const responsibleNames = getResponsibleNames(item);
+        if (responsibleNames === "No asignado") {
+          return <span className="no-data">No asignado</span>;
+        }
+        
+        // Si es una cadena, separarla por comas
+        const names = typeof responsibleNames === 'string' 
+          ? responsibleNames.split(', ') 
+          : responsibleNames;
+        
+        return (
+          <div className="vertical-list">
+            {Array.isArray(names) ? (
+              names.map((name, index) => (
+                <div key={index} className="list-item">
+                  {name.trim()}
+                </div>
+              ))
+            ) : (
+              <div className="list-item">{responsibleNames}</div>
+            )}
+          </div>
+        );
+      },
+      },
     {
       key: "places",
       title: "Lugares",
       sortable: false,
       width: "20%",
       align: "center",
-      render: (item) => getPlaceNames(item)
-    },
+      render: (item) => {
+        const placeNames = getPlaceNames(item);
+        if (placeNames === "No asignado") {
+          return <span className="no-data">No asignado</span>;
+        }
+        
+        // Si es una cadena, separarla por comas
+        const names = typeof placeNames === 'string' 
+          ? placeNames.split(', ') 
+          : placeNames;
+        
+        return (
+          <div className="vertical-list">
+            {Array.isArray(names) ? (
+              names.map((name, index) => (
+                <div key={index} className="list-item">
+                  {name.trim()}
+                </div>
+              ))
+            ) : (
+              <div className="list-item">{placeNames}</div>
+            )}
+          </div>
+        );
+      },
+      },
     {
       key: "dates",
       title: "Fechas",
@@ -427,40 +513,43 @@ const ActivityManagement: React.FC = () => {
       width: "15%",
       align: "center",
       render: (item) => (
-        <div className="dates-list">
-          {item.dates.slice(0, 2).map((date, index) => (
-            <div key={index} className="date-item">
+        <div className="vertical-list">
+          {item.dates.slice(0, 5).map((date, index) => (
+            <div key={index} className="list-item date-item">
               {formatDate(date)}
             </div>
           ))}
-          {item.dates.length > 2 && (
-            <div className="date-item">+{item.dates.length - 2} más</div>
+          {item.dates.length > 5 && (
+            <div className="list-item more-dates">
+              +{item.dates.length - 5} más
+            </div>
           )}
         </div>
-      )
+      ),
     },
     {
       key: "incomeActions",
-      title: "Ingresos", 
+      title: "Ingresos",
       sortable: false,
       width: "10%",
       align: "center",
       render: (item) => (
         <div className="income-action-container">
-      <button
-        className="action-btn income-btn-comp compact"
-        onClick={() => {
-          setSelectedActivityForIncomes(item);
-          setShowIncomesModal(true);
-        }}
-        title="Ver ingresos de la actividad"
-      >
-        <span className="btn-icon"><Icon name="eye" size={18} /></span>
-      </button>
-    </div>
-      )
+          <button
+            className="action-btn income-btn-comp compact"
+            onClick={() => {
+              setSelectedActivityForIncomes(item);
+              setShowIncomesModal(true);
+            }}
+            title="Ver ingresos de la actividad"
+          >
+            <span className="btn-icon">
+              <Icon name="eye" size={18} />
+            </span>
+          </button>
+        </div>
+      ),
     },
-    
   ];
 
   // Función para renderizar detalles en modal de eliminación
@@ -468,13 +557,15 @@ const ActivityManagement: React.FC = () => {
     return (
       <div className="activity-details">
         <div className="detail-item">
-          <strong>Clasificación:</strong> <span>{getClassificationText(activity.classification)}</span>
+          <strong>Clasificación:</strong>{" "}
+          <span>{getClassificationText(activity.classification)}</span>
         </div>
         <div className="detail-item">
           <strong>Tipo:</strong> <span>{getTypeText(activity.type)}</span>
         </div>
         <div className="detail-item">
-          <strong>Responsables:</strong> <span>{getResponsibleNames(activity)}</span>
+          <strong>Responsables:</strong>{" "}
+          <span>{getResponsibleNames(activity)}</span>
         </div>
         <div className="detail-item">
           <strong>Lugares:</strong> <span>{getPlaceNames(activity)}</span>
@@ -516,7 +607,6 @@ const ActivityManagement: React.FC = () => {
         className="activity-table"
         notification={notification || undefined}
         onNotificationClose={() => setNotification(null)}
-        
       />
 
       {/* Modal personalizado para creación */}
@@ -524,28 +614,32 @@ const ActivityManagement: React.FC = () => {
         <div className="modal-overlay">
           <div className="modal-content">
             <h3>Crear Nueva Actividad</h3>
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              const formData = new FormData(e.target as HTMLFormElement);
-              const data = {
-                classification: formData.get('classification') as ActivityClassification,
-                type: formData.get('type') as ActivityType,
-                responsibleIds: selectedResponsibleIds,
-                placeIds: selectedPlaceIds
-              };
-              handleCreate(data);
-            }}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target as HTMLFormElement);
+                const data = {
+                  classification: formData.get(
+                    "classification"
+                  ) as ActivityClassification,
+                  type: formData.get("type") as ActivityType,
+                  responsibleIds: selectedResponsibleIds,
+                  placeIds: selectedPlaceIds,
+                };
+                handleCreate(data);
+              }}
+            >
               {/* Campos básicos usando FormField */}
               <div className="form-row">
                 <div className="form-group">
                   <label>Clasificación *</label>
-                  <select 
-                    name="classification" 
-                    className="form-select" 
+                  <select
+                    name="classification"
+                    className="form-select"
                     required
                     defaultValue={initialCreateData.classification}
                   >
-                    {activityFields[0].options?.map(option => (
+                    {activityFields[0].options?.map((option) => (
                       <option key={option.value} value={option.value}>
                         {option.label}
                       </option>
@@ -554,13 +648,13 @@ const ActivityManagement: React.FC = () => {
                 </div>
                 <div className="form-group">
                   <label>Tipo *</label>
-                  <select 
-                    name="type" 
-                    className="form-select" 
+                  <select
+                    name="type"
+                    className="form-select"
                     required
                     defaultValue={initialCreateData.type}
                   >
-                    {activityFields[1].options?.map(option => (
+                    {activityFields[1].options?.map((option) => (
                       <option key={option.value} value={option.value}>
                         {option.label}
                       </option>
@@ -574,7 +668,10 @@ const ActivityManagement: React.FC = () => {
                 <label>Responsables *</label>
                 <MultiSelect
                   label="Seleccione responsables"
-                  options={responsibles.map(r => ({ value: r.id, label: r.name }))}
+                  options={responsibles.map((r) => ({
+                    value: r.id,
+                    label: r.name,
+                  }))}
                   selectedValues={selectedResponsibleIds}
                   onChange={setSelectedResponsibleIds}
                   required
@@ -586,7 +683,7 @@ const ActivityManagement: React.FC = () => {
                 <label>Lugares *</label>
                 <MultiSelect
                   label="Seleccione lugares"
-                  options={places.map(p => ({ value: p.id, label: p.name }))}
+                  options={places.map((p) => ({ value: p.id, label: p.name }))}
                   selectedValues={selectedPlaceIds}
                   onChange={setSelectedPlaceIds}
                   required
@@ -614,7 +711,9 @@ const ActivityManagement: React.FC = () => {
                         type="button"
                         className="remove-date"
                         onClick={() => {
-                          setDateFields(dateFields.filter((_, i) => i !== index));
+                          setDateFields(
+                            dateFields.filter((_, i) => i !== index)
+                          );
                         }}
                       >
                         ×
@@ -632,7 +731,11 @@ const ActivityManagement: React.FC = () => {
               </div>
 
               <div className="modal-actions">
-                <button type="submit" className="submit-button" disabled={loading}>
+                <button
+                  type="submit"
+                  className="submit-button"
+                  disabled={loading}
+                >
                   {loading ? "Creando..." : "Crear Actividad"}
                 </button>
                 <button
@@ -654,27 +757,31 @@ const ActivityManagement: React.FC = () => {
         <div className="modal-overlay">
           <div className="modal-content">
             <h3>Editar Actividad</h3>
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              const formData = new FormData(e.target as HTMLFormElement);
-              const data = {
-                classification: formData.get('classification') as ActivityClassification,
-                type: formData.get('type') as ActivityType,
-                responsibleIds: selectedResponsibleIds,
-                placeIds: selectedPlaceIds
-              };
-              handleUpdate(editingActivity.id, data);
-            }}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target as HTMLFormElement);
+                const data = {
+                  classification: formData.get(
+                    "classification"
+                  ) as ActivityClassification,
+                  type: formData.get("type") as ActivityType,
+                  responsibleIds: selectedResponsibleIds,
+                  placeIds: selectedPlaceIds,
+                };
+                handleUpdate(editingActivity.id, data);
+              }}
+            >
               <div className="form-row">
                 <div className="form-group">
                   <label>Clasificación *</label>
-                  <select 
-                    name="classification" 
-                    className="form-select" 
+                  <select
+                    name="classification"
+                    className="form-select"
                     required
                     defaultValue={editingActivity.classification}
                   >
-                    {activityEditFields[0].options?.map(option => (
+                    {activityEditFields[0].options?.map((option) => (
                       <option key={option.value} value={option.value}>
                         {option.label}
                       </option>
@@ -683,13 +790,13 @@ const ActivityManagement: React.FC = () => {
                 </div>
                 <div className="form-group">
                   <label>Tipo *</label>
-                  <select 
-                    name="type" 
-                    className="form-select" 
+                  <select
+                    name="type"
+                    className="form-select"
                     required
                     defaultValue={editingActivity.type}
                   >
-                    {activityEditFields[1].options?.map(option => (
+                    {activityEditFields[1].options?.map((option) => (
                       <option key={option.value} value={option.value}>
                         {option.label}
                       </option>
@@ -703,7 +810,10 @@ const ActivityManagement: React.FC = () => {
                 <label>Responsables *</label>
                 <MultiSelect
                   label="Seleccione responsables"
-                  options={responsibles.map(r => ({ value: r.id, label: r.name }))}
+                  options={responsibles.map((r) => ({
+                    value: r.id,
+                    label: r.name,
+                  }))}
                   selectedValues={selectedResponsibleIds}
                   onChange={setSelectedResponsibleIds}
                   required
@@ -715,7 +825,7 @@ const ActivityManagement: React.FC = () => {
                 <label>Lugares *</label>
                 <MultiSelect
                   label="Seleccione lugares"
-                  options={places.map(p => ({ value: p.id, label: p.name }))}
+                  options={places.map((p) => ({ value: p.id, label: p.name }))}
                   selectedValues={selectedPlaceIds}
                   onChange={setSelectedPlaceIds}
                   required
@@ -743,7 +853,9 @@ const ActivityManagement: React.FC = () => {
                         type="button"
                         className="remove-date"
                         onClick={() => {
-                          setDateFields(dateFields.filter((_, i) => i !== index));
+                          setDateFields(
+                            dateFields.filter((_, i) => i !== index)
+                          );
                         }}
                       >
                         ×
@@ -761,7 +873,11 @@ const ActivityManagement: React.FC = () => {
               </div>
 
               <div className="modal-actions">
-                <button type="submit" className="submit-button" disabled={loading}>
+                <button
+                  type="submit"
+                  className="submit-button"
+                  disabled={loading}
+                >
                   {loading ? "Actualizando..." : "Actualizar Actividad"}
                 </button>
                 <button
@@ -817,7 +933,9 @@ const ActivityManagement: React.FC = () => {
             setSelectedActivityForIncomes(null);
           }}
           activityId={selectedActivityForIncomes.id}
-          activityName={`${getClassificationText(selectedActivityForIncomes.classification)} - ${getTypeText(selectedActivityForIncomes.type)}`}
+          activityName={`${getClassificationText(
+            selectedActivityForIncomes.classification
+          )} - ${getTypeText(selectedActivityForIncomes.type)}`}
         />
       )}
     </section>

@@ -45,4 +45,18 @@ export class BaseService<CreateDto, ResponseDto> {
     if (!res.ok) throw new Error(`Error: ${res.status}`);
     return res.json();
   }
+
+  async postCustom<T>(endpoint: string, data: any): Promise<T> {
+    const res = await fetch(`${this.baseUrl}/${endpoint}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || `Error: ${res.status}`);
+    }
+    return res.json();
+  }
 }

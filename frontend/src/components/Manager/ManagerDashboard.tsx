@@ -8,6 +8,7 @@ import { AgencyResponseDto } from '../../../../backend/src/ApplicationLayer/DTOs
 import { ArtistStatus } from '../Admin/sections/Artist/ArtistManagement';
 import { ApprenticeStatus } from '../Admin/sections/Apprentice/ApprenticesManagement';
 import { sectionComponents } from './ManagerSectionMap';
+import '../Admin/AdminDashboard.css'
 
 const ManagerDashboard: React.FC = () => {
   const [activeSection, setActiveSection] = useState('profile');
@@ -143,7 +144,6 @@ const ManagerDashboard: React.FC = () => {
                   {artists.map((artist) => (
                     <tr key={artist.id}>
                       <td>{artist.stageName}</td>
-                      <td>{artist.groupId || 'Solista'}</td>
                       <td>{formatDate(artist.transitionDate)}</td>
                       <td>
                         <span className={`status-badge ${artist.status}`}>

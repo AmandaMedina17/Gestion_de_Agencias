@@ -16,7 +16,7 @@ export class ArtistGroupMembershipEntity {
     startDate!: Date;
     
     // Relación con GroupEntity
-    @ManyToOne(() => GroupEntity, (group: GroupEntity) => group.artistMemberships)
+    @ManyToOne(() => GroupEntity, (group: GroupEntity) => group.artistMemberships, {onDelete: 'CASCADE'})
     @JoinColumn({ name: 'group_id' })
     group!: GroupEntity;
 
@@ -33,5 +33,5 @@ export class ArtistGroupMembershipEntity {
     artist_debut_date!: Date;
 
     @Column({name: 'end_date',type: 'date', nullable: true})
-    endDate?: Date;
+    endDate: Date | null = null;
 }

@@ -4,6 +4,7 @@ import { ScheduleGroupDto } from '@application/DTOs/schedule-groupDto/schedule-g
 import { IGroupActivityRepository } from '@domain/Repositories/IGroupActivityRepository';
 import { ActivityResponseDto } from '@application/DTOs/activityDto/response-activity.dto';
 import { ActivityDtoMapper } from '@application/DTOs/dtoMappers/activity.dtoMapper';
+import { GetGroupCalendaryDto } from '@application/DTOs/schedule-groupDto/group_calendary.dto';
 
 @Injectable()
 export class GroupActivityService {
@@ -18,8 +19,8 @@ export class GroupActivityService {
     return await this.scheduleGroupUseCase.execute(dto);
   }
 
-  async getGroupActivities(groupId: string): Promise<ActivityResponseDto[]> {
-    const activities = await this.groupActivityRepository.getActivitiesByGroup(groupId);
+  async getGroupActivities(dto: GetGroupCalendaryDto): Promise<ActivityResponseDto[]> {
+    const activities = await this.groupActivityRepository.getActivitiesByGroupId(dto.groupId, dto.start_date, dto.end_date);
     return this.activityDtoMapper.toResponseList(activities)
   }
   

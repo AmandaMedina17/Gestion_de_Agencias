@@ -51,11 +51,11 @@ export class ScheduleArtistUseCase {
     }
 
     // Verificar conflictos de horario
-    const conflicts = await this.artistActivityRepository.checkScheduleConflicts(scheduleArtistDto.artistId, scheduleArtistDto.activityId)
+    // const conflicts = await this.artistActivityRepository.checkScheduleConflicts(scheduleArtistDto.artistId, scheduleArtistDto.activityId)
 
-    if (conflicts.length > 0) {
-      throw new ConflictException( `El artista tiene conflictos de horario`);
-    }
+    // if (conflicts.length > 0) {
+    //   throw new ConflictException( `El artista tiene conflictos de horario`);
+    // }
 
     // Programar al artista
     await this.artistActivityRepository.scheduleArtist(

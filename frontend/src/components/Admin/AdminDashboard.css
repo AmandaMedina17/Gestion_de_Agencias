@@ -1,5 +1,5 @@
 body {
-    background-image: url('/public/images/nubes.jpg');
+background: linear-gradient(135deg, #e0f2fe 0%, #f0fdfa 100%);    /* background-image: url('/public/images/nubes.jpg'); */
     background-repeat: no-repeat;
     background-size: cover;
     background-attachment: fixed; /* Esto fija el fondo */

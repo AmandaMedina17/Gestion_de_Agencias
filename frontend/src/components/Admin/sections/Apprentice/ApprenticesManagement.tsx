@@ -2,12 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useApprentice } from "../../../../context/ApprenticeContext";
 import { useAgency } from "../../../../context/AgencyContext";
 import GenericTable, { Column } from "../../../ui/datatable";
-import CreateModal, { FormField } from "../../../ui/reutilizables/CreateModal";
-import EditModal from "../../../ui/reutilizables/EditModal";
-import DeleteModal from "../../../ui/reutilizables/DeleteModal";
-import './ApprenticeStyle.css'
+import CreateModal, { FormField } from "../../../ui/reusable/CreateModal";
+import EditModal from "../../../ui/reusable/EditModal";
+import DeleteModal from "../../../ui/reusable/DeleteModal";
+import "./ApprenticeStyle.css";
 import { ApprenticeResponseDto } from "../../../../../../backend/src/ApplicationLayer/DTOs/apprenticeDto/response-apprentice.dto";
-
 
 export enum ApprenticeTrainingLevel {
   PRINCIPIANTE = "PRINCIPIANTE",
@@ -34,7 +33,7 @@ const ApprenticeManagement: React.FC = () => {
   } = useApprentice();
 
   const { agencies, fetchAgencies } = useAgency();
-  
+
   const [notification, setNotification] = useState<{
     type: "success" | "error" | "info" | "warning";
     title?: string;
@@ -42,16 +41,15 @@ const ApprenticeManagement: React.FC = () => {
   } | null>(null);
 
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editingApprentice, setEditingApprentice] = useState<ApprenticeResponseDto | null>(null);
-  const [deletingApprentice, setDeletingApprentice] = useState<ApprenticeResponseDto | null>(null);
+  const [editingApprentice, setEditingApprentice] =
+    useState<ApprenticeResponseDto | null>(null);
+  const [deletingApprentice, setDeletingApprentice] =
+    useState<ApprenticeResponseDto | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        await Promise.all([
-          fetchApprentices(),
-          fetchAgencies()
-        ]);
+        await Promise.all([fetchApprentices(), fetchAgencies()]);
       } catch (err) {
         console.error("Error loading data:", err);
       }
@@ -61,11 +59,11 @@ const ApprenticeManagement: React.FC = () => {
 
   // FUNCIÓN PARA OBTENER NOMBRE DE LA AGENCIA
   const getAgencyName = (apprentice: ApprenticeResponseDto) => {
-    if (apprentice.agency && typeof apprentice.agency === 'object') {
+    if (apprentice.agency && typeof apprentice.agency === "object") {
       return `${apprentice.agency} `;
     }
-    const agency = agencies.find(a => a.id === apprentice.agency);
-    return agency ? `${agency.nameAgency} - ${agency.place}` : "No asignado";
+    const agency = agencies.find((a) => a.id === apprentice.agency);
+    return agency ? `${agency.nameAgency}` : "No asignado";
   };
 
   // Definir campos del formulario de aprendiz
@@ -79,9 +77,10 @@ const ApprenticeManagement: React.FC = () => {
       min: 2,
       max: 100,
       validate: (value) => {
-        if (value.length < 2) return "El nombre debe tener al menos 2 caracteres";
+        if (value.length < 2)
+          return "El nombre debe tener al menos 2 caracteres";
         return null;
-      }
+      },
     },
     {
       name: "age",
@@ -95,7 +94,7 @@ const ApprenticeManagement: React.FC = () => {
         if (value < 16) return "La edad mínima es 16 años";
         if (value > 100) return "La edad máxima es 100 años";
         return null;
-      }
+      },
     },
     {
       name: "entryDate",
@@ -106,7 +105,7 @@ const ApprenticeManagement: React.FC = () => {
         const date = new Date(value);
         if (date > new Date()) return "La fecha no puede ser futura";
         return null;
-      }
+      },
     },
     {
       name: "status",
@@ -115,9 +114,12 @@ const ApprenticeManagement: React.FC = () => {
       required: true,
       options: [
         { value: ApprenticeStatus.EN_ENTRENAMIENTO, label: "En entrenamiento" },
-        { value: ApprenticeStatus.PROCESO_DE_SELECCION, label: "Proceso de selección" },
-        { value: ApprenticeStatus.TRANSFERIDO, label: "Transferido" }
-      ]
+        {
+          value: ApprenticeStatus.PROCESO_DE_SELECCION,
+          label: "Proceso de selección",
+        },
+        { value: ApprenticeStatus.TRANSFERIDO, label: "Transferido" },
+      ],
     },
     {
       name: "trainingLevel",
@@ -127,19 +129,19 @@ const ApprenticeManagement: React.FC = () => {
       options: [
         { value: ApprenticeTrainingLevel.PRINCIPIANTE, label: "Principiante" },
         { value: ApprenticeTrainingLevel.INTERMEDIO, label: "Intermedio" },
-        { value: ApprenticeTrainingLevel.AVANZADO, label: "Avanzado" }
-      ]
+        { value: ApprenticeTrainingLevel.AVANZADO, label: "Avanzado" },
+      ],
     },
     {
       name: "agencyId",
       label: "Agencia",
       type: "autocomplete",
       required: true,
-      options: agencies.map(agency => ({
+      options: agencies.map((agency) => ({
         value: agency.id,
-        label: `${agency.nameAgency} - ${agency.place}`
-      }))
-    }
+        label: `${agency.nameAgency} - ${agency.place}`,
+      })),
+    },
   ];
 
   // Datos iniciales para creación
@@ -149,11 +151,15 @@ const ApprenticeManagement: React.FC = () => {
     entryDate: "",
     status: ApprenticeStatus.EN_ENTRENAMIENTO,
     trainingLevel: ApprenticeTrainingLevel.PRINCIPIANTE,
-    agencyId: ""
+    agencyId: "",
   };
 
   // Funciones auxiliares para mostrar notificaciones
-  const showNotification = (type: "success" | "error" | "info" | "warning", title: string, message: string) => {
+  const showNotification = (
+    type: "success" | "error" | "info" | "warning",
+    title: string,
+    message: string
+  ) => {
     setNotification({ type, title, message });
   };
 
@@ -166,47 +172,64 @@ const ApprenticeManagement: React.FC = () => {
   };
 
   const showCreateSuccess = () => {
-    showSuccess("¡Aprendiz Creado!", "El aprendiz ha sido creado exitosamente.");
+    showSuccess(
+      "¡Aprendiz Creado!",
+      "El aprendiz ha sido creado exitosamente."
+    );
   };
 
   const showCreateError = (errorMessage?: string) => {
-    showError("Error al Crear", errorMessage || "No se pudo crear el aprendiz.");
+    showError(
+      "Error al Crear",
+      errorMessage || "No se pudo crear el aprendiz."
+    );
   };
 
   const showUpdateSuccess = () => {
-    showSuccess("¡Aprendiz Actualizado!", "El aprendiz ha sido actualizado exitosamente.");
+    showSuccess(
+      "¡Aprendiz Actualizado!",
+      "El aprendiz ha sido actualizado exitosamente."
+    );
   };
 
   const showUpdateError = (errorMessage?: string) => {
-    showError("Error al Actualizar", errorMessage || "No se pudo actualizar el aprendiz.");
+    showError(
+      "Error al Actualizar",
+      errorMessage || "No se pudo actualizar el aprendiz."
+    );
   };
 
   const showDeleteSuccess = () => {
-    showSuccess("¡Aprendiz Eliminado!", "El aprendiz ha sido eliminado exitosamente.");
+    showSuccess(
+      "¡Aprendiz Eliminado!",
+      "El aprendiz ha sido eliminado exitosamente."
+    );
   };
 
   const showDeleteError = (errorMessage?: string) => {
-    showError("Error al Eliminar", errorMessage || "No se pudo eliminar el aprendiz.");
+    showError(
+      "Error al Eliminar",
+      errorMessage || "No se pudo eliminar el aprendiz."
+    );
   };
 
   // Manejar creación
   const handleCreate = async (data: Record<string, any>) => {
     try {
       console.log("Datos para crear aprendiz:", data);
-      
+
       await createApprentice({
         fullName: data.fullName,
         age: parseInt(data.age),
         entryDate: new Date(data.entryDate),
         status: data.status,
         trainingLevel: data.trainingLevel,
-        agency: data.agencyId
+        agency: data.agencyId,
       });
 
       showCreateSuccess();
       setShowCreateModal(false);
       await fetchApprentices();
-
     } catch (err: any) {
       console.error("Error al crear aprendiz:", err);
       showCreateError(err.message);
@@ -214,7 +237,10 @@ const ApprenticeManagement: React.FC = () => {
   };
 
   // Manejar actualización
-  const handleUpdate = async (id: string | number, data: Record<string, any>) => {
+  const handleUpdate = async (
+    id: string | number,
+    data: Record<string, any>
+  ) => {
     try {
       await updateApprentice(id as string, {
         fullName: data.fullName,
@@ -222,7 +248,7 @@ const ApprenticeManagement: React.FC = () => {
         entryDate: new Date(data.entryDate),
         status: data.status,
         trainingLevel: data.trainingLevel,
-        agency: data.agencyId
+        agency: data.agencyId,
       });
 
       showUpdateSuccess();
@@ -279,7 +305,7 @@ const ApprenticeManagement: React.FC = () => {
       title: "Nombre",
       sortable: true,
       width: "25%",
-      align: "center"
+      align: "center",
     },
     {
       key: "age",
@@ -287,7 +313,7 @@ const ApprenticeManagement: React.FC = () => {
       sortable: true,
       width: "10%",
       align: "center",
-      render: (item) => `${item.age} años`
+      render: (item) => `${item.age} años`,
     },
     {
       key: "entryDate",
@@ -295,19 +321,19 @@ const ApprenticeManagement: React.FC = () => {
       sortable: true,
       width: "15%",
       render: (item) => formatDate(item.entryDate.toString()),
-      align: "center"
+      align: "center",
     },
     {
       key: "status",
       title: "Estado",
       sortable: true,
-      width: "15%",
+      width: "18%",
       align: "center",
       render: (item) => (
-        <span className={`status-badge status-${item.status.toLowerCase()}`}>
+        <span className={`status-appren-badge status-appren-${item.status.toLowerCase()}`}>
           {getStatusText(item.status)}
         </span>
-      )
+      ),
     },
     {
       key: "trainingLevel",
@@ -316,10 +342,12 @@ const ApprenticeManagement: React.FC = () => {
       width: "15%",
       align: "center",
       render: (item) => (
-        <span className={`trainingLevel-badge trainingLevel-${item.trainingLevel.toLowerCase()}`}>
+        <span
+          className={`trainingLevel-badge trainingLevel-${item.trainingLevel.toLowerCase()}`}
+        >
           {getTrainingLevelText(item.trainingLevel)}
         </span>
-      )
+      ),
     },
     {
       key: "agency.nameAgency", // Usando notación de punto como en contrato
@@ -328,12 +356,12 @@ const ApprenticeManagement: React.FC = () => {
       width: "20%",
       align: "center",
       render: (item) => {
-        if (item.agency && typeof item.agency === 'object') {
+        if (item.agency && typeof item.agency === "object") {
           return `${item.agency}`;
         }
         return getAgencyName(item);
-      }
-    }
+      },
+    },
   ];
 
   // Función para renderizar detalles en modal de eliminación
@@ -346,13 +374,15 @@ const ApprenticeManagement: React.FC = () => {
         <strong>Edad:</strong> <span>{apprentice.age} años</span>
       </div>
       <div className="detail-item">
-        <strong>Fecha ingreso:</strong> <span>{formatDate(apprentice.entryDate.toString())}</span>
+        <strong>Fecha ingreso:</strong>{" "}
+        <span>{formatDate(apprentice.entryDate.toString())}</span>
       </div>
       <div className="detail-item">
         <strong>Estado:</strong> <span>{getStatusText(apprentice.status)}</span>
       </div>
       <div className="detail-item">
-        <strong>Nivel:</strong> <span>{getTrainingLevelText(apprentice.trainingLevel)}</span>
+        <strong>Nivel:</strong>{" "}
+        <span>{getTrainingLevelText(apprentice.trainingLevel)}</span>
       </div>
       <div className="detail-item">
         <strong>Agencia:</strong> <span>{getAgencyName(apprentice)}</span>
@@ -405,14 +435,13 @@ const ApprenticeManagement: React.FC = () => {
             entryDate: editingApprentice.entryDate.toString().split("T")[0],
             status: editingApprentice.status,
             trainingLevel: editingApprentice.trainingLevel,
-            agencyId: editingApprentice.agency || ""
+            agencyId: editingApprentice.agency || "",
           }}
           itemId={editingApprentice.id}
           onSubmit={handleUpdate}
           onClose={() => setEditingApprentice(null)}
           loading={loading}
           submitText="Actualizar Aprendiz"
-          
         />
       )}
 
