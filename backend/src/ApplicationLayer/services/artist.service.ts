@@ -20,6 +20,8 @@ import { GroupRepository } from '../../InfraestructureLayer/database/Repositorie
 import { CreateArtistCollaborationUseCase } from "@application/UseCases/create_artist_collaboration.use-case";
 import { CreateArtistGroupCollaborationUseCase } from "@application/UseCases/create_artist_group_collaboration.use-case";
 import { CreateArtistUseCase } from "@application/UseCases/create_artist.use-case";
+import { ProfessionalHistoryResponseDto } from "@application/DTOs/professional_historyDto/response-professional-history.dto";
+import { GetProfessionalHistoryUseCase } from "@application/UseCases/get_artist_professional_history.use-case";
 
 @Injectable()
 export class ArtistService extends BaseService<Artist, CreateArtistDto, ArtistResponseDto, UpdateArtistDto>{
@@ -36,6 +38,7 @@ export class ArtistService extends BaseService<Artist, CreateArtistDto, ArtistRe
         private readonly createArtistCollaborationUseCase: CreateArtistCollaborationUseCase,
         private readonly createArtistGroupCollaborationUseCase: CreateArtistGroupCollaborationUseCase,
         private readonly createArtistUseCase : CreateArtistUseCase,
+        private readonly getProfessionalHistoryUseCase: GetProfessionalHistoryUseCase,
     ){
         super(artistRepository, artistDtoMapper)
     }
@@ -135,4 +138,9 @@ export class ArtistService extends BaseService<Artist, CreateArtistDto, ArtistRe
     response.date = date;
     return response;
   }
+
+    async getProfessionalHistory(artistId: string): Promise<ProfessionalHistoryResponseDto> {
+        return await this.getProfessionalHistoryUseCase.execute(artistId);
+    }
+
 }
