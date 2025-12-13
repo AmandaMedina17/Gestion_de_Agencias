@@ -26,6 +26,8 @@ import { IContractRepository } from '@domain/Repositories/IContractRepository';
 import { ResponseArtistAgencyDto } from '@application/DTOs/artist_agencyDto/response-artist-agency.dto';
 import { AgencyCollaborationsResponseDto } from '@application/DTOs/agencyCollaborationsDto/response-agency-collaborations.dto';
 import { GetAgencyCollaborationsUseCase } from '../UseCases/get_agency_collaborations.use-case';
+import { RemoveArtistFromAgencyUseCase } from '../UseCases/remove_artist_from_agency.use-case';
+import { CreateEndMembershipDto } from '@application/DTOs/endArtistMembership/create-end-artist-membership.dto';
 
 @Injectable()
 export class AgencyService extends BaseService<Agency, CreateAgencyDto, AgencyResponseDto, UpdateAgencyDto> {
@@ -42,6 +44,7 @@ export class AgencyService extends BaseService<Agency, CreateAgencyDto, AgencyRe
     private readonly getAgencyGroupsUseCase: GetAgencyGroupsUseCase,
     private readonly getArtistsWithDebutUseCase: GetArtistsWithDebutUseCase,
     private readonly getAgencyCollaborationsUseCase: GetAgencyCollaborationsUseCase,
+    private readonly removeArtistFromAgencyUseCase: RemoveArtistFromAgencyUseCase,
     @Inject(IArtistRepository)
     private readonly artistRepository: IArtistRepository,
     private readonly relateArtistToAgencyUseCase: RelateArtistToAgencyUseCase,
@@ -123,5 +126,9 @@ export class AgencyService extends BaseService<Agency, CreateAgencyDto, AgencyRe
   }
   async getAgencyCollaborations(agencyId: string): Promise<AgencyCollaborationsResponseDto> {
     return await this.getAgencyCollaborationsUseCase.execute(agencyId);
+  }
+
+  async removeArtistFromAgency(endMembership: CreateEndMembershipDto){
+    this.removeArtistFromAgencyUseCase.execute(endMembership.agencyId,endMembership.artistId,endMembership.leaveDate);
   }
 }

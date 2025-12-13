@@ -37,6 +37,7 @@ import { GetAgencyCollaborationsUseCase } from '../ApplicationLayer/UseCases/get
 import { IGroupRepository } from "@domain/Repositories/IGroupRepository";
 import { GroupRepository } from "@infrastructure/database/Repositories/GroupRepository";
 import { GroupEntity } from "@infrastructure/database/Entities/GroupEntity";
+import { RemoveArtistFromAgencyUseCase } from "@application/UseCases/remove_artist_from_agency.use-case";
 
 @Module({
   imports: [
@@ -82,6 +83,7 @@ import { GroupEntity } from "@infrastructure/database/Entities/GroupEntity";
     RelateArtistToAgencyUseCase,
     GetArtistsWithDebutUseCase,
     GetAgencyCollaborationsUseCase,
+    RemoveArtistFromAgencyUseCase,
   ],
   exports: [IAgencyRepository, AgencyDtoMapper, AgencyMapper],
 })
