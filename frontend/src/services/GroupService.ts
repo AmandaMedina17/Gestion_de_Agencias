@@ -32,12 +32,22 @@ export class GroupService extends BaseService<
       const error = await res.json();
       throw new Error(error.message || `Error: ${res.status}`);
     }
+
+     const contentLength = res.headers.get('content-length');
+    const contentType = res.headers.get('content-type');
+    
+    // Si no hay contenido (204 No Content), obtener el grupo actualizado manualmente
+    if (res.status === 204 || contentLength === '0' || !contentType?.includes('application/json')) {
+      // Hacer una solicitud adicional para obtener el grupo actualizado
+      return this.findOne(groupId);
+    }
+    
     return res.json();
   }
 
   // Método para agregar un miembro al grupo
   async addMember(groupId: string, addMemberDto: AddMemberToGroupDto): Promise<ResponseMembershipDto> {
-    const res = await fetch(`http://localhost:3000/groups/${groupId}/members`, {
+    const res = await fetch(`http://localhost:3000/groups/addMember`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(addMemberDto),

@@ -38,7 +38,7 @@ interface GroupContextType {
   clearError: () => void;
 
   // Acciones para miembros
-  addMemberToGroup: (groupId: string, addMemberDto: AddMemberToGroupDto) => Promise<ResponseMembershipDto>;
+  addMemberToGroup: ( addMemberDto: AddMemberToGroupDto) => Promise<ResponseMembershipDto>;
   getGroupMembers: (groupId: string) => Promise<ArtistResponseDto[]>;
   removeMemberFromGroup: (groupId: string, artistId: string) => Promise<void>;
   
@@ -205,18 +205,17 @@ export const GroupProvider: React.FC<GroupProviderProps> = ({ children }) => {
     }
   };
 
-  // Funciones para manejar miembros
 
-  const addMemberToGroup = async (groupId: string, addMemberDto: AddMemberToGroupDto) => {
+  const addMemberToGroup = async (addMemberDto: AddMemberToGroupDto) => {
     setMembersLoading(true);
     setMembersError(null);
     try {
-      const newMembership = await groupService.addMember(groupId, addMemberDto);
+      const newMembership = await groupService.addMember(addMemberDto.groupId, addMemberDto);
       // Actualizar la lista de miembros del grupo actual
       setCurrentGroupMembers(prev => [...prev, newMembership]);
       // Actualizar el contador de miembros en la lista de grupos
       setGroups(prev => prev.map(group => {
-        if (group.id === groupId) {
+        if (group.id === addMemberDto.groupId) {
           return { ...group, members_num: group.members_num + 1 };
         }
         return group;

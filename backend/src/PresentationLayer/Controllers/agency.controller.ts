@@ -18,9 +18,10 @@ export class AgencyController {
   constructor(private readonly agencyService: AgencyService) {}
 
   @Post()
-    create(@Body(ValidationPipe) createAgencyDto: CreateAgencyDto){
-      return this.agencyService.create(createAgencyDto);
-    }
+  create(@Body(ValidationPipe) createAgencyDto: CreateAgencyDto){
+    return this.agencyService.create(createAgencyDto);
+  }
+
   @Get()
     findAll() {
     return this.agencyService.findAll();
@@ -40,6 +41,7 @@ export class AgencyController {
   remove(@Param('id') id: string) {
     return this.agencyService.remove(id);
   }
+  
   @Get(':id/artists')
   getAgencyArtists(@Param('id') id: string) {
     return this.agencyService.getAgencyArtists(id);

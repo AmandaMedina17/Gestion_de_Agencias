@@ -22,6 +22,17 @@ export enum GroupStatus {
   DISUELTO = "DISUELTO",
 }
 
+
+export enum ArtistRole{
+    LIDER = "LIDER",
+    VOCALISTA = "VOCALISTA", 
+    RAPERO = "RAPERO",
+    BAILARIN = "BAILARIN",
+    VISUAL = "VISUAL",
+    MAKNAE = "MAKNAE"
+}
+
+
 // Interfaz para trainee en el modal
 interface TraineeForModal {
   id: string;
@@ -112,8 +123,7 @@ const GroupManagement: React.FC = () => {
   const [selectedTraineeForArtist, setSelectedTraineeForArtist] = useState<{
     trainee: TraineeForModal;
     groupId: string;
-    role: string;
-    endDate?: Date;
+    role: ArtistRole;
   } | null>(null);
 
   useEffect(() => {
@@ -149,6 +159,12 @@ const GroupManagement: React.FC = () => {
     return agency
       ? `${agency.nameAgency}`
       : "Agencia no encontrada";
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    date.setDate(date.getDate() + 1);
+    return date.toLocaleDateString("es-ES");
   };
 
   // Funciones para mostrar notificaciones
@@ -371,12 +387,7 @@ const GroupManagement: React.FC = () => {
     }
   };
 
-  // Funciones auxiliares
-  const formatDate = (date: Date | string) => {
-    if (!date) return "N/A";
-    const dateObj = typeof date === "string" ? new Date(date) : date;
-    return dateObj.toLocaleDateString("es-ES");
-  };
+  
 
   const getStatusText = (status: GroupStatus) => {
     const statusMap = {
@@ -434,8 +445,7 @@ const GroupManagement: React.FC = () => {
   // Manejar adición de miembro con lógica de creación de artista
   const handleAddMemberToGroup = async (
     traineeId: string,
-    role: string,
-    endDate?: Date
+    role: ArtistRole,
   ) => {
     if (!addingMemberGroup) return;
 
@@ -452,10 +462,9 @@ const GroupManagement: React.FC = () => {
 
       if (existingArtist) {
         // Si ya tiene artista, agregar al grupo
-        await addMemberToGroup(addingMemberGroup.id, {
+        await addMemberToGroup( {groupId: addingMemberGroup.id,
           artistId: existingArtist.id,
           role,
-          endDate,
         });
         showSuccess(
           "Miembro agregado",
@@ -476,7 +485,7 @@ const GroupManagement: React.FC = () => {
           },
           groupId: addingMemberGroup.id,
           role,
-          endDate,
+      
         });
         setAddingMemberGroup(null);
         setShowCreateArtistModal(true);
@@ -507,10 +516,9 @@ const GroupManagement: React.FC = () => {
       await fetchArtists();
 
       // Agregar el artista al grupo
-      await addMemberToGroup(selectedTraineeForArtist.groupId, {
+      await addMemberToGroup({groupId: selectedTraineeForArtist.groupId,
         artistId: selectedTraineeForArtist.trainee.id,
         role: selectedTraineeForArtist.role,
-        endDate: selectedTraineeForArtist.endDate,
       });
 
       showSuccess(
@@ -631,7 +639,7 @@ const GroupManagement: React.FC = () => {
       sortable: true,
       width: "13%",
       align: "center",
-      render: (item) => formatDate(item.debut_date),
+      render: (item) => formatDate(item.debut_date.toString()),
     },
     {
       key: "members_num",
@@ -739,7 +747,7 @@ const GroupManagement: React.FC = () => {
       sortable: true,
       width: "20%",
       align: "center",
-      render: (item) => formatDate(item.debut_date),
+      render: (item) => formatDate(item.debut_date.toString()),
     },
     {
       key: "agency",
@@ -848,7 +856,7 @@ const GroupManagement: React.FC = () => {
         </div>
         <div className="detail-item">
           <strong>Fecha de Debut:</strong>{" "}
-          <span>{formatDate(group.debut_date)}</span>
+          <span>{formatDate(group.debut_date.toString())}</span>
         </div>
         <div className="detail-item">
           <strong>Años Activos:</strong>{" "}
@@ -889,13 +897,7 @@ const GroupManagement: React.FC = () => {
       {userAgency && (
         <div className="agency-info-banner">
           <p>
-            <strong>Agencia Actual:</strong> {userAgency.nameAgency} -{" "}
-            {userAgency.place}
-            <br />
-            <small>
-              Todos los grupos creados o editados se asociarán automáticamente a
-              esta agencia.
-            </small>
+            <h2>Gestion de Grupos en {userAgency.nameAgency}</h2>
           </p>
         </div>
       )}
