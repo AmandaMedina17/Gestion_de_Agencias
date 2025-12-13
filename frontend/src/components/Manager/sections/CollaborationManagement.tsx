@@ -1,0 +1,897 @@
+// CollaborationManagement.tsx - Versión usando la misma lógica que AgencyManagement
+import React, { useState, useEffect, useMemo } from "react";
+import { useCollaboration } from "../../../context/CollaborationContext";
+import { useAgency } from "../../../context/AgencyContext";
+import { useGroup } from "../../../context/GroupContext";
+import { useAuth } from "../../../context/AuthContext";
+import GenericTable, { Column } from "../../ui/datatable";
+import CreateModal, { FormField } from "../../ui/reusable/CreateModal";
+import EditModal from "../../ui/reusable/EditModal";
+import DeleteModal from "../../ui/reusable/DeleteModal";
+import ViewModal from "../../ui/reusable/ViewModal";
+import { Tabs, Tab, Box, Paper, Typography, Alert, Chip, IconButton, Tooltip, Button } from '@mui/material';
+import { Edit, Delete, Visibility, Add } from '@mui/icons-material';
+//import "./Collaboration.css";
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+const TabPanel: React.FC<TabPanelProps> = ({ children, value, index, ...other }) => {
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`collaboration-tabpanel-${index}`}
+      aria-labelledby={`collaboration-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 3 }}>
+          {children}
+        </Box>
+      )}
+    </div>
+  );
+};
+
+const CollaborationManagement: React.FC = () => {
+  const {
+    artistCollaborations,
+    artistGroupCollaborations,
+    loading,
+    error: collaborationError,
+    createArtistCollaboration,
+    createArtistGroupCollaboration,
+    fetchArtistCollaborations,
+    fetchArtistGroupCollaborations,
+    updateArtistCollaboration,
+    updateArtistGroupCollaboration,
+    deleteArtistCollaboration,
+    deleteArtistGroupCollaboration,
+  } = useCollaboration();
+
+  const { 
+    artists, // Usando artists directamente del contexto
+    artistsWithGroup,
+    loading: agencyLoading,
+    fetchAgencyArtists, // Función para obtener artistas de la agencia
+    fetchArtistsWithGroup 
+  } = useAgency();
+  
+  const { groups, fetchGroups } = useGroup();
+  const { user } = useAuth();
+
+  const [notification, setNotification] = useState<{
+    type: "success" | "error" | "info" | "warning";
+    title?: string;
+    message: string;
+  } | null>(null);
+
+  const [activeTab, setActiveTab] = useState(0);
+  const [showCreateArtistCollabModal, setShowCreateArtistCollabModal] = useState(false);
+  const [showCreateGroupCollabModal, setShowCreateGroupCollabModal] = useState(false);
+  const [editingArtistCollab, setEditingArtistCollab] = useState<any | null>(null);
+  const [editingGroupCollab, setEditingGroupCollab] = useState<any | null>(null);
+  const [deletingArtistCollab, setDeletingArtistCollab] = useState<any | null>(null);
+  const [deletingGroupCollab, setDeletingGroupCollab] = useState<any | null>(null);
+  const [viewingArtistCollab, setViewingArtistCollab] = useState<any | null>(null);
+  const [viewingGroupCollab, setViewingGroupCollab] = useState<any | null>(null);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        if (user?.agency) {
+          await Promise.all([
+            fetchArtistCollaborations(user.agency),
+            fetchArtistGroupCollaborations(user.agency),
+            fetchAgencyArtists(user.agency), // Obtener artistas de la agencia
+            fetchGroups()
+          ]);
+        }
+      } catch (err) {
+        console.error("Error loading data:", err);
+        showError("Error", "No se pudieron cargar las colaboraciones");
+      }
+    };
+    loadData();
+  }, [user?.agency]);
+
+  // Filtrar grupos de la agencia del usuario
+  const agencyGroups = useMemo(() => 
+    groups.filter(group => group.agencyID === user?.agency),
+    [groups, user?.agency]
+  );
+
+  // Usar los artistas directamente del contexto (ya filtrados por agencia)
+  const availableArtists = useMemo(() => {
+    // Si tenemos artists del contexto, usarlos
+    if (artists && artists.length > 0) {
+      return artists;
+    }
+    // Si no, extraer de artistsWithGroup como fallback
+    return artistsWithGroup.map(item => item.artist).filter((artist, index, self) =>
+      index === self.findIndex(a => a.id === artist.id)
+    );
+  }, [artists, artistsWithGroup]);
+
+  // Filtrar colaboraciones por agencia del usuario
+  const filteredArtistCollaborations = useMemo(() => {
+    if (!user?.agency) return [];
+    
+    return artistCollaborations.filter(collab => {
+      // Verificar si ambos artistas pertenecen a la agencia del usuario
+      const artist1InAgency = availableArtists.some(artist => artist.id === collab.artist1.id);
+      const artist2InAgency = availableArtists.some(artist => artist.id === collab.artist2.id);
+      return artist1InAgency && artist2InAgency;
+    });
+  }, [artistCollaborations, availableArtists, user?.agency]);
+
+  const filteredArtistGroupCollaborations = useMemo(() => {
+    if (!user?.agency) return [];
+    
+    return artistGroupCollaborations.filter(collab => {
+      // Verificar si el artista y el grupo pertenecen a la agencia del usuario
+      const artistInAgency = availableArtists.some(artist => artist.id === collab.artist.id);
+      const groupInAgency = agencyGroups.some(group => group.id === collab.group.id);
+      return artistInAgency && groupInAgency;
+    });
+  }, [artistGroupCollaborations, availableArtists, agencyGroups, user?.agency]);
+
+  // Funciones para mostrar notificaciones
+  const showNotification = (
+    type: "success" | "error" | "info" | "warning",
+    title: string,
+    message: string
+  ) => {
+    setNotification({ type, title, message });
+  };
+
+  const showSuccess = (title: string, message: string) => {
+    showNotification("success", title, message);
+  };
+
+  const showError = (title: string, message: string) => {
+    showNotification("error", title, message);
+  };
+
+  // Campos para colaboración artista-artista
+  const artistCollabFields: FormField[] = [
+    {
+      name: "artist1Id",
+      label: "Artista 1",
+      type: "autocomplete",
+      required: true,
+      options: availableArtists.map(artist => ({
+        value: artist.id,
+        label: `${artist.stageName} (ID: ${artist.id})`,
+      })),
+      validate: (value) => {
+        if (!value) return "Selecciona el primer artista";
+        return null;
+      },
+    },
+    {
+      name: "artist2Id",
+      label: "Artista 2",
+      type: "autocomplete",
+      required: true,
+      options: availableArtists.map(artist => ({
+        value: artist.id,
+        label: `${artist.stageName} (ID: ${artist.id})`,
+      })),
+      validate: (value, formData) => {
+        if (!value) return "Selecciona el segundo artista";
+        if (formData && value === formData.artist1Id) return "Los artistas deben ser diferentes";
+        return null;
+      },
+    },
+    {
+      name: "date",
+      label: "Fecha de Colaboración",
+      type: "date",
+      required: true,
+      validate: (value) => {
+        if (!value) return "La fecha es requerida";
+        const date = new Date(value);
+        if (date > new Date()) return "La fecha no puede ser futura";
+        return null;
+      },
+    },
+  ];
+
+  const artistCollabEditFields = [...artistCollabFields];
+
+  // Campos para colaboración artista-grupo
+  const groupCollabFields: FormField[] = [
+    {
+      name: "artistId",
+      label: "Artista",
+      type: "autocomplete",
+      required: true,
+      options: availableArtists.map(artist => ({
+        value: artist.id,
+        label: `${artist.stageName} (ID: ${artist.id})`,
+      })),
+      validate: (value) => {
+        if (!value) return "Selecciona un artista";
+        return null;
+      },
+    },
+    {
+      name: "groupId",
+      label: "Grupo",
+      type: "autocomplete",
+      required: true,
+      options: agencyGroups.map(group => ({
+        value: group.id,
+        label: `${group.name} (ID: ${group.id})`,
+      })),
+      validate: (value) => {
+        if (!value) return "Selecciona un grupo";
+        return null;
+      },
+    },
+    {
+      name: "date",
+      label: "Fecha de Colaboración",
+      type: "date",
+      required: true,
+      validate: (value) => {
+        if (!value) return "La fecha es requerida";
+        const date = new Date(value);
+        if (date > new Date()) return "La fecha no puede ser futura";
+        return null;
+      },
+    },
+  ];
+
+  const groupCollabEditFields = [...groupCollabFields];
+
+  // Manejar creación de colaboración artista-artista
+  const handleCreateArtistCollab = async (data: Record<string, any>) => {
+    try {
+      await createArtistCollaboration({
+        artist1Id: data.artist1Id,
+        artist2Id: data.artist2Id,
+        date: new Date(data.date),
+      });
+      showSuccess("¡Colaboración Creada!", "La colaboración entre artistas se ha creado exitosamente.");
+      setShowCreateArtistCollabModal(false);
+      
+      // Recargar datos
+      if (user?.agency) {
+        await fetchArtistCollaborations(user.agency);
+      }
+    } catch (err: any) {
+      showError("Error al Crear", err.message || "No se pudo crear la colaboración.");
+    }
+  };
+
+  // Manejar creación de colaboración artista-grupo
+  const handleCreateGroupCollab = async (data: Record<string, any>) => {
+    try {
+      await createArtistGroupCollaboration({
+        artistId: data.artistId,
+        groupId: data.groupId,
+        date: new Date(data.date),
+      });
+      showSuccess("¡Colaboración Creada!", "La colaboración entre artista y grupo se ha creado exitosamente.");
+      setShowCreateGroupCollabModal(false);
+      
+      // Recargar datos
+      if (user?.agency) {
+        await fetchArtistGroupCollaborations(user.agency);
+      }
+    } catch (err: any) {
+      showError("Error al Crear", err.message || "No se pudo crear la colaboración.");
+    }
+  };
+
+  // CORREGIDO: Función que acepta string | number
+  const handleUpdateArtistCollab = async (id: string | number, data: Record<string, any>) => {
+    if (!editingArtistCollab) return;
+    
+    try {
+      // Convertir id a string si es necesario
+      const idString = typeof id === 'number' ? id.toString() : id;
+      const [artist1Id, artist2Id] = idString.split('-');
+      
+      await updateArtistCollaboration(
+        artist1Id,
+        artist2Id,
+        new Date(editingArtistCollab.date),
+        {
+          artist1Id: data.artist1Id,
+          artist2Id: data.artist2Id,
+          date: new Date(data.date),
+        }
+      );
+      
+      showSuccess("¡Colaboración Actualizada!", "La colaboración entre artistas se ha actualizado exitosamente.");
+      setEditingArtistCollab(null);
+      
+      // Recargar datos
+      if (user?.agency) {
+        await fetchArtistCollaborations(user.agency);
+      }
+    } catch (err: any) {
+      showError("Error al Actualizar", err.message || "No se pudo actualizar la colaboración.");
+    }
+  };
+
+  // CORREGIDO: Función que acepta string | number
+  const handleUpdateGroupCollab = async (id: string | number, data: Record<string, any>) => {
+    if (!editingGroupCollab) return;
+    
+    try {
+      // Convertir id a string si es necesario
+      const idString = typeof id === 'number' ? id.toString() : id;
+      const [artistId, groupId] = idString.split('-');
+      
+      await updateArtistGroupCollaboration(
+        artistId,
+        groupId,
+        new Date(editingGroupCollab.date),
+        {
+          artistId: data.artistId,
+          groupId: data.groupId,
+          date: new Date(data.date),
+        }
+      );
+      
+      showSuccess("¡Colaboración Actualizada!", "La colaboración entre artista y grupo se ha actualizada exitosamente.");
+      setEditingGroupCollab(null);
+      
+      // Recargar datos
+      if (user?.agency) {
+        await fetchArtistGroupCollaborations(user.agency);
+      }
+    } catch (err: any) {
+      showError("Error al Actualizar", err.message || "No se pudo actualizar la colaboración.");
+    }
+  };
+
+  // Manejar eliminación de colaboración artista-artista
+  const handleDeleteArtistCollab = async () => {
+    if (!deletingArtistCollab) return;
+    try {
+      await deleteArtistCollaboration(
+        deletingArtistCollab.artist1.id,
+        deletingArtistCollab.artist2.id,
+        new Date(deletingArtistCollab.date)
+      );
+      showSuccess("¡Colaboración Eliminada!", "La colaboración entre artistas se ha eliminado exitosamente.");
+      setDeletingArtistCollab(null);
+    } catch (err: any) {
+      showError("Error al Eliminar", err.message || "No se pudo eliminar la colaboración.");
+    }
+  };
+
+  // Manejar eliminación de colaboración artista-grupo
+  const handleDeleteGroupCollab = async () => {
+    if (!deletingGroupCollab) return;
+    try {
+      await deleteArtistGroupCollaboration(
+        deletingGroupCollab.artist.id,
+        deletingGroupCollab.group.id,
+        new Date(deletingGroupCollab.date)
+      );
+      showSuccess("¡Colaboración Eliminada!", "La colaboración entre artista y grupo se ha eliminado exitosamente.");
+      setDeletingGroupCollab(null);
+    } catch (err: any) {
+      showError("Error al Eliminar", err.message || "No se pudo eliminar la colaboración.");
+    }
+  };
+
+  // Formatear fecha
+  const formatDate = (dateString: string | Date) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("es-ES", {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  // Columnas para colaboraciones artista-artista
+  const artistCollabColumns: Column<any>[] = [
+    {
+      key: "artist1",
+      title: "Artista 1",
+      sortable: true,
+      width: "25%",
+      align: "center",
+      render: (item) => (
+        <div className="collab-artist-info">
+          <Typography variant="subtitle1" fontWeight="bold">
+            {item.artist1.stageName}
+          </Typography>
+          <Chip 
+            label={`ID: ${item.artist1.id}`} 
+            size="small" 
+            variant="outlined"
+            sx={{ mt: 0.5 }}
+          />
+        </div>
+      ),
+    },
+    {
+      key: "artist2",
+      title: "Artista 2",
+      sortable: true,
+      width: "25%",
+      align: "center",
+      render: (item) => (
+        <div className="collab-artist-info">
+          <Typography variant="subtitle1" fontWeight="bold">
+            {item.artist2.stageName}
+          </Typography>
+          <Chip 
+            label={`ID: ${item.artist2.id}`} 
+            size="small" 
+            variant="outlined"
+            sx={{ mt: 0.5 }}
+          />
+        </div>
+      ),
+    },
+    {
+      key: "date",
+      title: "Fecha de Colaboración",
+      sortable: true,
+      width: "20%",
+      align: "center",
+      render: (item) => (
+        <Typography variant="body2" color="text.secondary">
+          {formatDate(item.date)}
+        </Typography>
+      ),
+    },
+  ];
+
+  // Columnas para colaboraciones artista-grupo
+  const groupCollabColumns: Column<any>[] = [
+    {
+      key: "artist",
+      title: "Artista",
+      sortable: true,
+      width: "25%",
+      align: "center",
+      render: (item) => (
+        <div className="collab-artist-info">
+          <Typography variant="subtitle1" fontWeight="bold">
+            {item.artist.stageName}
+          </Typography>
+          <Chip 
+            label={`ID: ${item.artist.id}`} 
+            size="small" 
+            variant="outlined"
+            sx={{ mt: 0.5 }}
+          />
+        </div>
+      ),
+    },
+    {
+      key: "group",
+      title: "Grupo",
+      sortable: true,
+      width: "25%",
+      align: "center",
+      render: (item) => (
+        <div className="collab-group-info">
+          <Typography variant="subtitle1" fontWeight="bold">
+            {item.group.name}
+          </Typography>
+          <Chip 
+            label={`ID: ${item.group.id}`} 
+            size="small" 
+            variant="outlined"
+            sx={{ mt: 0.5 }}
+          />
+        </div>
+      ),
+    },
+    {
+      key: "date",
+      title: "Fecha de Colaboración",
+      sortable: true,
+      width: "20%",
+      align: "center",
+      render: (item) => (
+        <Typography variant="body2" color="text.secondary">
+          {formatDate(item.date)}
+        </Typography>
+      ),
+    },
+  ];
+
+  // Renderizar acciones para colaboraciones artista-artista
+  const renderArtistCollabActions = (item: any) => (
+    <div className="collab-actions">
+      <Tooltip title="Ver detalles">
+        <IconButton
+          size="small"
+          onClick={() => setViewingArtistCollab(item)}
+          color="info"
+        >
+          <Visibility fontSize="small" />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Editar">
+        <IconButton
+          size="small"
+          onClick={() => setEditingArtistCollab(item)}
+          color="primary"
+        >
+          <Edit fontSize="small" />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Eliminar">
+        <IconButton
+          size="small"
+          onClick={() => setDeletingArtistCollab(item)}
+          color="error"
+        >
+          <Delete fontSize="small" />
+        </IconButton>
+      </Tooltip>
+    </div>
+  );
+
+  // Renderizar acciones para colaboraciones artista-grupo
+  const renderGroupCollabActions = (item: any) => (
+    <div className="collab-actions">
+      <Tooltip title="Ver detalles">
+        <IconButton
+          size="small"
+          onClick={() => setViewingGroupCollab(item)}
+          color="info"
+        >
+          <Visibility fontSize="small" />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Editar">
+        <IconButton
+          size="small"
+          onClick={() => setEditingGroupCollab(item)}
+          color="primary"
+        >
+          <Edit fontSize="small" />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Eliminar">
+        <IconButton
+          size="small"
+          onClick={() => setDeletingGroupCollab(item)}
+          color="error"
+        >
+          <Delete fontSize="small" />
+        </IconButton>
+      </Tooltip>
+    </div>
+  );
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setActiveTab(newValue);
+  };
+
+  return (
+    <section id="collaboration_management" className="content-section active">
+      <Typography variant="h4" gutterBottom>
+        🎭 Gestión de Colaboraciones
+      </Typography>
+      
+      {user?.agency && (
+        <Alert severity="info" sx={{ mb: 3 }}>
+          Mostrando colaboraciones de la agencia actual. Solo puedes gestionar colaboraciones entre artistas y grupos de tu agencia.
+        </Alert>
+      )}
+
+      {collaborationError && (
+        <Alert severity="error" sx={{ mb: 3 }} onClose={() => {}}>
+          {collaborationError}
+        </Alert>
+      )}
+
+      <Paper sx={{ width: '100%', mb: 2, boxShadow: 3 }}>
+        <Tabs 
+          value={activeTab} 
+          onChange={handleTabChange} 
+          aria-label="collaboration tabs"
+          sx={{ 
+            borderBottom: 1, 
+            borderColor: 'divider',
+            '& .MuiTab-root': {
+              fontWeight: 'bold',
+              fontSize: '1rem',
+            }
+          }}
+        >
+          <Tab 
+            icon={<span>🎤</span>}
+            iconPosition="start"
+            label={`Artista-Artista (${filteredArtistCollaborations.length})`} 
+            id="collaboration-tab-0"
+          />
+          <Tab 
+            icon={<span>👥</span>}
+            iconPosition="start"
+            label={`Artista-Grupo (${filteredArtistGroupCollaborations.length})`} 
+            id="collaboration-tab-1"
+          />
+        </Tabs>
+
+        {/* Pestaña de colaboraciones artista-artista */}
+        <TabPanel value={activeTab} index={0}>
+          {/* Botón de crear fuera de la tabla */}
+          {availableArtists.length > 1 && (
+            <Box display="flex" justifyContent="flex-end" mb={2}>
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<Add />}
+                onClick={() => setShowCreateArtistCollabModal(true)}
+                disabled={loading}
+                sx={{ 
+                  backgroundColor: 'primary.main',
+                  '&:hover': {
+                    backgroundColor: 'primary.dark',
+                  }
+                }}
+              >
+                Crear Colaboración Artista-Artista
+              </Button>
+            </Box>
+          )}
+          
+          <GenericTable<any>
+            title="Colaboraciones entre Artistas"
+            description="Colaboraciones entre artistas de tu agencia"
+            data={filteredArtistCollaborations}
+            columns={artistCollabColumns}
+            loading={loading || agencyLoading}
+            onReload={() => user?.agency && fetchArtistCollaborations(user.agency)}
+            showCreateForm={showCreateArtistCollabModal}
+            onShowCreateChange={setShowCreateArtistCollabModal}
+            editingItem={editingArtistCollab}
+            onEditingChange={setEditingArtistCollab}
+            deletingItem={deletingArtistCollab}
+            onDeletingChange={setDeletingArtistCollab}
+            itemsPerPage={10}
+            className="collaboration-table"
+            notification={notification || undefined}
+            onNotificationClose={() => setNotification(null)}
+            showActionsColumn={true}
+            showCreateButton={false} // No usar el botón por defecto
+            showSearch={true}
+            showReloadButton={true}
+            renderCustomActions={renderArtistCollabActions}
+          />
+          
+          {availableArtists.length <= 1 && (
+            <Alert severity="warning" sx={{ mt: 2 }}>
+              Necesitas al menos 2 artistas en tu agencia para crear colaboraciones entre artistas.
+            </Alert>
+          )}
+        </TabPanel>
+
+        {/* Pestaña de colaboraciones artista-grupo */}
+        <TabPanel value={activeTab} index={1}>
+          {/* Botón de crear fuera de la tabla */}
+          {availableArtists.length > 0 && agencyGroups.length > 0 && (
+            <Box display="flex" justifyContent="flex-end" mb={2}>
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<Add />}
+                onClick={() => setShowCreateGroupCollabModal(true)}
+                disabled={loading}
+                sx={{ 
+                  backgroundColor: 'primary.main',
+                  '&:hover': {
+                    backgroundColor: 'primary.dark',
+                  }
+                }}
+              >
+                Crear Colaboración Artista-Grupo
+              </Button>
+            </Box>
+          )}
+          
+          <GenericTable<any>
+            title="Colaboraciones Artista-Grupo"
+            description="Colaboraciones entre artistas y grupos de tu agencia"
+            data={filteredArtistGroupCollaborations}
+            columns={groupCollabColumns}
+            loading={loading || agencyLoading}
+            onReload={() => user?.agency && fetchArtistGroupCollaborations(user.agency)}
+            showCreateForm={showCreateGroupCollabModal}
+            onShowCreateChange={setShowCreateGroupCollabModal}
+            editingItem={editingGroupCollab}
+            onEditingChange={setEditingGroupCollab}
+            deletingItem={deletingGroupCollab}
+            onDeletingChange={setDeletingGroupCollab}
+            itemsPerPage={10}
+            className="collaboration-table"
+            notification={notification || undefined}
+            onNotificationClose={() => setNotification(null)}
+            showActionsColumn={true}
+            showCreateButton={false} // No usar el botón por defecto
+            showSearch={true}
+            showReloadButton={true}
+            renderCustomActions={renderGroupCollabActions}
+          />
+          
+          {availableArtists.length === 0 && (
+            <Alert severity="warning" sx={{ mt: 2 }}>
+              No hay artistas en tu agencia para crear colaboraciones.
+            </Alert>
+          )}
+          
+          {agencyGroups.length === 0 && availableArtists.length > 0 && (
+            <Alert severity="warning" sx={{ mt: 2 }}>
+              No hay grupos en tu agencia para crear colaboraciones.
+            </Alert>
+          )}
+        </TabPanel>
+      </Paper>
+
+      {/* Modal para crear colaboración artista-artista */}
+      {showCreateArtistCollabModal && (
+        <CreateModal
+          title="🎭 Crear Colaboración Artista-Artista"
+          fields={artistCollabFields}
+          initialData={{
+            artist1Id: "",
+            artist2Id: "",
+            date: new Date().toISOString().split("T")[0],
+          }}
+          onSubmit={handleCreateArtistCollab}
+          onClose={() => setShowCreateArtistCollabModal(false)}
+          loading={loading}
+          submitText="Crear Colaboración"
+        />
+      )}
+
+      {/* Modal para crear colaboración artista-grupo */}
+      {showCreateGroupCollabModal && (
+        <CreateModal
+          title="👥 Crear Colaboración Artista-Grupo"
+          fields={groupCollabFields}
+          initialData={{
+            artistId: "",
+            groupId: "",
+            date: new Date().toISOString().split("T")[0],
+          }}
+          onSubmit={handleCreateGroupCollab}
+          onClose={() => setShowCreateGroupCollabModal(false)}
+          loading={loading}
+          submitText="Crear Colaboración"
+        />
+      )}
+
+      {/* Modal para editar colaboración artista-artista */}
+      {editingArtistCollab && (
+        <EditModal
+          title="✏️ Editar Colaboración Artista-Artista"
+          fields={artistCollabEditFields}
+          initialData={{
+            artist1Id: editingArtistCollab.artist1.id,
+            artist2Id: editingArtistCollab.artist2.id,
+            date: new Date(editingArtistCollab.date).toISOString().split("T")[0],
+          }}
+          itemId={`${editingArtistCollab.artist1.id}-${editingArtistCollab.artist2.id}`}
+          onSubmit={handleUpdateArtistCollab}
+          onClose={() => setEditingArtistCollab(null)}
+          loading={loading}
+          submitText="Actualizar Colaboración"
+        />
+      )}
+
+      {/* Modal para editar colaboración artista-grupo */}
+      {editingGroupCollab && (
+        <EditModal
+          title="✏️ Editar Colaboración Artista-Grupo"
+          fields={groupCollabEditFields}
+          initialData={{
+            artistId: editingGroupCollab.artist.id,
+            groupId: editingGroupCollab.group.id,
+            date: new Date(editingGroupCollab.date).toISOString().split("T")[0],
+          }}
+          itemId={`${editingGroupCollab.artist.id}-${editingGroupCollab.group.id}`}
+          onSubmit={handleUpdateGroupCollab}
+          onClose={() => setEditingGroupCollab(null)}
+          loading={loading}
+          submitText="Actualizar Colaboración"
+        />
+      )}
+
+      {/* Modal para ver detalles de colaboración artista-artista */}
+      {viewingArtistCollab && (
+        <ViewModal
+          title="👁️ Detalles de Colaboración Artista-Artista"
+          item={viewingArtistCollab}
+          onClose={() => setViewingArtistCollab(null)}
+          fields={[
+            { label: "Artista 1", value: viewingArtistCollab.artist1.stageName },
+            { label: "ID Artista 1", value: viewingArtistCollab.artist1.id },
+            { label: "Artista 2", value: viewingArtistCollab.artist2.stageName },
+            { label: "ID Artista 2", value: viewingArtistCollab.artist2.id },
+            { label: "Fecha de Colaboración", value: formatDate(viewingArtistCollab.date) },
+          ]}
+        />
+      )}
+
+      {/* Modal para ver detalles de colaboración artista-grupo */}
+      {viewingGroupCollab && (
+        <ViewModal
+          title="👁️ Detalles de Colaboración Artista-Grupo"
+          item={viewingGroupCollab}
+          onClose={() => setViewingGroupCollab(null)}
+          fields={[
+            { label: "Artista", value: viewingGroupCollab.artist.stageName },
+            { label: "ID Artista", value: viewingGroupCollab.artist.id },
+            { label: "Grupo", value: viewingGroupCollab.group.name },
+            { label: "ID Grupo", value: viewingGroupCollab.group.id },
+            { label: "Fecha de Colaboración", value: formatDate(viewingGroupCollab.date) },
+          ]}
+        />
+      )}
+
+      {/* Modal para eliminar colaboración artista-artista */}
+      {deletingArtistCollab && (
+        <DeleteModal<any>
+          title="🗑️ ¿Eliminar Colaboración?"
+          item={deletingArtistCollab}
+          itemName="Colaboración Artista-Artista"
+          itemId={`${deletingArtistCollab.artist1.id}-${deletingArtistCollab.artist2.id}`}
+          onConfirm={handleDeleteArtistCollab}
+          onClose={() => setDeletingArtistCollab(null)}
+          loading={loading}
+          confirmText="Sí, Eliminar"
+          warningMessage="⚠️ Esta acción no se puede deshacer. Se eliminará permanentemente la colaboración entre los artistas."
+          renderDetails={(item) => (
+            <Box className="collab-details" sx={{ p: 2, bgcolor: 'background.default', borderRadius: 1 }}>
+              <Typography variant="subtitle2" gutterBottom>Detalles de la colaboración:</Typography>
+              <Box sx={{ mt: 1 }}>
+                <Typography variant="body2"><strong>Artista 1:</strong> {item.artist1.stageName}</Typography>
+                <Typography variant="body2"><strong>Artista 2:</strong> {item.artist2.stageName}</Typography>
+                <Typography variant="body2"><strong>Fecha:</strong> {formatDate(item.date)}</Typography>
+              </Box>
+            </Box>
+          )}
+        />
+      )}
+
+      {/* Modal para eliminar colaboración artista-grupo */}
+      {deletingGroupCollab && (
+        <DeleteModal<any>
+          title="🗑️ ¿Eliminar Colaboración?"
+          item={deletingGroupCollab}
+          itemName="Colaboración Artista-Grupo"
+          itemId={`${deletingGroupCollab.artist.id}-${deletingGroupCollab.group.id}`}
+          onConfirm={handleDeleteGroupCollab}
+          onClose={() => setDeletingGroupCollab(null)}
+          loading={loading}
+          confirmText="Sí, Eliminar"
+          warningMessage="⚠️ Esta acción no se puede deshacer. Se eliminará permanentemente la colaboración entre el artista y el grupo."
+          renderDetails={(item) => (
+            <Box className="collab-details" sx={{ p: 2, bgcolor: 'background.default', borderRadius: 1 }}>
+              <Typography variant="subtitle2" gutterBottom>Detalles de la colaboración:</Typography>
+              <Box sx={{ mt: 1 }}>
+                <Typography variant="body2"><strong>Artista:</strong> {item.artist.stageName}</Typography>
+                <Typography variant="body2"><strong>Grupo:</strong> {item.group.name}</Typography>
+                <Typography variant="body2"><strong>Fecha:</strong> {formatDate(item.date)}</Typography>
+              </Box>
+            </Box>
+          )}
+        />
+      )}
+    </section>
+  );
+};
+
+export default CollaborationManagement;

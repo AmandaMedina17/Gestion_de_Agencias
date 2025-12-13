@@ -15,8 +15,8 @@ export enum GroupStatus {
 
 const GroupProposal: React.FC = () => {
   const {
-    groups,
-    fetchGroups,
+    notCreatedGroups, // Usar notCreatedGroups en lugar de groups
+    fetchNotCreatedGroups, // Usar esta función específica
     createGroup,
     loading: groupLoading,
     error: groupError,
@@ -37,7 +37,7 @@ const GroupProposal: React.FC = () => {
     const loadData = async () => {
       try {
         await Promise.all([
-          fetchGroups(),
+          fetchNotCreatedGroups(), // Cambiado a fetchNotCreatedGroups
           fetchAgencies(),
         ]);
       } catch (err) {
@@ -170,7 +170,7 @@ const GroupProposal: React.FC = () => {
 
       showSuccess("¡Grupo Creado!", "El grupo ha sido creado exitosamente.");
       setShowCreateModal(false);
-      await fetchGroups();
+      await fetchNotCreatedGroups(); // Cambiado a fetchNotCreatedGroups
     } catch (err: any) {
       showError("Error al Crear", err.message || "No se pudo crear el grupo.");
     }
@@ -196,7 +196,7 @@ const GroupProposal: React.FC = () => {
     const statusClassMap = {
       [GroupStatus.ACTIVO]: "active",
       [GroupStatus.DISUELTO]: "dissolved",
-      [GroupStatus.EN_PAUSA]: "En pausa",
+      [GroupStatus.EN_PAUSA]: "en-pausa",
     };
     return statusClassMap[status] || "";
   };
@@ -310,13 +310,13 @@ const GroupProposal: React.FC = () => {
       )}
 
       <GenericTable<GroupResponseDto>
-        title="Grupos"
-        description="Lista de todos los grupos del sistema"
-        data={groups}
+        title="Propuestas de Grupos"
+        description="Lista de grupos propuestos (no creados aún)"
+        data={notCreatedGroups} // Usar notCreatedGroups en lugar de groups
         columns={columns}
         loading={groupLoading}
         onReload={() => {
-          fetchGroups();
+          fetchNotCreatedGroups(); // Cambiado a fetchNotCreatedGroups
           fetchAgencies();
         }}
         showCreateForm={showCreateModal}
@@ -330,20 +330,18 @@ const GroupProposal: React.FC = () => {
         showSearch={true}
         showReloadButton={true}
         renderCustomActions={renderCustomActions}
-        //hideEdit={true} // No mostrar botones de editar
-        //hideDelete={true} // No mostrar botones de eliminar
       />
 
       {/* Modal de creación de grupo */}
       {showCreateModal && (
         <CreateModal
-          title="Crear Nuevo Grupo"
+          title="Crear Nueva Propuesta de Grupo"
           fields={groupFields}
           initialData={initialCreateData}
           onSubmit={handleCreate}
           onClose={() => setShowCreateModal(false)}
           loading={groupLoading}
-          submitText="Crear Grupo"
+          submitText="Crear Propuesta"
         />
       )}
     </section>
