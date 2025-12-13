@@ -5,11 +5,11 @@ import { InjectRepository } from "@nestjs/typeorm";
 
 @Injectable()
 export class GetSuccessfulSongOfAnAlbumUseCase {
-    constructor(
-        private readonly albumRepository : IAlbumRepository
-    ) {}
+    // constructor(
+    //     private readonly albumRepository : IAlbumRepository
+    // ) {}
 
-    async execute (id : string) : ResponseHitsByAlbumDto{
-        const 
-    }
+    // async execute (id : string) : ResponseHitsByAlbumDto{
+    //     const 
+    // }
 }
