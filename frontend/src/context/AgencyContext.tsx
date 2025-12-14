@@ -22,6 +22,7 @@ interface AgencyContextType {
   apprentices: ApprenticeResponseDto[];
   loading: boolean;
   error: string | null;
+  artistsWithDebutAndContracts: any[];
 
   collaborations: {
     artistCollaborations: any[];
@@ -42,6 +43,7 @@ interface AgencyContextType {
   clearError: () => void;
   fetchAllArtists: () => Promise<ArtistResponseDto[]>;
     fetchAgencyCollaborations: (agencyId: string) => Promise<void>;
+    fetchArtistsWithDebutAndContracts: (agencyId: string) => Promise<any[]>;
 }
 
 interface AgencyProviderProps {
@@ -66,6 +68,7 @@ export const AgencyProvider: React.FC<AgencyProviderProps> = ({ children }) => {
   const [allArtists, setAllArtists] = useState<ArtistResponseDto[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [artistsWithDebutAndContracts, setArtistsWithDebutAndContracts] = useState<any[]>([]);
 
   const createAgency = async (createDto: CreateAgencyDto) => {
     setLoading(true);
@@ -90,31 +93,61 @@ export const AgencyProvider: React.FC<AgencyProviderProps> = ({ children }) => {
   });
 
     const fetchAgencies = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await agencyService.findAll();
-        setAgencies(data);
-      } catch (err: any) {
-        setError(err.message || 'Error al cargar agencias');
-      } finally {
-        setLoading(false);
-      }
-    };
+        setLoading(true);
+        setError(null);
+        try {
+          const data = await agencyService.findAll();
+          setAgencies(data);
+        } catch (err: any) {
+          setError(err.message || 'Error al cargar agencias');
+        } finally {
+          setLoading(false);
+        }
+      };
 
-  const fetchAgencyCollaborations = async (agencyId: string) => {
-  setLoading(true);
-  setError(null);
-  try {
-    const collaborationsData = await agencyService.getAgencyCollaborations(agencyId);
-    setCollaborations(collaborationsData);
-  } catch (err: any) {
-    setError(err.message || 'Error al cargar colaboraciones de la agencia');
-    throw err;
-  } finally {
-    setLoading(false);
-  }
-};
+    const fetchAgencyCollaborations = async (agencyId: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const collaborationsData = await agencyService.getAgencyCollaborations(agencyId);
+      
+      // Función para deduplicar colaboraciones artista-artista
+      const deduplicateCollaborations = (collaborations: any[]) => {
+        const seen = new Set<string>();
+        return collaborations.filter(collab => {
+          if (!collab.artist1?.id || !collab.artist2?.id) return true;
+          
+          // Crear clave única ordenando los IDs
+          const sortedIds = [collab.artist1.id, collab.artist2.id].sort().join('-');
+          const key = `${sortedIds}-${collab.date}`;
+          
+          if (seen.has(key)) {
+            return false;
+          }
+          seen.add(key);
+          return true;
+        });
+      };
+      
+      // Aplicar deduplicación
+      const uniqueArtistCollabs = deduplicateCollaborations(collaborationsData.artistCollaborations || []);
+      
+      setCollaborations({
+        artistCollaborations: uniqueArtistCollabs,
+        artistGroupCollaborations: collaborationsData.artistGroupCollaborations || []
+      });
+      
+      console.log("Colaboraciones deduplicadas:", {
+        original: collaborationsData.artistCollaborations?.length,
+        deduplicadas: uniqueArtistCollabs.length
+      });
+    } catch (err: any) {
+      setError(err.message || 'Error al cargar colaboraciones de la agencia');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchAgency = async (id: string): Promise<AgencyResponseDto | null> => {
     setLoading(true);
@@ -330,6 +363,21 @@ export const AgencyProvider: React.FC<AgencyProviderProps> = ({ children }) => {
     }
   };
 
+  const fetchArtistsWithDebutAndContracts = async (agencyId: string): Promise<any[]> => {
+  setLoading(true);
+  setError(null);
+  try {
+    const data = await agencyService.getArtistsWithDebutAndContracts(agencyId);
+    setArtistsWithDebutAndContracts(data);
+    return data;
+  } catch (err: any) {
+    setError(err.message || 'Error al cargar artistas con debut y contratos activos');
+    throw err;
+  } finally {
+    setLoading(false);
+  }
+};
+
   const clearError = () => setError(null);
 
   return (
@@ -354,6 +402,8 @@ export const AgencyProvider: React.FC<AgencyProviderProps> = ({ children }) => {
       clearError,
        collaborations,
     fetchAgencyCollaborations,
+     artistsWithDebutAndContracts,
+    fetchArtistsWithDebutAndContracts,
     }}>
       {children}
     </AgencyContext.Provider>

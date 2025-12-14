@@ -14,7 +14,7 @@ interface ArtistContextType {
   completeInfoError: string | null;
 
   // Acciones
-  createArtist: (createDto: CreateArtistDto) => Promise<void>;
+  createArtist: (createDto: CreateArtistDto) => Promise<ArtistResponseDto>;
   fetchArtists: () => Promise<void>;
   fetchArtist: (id: string) => Promise<ArtistResponseDto | null>;
   deleteArtist: (id: string) => Promise<void>;
@@ -44,12 +44,13 @@ export const ArtistProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const [completeInfoLoading, setCompleteInfoLoading] = useState(false);
   const [completeInfoError, setCompleteInfoError] = useState<string | null>(null);
 
-  const createArtist = async (createDto: CreateArtistDto) => {
+  const createArtist = async (createDto: CreateArtistDto) : Promise<ArtistResponseDto>=> {
     setLoading(true);
     setError(null);
     try {
       const newArtist = await artistService.create(createDto);
       setArtists(prev => [...prev, newArtist]);
+      return newArtist;
     } catch (err: any) {
       setError(err.message || 'Error al crear artista');
       throw err;

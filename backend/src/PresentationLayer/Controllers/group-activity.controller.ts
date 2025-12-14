@@ -14,7 +14,7 @@ export class GroupActivityController {
     await this.group_activity_service.scheduleGroup(scheduleGroupDto);
   }
 
-  @Get('/activities')
+  @Post('/activities')
   getGroupActivities(@Body(ValidationPipe) dto: GetGroupCalendaryDto) {
     return this.group_activity_service.getGroupActivities(dto)
   }

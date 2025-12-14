@@ -205,17 +205,10 @@ const ActivitySchedulingView: React.FC = () => {
   };
 
   // Formatear fechas para la tabla
-  const formatDate = (dateString: string | Date) => {
-    try {
-      const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
-      return date.toLocaleDateString("es-ES", {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-      });
-    } catch {
-      return "Fecha no disponible";
-    }
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    date.setDate(date.getDate() + 1);
+    return date.toLocaleDateString("es-ES");
   };
 
   const prepareArtistActivities = () => {
