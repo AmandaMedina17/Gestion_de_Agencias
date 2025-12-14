@@ -507,7 +507,7 @@ const processArtistResponse = (response: any): ArtistWithGroup[] => {
             </Typography>
             {agencyInfo && (
               <Typography variant="subtitle1" color="text.secondary">
-                {agencyInfo.nameAgency} - {agencyInfo.place}
+                {agencyInfo.nameAgency} - {agencyInfo.place.name}
               </Typography>
             )}
           </Box>
@@ -648,7 +648,7 @@ const processArtistResponse = (response: any): ArtistWithGroup[] => {
       <Box sx={{ mt: 3, pt: 2, borderTop: 1, borderColor: 'divider' }}>
         <Typography variant="caption" color="text.secondary">
           Mostrando {artistsCount} artistas
-          {agencyInfo && ` • ${agencyInfo.nameAgency} (${agencyInfo.place})`}
+          {agencyInfo && ` • ${agencyInfo.nameAgency} (${agencyInfo.place.name})`}
           {artistsCount > 0 && (
             <>
               {' • '}

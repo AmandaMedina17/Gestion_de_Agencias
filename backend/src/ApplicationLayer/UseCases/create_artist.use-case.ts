@@ -31,7 +31,7 @@ export class CreateArtistUseCase {
     }
 
     //Validar que la fecha de nacimiento coincida con la edad del aprendiz
-    this.validateBirthDateMatchesApprenticeAge(birthday, apprentice);
+    // this.validateBirthDateMatchesApprenticeAge(birthday, apprentice);
 
     //Crear el artista
     const artist = Artist.create(
@@ -53,26 +53,26 @@ export class CreateArtistUseCase {
   }
 
   // Validar que la fecha de nacimiento coincida con la edad del aprendiz
-  private validateBirthDateMatchesApprenticeAge(birthDate: Date, apprentice: Apprentice): void {
-    // Calcular la edad a partir de la fecha de nacimiento
-    const today = new Date();
-    let calculatedAge = today.getFullYear() - birthDate.getFullYear();
+  // private validateBirthDateMatchesApprenticeAge(birthDate: Date, apprentice: Apprentice): void {
+  //   // Calcular la edad a partir de la fecha de nacimiento
+  //   const today = new Date();
+  //   let calculatedAge = today.getFullYear() - birthDate.getFullYear();
     
-    // Ajustar si el cumpleaños aún no ha ocurrido este año
-    const hasHadBirthdayThisYear = 
-      (today.getMonth() > birthDate.getMonth()) || 
-      (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
+  //   // Ajustar si el cumpleaños aún no ha ocurrido este año
+  //   const hasHadBirthdayThisYear = 
+  //     (today.getMonth() > birthDate.getMonth()) || 
+  //     (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
     
-    if (!hasHadBirthdayThisYear) {
-      calculatedAge--;
-    }
+  //   if (!hasHadBirthdayThisYear) {
+  //     calculatedAge--;
+  //   }
 
-    // Obtener la edad del aprendiz
-    const apprenticeAge = apprentice.getAge();
+  //   // Obtener la edad del aprendiz
+  //   const apprenticeAge = apprentice.getAge();
 
-    // Comparar las edades (permitir un margen de diferencia de ±1 año por posibles discrepancias)
-    if (Math.abs(calculatedAge - apprenticeAge) > 1) {
-      throw new Error(`Artist birth date (age ${calculatedAge}) does not match apprentice age (${apprenticeAge})`);
-    }
-  }
+  //   // Comparar las edades (permitir un margen de diferencia de ±1 año por posibles discrepancias)
+  //   if (Math.abs(calculatedAge - apprenticeAge) > 1) {
+  //     throw new Error(`Artist birth date (age ${calculatedAge}) does not match apprentice age (${apprenticeAge})`);
+  //   }
+  // }
 }
