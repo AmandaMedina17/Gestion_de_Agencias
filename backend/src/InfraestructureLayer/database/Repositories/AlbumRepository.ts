@@ -13,6 +13,9 @@ import { SongBillboardRepository } from "./SonBillboardrepository";
 import { SongBillboard } from "@domain/Entities/SongBillboard";
 import { ISongBillboardRepository } from "@domain/Repositories/ISonBillboardRepository";
 import { SongMapper } from "../Mappers/SongMapper";
+import { Award } from "@domain/Entities/Award";
+import { AwardMapper } from "../Mappers/AwardMapper";
+import { console } from "inspector";
 
 @Injectable()
 export class AlbumRepository extends BaseRepository<Album,AlbumEntity> implements IAlbumRepository{
@@ -20,17 +23,38 @@ export class AlbumRepository extends BaseRepository<Album,AlbumEntity> implement
         @InjectRepository(AlbumEntity)
         repository: Repository<AlbumEntity>,
         mapper: AlbumMapper,
-        private readonly songMapper : SongMapper
+        private readonly songMapper : SongMapper,
+        private readonly awardMapper : AwardMapper
     ) {
         super(repository, mapper);
     }
     async getAllSong(id: string): Promise<Song[]> {
-        const entity  =  await this.repository.findOne({where : {id}, relations : {
-            songs : true
-        }});
+        const entity  =  await this.getObjectWithRelations(id);
 
         return this.songMapper.toDomainEntities(entity!.songs);
     }
+
+    async getAllAwards(id: string): Promise<Award[]> {
+        const entity  = await this.getObjectWithRelations(id);
+        console.log('=== DEBUG getAllAwards ===');
+        console.log('Album ID:', id);
+        console.log('Entity found:', !!entity);
+        console.log('Awards from DB:', entity?.awards);
+        console.log('Awards length:', entity?.awards?.length);
+    
+            if (!entity?.awards || entity.awards.length === 0) {
+            console.log('No awards found in database for this album');
+            return [];
+        }
+    
+        const mapped = this.awardMapper.toDomainEntities(entity.awards);
+        console.log('Mapped awards:', mapped);
+        console.log('Mapped length:', mapped.length);
+        return mapped;
+        // const entity  = await this.getObjectWithRelations(id);
+        // return this.awardMapper.toDomainEntities(entity!.awards);
+    }
+
     
     async findByTitle(title: string): Promise<Album> {
         const entity = await this.repository.findOne({ 
@@ -42,9 +66,7 @@ export class AlbumRepository extends BaseRepository<Album,AlbumEntity> implement
           return this.mapper.toDomainEntity(entity);
     }
     async findById(id: string): Promise<Album | null> {
-        const entity : AlbumEntity | null =  await this.repository.findOne({where : {id}, relations : {
-            songs : true
-        }});
+        const entity : AlbumEntity | null = await this.getObjectWithRelations(id)
 
         console.log(entity)
         if(!entity)
@@ -59,5 +81,17 @@ export class AlbumRepository extends BaseRepository<Album,AlbumEntity> implement
             songs : true
         }});
         return this.mapper.toDomainEntities(dbEntities);
+    }
+
+    async getObjectWithRelations(id: string): Promise<AlbumEntity| null> {
+        const entity : AlbumEntity | null =  await this.repository.findOne({where : {id}, relations : {
+            songs : true,
+            awards : true
+        }});
+
+        if(!entity)
+        throw new Error("This album doesn't exist")
+
+        return entity;
     }
 }

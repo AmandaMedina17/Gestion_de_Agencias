@@ -19,12 +19,12 @@ export class AwardRepository extends BaseRepository<Award,AwardEntity> implement
   ) {super(repository, mapper);}
 
   async findByAlbumId(albumId: string): Promise<Award[]> {
-    const awards = await this.repository.find({where : {albumId}})
+    const awards = await this.repository.find({where : {album : {id : albumId}}});
     return this.mapper.toDomainEntities(awards);
   }
 
   async findUnassigned(): Promise<Award[]> {
-    const awards = await this.repository.find({where: { albumId: IsNull() },});
+    const awards = await this.repository.find({where: { album: IsNull() },});
     return this.mapper.toDomainEntities(awards);
   }
   

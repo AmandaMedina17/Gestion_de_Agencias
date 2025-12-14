@@ -11,6 +11,8 @@ import { SongBillboardDtoMapper } from '@application/DTOs/dtoMappers/song.billbo
 import { ISongBillboardRepository } from '@domain/Repositories/ISonBillboardRepository';
 import { SongDtoMapper } from '@application/DTOs/dtoMappers/song.dto.mapper';
 import { ResponseSongDto } from '@application/DTOs/songDto/response.song.dto';
+import { ResponseAwardDto } from '@application/DTOs/AwardDto/response.award.dto';
+import { AwardDtoMapper } from '@application/DTOs/dtoMappers/award.dto.mapper';
 
 @Injectable()
 export class AlbumService extends BaseService<Album,CreateAlbumDto,ResponseAlbumDto,UpdateAlbumDto>{
@@ -21,7 +23,8 @@ export class AlbumService extends BaseService<Album,CreateAlbumDto,ResponseAlbum
         private readonly songBillboard : ISongBillboardRepository,
         private readonly albumDtoMapper: AlbumDtoMapper,
         private readonly songBillboardDtoMapper : SongBillboardDtoMapper,
-        private readonly song : SongDtoMapper
+        private readonly song : SongDtoMapper,
+        private readonly awardDtoMapper : AwardDtoMapper,
     ) {
         super(albumRepository, albumDtoMapper)
     }
@@ -40,6 +43,12 @@ export class AlbumService extends BaseService<Album,CreateAlbumDto,ResponseAlbum
     async getAllSongs(id: string) : Promise<ResponseSongDto[]> {
         const songs = await this.albumRepository.getAllSong(id);
         return this.song.toResponseList(songs);
+    }
+
+    async getAlbumAwards(id: string): Promise<ResponseAwardDto[]> {
+        const awards = await this.albumRepository.getAllAwards(id);
+        console.log(awards)
+        return this.awardDtoMapper.toResponseList(awards);
     }
 }
 

@@ -22,11 +22,16 @@ import { SongDtoMapper } from '@application/DTOs/dtoMappers/song.dto.mapper';
 import { BillboardListMapper } from '@infrastructure/database/Mappers/BillboardListMapper';
 import { BillboardListDtoMapper } from '@application/DTOs/dtoMappers/billboardList.dto.mapper';
 import { Song } from '@domain/Entities/Song';
+import { Award } from '@domain/Entities/Award';
+import { AwardDtoMapper } from '@application/DTOs/dtoMappers/award.dto.mapper';
+import { AwardMapper } from '@infrastructure/database/Mappers/AwardMapper';
+import { AwardModule } from '../award/award.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([AlbumEntity]),
-    SongBillboardModule
+    SongBillboardModule,
+    AwardModule
   ],
   controllers: [AlbumController],
   providers: [ 

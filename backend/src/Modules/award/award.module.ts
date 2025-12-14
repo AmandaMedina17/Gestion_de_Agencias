@@ -29,7 +29,9 @@ import { AwardController } from '@presentation/Controllers/award/award.controlle
       
     ],
     exports: [
-        IAwardRepository
+        IAwardRepository,
+        AwardMapper,
+        AwardDtoMapper
     ]
   })
   export class AwardModule {}
