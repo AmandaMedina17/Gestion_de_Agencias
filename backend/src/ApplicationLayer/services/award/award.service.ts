@@ -26,10 +26,11 @@ export class AwardService extends BaseService<Award,CreateAwardDto,ResponseAward
 
         if(!awardDomain)
             throw new Error("The award you wanna give to the album doesn't exist")
+        
 
         if(awardDomain.getAlbum())
             throw new Error(`The award with id ${awardId} is already assigned to an album`)
-        
+            
         const albumDomain = await this.albumRepository.findById(albumId)
 
         if(albumDomain)
@@ -38,11 +39,24 @@ export class AwardService extends BaseService<Award,CreateAwardDto,ResponseAward
         return this.save(awardDomain);
     }
 
-
-
+    async create(createDto: CreateAwardDto): Promise<ResponseAwardDto> {
+        let album = undefined;
+    
+        if (createDto.albumId) {
+            album = await this.albumRepository.findById(createDto.albumId);
+        }
+        const awardDomain = Award.create(createDto.name, createDto.date,album!);
+        return this.save(awardDomain);
+    }
+    
     async save(entity : Award) : Promise<ResponseAwardDto> {
     
         const savedEntity = await this.awardRepository.save(entity)
         return this.mapper.toResponse(savedEntity)
+    }
+
+    async findUnassignedAwards() : Promise<ResponseAwardDto[]>{
+        const unassigned = await this.awardRepository.findUnassigned();
+        return this.mapper.toResponseList(unassigned)
     }
 }

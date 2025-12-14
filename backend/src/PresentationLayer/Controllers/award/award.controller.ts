@@ -25,6 +25,12 @@ export class AwardController {
         return this.awardService.findAll();
     }
 
+
+    @Get('unassigned')
+    findUnassignedAwards() {
+        return this.awardService.findUnassignedAwards();
+    }
+    
     @Get(':id')
     findOne(@Param('id') id: string) {
         return this.awardService.findOne(id);

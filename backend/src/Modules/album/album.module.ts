@@ -31,7 +31,7 @@ import { AwardModule } from '../award/award.module';
   imports: [
     TypeOrmModule.forFeature([AlbumEntity]),
     SongBillboardModule,
-    AwardModule
+    forwardRef(() => AwardModule) 
   ],
   controllers: [AlbumController],
   providers: [ 

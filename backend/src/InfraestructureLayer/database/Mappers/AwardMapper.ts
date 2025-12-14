@@ -16,7 +16,7 @@ export class AwardMapper extends IMapper<Award, AwardEntity>{
             throw new Error('Cannot map null entity to domain');
         }
 
-        return new Award(dataBaseEntity.id,dataBaseEntity.name,dataBaseEntity.date, dataBaseEntity ? this.albumMapper.toDomainEntity(dataBaseEntity.album!) : undefined!)
+        return new Award(dataBaseEntity.id,dataBaseEntity.name,dataBaseEntity.date, dataBaseEntity.album ? this.albumMapper.toDomainEntity(dataBaseEntity.album!) : undefined!)
     }
 
     toDataBaseEntity(domainEntity: Award): AwardEntity{
@@ -25,7 +25,10 @@ export class AwardMapper extends IMapper<Award, AwardEntity>{
         entity.id = domainEntity.getId();
         entity.name= domainEntity.getName();
         entity.date= domainEntity.getDate();
-        entity.album = this.albumMapper.toDataBaseEntity(domainEntity.getAlbum());
+
+        const album = domainEntity.getAlbum();
+        if(album)
+            entity.album = this.albumMapper.toDataBaseEntity(album);
 
 
         return entity;

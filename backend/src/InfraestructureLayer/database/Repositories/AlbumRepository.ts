@@ -5,13 +5,8 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { AlbumEntity } from "../Entities/AlbumEntity";
 import { BaseRepository } from "./BaseRepositoryImpl";
 import { Repository } from "typeorm";
-import { IMapper } from "../Mappers/IMapper";
 import { AlbumMapper } from "../Mappers/AlbumMapper";
 import { Song } from "@domain/Entities/Song";
-import { SongBillboardEntity } from "../Entities/SongBillboardEntity";
-import { SongBillboardRepository } from "./SonBillboardrepository";
-import { SongBillboard } from "@domain/Entities/SongBillboard";
-import { ISongBillboardRepository } from "@domain/Repositories/ISonBillboardRepository";
 import { SongMapper } from "../Mappers/SongMapper";
 import { Award } from "@domain/Entities/Award";
 import { AwardMapper } from "../Mappers/AwardMapper";
@@ -36,11 +31,6 @@ export class AlbumRepository extends BaseRepository<Album,AlbumEntity> implement
 
     async getAllAwards(id: string): Promise<Award[]> {
         const entity  = await this.getObjectWithRelations(id);
-        console.log('=== DEBUG getAllAwards ===');
-        console.log('Album ID:', id);
-        console.log('Entity found:', !!entity);
-        console.log('Awards from DB:', entity?.awards);
-        console.log('Awards length:', entity?.awards?.length);
     
             if (!entity?.awards || entity.awards.length === 0) {
             console.log('No awards found in database for this album');
@@ -48,11 +38,7 @@ export class AlbumRepository extends BaseRepository<Album,AlbumEntity> implement
         }
     
         const mapped = this.awardMapper.toDomainEntities(entity.awards);
-        console.log('Mapped awards:', mapped);
-        console.log('Mapped length:', mapped.length);
         return mapped;
-        // const entity  = await this.getObjectWithRelations(id);
-        // return this.awardMapper.toDomainEntities(entity!.awards);
     }
 
     

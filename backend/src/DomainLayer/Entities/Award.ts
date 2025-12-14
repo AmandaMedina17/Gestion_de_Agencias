@@ -7,7 +7,7 @@ export class Award implements IUpdatable{
         private readonly id: string,
         private name: string,
         private date:Date,
-        private album : Album
+        private album? : Album
     ){
         this.validateName();
     }
@@ -40,11 +40,11 @@ export class Award implements IUpdatable{
         return this.date;
     }
 
-    public getAlbum(): Album{
+    public getAlbum(): Album | undefined{
         return this.album;
     }
 
-    public static create( name :string , date : Date, album: Album) : Award{
+    public static create( name :string , date : Date, album?: Album) : Award{
         const id = uuidv4()
         return new Award(id, name,date,album);
     }

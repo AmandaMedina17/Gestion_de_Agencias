@@ -17,11 +17,12 @@ export class AwardDtoMapper extends BaseDtoMapper<Award, CreateAwardDto, Respons
     };
   
     toResponse(domain: Award): ResponseAwardDto {
+        console.log(domain);
         return {
             id: domain.getId(),
             name: domain.getName(),
             date: domain.getDate(),
-            album : this.albumDtoMapper.toResponse(domain.getAlbum())
+            album : domain.getAlbum() ? this.albumDtoMapper.toResponse(domain.getAlbum()!) : undefined
         };
     }
    
