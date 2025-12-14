@@ -9,6 +9,7 @@ import { groupService } from '../../../../services/GroupService'
 import './profile.css'
 
 import sk from "../../../../../public/images/straykids.jpg"
+import { PlaceResponseDto } from "../../../../../../backend/src/ApplicationLayer/DTOs/placeDto/response-place.dto"
 
 interface ManagerProfileProps {
   manager: {
@@ -21,7 +22,7 @@ interface ManagerProfileProps {
   }
   agencyDetails?: {
     nameAgency: string
-    place: string
+    place: PlaceResponseDto
     dateFundation: string | Date
   } | null
 }

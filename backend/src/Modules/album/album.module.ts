@@ -13,7 +13,7 @@ import { AlbumController } from '@presentation/Controllers/album/album.controlle
 import { SongModule } from '../song/song.module';
 import { SongBillboardRepository } from '@infrastructure/database/Repositories/SonBillboardrepository';
 import { SongBillboardEntity } from '@infrastructure/database/Entities/SongBillboardEntity';
-import { SongBillBoardMapper } from '@infrastructure/database/Mappers/SongBillboardMapper';
+import { SongBillBoardMapper } from '@infrastructure/database/Mappers/SongBillBoardMapper';
 import { SongBillboardDtoMapper } from '@application/DTOs/dtoMappers/song.billboard.dtoMapper';
 import { ISongBillboardRepository } from '@domain/Repositories/ISonBillboardRepository';
 import { SongBillboardModule } from '../song_billboard/song_billboard.module';

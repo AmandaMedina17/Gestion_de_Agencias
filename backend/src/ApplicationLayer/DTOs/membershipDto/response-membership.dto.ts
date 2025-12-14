@@ -1,4 +1,4 @@
-import { ArtistRole } from "@domain/Enums";
+import { ArtistRole } from "../../../DomainLayer/Enums";
 
 export class ResponseMembershipDto {
   artistId!: string;
