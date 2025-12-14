@@ -19,6 +19,7 @@ import { GroupModule } from './GroupModule';
 import { ArtistActivityModule } from './ArtistActivityModule';
 import { GroupActivityModule } from './GroupActivityModule';
 import { SongBillboardModule } from './song_billboard/song_billboard.module';
+import { GroupDebutModule } from './GroupDebutModule';
 import { ApprenticeEvaluationModule } from './ApprenticeEvaluationModule';
 
 @Module({
@@ -41,6 +42,7 @@ import { ApprenticeEvaluationModule } from './ApprenticeEvaluationModule';
     ArtistActivityModule,
     GroupActivityModule,
     SongBillboardModule,
+    GroupDebutModule,
     ApprenticeEvaluationModule
   ],
   controllers: [AppController],

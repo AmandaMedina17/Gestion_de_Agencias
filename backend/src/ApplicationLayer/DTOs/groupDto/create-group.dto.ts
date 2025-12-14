@@ -25,6 +25,9 @@ export class CreateGroupDto {
     @MinLength(1)
     concept!: string;
 
+    @IsOptional()
+    @IsString()
+    visualConcept?: string;
 
     @IsNotEmpty()
     @IsBoolean()
@@ -34,7 +37,7 @@ export class CreateGroupDto {
     @IsString()
     agencyId!: string;
 
-    // @IsOptional()
-    // @IsString()
-    // proposedByArtistId?: string; 
+    @IsOptional()
+    @IsString()
+    proposedByArtistId?: string; 
 }

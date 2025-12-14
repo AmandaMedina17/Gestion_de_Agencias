@@ -18,7 +18,9 @@ export class GroupMapper extends IMapper<Group, GroupEntity>{
             dataBaseEntity.concept,
             dataBaseEntity.is_created,
             dataBaseEntity.agencyId,
-            dataBaseEntity.num_members
+            dataBaseEntity.num_members,
+            dataBaseEntity.visualconcept,
+            dataBaseEntity.proposedByArtistId
         )
     }
 
@@ -37,6 +39,8 @@ export class GroupMapper extends IMapper<Group, GroupEntity>{
             entity.is_created,
             entity.agencyId,
             entity.num_members,
+            entity.visualconcept,
+            entity.proposedByArtistId,
             members
         );
     }
@@ -52,6 +56,8 @@ export class GroupMapper extends IMapper<Group, GroupEntity>{
         entity.is_created = domainEntity.isCreated();
         entity.concept = domainEntity.getConcept()
         entity.agencyId = domainEntity.getAgency()
+        entity.visualconcept = domainEntity.getVisualConcept();
+        entity.proposedByArtistId = domainEntity.getProposedByArtistId();
         
         return entity;
     }
