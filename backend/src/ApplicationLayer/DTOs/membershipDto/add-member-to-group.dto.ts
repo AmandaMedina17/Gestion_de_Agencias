@@ -1,6 +1,6 @@
 import { IsEnum, IsNotEmpty, IsString, IsUUID } from 'class-validator';
 
-import { ArtistRole } from '@domain/Enums';
+import { ArtistRole } from '../../../DomainLayer/Enums';
 
 export class AddMemberToGroupDto {
   @IsUUID()

@@ -1,6 +1,6 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
+import { Repository, In, LessThanOrEqual, MoreThanOrEqual, createQueryBuilder } from 'typeorm';
 import { BaseRepository } from './BaseRepositoryImpl';
 import { Artist} from '@domain/Entities/Artist';
 import { ArtistEntity } from '../Entities/ArtistEntity';
@@ -36,6 +36,10 @@ export class ArtistRepository
   ) {
     super(repository, mapper);
   }
+  getArtistLastGroup(id: string): Promise<Group> {
+    throw new Error('Method not implemented.');
+  }
+  
 
   async createArtistCollaboration(artist1Id: string, artist2Id: string, date: Date): Promise<void> {
     // Validar que no exista ya la colaboración

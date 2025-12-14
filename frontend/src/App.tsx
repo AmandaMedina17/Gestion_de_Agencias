@@ -26,6 +26,8 @@ import { ActivitySchedulingProvider } from './context/ActivitySchedulingContext'
 import ArtistManagement from './components/Admin/sections/Artist/ArtistManagement';
 import { AwardProvider } from './context/AwardContext';
 import { SongBillboardProvider } from './context/SongBillboardContext';
+import ArtistDashboard from './components/Artist/ArtistDashboard';
+import { CollaborationProvider } from './context/CollaborationContext';
 
 // const PrivateRoute = ({ children, allowedRoles }: { children: React.ReactNode, allowedRoles: string[] }) => {
 //   const { user, isAuthenticated } = useAuth();
@@ -43,6 +45,7 @@ import { SongBillboardProvider } from './context/SongBillboardContext';
 
 function App() {
   return (
+    <CollaborationProvider>
     <SongBillboardProvider>
     <AwardProvider>
       <ActivitySchedulingProvider>
@@ -80,7 +83,7 @@ function App() {
                                         <Route 
                                           path="/artist" 
                                           element={
-                                            <ArtistManagement />
+                                            <ArtistDashboard />
                                           } 
                                         />
                                       </Routes>
@@ -102,6 +105,7 @@ function App() {
     </ActivitySchedulingProvider>
    </AwardProvider>
    </SongBillboardProvider>
+   </CollaborationProvider>
   );
 }
 

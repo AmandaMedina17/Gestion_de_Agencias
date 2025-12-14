@@ -28,16 +28,16 @@ const ManagerSidebar: React.FC<ManagerSidebarProps> = ({
 
   const menuItems = [
         {   id: 'active_apprentice', 
-            label: ' Aprendices', 
+            label: 'Gestión de Aprendices', 
             tooltip: 'Datos de Aprendices',
         },
         {   id: 'active_artists', 
-            label: ' Artistas', 
+            label: 'Gestión de Artistas', 
             tooltip: 'Datos de Artista',
         },
         {   id: 'group_management', 
-            label: 'Grupos de agencia', 
-            tooltip: 'Detalles de los grupos',
+            label: 'Gestión de Grupos', 
+            tooltip: 'Crear, aceptar, editar y eliminar grupos',
         },
         {   id: 'activities_management', 
             label: 'Gestión de Actividades', 
@@ -47,26 +47,26 @@ const ManagerSidebar: React.FC<ManagerSidebarProps> = ({
             label: 'Gestión de Éxitos', 
             tooltip: 'Registrar éxitos',
         },
-        // {   id: 'songs_management', 
-        //     label: 'Gestión de Canciones', 
-        //     tooltip: 'Registrar, modificar y eliminar canciones',
-        // },
-        // {   id: 'albums_management', 
-        //     label: 'Gestión de Albumes', 
-        //     tooltip: 'Registrar, modificar y eliminar albumes',
-        // },
-        // {   id: 'billboard_management', 
-        //     label: 'Gestión de Listas Billboard', 
-        //     tooltip: 'Registrar, modificar y eliminar listas billboard',
-        // },
-        // {   id: 'activities_management', 
-        //     label: 'Gestión de Actividades', 
-        //     tooltip: 'Registrar, modificar y eliminar actividades',
-        // },
-        // {   id: 'responsible_management', 
-        //     label: 'Gestión de Responsables', 
-        //     tooltip: 'Registrar, modificar y eliminar responsables',
-        // },
+        {   id: 'collaboration_management', 
+            label: 'Gestión de Colaboraciones', 
+            tooltip: 'Registrar, modificar y eliminar colaboraciones',
+        },
+        {   id: 'evaluations_management', 
+            label: 'Gestión de Evaluaciones', 
+            tooltip: 'Registrar, modificar y eliminar evaluaciones de aprendices',
+        },
+        {   id: 'artists_changes', 
+            label: 'Gestión de Artistas Cmabiados', 
+            tooltip: 'Registrar, modificar y eliminar listas billboard',
+        },
+        {   id: 'calendar_group', 
+            label: 'Calendario de Grupos', 
+            tooltip: 'Consultar actividades programadas de un grupo',
+        },
+        {   id: 'artist_debut_contract', 
+            label: 'Artistas con contratos', 
+            tooltip: 'Artistas que ya debutaron y tienen contratos activos',
+        },
         // {   id: 'place_management', 
         //     label: 'Gestión de Lugares', 
         //     tooltip: 'Registrar, modificar y eliminar lugares',
@@ -81,13 +81,6 @@ const ManagerSidebar: React.FC<ManagerSidebarProps> = ({
         // },
     ];
 
-  // const menuItems = [
-  //   { id: 'group_calendar', label: '📆 Calendario de Grupos', tooltip: 'Detalles de las Actividades Grupales' },
-  //   { id: 'artist_calendar', label: '📖 Calendario de Artistas', tooltip: 'Detalles de Actividades de los Artistas' },
-  //   { id: 'artist_income', label: '💰 Ingresos de Artistas', tooltip: 'Ingresos y éxitos' },
-  //   { id: 'artist_mobility', label: '🔄 Movilidad de Artistas', tooltip: 'Historial de Artistas transferidos de Agencia y Grupos' },
-  //   { id: 'elite_artists', label: '👩🏼‍🎤 Artistas Élite', tooltip: 'Historial de Artistas que pertenecieron a grupos disueltos y carrera exitosa' }
-  // ];
 
   return (
     <div className={`sidebar ${isOpen ? 'show' : ''}`} id="drop">
@@ -126,18 +119,7 @@ const ManagerSidebar: React.FC<ManagerSidebarProps> = ({
         ))}
       </nav>
 
-      {/* Botón de cerrar sesión */}
-      <div className="sidebar-footer">
-        <button className="logout-btn" onClick={() => {
-          // Aquí agregarías la lógica de logout
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          window.location.href = '/login';
-        }}>
-          <span className="logout-icon">🚪</span>
-          <span className="logout-text">Cerrar Sesión</span>
-        </button>
-      </div>
+      
     </div>
   );
 };

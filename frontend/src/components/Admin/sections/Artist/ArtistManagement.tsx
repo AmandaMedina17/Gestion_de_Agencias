@@ -244,6 +244,16 @@ const ArtistManagement: React.FC = () => {
       type: "text",
       required: false,
     },
+    {
+    name: "apprenticeId",
+    label: "Aprendiz Asociado",
+    type: "autocomplete",
+    required: true,
+    options: apprentices.map((apprentice) => ({
+      value: apprentice.id,
+      label: `${apprentice.fullName}`,
+    })),
+  },
   ];
 
   // Datos iniciales para creación
@@ -286,7 +296,7 @@ const ArtistManagement: React.FC = () => {
         birthday: new Date(data.birthday),
         transitionDate: new Date(data.transitionDate),
         status: data.status,
-        groupId: data.groupId.trim() || undefined,
+        groupId: data.goupId? data.groupId.trim() : undefined,
         apprenticeId: data.apprenticeId,
       });
 
@@ -494,6 +504,7 @@ const ArtistManagement: React.FC = () => {
                   .split("T")[0]
               : "",
             status: editingArtist.status,
+             apprenticeId: editingArtist.apprenticeId,
           }}
           itemId={editingArtist.id}
           onSubmit={handleUpdate}

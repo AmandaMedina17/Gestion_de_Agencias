@@ -1,11 +1,3 @@
-/* ManagerDashboard.css */
-
-/* Estilos generales del dashboard */
-#managers_interface {
-  background-image: url('/public/images/nubes.jpg');
-  display: flex;
-  min-height: 100vh;
-}
 
 
 /* Contenido principal */

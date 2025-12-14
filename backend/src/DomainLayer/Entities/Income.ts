@@ -84,10 +84,10 @@ export class Income implements IUpdatable {
       if (!date) {
         throw new Error("Date cannot be null");
       }
-      const now = new Date();
-      if (date < now) {
-        throw new Error("Income date cannot be in the past");
-      }
+      // const now = new Date();
+      // if (date < now) {
+      //   throw new Error("Income date cannot be in the past");
+      // }
     }
 
     static create(activityId: string, type: IncomeType, mount: number, date: Date, responsible: string): Income {

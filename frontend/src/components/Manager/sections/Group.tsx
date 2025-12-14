@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useGroup } from "../../../context/GroupContext";
 import { useAgency } from "../../../context/AgencyContext";
 import { useAuth } from "../../../context/AuthContext";
@@ -14,12 +14,24 @@ import "./Group.css";
 import Icon from "../../icons/Icon";
 import { GroupResponseDto } from "../../../../../backend/src/ApplicationLayer/DTOs/groupDto/response-group.dto";
 import { ApprenticeResponseDto } from "../../../../../backend/src/ApplicationLayer/DTOs/apprenticeDto/response-apprentice.dto";
+import { Tabs, Tab, Box, Paper } from '@mui/material';
 
 export enum GroupStatus {
   ACTIVO = "ACTIVO",
   EN_PAUSA = "EN_PAUSA",
   DISUELTO = "DISUELTO",
 }
+
+
+export enum ArtistRole{
+    LIDER = "LIDER",
+    VOCALISTA = "VOCALISTA", 
+    RAPERO = "RAPERO",
+    BAILARIN = "BAILARIN",
+    VISUAL = "VISUAL",
+    MAKNAE = "MAKNAE"
+}
+
 
 // Interfaz para trainee en el modal
 interface TraineeForModal {
@@ -29,6 +41,30 @@ interface TraineeForModal {
   fullName: string;
   artistId?: string;
 }
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+const TabPanel: React.FC<TabPanelProps> = ({ children, value, index, ...other }) => {
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`group-tabpanel-${index}`}
+      aria-labelledby={`group-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 0 }}>
+          {children}
+        </Box>
+      )}
+    </div>
+  );
+};
 
 const GroupManagement: React.FC = () => {
   const {
@@ -42,6 +78,7 @@ const GroupManagement: React.FC = () => {
     addMemberToGroup,
     getGroupMembers,
     removeMemberFromGroup,
+    activateGroup
   } = useGroup();
 
   const { agencies, fetchAgencies } = useAgency();
@@ -79,14 +116,14 @@ const GroupManagement: React.FC = () => {
   );
   const [addingMemberGroup, setAddingMemberGroup] =
     useState<GroupResponseDto | null>(null);
+  const [activeTab, setActiveTab] = useState(0);
 
   // Estados para creación de artista
   const [showCreateArtistModal, setShowCreateArtistModal] = useState(false);
   const [selectedTraineeForArtist, setSelectedTraineeForArtist] = useState<{
     trainee: TraineeForModal;
     groupId: string;
-    role: string;
-    endDate?: Date;
+    role: ArtistRole;
   } | null>(null);
 
   useEffect(() => {
@@ -120,8 +157,14 @@ const GroupManagement: React.FC = () => {
     if (!group.agencyID) return "No asignada";
     const agency = agencies.find((a) => a.id === group.agencyID);
     return agency
-      ? `${agency.nameAgency} - ${agency.place}`
+      ? `${agency.nameAgency}`
       : "Agencia no encontrada";
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    date.setDate(date.getDate() + 1);
+    return date.toLocaleDateString("es-ES");
   };
 
   // Funciones para mostrar notificaciones
@@ -152,7 +195,10 @@ const GroupManagement: React.FC = () => {
   };
 
   const handleAddMember = (group: GroupResponseDto) => {
-    setAddingMemberGroup(group);
+    // Solo permitir añadir miembros si el grupo está creado
+    if (group.is_created) {
+      setAddingMemberGroup(group);
+    }
   };
 
   // Definir campos del formulario de grupo
@@ -249,18 +295,27 @@ const GroupManagement: React.FC = () => {
         return;
       }
 
+      const isCreated = data.is_created === "true";
+      
       await createGroup({
         name: data.name.trim(),
         concept: data.concept.trim(),
         status: data.status,
         debut_date: new Date(data.debut_date),
-        is_created: data.is_created === "true",
+        is_created: isCreated,
         agencyId: userAgency.id,
       });
 
       showSuccess("¡Grupo Creado!", "El grupo ha sido creado exitosamente.");
       setShowCreateModal(false);
       await fetchGroups();
+      
+      // Cambiar a la pestaña correspondiente según si está creado o no
+      if (isCreated) {
+        setActiveTab(0); // Pestaña de grupos creados
+      } else {
+        setActiveTab(1); // Pestaña de grupos no creados
+      }
     } catch (err: any) {
       showError("Error al Crear", err.message || "No se pudo crear el grupo.");
     }
@@ -280,12 +335,14 @@ const GroupManagement: React.FC = () => {
         return;
       }
 
+      const isCreated = data.is_created === "true";
+      
       await updateGroup(id as string, {
         name: data.name.trim(),
         concept: data.concept.trim(),
         status: data.status,
         debut_date: new Date(data.debut_date),
-        is_created: data.is_created === "true",
+        is_created: isCreated,
         agencyId: userAgency.id,
       });
 
@@ -295,6 +352,13 @@ const GroupManagement: React.FC = () => {
       );
       setEditingGroup(null);
       await fetchGroups();
+      
+      // Cambiar a la pestaña correspondiente según si está creado o no
+      if (isCreated) {
+        setActiveTab(0);
+      } else {
+        setActiveTab(1);
+      }
     } catch (err: any) {
       showError(
         "Error al Actualizar",
@@ -323,12 +387,7 @@ const GroupManagement: React.FC = () => {
     }
   };
 
-  // Funciones auxiliares
-  const formatDate = (date: Date | string) => {
-    if (!date) return "N/A";
-    const dateObj = typeof date === "string" ? new Date(date) : date;
-    return dateObj.toLocaleDateString("es-ES");
-  };
+  
 
   const getStatusText = (status: GroupStatus) => {
     const statusMap = {
@@ -386,8 +445,7 @@ const GroupManagement: React.FC = () => {
   // Manejar adición de miembro con lógica de creación de artista
   const handleAddMemberToGroup = async (
     traineeId: string,
-    role: string,
-    endDate?: Date
+    role: ArtistRole,
   ) => {
     if (!addingMemberGroup) return;
 
@@ -404,10 +462,9 @@ const GroupManagement: React.FC = () => {
 
       if (existingArtist) {
         // Si ya tiene artista, agregar al grupo
-        await addMemberToGroup(addingMemberGroup.id, {
+        await addMemberToGroup( {groupId: addingMemberGroup.id,
           artistId: existingArtist.id,
           role,
-          endDate,
         });
         showSuccess(
           "Miembro agregado",
@@ -428,7 +485,7 @@ const GroupManagement: React.FC = () => {
           },
           groupId: addingMemberGroup.id,
           role,
-          endDate,
+      
         });
         setAddingMemberGroup(null);
         setShowCreateArtistModal(true);
@@ -459,10 +516,9 @@ const GroupManagement: React.FC = () => {
       await fetchArtists();
 
       // Agregar el artista al grupo
-      await addMemberToGroup(selectedTraineeForArtist.groupId, {
-        artistId: selectedTraineeForArtist.trainee.id,
+      await addMemberToGroup({groupId: selectedTraineeForArtist.groupId,
+        artistId: newArtist.id,
         role: selectedTraineeForArtist.role,
-        endDate: selectedTraineeForArtist.endDate,
       });
 
       showSuccess(
@@ -548,8 +604,8 @@ const GroupManagement: React.FC = () => {
     };
   };
 
-  // Definir columnas para la tabla
-  const columns: Column<GroupResponseDto>[] = [
+  // Definir columnas base (compartidas entre ambas pestañas)
+  const baseColumns: Column<GroupResponseDto>[] = [
     {
       key: "name",
       title: "Nombre del Grupo",
@@ -583,15 +639,7 @@ const GroupManagement: React.FC = () => {
       sortable: true,
       width: "13%",
       align: "center",
-      render: (item) => formatDate(item.debut_date),
-    },
-    {
-      key: "years_active",
-      title: "Años Activos",
-      sortable: false,
-      width: "13%",
-      align: "center",
-      render: (item) => calculateYearsSinceDebut(item.debut_date),
+      render: (item) => formatDate(item.debut_date.toString()),
     },
     {
       key: "members_num",
@@ -632,38 +680,145 @@ const GroupManagement: React.FC = () => {
       align: "center",
       render: (item) => getAgencyName(item),
     },
+  ];
+
+  // Columna de miembros (solo para grupos creados)
+  const membersColumn: Column<GroupResponseDto> = {
+    key: "members",
+    title: "Miembros",
+    sortable: false,
+    width: "16%",
+    align: "center",
+    render: (item) => (
+      <div className="members-actions">
+        <button
+          className="action-btnn view-members-btn"
+          onClick={() => handleViewMembers(item)}
+          title="Ver miembros"
+          disabled={groupLoading}
+          style={{ marginRight: "8px" }}
+        >
+          <Icon name="user" size={16} />
+        </button>
+        <button
+          className="action-btnn add-member-btn"
+          onClick={() => handleAddMember(item)}
+          title="Añadir miembro"
+          disabled={groupLoading}
+        >
+          <Icon name="user" size={16} />
+        </button>
+      </div>
+    ),
+  };
+
+  // Columnas para grupos no creados (sin acciones en columna separada)
+  const notCreatedColumns: Column<GroupResponseDto>[] = [
     {
-      key: "members",
-      title: "Miembros",
-      sortable: false,
-      width: "16%",
+      key: "name",
+      title: "Nombre del Grupo",
+      sortable: true,
+      width: "25%",
       align: "center",
       render: (item) => (
-        <div className="members-actions">
-          <button
-            className="action-btnn view-members-btn"
-            onClick={() => handleViewMembers(item)}
-            title="Ver miembros"
-            disabled={groupLoading}
-            style={{ marginRight: "8px" }}
-          >
-            <Icon name="user" size={16} />
-          </button>
-          <button
-            className="action-btnn add-member-btn"
-            onClick={() => handleAddMember(item)}
-            title="Añadir miembro"
-            disabled={groupLoading}
-          >
-            <Icon name="user" size={16} />
-          </button>
+        <div className="group-name-cell">
+          <strong>{item.name}</strong>
+          <div className="group-concept">
+            {item.concept.substring(0, 50)}...
+          </div>
         </div>
       ),
     },
+    {
+      key: "status",
+      title: "Estado",
+      sortable: true,
+      width: "15%",
+      align: "center",
+      render: (item) => (
+        <span className={`status-badge status-${getStatusClass(item.status)}`}>
+          {getStatusText(item.status)}
+        </span>
+      ),
+    },
+    {
+      key: "debut_date",
+      title: "Fecha de Debut Propuesta",
+      sortable: true,
+      width: "20%",
+      align: "center",
+      render: (item) => formatDate(item.debut_date.toString()),
+    },
+    {
+      key: "agency",
+      title: "Agencia",
+      width: "20%",
+      align: "center",
+      render: (item) => getAgencyName(item),
+    },
   ];
 
-  // Función para renderizar acciones personalizadas
-  const renderCustomActions = (item: GroupResponseDto) => {
+  // Función para manejar la aceptación del grupo
+  const handleAcceptGroup = async (group: GroupResponseDto) => {
+    try {
+      await activateGroup(group.id);
+      showSuccess("¡Grupo Aceptado!", "El grupo ha sido marcado como creado exitosamente.");
+      
+      // Actualizar la lista de grupos
+      await fetchGroups();
+      
+      // Cambiar a la pestaña de grupos creados
+      setActiveTab(0);
+    } catch (err: any) {
+      showError("Error al Aceptar", err.message || "No se pudo aceptar el grupo.");
+    }
+  };
+
+  // Función para renderizar acciones personalizadas para grupos NO creados
+  const renderNotCreatedActions = (item: GroupResponseDto) => {
+    return (
+      <div className="not-created-actions">
+        <button
+          className="action-btn accept-btn"
+          onClick={() => handleAcceptGroup(item)}
+          title="Aceptar grupo"
+          disabled={groupLoading}
+          style={{ 
+            backgroundColor: '#4CAF50',
+            color: 'white',
+            marginRight: '8px',
+            padding: '6px 12px',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          <Icon name="check" size={16} />
+          <span style={{ marginLeft: '4px' }}>Aceptar</span>
+        </button>
+        <button
+          className="action-btn edit-btn-comp"
+          onClick={() => setEditingGroup(item)}
+          title="Editar grupo"
+          disabled={groupLoading}
+          style={{ marginRight: '8px' }}
+        >
+          <Icon name="edit" size={16} />
+        </button>
+        <button
+          className="action-btn delete-btn-comp"
+          onClick={() => setDeletingGroup(item)}
+          title="Eliminar grupo"
+          disabled={groupLoading}
+        >
+          <Icon name="trash" size={16} />
+        </button>
+      </div>
+    );
+  };
+
+  // Función para renderizar acciones personalizadas para grupos creados
+  const renderCreatedActions = (item: GroupResponseDto) => {
     return (
       <div className="group-actions">
         <button
@@ -701,7 +856,7 @@ const GroupManagement: React.FC = () => {
         </div>
         <div className="detail-item">
           <strong>Fecha de Debut:</strong>{" "}
-          <span>{formatDate(group.debut_date)}</span>
+          <span>{formatDate(group.debut_date.toString())}</span>
         </div>
         <div className="detail-item">
           <strong>Años Activos:</strong>{" "}
@@ -721,51 +876,119 @@ const GroupManagement: React.FC = () => {
     );
   };
 
+  // Filtrar grupos por estado de creación
+  const createdGroups = useMemo(() => 
+    groups.filter(group => group.is_created), 
+    [groups]
+  );
+  
+  const notCreatedGroups = useMemo(() => 
+    groups.filter(group => !group.is_created), 
+    [groups]
+  );
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setActiveTab(newValue);
+  };
+
   return (
     <section id="group_management" className="content-section active">
       {/* Mostrar información de la agencia del usuario */}
       {userAgency && (
         <div className="agency-info-banner">
           <p>
-            <strong>Agencia Actual:</strong> {userAgency.nameAgency} -{" "}
-            {userAgency.place}
-            <br />
-            <small>
-              Todos los grupos creados o editados se asociarán automáticamente a
-              esta agencia.
-            </small>
+            <h2>Gestion de Grupos en {userAgency.nameAgency}</h2>
           </p>
         </div>
       )}
 
-      <GenericTable<GroupResponseDto>
-        title="Gestión de Grupos"
-        description="Administre todos los grupos del sistema"
-        data={groups}
-        columns={columns}
-        loading={groupLoading}
-        onReload={() => {
-          fetchGroups();
-          fetchAgencies();
-          fetchApprentices();
-          fetchArtists();
-        }}
-        showCreateForm={showCreateModal}
-        onShowCreateChange={setShowCreateModal}
-        editingItem={editingGroup}
-        onEditingChange={setEditingGroup}
-        deletingItem={deletingGroup}
-        onDeletingChange={setDeletingGroup}
-        itemsPerPage={30}
-        className="group-table"
-        notification={notification || undefined}
-        onNotificationClose={() => setNotification(null)}
-        showActionsColumn={true}
-        showCreateButton={true}
-        showSearch={true}
-        showReloadButton={true}
-        renderCustomActions={renderCustomActions}
-      />
+      <Paper sx={{ width: '100%', mb: 2 }}>
+        <Tabs 
+          value={activeTab} 
+          onChange={handleTabChange} 
+          aria-label="group tabs"
+          sx={{ 
+            borderBottom: 1, 
+            borderColor: 'divider',
+            '& .MuiTab-root': {
+              fontWeight: 'bold',
+            }
+          }}
+        >
+          <Tab 
+            label={`Grupos Creados (${createdGroups.length})`} 
+            id="group-tab-0"
+          />
+          <Tab 
+            label={`Grupos No Creados (${notCreatedGroups.length})`} 
+            id="group-tab-1"
+          />
+        </Tabs>
+
+        {/* Pestaña de Grupos Creados */}
+        <TabPanel value={activeTab} index={0}>
+          <GenericTable<GroupResponseDto>
+            title="Grupos Creados"
+            description="Grupos que ya han sido formalmente creados y están activos"
+            data={createdGroups}
+            columns={[...baseColumns, membersColumn]} // Incluye columna de miembros
+            loading={groupLoading}
+            onReload={() => {
+              fetchGroups();
+              fetchAgencies();
+              fetchApprentices();
+              fetchArtists();
+            }}
+            showCreateForm={showCreateModal}
+            onShowCreateChange={setShowCreateModal}
+            editingItem={editingGroup}
+            onEditingChange={setEditingGroup}
+            deletingItem={deletingGroup}
+            onDeletingChange={setDeletingGroup}
+            itemsPerPage={30}
+            className="group-table"
+            notification={notification || undefined}
+            onNotificationClose={() => setNotification(null)}
+            showActionsColumn={true} // Mostrar columna de acciones
+            showCreateButton={true}
+            showSearch={true}
+            showReloadButton={true}
+            renderCustomActions={renderCreatedActions} // Acciones específicas para creados
+          />
+        </TabPanel>
+
+        {/* Pestaña de Grupos No Creados */}
+        <TabPanel value={activeTab} index={1}>
+          <GenericTable<GroupResponseDto>
+            title="Grupos No Creados"
+            description="Grupos en planificación o que aún no han sido formalmente creados"
+            data={notCreatedGroups}
+            columns={notCreatedColumns} // Sin columna de miembros
+            loading={groupLoading}
+            onReload={() => {
+              fetchGroups();
+              fetchAgencies();
+              fetchApprentices();
+              fetchArtists();
+            }}
+            showCreateForm={showCreateModal}
+            onShowCreateChange={setShowCreateModal}
+            editingItem={editingGroup}
+            onEditingChange={setEditingGroup}
+            deletingItem={deletingGroup}
+            onDeletingChange={setDeletingGroup}
+            itemsPerPage={30}
+            className="group-table"
+            notification={notification || undefined}
+            onNotificationClose={() => setNotification(null)}
+            showActionsColumn={true} // Mostrar columna de acciones
+            showCreateButton={true}
+            showSearch={true}
+            showReloadButton={true}
+            renderCustomActions={renderNotCreatedActions} // Acciones específicas para no creados
+          />
+        </TabPanel>
+      </Paper>
 
       {/* Modal de creación de grupo */}
       {showCreateModal && (

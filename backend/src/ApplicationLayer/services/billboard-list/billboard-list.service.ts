@@ -4,13 +4,13 @@ import { BillboardList } from '@domain/Entities/BillboardList';
 import { CreateBillBoardListDto } from '@application/DTOs/billboardDto/create.billboard.dto';
 import { ResponseBillboardListDto } from '@application/DTOs/billboardDto/response.billboard.dto';
 import { UpdateBillboardListDto } from '@application/DTOs/billboardDto/update.billboard.dto';
-import { BILLBOARD_LIST_REPOSITORY, IBillboardRepository } from '@domain/Repositories/IBillboardListRepository';
+import { IBillboardRepository } from '@domain/Repositories/IBillboardListRepository';
 import { BillboardListDtoMapper } from '@application/DTOs/dtoMappers/billboardList.dto.mapper';
 
 @Injectable()
 export class BillboardListService extends BaseService<BillboardList,CreateBillBoardListDto,ResponseBillboardListDto,UpdateBillboardListDto>{
     constructor(
-        @Inject(BILLBOARD_LIST_REPOSITORY)
+        @Inject(IBillboardRepository)
         private readonly billboardRepository: IBillboardRepository,
         private readonly billboardDtoMapper: BillboardListDtoMapper
     ) {

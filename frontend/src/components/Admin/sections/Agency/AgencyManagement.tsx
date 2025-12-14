@@ -7,11 +7,6 @@ import DeleteModal from "../../../ui/reusable/DeleteModal";
 import "./AgencyStyle.css";
 import { AgencyResponseDto } from "../../../../../../backend/src/ApplicationLayer/DTOs/agencyDto/response-agency.dto";
 
-import Alert from "@mui/material/Alert";
-import AlertTitle from "@mui/material/AlertTitle";
-import IconButton from "@mui/material/IconButton";
-import CloseIcon from "@mui/icons-material/Close";
-import Stack from "@mui/material/Stack";
 
 const AgencyManagement: React.FC = () => {
   const {
@@ -21,8 +16,6 @@ const AgencyManagement: React.FC = () => {
     updateAgency,
     deleteAgency,
     loading,
-    error,
-    clearError,
   } = useAgency();
 
   const [notification, setNotification] = useState<{
@@ -42,6 +35,7 @@ const AgencyManagement: React.FC = () => {
     const loadData = async () => {
       try {
         await fetchAgencies();
+        console.log(agencies[0]);
       } catch (err) {
         console.error("Error loading data:", err);
       }
@@ -157,7 +151,7 @@ const AgencyManagement: React.FC = () => {
     try {
       await createAgency({
         nameAgency: data.nameAgency,
-        place: data.place,
+        placeId: data.place,
         dateFundation: new Date(data.dateFundation),
       });
 
@@ -177,7 +171,7 @@ const AgencyManagement: React.FC = () => {
     try {
       await updateAgency(id as string, {
         nameAgency: data.nameAgency,
-        place: data.place,
+        placeId: data.place,
         dateFundation: new Date(data.dateFundation),
       });
 
@@ -234,6 +228,7 @@ const AgencyManagement: React.FC = () => {
       sortable: true,
       width: "25%",
       align: "center",
+      render: (item) => item.place.name,
     },
     {
       key: "dateFundation",
@@ -246,7 +241,7 @@ const AgencyManagement: React.FC = () => {
     {
       key: "antiquity",
       title: "Antigüedad",
-      sortable: false,
+      sortable: true,
       width: "15%",
       align: "center",
       render: (item) => `${calculateAntiquity(item.dateFundation)} años`,
@@ -260,7 +255,7 @@ const AgencyManagement: React.FC = () => {
         <strong>Nombre:</strong> <span>{agency.nameAgency}</span>
       </div>
       <div className="detail-item">
-        <strong>Lugar:</strong> <span>{agency.place}</span>
+        <strong>Lugar:</strong> <span>{"nada"}</span>
       </div>
       <div className="detail-item">
         <strong>Fecha de fundación:</strong>{" "}

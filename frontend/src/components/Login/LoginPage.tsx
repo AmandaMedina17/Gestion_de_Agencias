@@ -2,11 +2,12 @@
 
 import type React from "react"
 import { useState } from "react"
-import { Eye, EyeOff, User, Lock, Sparkles } from "lucide-react"
+import { Eye, EyeOff, Sparkles } from "lucide-react"
 import { useAuth } from "../../context/AuthContext" 
 import "./globals.css"
 import { useNavigate } from "react-router-dom"   
-
+import Alert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
 
 export enum UserRole {
   AGENCY_MANAGER = 'AGENCY_MANAGER',
@@ -16,39 +17,84 @@ export enum UserRole {
 
 export default function Login() {
   const navigate = useNavigate()
-
   const { login, loading } = useAuth()  
+  
   const [showPassword, setShowPassword] = useState(false)
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
-  const [errorMessage, setErrorMessage] = useState("")
-  const [error, setError] = useState(''); // Estado para errores
-    const [loadingg, setLoading] = useState(false); //  Estado para loading
   
+  // Estados para notificaciones
+  const [openAlert, setOpenAlert] = useState(false)
+  const [alertMessage, setAlertMessage] = useState("")
+  const [alertSeverity, setAlertSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('error')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setErrorMessage("")
-    setLoading(true);
-    setError('');
+    
+    // Validaciones básicas
+    if (!username.trim() || !password.trim()) {
+      showNotification("Por favor, completa todos los campos", "warning")
+      return
+    }
 
     try {
-      await login({ username, password })  
-const user = JSON.parse(localStorage.getItem('user') || '{}');
-        if (user.role === UserRole.AGENCY_MANAGER) {
-          navigate('/manager');
-        } else if (user.role === UserRole.ARTIST) {
-          navigate('/artist');
-        } else if (user.role === UserRole.ADMIN) {
-          navigate('/admin');
-        } else {
-          navigate('/dashboard');
-        }
-      } catch (err: any) {
-        setError(err.message || 'Error al iniciar sesión');
-      } finally {
-        setLoading(false);
+      await login({ username, password })
+      
+      // Obtener usuario del localStorage después del login exitoso
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      
+      // Redirigir según el rol
+      if (user.role === UserRole.AGENCY_MANAGER) {
+        navigate('/manager');
+      } else if (user.role === UserRole.ARTIST) {
+        navigate('/artist');
+      } else if (user.role === UserRole.ADMIN) {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
       }
+      
+      
+    } catch (err: any) {
+      // Manejar diferentes tipos de errores
+      let errorMsg = "Error al iniciar sesión"
+      
+      if (err.response) {
+        // Error de respuesta del servidor
+        if (err.response.status === 401) {
+          errorMsg = "Credenciales incorrectas. Verifica tu usuario y contraseña."
+        } else if (err.response.status === 404) {
+          errorMsg = "Usuario no encontrado"
+        } else if (err.response.status >= 500) {
+          errorMsg = "Error del servidor. Por favor, intenta más tarde."
+        } else {
+          errorMsg = err.response.data?.message || "Error en la autenticación"
+        }
+      } else if (err.request) {
+        // Error de red
+        errorMsg = "Error de conexión. Verifica tu conexión a internet."
+      } else {
+        // Error en la configuración de la solicitud
+        errorMsg = err.message || "Error al procesar la solicitud"
+      }
+      
+      showNotification(errorMsg, "error")
+    }
+  }
+
+  // Función para mostrar notificaciones
+  const showNotification = (message: string, severity: 'error' | 'warning' | 'info' | 'success') => {
+    setAlertMessage(message)
+    setAlertSeverity(severity)
+    setOpenAlert(true)
+  }
+
+  // Función para cerrar la notificación
+  const handleCloseAlert = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpenAlert(false)
   }
 
   return (
@@ -97,19 +143,11 @@ const user = JSON.parse(localStorage.getItem('user') || '{}');
               <p className="form-subtitle">Accede a tu panel de gestión</p>
             </div>
 
-            {/* Mostrar errores */}
-            {errorMessage && (
-              <div className="error-box">
-                {errorMessage}
-              </div>
-            )}
-
             <form onSubmit={handleSubmit} className="login-form">
 
               <div className="form-group">
                 <label className="form-label">Usuario</label>
                 <div className="input-wrapper">
-                  <User className="input-icon" />
                   <input
                     type="text"
                     placeholder="Nombre de usuario"
@@ -124,7 +162,6 @@ const user = JSON.parse(localStorage.getItem('user') || '{}');
               <div className="form-group">
                 <label className="form-label">Contraseña</label>
                 <div className="input-wrapper">
-                  <Lock className="input-icon" />
                   <input
                     type={showPassword ? "text" : "password"}
                     placeholder="Tu contraseña"
@@ -137,13 +174,18 @@ const user = JSON.parse(localStorage.getItem('user') || '{}');
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="toggle-password"
+                    aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                   >
                     {showPassword ? <EyeOff className="eye-icon" /> : <Eye className="eye-icon" />}
                   </button>
                 </div>
               </div>
 
-              <button type="submit" className="submit-button" disabled={loading}>
+              <button 
+                type="submit" 
+                className="submit-button" 
+                disabled={loading}
+              >
                 {loading ? "Ingresando..." : "Ingresar"}
               </button>
 
@@ -152,6 +194,23 @@ const user = JSON.parse(localStorage.getItem('user') || '{}');
         </div>
 
       </div>
+
+      {/* Notificación Snackbar de MUI */}
+      <Snackbar
+        open={openAlert}
+        autoHideDuration={6000}
+        onClose={handleCloseAlert}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert 
+          onClose={handleCloseAlert} 
+          severity={alertSeverity}
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {alertMessage}
+        </Alert>
+      </Snackbar>
     </div>
   )
 }

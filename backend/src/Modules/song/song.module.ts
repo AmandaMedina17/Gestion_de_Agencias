@@ -15,7 +15,9 @@ import { IAlbumRepository } from '@domain/Repositories/IAlbumRepository';
 import { AlbumRepository } from '@infrastructure/database/Repositories/AlbumRepository';
 import { AlbumEntity } from '@infrastructure/database/Entities/AlbumEntity';
 import { SongDtoMapper } from '@application/DTOs/dtoMappers/song.dto.mapper';
-
+import { SongBillboardModule } from '../song_billboard/song_billboard.module';
+import { Award } from '@domain/Entities/Award';
+import { AwardMapper } from '@infrastructure/database/Mappers/AwardMapper';
 
 @Module({
   imports: [
@@ -25,6 +27,7 @@ import { SongDtoMapper } from '@application/DTOs/dtoMappers/song.dto.mapper';
   providers: [
     AlbumMapper,
     SongMapper,
+    AwardMapper,
     {
       provide : IAlbumRepository,
       useClass : AlbumRepository

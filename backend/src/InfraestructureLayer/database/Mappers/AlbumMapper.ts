@@ -7,11 +7,11 @@ import { SongMapper } from "./SongMapper";
 @Injectable()
 export class AlbumMapper implements IMapper<Album,AlbumEntity>{
     
-
     toDomainEntity(dataBaseEntity: AlbumEntity): Album {
         console.log(dataBaseEntity)
         return new Album ( dataBaseEntity.id,dataBaseEntity.title,dataBaseEntity.releaseDate,
-            dataBaseEntity.mainProducer,dataBaseEntity.copiesSold,dataBaseEntity.songs?.length || 0
+            dataBaseEntity.mainProducer,dataBaseEntity.copiesSold,dataBaseEntity.songs?.length || 0,
+            dataBaseEntity.artistId, dataBaseEntity.groupId
         )
     }
     toDataBaseEntity(domainEntity: Album): AlbumEntity {
@@ -23,6 +23,8 @@ export class AlbumMapper implements IMapper<Album,AlbumEntity>{
         ormEnt.releaseDate = domainEntity.getReleaseDate()
         ormEnt.mainProducer =domainEntity.getMainProducer()
         ormEnt.copiesSold = domainEntity.getCopiesSold()
+        ormEnt.artistId = domainEntity.getArtistId();
+        ormEnt.groupId = domainEntity.getGroupId();
         return ormEnt
     }
     toDomainEntities(entities: AlbumEntity[]): Album[] {

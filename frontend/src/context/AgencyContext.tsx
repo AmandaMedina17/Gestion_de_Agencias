@@ -6,9 +6,10 @@ import { ArtistResponseDto } from '../../../backend/src/ApplicationLayer/DTOs/ar
 import { ApprenticeResponseDto } from '../../../backend/src/ApplicationLayer/DTOs/apprenticeDto/response-apprentice.dto';
 import { CreateArtistAgencyDto } from '../../../backend/src/ApplicationLayer/DTOs/artist_agencyDto/create-artist-agency.dto';
 import { GroupResponseDto } from '../../../backend/src/ApplicationLayer/DTOs/groupDto/response-group.dto';
+import { CreateEndMembershipDto } from '../../../backend/src/ApplicationLayer/DTOs/endArtistMembership/create-end-artist-membership.dto';
 
 interface ArtistWithGroup {
-  id:string;
+  id: string;
   artist: ArtistResponseDto;
   group: GroupResponseDto | null;
 }
@@ -21,19 +22,28 @@ interface AgencyContextType {
   apprentices: ApprenticeResponseDto[];
   loading: boolean;
   error: string | null;
+  artistsWithDebutAndContracts: any[];
+
+  collaborations: {
+    artistCollaborations: any[];
+    artistGroupCollaborations: any[];
+  };
 
   // Acciones
   createAgency: (createDto: CreateAgencyDto) => Promise<void>;
   fetchAgencies: () => Promise<void>;
   fetchAgency: (id: string) => Promise<AgencyResponseDto | null>;
   deleteAgency: (id: string) => Promise<void>;
-  updateAgency: (id: string, updateData: { place: string, nameAgency: string, dateFundation: Date }) => Promise<void>;
-  fetchAgencyArtists: (agencyId: string) => Promise<void>;
+  updateAgency: (id: string, updateData: { placeId: string, nameAgency: string, dateFundation: Date }) => Promise<void>;
+  fetchAgencyArtists: (agencyId: string) => Promise<ArtistResponseDto[]>;
   fetchAgencyApprentices: (agencyId: string) => Promise<void>;
   fetchArtistsWithGroup: (agencyId: string) => Promise<any[]>;
   addArtistToAgency: (agencyId: string, createArtistAgencyDto: CreateArtistAgencyDto) => Promise<void>;
+  endMembership: (createEndMembershipDto: CreateEndMembershipDto) => Promise<void>;
   clearError: () => void;
   fetchAllArtists: () => Promise<ArtistResponseDto[]>;
+    fetchAgencyCollaborations: (agencyId: string) => Promise<void>;
+    fetchArtistsWithDebutAndContracts: (agencyId: string) => Promise<any[]>;
 }
 
 interface AgencyProviderProps {
@@ -58,6 +68,7 @@ export const AgencyProvider: React.FC<AgencyProviderProps> = ({ children }) => {
   const [allArtists, setAllArtists] = useState<ArtistResponseDto[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [artistsWithDebutAndContracts, setArtistsWithDebutAndContracts] = useState<any[]>([]);
 
   const createAgency = async (createDto: CreateAgencyDto) => {
     setLoading(true);
@@ -73,14 +84,66 @@ export const AgencyProvider: React.FC<AgencyProviderProps> = ({ children }) => {
     }
   };
 
-  const fetchAgencies = async () => {
+  const [collaborations, setCollaborations] = useState<{
+    artistCollaborations: any[];
+    artistGroupCollaborations: any[];
+  }>({
+    artistCollaborations: [],
+    artistGroupCollaborations: []
+  });
+
+    const fetchAgencies = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+          const data = await agencyService.findAll();
+          setAgencies(data);
+        } catch (err: any) {
+          setError(err.message || 'Error al cargar agencias');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+    const fetchAgencyCollaborations = async (agencyId: string) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await agencyService.findAll();
-      setAgencies(data);
+      const collaborationsData = await agencyService.getAgencyCollaborations(agencyId);
+      
+      // Función para deduplicar colaboraciones artista-artista
+      const deduplicateCollaborations = (collaborations: any[]) => {
+        const seen = new Set<string>();
+        return collaborations.filter(collab => {
+          if (!collab.artist1?.id || !collab.artist2?.id) return true;
+          
+          // Crear clave única ordenando los IDs
+          const sortedIds = [collab.artist1.id, collab.artist2.id].sort().join('-');
+          const key = `${sortedIds}-${collab.date}`;
+          
+          if (seen.has(key)) {
+            return false;
+          }
+          seen.add(key);
+          return true;
+        });
+      };
+      
+      // Aplicar deduplicación
+      const uniqueArtistCollabs = deduplicateCollaborations(collaborationsData.artistCollaborations || []);
+      
+      setCollaborations({
+        artistCollaborations: uniqueArtistCollabs,
+        artistGroupCollaborations: collaborationsData.artistGroupCollaborations || []
+      });
+      
+      console.log("Colaboraciones deduplicadas:", {
+        original: collaborationsData.artistCollaborations?.length,
+        deduplicadas: uniqueArtistCollabs.length
+      });
     } catch (err: any) {
-      setError(err.message || 'Error al cargar agencias');
+      setError(err.message || 'Error al cargar colaboraciones de la agencia');
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -113,7 +176,7 @@ export const AgencyProvider: React.FC<AgencyProviderProps> = ({ children }) => {
     }
   };
 
-  const updateAgency = async (id: string, updateData: { place: string, nameAgency: string, dateFundation: Date }) => {
+  const updateAgency = async (id: string, updateData: { placeId: string, nameAgency: string, dateFundation: Date }) => {
     setLoading(true);
     setError(null);
     try {
@@ -127,12 +190,13 @@ export const AgencyProvider: React.FC<AgencyProviderProps> = ({ children }) => {
     }
   };
 
-  const fetchAgencyArtists = async (agencyId: string) => {
+  const fetchAgencyArtists = async (agencyId: string): Promise<ArtistResponseDto[]> => {
     setLoading(true);
     setError(null);
     try {
       const artistsData = await agencyService.getAgencyArtists(agencyId);
       setArtists(artistsData);
+      return artistsData;
     } catch (err: any) {
       setError(err.message || 'Error al cargar artistas de la agencia');
       throw err;
@@ -142,73 +206,83 @@ export const AgencyProvider: React.FC<AgencyProviderProps> = ({ children }) => {
   };
 
   const fetchArtistsWithGroup = async (agencyId: string) => {
-  setLoading(true);
-  setError(null);
-  try {
-    const response = await agencyService.getActiveArtistsWithGroup(agencyId);
-    
-    console.log('=== CONTEXTO: Respuesta del servicio ===');
-    console.log('Respuesta completa:', response);
-    console.log('Tipo:', typeof response);
-    console.log('Es array?', Array.isArray(response));
-    
-    let processedData: any[] = [];
-    
-    // Caso más común: respuesta directa del backend
-    if (Array.isArray(response)) {
-      console.log('Procesando array de respuesta');
-      console.log(response);
-      processedData = response.map((item: any, index: number) => {
-        // Si el item tiene la estructura completa
-          return {
-            id: item.artist.id || `artist-${index}`,
-            artist: item.artist,
-            group: item.group
-          };
-        
-        
-      });
-    }
-    // Caso: objeto con keys y values
-    else if (response && response.keys && response.values) {
-      console.log('Procesando estructura keys/values');
-      processedData = response.keys.map((artist: any, index: number) => ({
-        id: artist.id || `key-${index}`,
-        artist: artist,
-        group: response.values[index] || null
-      }));
-    }
-    // Caso: objeto simple
-    else if (response && typeof response === 'object') {
-      console.log('Procesando objeto simple');
-      // Intentar extraer datos de diferentes maneras
-      const data = response.data || response.artists || [response];
-      if (Array.isArray(data)) {
-        processedData = data.map((item: any, index: number) => ({
-          id: item.id || `obj-${index}`,
-          artist: item,
-          group: null
-        }));
+    try {
+      setLoading(true);
+      const response = await agencyService.getActiveArtistsWithGroup(agencyId);
+      console.log('=== CONTEXTO: Respuesta del servicio ===');
+      console.log('Respuesta completa:', response);
+      console.log('Tipo:', typeof response);
+      console.log('Es array?', Array.isArray(response));
+
+      if (Array.isArray(response)) {
+        console.log('Procesando array de respuesta');
+        console.log(response);
+
+        const processed = response
+          .filter(item => item && item.length >= 2)
+          .map((item, index) => {
+            if (Array.isArray(item) && item.length === 2) {
+              const artist = item[0];
+              const group = item[1];
+              
+              if (!artist) {
+                console.warn(`Artista undefined en posición ${index}:`, item);
+                return {
+                  id: `unknown-${index}`,
+                  artist: {},
+                  group: group || null
+                };
+              }
+              
+              return {
+                id: artist.id || `artist-${index}`,
+                artist: artist,
+                group: group || null
+              };
+            }
+            
+            if (item && typeof item === 'object') {
+              const artist = item.artist || item;
+              const group = item.group || null;
+              
+              if (!artist) {
+                return {
+                  id: `unknown-${index}`,
+                  artist: {},
+                  group: group
+                };
+              }
+              
+              return {
+                id: artist.id || `artist-${index}`,
+                artist: artist,
+                group: group
+              };
+            }
+            
+            console.warn(`Formato inesperado en posición ${index}:`, item);
+            return {
+              id: `unknown-${index}`,
+              artist: {},
+              group: null
+            };
+          });
+
+        console.log('Artistas procesados:', processed);
+        setArtistsWithGroup(processed);
+        return processed;
+      } else {
+        console.error('La respuesta no es un array:', response);
+        setArtistsWithGroup([]);
+        return [];
       }
+    } catch (err) {
+      console.error('Error en fetchArtistsWithGroup:', err);
+      throw err;
+    } finally {
+      setLoading(false);
     }
-    
-    console.log('=== DATOS PROCESADOS ===');
-    console.log('Cantidad:', processedData.length);
-    console.log('Primeros 3:', processedData.slice(0, 3));
-    
-    setArtistsWithGroup(processedData);
-    
-    // Devolver los datos procesados
-    return processedData;
-    
-  } catch (err: any) {
-    console.error('Error en fetchArtistsWithGroup:', err);
-    setError(err.message || 'Error al cargar artistas con grupos');
-    throw err;
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const fetchAgencyApprentices = async (agencyId: string) => {
     setLoading(true);
@@ -224,39 +298,55 @@ export const AgencyProvider: React.FC<AgencyProviderProps> = ({ children }) => {
     }
   };
 
-  
-const addArtistToAgency = async (agencyId: string, createArtistAgencyDto: CreateArtistAgencyDto) => {
-  setLoading(true);
-  setError(null);
-  
-  try {
-    // Preparar el DTO para enviar
-    const dtoToSend: any = {
-      artistid: createArtistAgencyDto.artistid,
-      startDate: createArtistAgencyDto.startDate,
-    };
+  const addArtistToAgency = async (agencyId: string, createArtistAgencyDto: CreateArtistAgencyDto) => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const dtoToSend: any = {
+        artistid: createArtistAgencyDto.artistid,
+        startDate: createArtistAgencyDto.startDate,
+      };
 
-    // Solo agregar endDate si es una instancia válida de Date
-    if (createArtistAgencyDto.endDate instanceof Date && !isNaN(createArtistAgencyDto.endDate.getTime())) {
-      dtoToSend.endDate = createArtistAgencyDto.endDate;
+      if (createArtistAgencyDto.endDate instanceof Date && !isNaN(createArtistAgencyDto.endDate.getTime())) {
+        dtoToSend.endDate = createArtistAgencyDto.endDate;
+      }
+
+      console.log('Enviando DTO al servicio:', dtoToSend);
+      
+      await agencyService.addArtistToAgency(agencyId, dtoToSend);
+      
+      await fetchArtistsWithGroup(agencyId);
+    } catch (err: any) {
+      console.error('Error en addArtistToAgency:', err);
+      setError(err.message || 'Error al agregar artista a la agencia');
+      throw err;
+    } finally {
+      setLoading(false);
     }
-    // Si endDate es una cadena vacía o undefined, no lo incluimos
-    // Esto asegura que el backend reciba undefined cuando no hay fecha de fin
+  };
 
-    console.log('Enviando DTO al servicio:', dtoToSend);
-    
-    await agencyService.addArtistToAgency(agencyId, dtoToSend);
-    
-    // Actualizar la lista de artistas con grupos
-    await fetchArtistsWithGroup(agencyId);
-  } catch (err: any) {
-    console.error('Error en addArtistToAgency:', err);
-    setError(err.message || 'Error al agregar artista a la agencia');
-    throw err;
-  } finally {
-    setLoading(false);
-  }
-};
+  // NUEVA FUNCIÓN: Finalizar membresía de un artista
+  const endMembership = async (createEndMembershipDto: CreateEndMembershipDto) => {
+    setLoading(true);
+    setError(null);
+    try {
+      console.log('Enviando DTO de finalización de membresía:', createEndMembershipDto);
+      await agencyService.endMembership(createEndMembershipDto);
+      
+      // Actualizar la lista de artistas después de finalizar la membresía
+      if (createEndMembershipDto.agencyId) {
+        await fetchArtistsWithGroup(createEndMembershipDto.agencyId);
+      }
+      
+    } catch (err: any) {
+      console.error('Error en endMembership:', err);
+      setError(err.message || 'Error al finalizar la membresía del artista');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchAllArtists = async (): Promise<ArtistResponseDto[]> => {
     setLoading(true);
@@ -272,6 +362,21 @@ const addArtistToAgency = async (agencyId: string, createArtistAgencyDto: Create
       setLoading(false);
     }
   };
+
+  const fetchArtistsWithDebutAndContracts = async (agencyId: string): Promise<any[]> => {
+  setLoading(true);
+  setError(null);
+  try {
+    const data = await agencyService.getArtistsWithDebutAndContracts(agencyId);
+    setArtistsWithDebutAndContracts(data);
+    return data;
+  } catch (err: any) {
+    setError(err.message || 'Error al cargar artistas con debut y contratos activos');
+    throw err;
+  } finally {
+    setLoading(false);
+  }
+};
 
   const clearError = () => setError(null);
 
@@ -292,8 +397,13 @@ const addArtistToAgency = async (agencyId: string, createArtistAgencyDto: Create
       fetchAgencyApprentices,
       fetchArtistsWithGroup,
       addArtistToAgency,
+      endMembership,
       fetchAllArtists,
       clearError,
+       collaborations,
+    fetchAgencyCollaborations,
+     artistsWithDebutAndContracts,
+    fetchArtistsWithDebutAndContracts,
     }}>
       {children}
     </AgencyContext.Provider>

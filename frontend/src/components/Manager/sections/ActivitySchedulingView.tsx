@@ -22,6 +22,12 @@ interface ActivityData {
   [key: string]: any;
 }
 
+// Definir los tipos de actividad localmente si no puedes importarlos
+enum ActivityType {
+  INDIVIDUAL = "INDIVIDUAL",
+  GRUPAL = "GRUPAL",
+}
+
 const TabPanel: React.FC<TabPanelProps> = ({ children, value, index, ...other }) => {
   return (
     <div
@@ -99,6 +105,15 @@ const ActivitySchedulingView: React.FC = () => {
     setNotification({ ...notification, open: false });
   };
 
+  // Filtrar actividades por tipo
+  const getIndividualActivities = () => {
+    return activities.filter(activity => activity.type === ActivityType.INDIVIDUAL);
+  };
+
+  const getGroupActivitiesList = () => {
+    return activities.filter(activity => activity.type === ActivityType.GRUPAL);
+  };
+
   // Función para programar actividad a artista
   const handleScheduleArtist = async () => {
     if (!selectedArtist || !selectedActivity) {
@@ -165,6 +180,7 @@ const ActivitySchedulingView: React.FC = () => {
   // Cargar actividades del artista/grupo seleccionado
   const handleArtistChange = async (artistId: string) => {
     setSelectedArtist(artistId);
+    setSelectedActivity(""); // Limpiar actividad seleccionada al cambiar artista
     if (artistId) {
       try {
         await getArtistActivities(artistId);
@@ -177,6 +193,7 @@ const ActivitySchedulingView: React.FC = () => {
 
   const handleGroupChange = async (groupId: string) => {
     setSelectedGroup(groupId);
+    setSelectedActivity(""); // Limpiar actividad seleccionada al cambiar grupo
     if (groupId) {
       try {
         await getGroupActivities(groupId);
@@ -188,24 +205,10 @@ const ActivitySchedulingView: React.FC = () => {
   };
 
   // Formatear fechas para la tabla
-  const formatDate = (dateString: string | Date) => {
-    try {
-      const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
-      return date.toLocaleDateString("es-ES", {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-       
-      });
-    } catch {
-      return "Fecha no disponible";
-    }
-  };
-
-  // Obtener informacin de la actividad
-  const getActivityInfo = (activityId: string) => {
-    const activity = activities.find(a => a.id === activityId);
-    return activity || null;
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    date.setDate(date.getDate() + 1);
+    return date.toLocaleDateString("es-ES");
   };
 
   const prepareArtistActivities = () => {
@@ -222,8 +225,7 @@ const ActivitySchedulingView: React.FC = () => {
       ...item,
       activityType: item.type || 'N/A',
       classification: item.classification || 'N/A',
-            formattedDate: formatDate(item.dates.toString())
-
+      formattedDate: formatDate(item.dates.toString())
     }));
   };
 
@@ -243,11 +245,10 @@ const ActivitySchedulingView: React.FC = () => {
       headerName: 'Fecha Programada', 
       width: 300
     },
-    
   ];
 
   const groupActivityColumns: GridColDef[] = [
-     { 
+    { 
       field: 'activityType', 
       headerName: 'Tipo', 
       width: 300
@@ -297,7 +298,7 @@ const ActivitySchedulingView: React.FC = () => {
           <Tab label="Programar a Grupo" />
         </Tabs>
 
-        {/* Tab de Artistas */}
+        {/* Tab de Artistas - Solo actividades individuales */}
         <TabPanel value={activeTab} index={0}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             {/* Selectores para artista */}
@@ -330,7 +331,7 @@ const ActivitySchedulingView: React.FC = () => {
 
               <Box sx={{ minWidth: 300, flex: 1 }}>
                 <Typography variant="subtitle2" gutterBottom>
-                  Seleccionar Actividad
+                  Seleccionar Actividad Individual
                 </Typography>
                 <select
                   value={selectedActivity}
@@ -343,15 +344,20 @@ const ActivitySchedulingView: React.FC = () => {
                     backgroundColor: 'white',
                     fontSize: '14px'
                   }}
-                  disabled={loading}
+                  disabled={loading || !selectedArtist}
                 >
-                  <option value="">Selecciona una actividad</option>
-                  {activities.map((activity) => (
+                  <option value="">Selecciona una actividad individual</option>
+                  {getIndividualActivities().map((activity) => (
                     <option key={activity.id} value={activity.id}>
                       {activity.classification || 'Sin nombre'} ({activity.type})
                     </option>
                   ))}
                 </select>
+                {getIndividualActivities().length === 0 && (
+                  <Typography variant="caption" color="textSecondary" sx={{ mt: 1, display: 'block' }}>
+                    No hay actividades individuales disponibles
+                  </Typography>
+                )}
               </Box>
 
               <Button
@@ -403,7 +409,7 @@ const ActivitySchedulingView: React.FC = () => {
           </Box>
         </TabPanel>
 
-        {/* Tab de Grupos */}
+        {/* Tab de Grupos - Solo actividades grupales */}
         <TabPanel value={activeTab} index={1}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
             {/* Selectores para grupo */}
@@ -436,7 +442,7 @@ const ActivitySchedulingView: React.FC = () => {
 
               <Box sx={{ minWidth: 300, flex: 1 }}>
                 <Typography variant="subtitle2" gutterBottom>
-                  Seleccionar Actividad
+                  Seleccionar Actividad Grupal
                 </Typography>
                 <select
                   value={selectedActivity}
@@ -449,15 +455,20 @@ const ActivitySchedulingView: React.FC = () => {
                     backgroundColor: 'white',
                     fontSize: '14px'
                   }}
-                  disabled={loading}
+                  disabled={loading || !selectedGroup}
                 >
-                  <option value="">Selecciona una actividad</option>
-                  {activities.map((activity) => (
+                  <option value="">Selecciona una actividad grupal</option>
+                  {getGroupActivitiesList().map((activity) => (
                     <option key={activity.id} value={activity.id}>
                       {activity.classification} ({activity.type})
                     </option>
                   ))}
                 </select>
+                {getGroupActivitiesList().length === 0 && (
+                  <Typography variant="caption" color="textSecondary" sx={{ mt: 1, display: 'block' }}>
+                    No hay actividades grupales disponibles
+                  </Typography>
+                )}
               </Box>
 
               <Button
@@ -509,8 +520,6 @@ const ActivitySchedulingView: React.FC = () => {
           </Box>
         </TabPanel>
       </Paper>
-
-      
     </Box>
   );
 };
