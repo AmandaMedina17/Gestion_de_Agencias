@@ -1,3 +1,4 @@
+import { ArtistIncomeDto } from "@application/DTOs/schedule-artistDto/artist_income.dto";
 import { ScheduleArtistDto } from "@application/DTOs/schedule-artistDto/schedule-artist.dto";
 import { ArtistActivityService } from "@application/services/artist-activity.service";
 import { Body, Controller, Get, Param, Post, ValidationPipe } from "@nestjs/common";
@@ -17,5 +18,10 @@ export class ArtistActivityController {
   async getArtistActivities(
     @Param('artistId') artistId: string) {
     return this.artistActivityService.getArtistSchedule(artistId);
+  }
+
+  @Post('/incomes')
+  async getArtistIncomes(@Body(ValidationPipe) artistIncomeDto: ArtistIncomeDto) {
+    return this.artistActivityService.calculateArtistIncomes(artistIncomeDto);
   }
 }

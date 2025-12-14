@@ -43,16 +43,54 @@ const ContractManagement: React.FC = () => {
   const [deletingContract, setDeletingContract] =
     useState<ContractResponseDto | null>(null);
 
+  // Add loading states for agencies and artists
+  const [loadingAgencies, setLoadingAgencies] = useState(false);
+  const [loadingArtists, setLoadingArtists] = useState(false);
+
+  useEffect(() => {
+    console.log('=== STRUCTURE DEBUG ===');
+    console.log('Primer artista:', artists[0]);
+    console.log('Primera agencia:', agencies[0]);
+    console.log('Primer contrato:', contracts[0]);
+  }, [artists, agencies, contracts]);
+
   useEffect(() => {
     const loadData = async () => {
       try {
+        setLoadingAgencies(true);
+        setLoadingArtists(true);
         await Promise.all([fetchContracts(), fetchAgencies(), fetchArtists()]);
       } catch (err) {
         console.error("Error loading data:", err);
+        showNotification('error', 'Error', 'Error al cargar los datos');
+      } finally {
+        setLoadingAgencies(false);
+        setLoadingArtists(false);
       }
     };
     loadData();
   }, []);
+
+  // Get unique artists and agencies to avoid duplicate keys
+  const getUniqueArtists = () => {
+    const uniqueMap = new Map();
+    artists.forEach(artist => {
+      if (!uniqueMap.has(artist.stageName)) {
+        uniqueMap.set(artist.stageName, artist);
+      }
+    });
+    return Array.from(uniqueMap.values());
+  };
+
+  const getUniqueAgencies = () => {
+    const uniqueMap = new Map();
+    agencies.forEach(agency => {
+      if (!uniqueMap.has(agency.nameAgency)) {
+        uniqueMap.set(agency.nameAgency, agency);
+      }
+    });
+    return Array.from(uniqueMap.values());
+  };
 
   const getArtistName = (contract: ContractResponseDto) => {
     if (contract.artist && typeof contract.artist === "object") {
@@ -74,14 +112,14 @@ const ContractManagement: React.FC = () => {
     return agency ? agency.nameAgency : "No asignada";
   };
 
-  // Definir campos del formulario de contrato - VERSIÓN ACTUALIZADA
+  // Definir campos del formulario de contrato - FIXED DUPLICATE KEYS
   const contractFields: FormField[] = [
     {
       name: "artistId",
       label: "Artista",
       type: "autocomplete",
       required: true,
-      options: artists.map((artist) => ({
+      options: getUniqueArtists().map((artist) => ({
         value: artist.id,
         label: artist.stageName,
       })),
@@ -91,9 +129,9 @@ const ContractManagement: React.FC = () => {
       label: "Agencia",
       type: "autocomplete",
       required: true,
-      options: agencies.map((agency) => ({
+      options: getUniqueAgencies().map((agency) => ({
         value: agency.id,
-        label: `${agency.nameAgency} - ${agency.place}`,
+        label: `${agency.nameAgency}`,
       })),
     },
     {
@@ -126,7 +164,6 @@ const ContractManagement: React.FC = () => {
       type: "date",
       required: false,
       validate: (value, formData) => {
-        // Solo validar si es contrato a plazo fijo
         if (formData?.contractType === "fixed") {
           if (!value)
             return "La fecha de fin es requerida para contratos a plazo fijo";
@@ -271,9 +308,9 @@ const ContractManagement: React.FC = () => {
     artistId: "",
     agencyId: "",
     startDate: "",
-    contractType: "indefinite", // Por defecto tiempo indefinido
+    contractType: "indefinite",
     endDate: "",
-    distributionPercentage: "",
+    distributionPercentage: "20",
     status: ContractStatus.ACTIVO,
     conditions: "",
   };
@@ -285,6 +322,8 @@ const ContractManagement: React.FC = () => {
     message: string
   ) => {
     setNotification({ type, title, message });
+    // Auto-clear notification after 5 seconds
+    setTimeout(() => setNotification(null), 5000);
   };
 
   const showSuccess = (title: string, message: string) => {
@@ -337,13 +376,42 @@ const ContractManagement: React.FC = () => {
     );
   };
 
-  // Manejar creación
+  // Validate if agency and artist exist before creating contract
+  const validateContractData = async (data: any) => {
+    const errors: string[] = [];
+
+    // Check if agency exists in the loaded list
+    const agencyExists = agencies.some(a => a.id === data.agencyId);
+    if (!agencyExists) {
+      errors.push(`La agencia con ID ${data.agencyId} no se encontró en la lista cargada`);
+    }
+
+    // Check if artist exists in the loaded list
+    const artistExists = artists.some(a => a.id === data.artistId);
+    if (!artistExists) {
+      errors.push(`El artista con ID ${data.artistId} no se encontró en la lista cargada`);
+    }
+
+    if (errors.length > 0) {
+      throw new Error(errors.join('. '));
+    }
+  };
+
+  // Manejar creación - IMPROVED WITH BETTER VALIDATION
   const handleCreate = async (data: Record<string, any>) => {
     try {
+      console.log('=== DEBUG: Datos del formulario ===');
+      console.log('Form data completo:', data);
+      console.log('ArtistId seleccionado:', data.artistId);
+      console.log('AgencyId seleccionado:', data.agencyId);
+      
+      // First, validate the data
+      await validateContractData(data);
+
       const isIndefinite = data.contractType === "indefinite";
 
       const contractData: any = {
-        startDate: new Date(data.startDate),
+        startDate: new Date(data.startDate).toISOString(),
         agencyId: data.agencyId,
         artistId: data.artistId,
         distributionPercentage: parseFloat(data.distributionPercentage),
@@ -351,10 +419,13 @@ const ContractManagement: React.FC = () => {
         conditions: data.conditions.trim(),
       };
 
-      // Solo agregar endDate si es contrato a plazo fijo
+      // Only add endDate for fixed-term contracts
       if (!isIndefinite && data.endDate) {
-        contractData.endDate = new Date(data.endDate);
+        contractData.endDate = new Date(data.endDate).toISOString();
       }
+
+      console.log('=== DEBUG: Datos a enviar al backend ===');
+      console.log('Contrato a crear:', contractData);
 
       await createContract(contractData);
 
@@ -362,7 +433,21 @@ const ContractManagement: React.FC = () => {
       setShowCreateModal(false);
       await fetchContracts();
     } catch (err: any) {
-      showCreateError(err.message);
+      console.error('Error completo al crear contrato:', err);
+      
+      // Extract meaningful error message
+      let errorMessage = 'Error interno del servidor al crear el contrato';
+      
+      if (err.message.includes('no se encontró')) {
+        errorMessage = err.message;
+      } else if (err.message.includes('Internal server error')) {
+        errorMessage = 'Error en el servidor. Verifique que la agencia y el artista existan en la base de datos.';
+      } else if (err.response) {
+        // Try to get error from response
+        errorMessage = err.response.data?.message || err.message;
+      }
+      
+      showCreateError(errorMessage);
     }
   };
 
@@ -385,7 +470,7 @@ const ContractManagement: React.FC = () => {
 
       // Manejar endDate según el tipo de contrato
       if (isIndefinite) {
-        updateData.endDate = null; // O undefined, dependiendo de tu backend
+        updateData.endDate = null;
       } else if (data.endDate) {
         updateData.endDate = new Date(data.endDate);
       }
@@ -431,48 +516,23 @@ const ContractManagement: React.FC = () => {
     return statusMap[status] || status;
   };
 
-  const getDaysRemaining = (endDate: Date | string | null) => {
-    if (!endDate) return null; // Contrato indefinido
-    const end = typeof endDate === "string" ? new Date(endDate) : endDate;
-    const today = new Date();
-    const diffTime = end.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
-  };
-
-  // Definir columnas para la tabla
+  // Definir columnas para la tabla - FIXED DUPLICATE KEYS
   const columns: Column<ContractResponseDto>[] = [
     {
-      key: "artist.stageName",
+      key: "artist",
       title: "Artista",
       sortable: true,
       width: "15%",
       align: "center",
-      render: (item) => {
-        if (item.artist && typeof item.artist === "object") {
-          return item.artist.stageName;
-        }
-        const artist = artists.find(
-          (a) => a.apprenticeId === item.artist.apprenticeId
-        );
-        return artist ? artist.stageName : "No asignado";
-      },
+      render: (item) => getArtistName(item),
     },
     {
-      key: "agency.nameAgency",
+      key: "agency",
       title: "Agencia",
       sortable: true,
       width: "15%",
       align: "center",
-      render: (item) => {
-        if (item.agency && typeof item.agency === "object") {
-          return item.agency.nameAgency;
-        }
-        const agency = agencies.find(
-          (a) => a.nameAgency === item.agency.nameAgency
-        );
-        return agency ? agency.nameAgency : "No asignada";
-      },
+      render: (item) => getAgencyName(item),
     },
     {
       key: "startDate",
@@ -490,7 +550,6 @@ const ContractManagement: React.FC = () => {
       align: "center",
       render: (item) => (item.endDate ? formatDate(item.endDate) : "-"),
     },
-
     {
       key: "distributionPercentage",
       title: "Distribución",
@@ -515,17 +574,8 @@ const ContractManagement: React.FC = () => {
 
   // Función para renderizar detalles en modal de eliminación
   const renderContractDetails = (contract: ContractResponseDto) => {
-    const artistName =
-      contract.artist && typeof contract.artist === "object"
-        ? contract.artist.stageName
-        : artists.find((a) => a.apprenticeId === contract.artist.apprenticeId)
-            ?.stageName || "No asignado";
-
-    const agencyName =
-      contract.agency && typeof contract.agency === "object"
-        ? contract.agency.nameAgency
-        : agencies.find((a) => a.nameAgency === contract.agency.nameAgency)
-            ?.nameAgency || "No asignada";
+    const artistName = getArtistName(contract);
+    const agencyName = getAgencyName(contract);
 
     return (
       <div className="contract-details">
@@ -567,9 +617,20 @@ const ContractManagement: React.FC = () => {
   const getEditInitialData = (contract: ContractResponseDto) => {
     const isIndefinite = !contract.endDate;
 
+    // Extract IDs safely
+    const artistId = contract.artist?.id || 
+                    (typeof contract.artist === 'object' && 'apprenticeId' in contract.artist 
+                      ? contract.artist.apprenticeId 
+                      : '');
+    
+    const agencyId = contract.agency?.id || 
+                    (typeof contract.agency === 'object' && 'nameAgency' in contract.agency 
+                      ? contract.agency.nameAgency 
+                      : '');
+
     return {
-      artistId: contract.artist.apprenticeId,
-      agencyId: contract.agency.nameAgency || contract.agency,
+      artistId,
+      agencyId,
       startDate: contract.startDate
         ? new Date(contract.startDate).toISOString().split("T")[0]
         : "",
@@ -590,7 +651,7 @@ const ContractManagement: React.FC = () => {
         description="Administre todos los contratos del sistema"
         data={contracts}
         columns={columns}
-        loading={loading}
+        loading={loading || loadingAgencies || loadingArtists}
         onReload={() => {
           fetchContracts();
           fetchAgencies();

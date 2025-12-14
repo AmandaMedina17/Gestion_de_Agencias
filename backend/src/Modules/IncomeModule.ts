@@ -25,7 +25,7 @@ import { CreateIncomeUseCase } from '@application/UseCases/create_income.use-cas
       useClass: IncomeRepositoryImpl
     }
   ],
-  exports: [IncomeRepository]
+  exports: [IncomeRepository, IncomeDtoMapper, IncomeMapper]
 })
 export class IncomeModule {}
 

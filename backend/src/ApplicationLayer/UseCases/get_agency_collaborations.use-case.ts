@@ -59,9 +59,9 @@ export class GetAgencyCollaborationsUseCase {
           artistGroupCollaborations.push(dto);
         }
     }
-    // Ordenar por fecha (más reciente primero)
-    artistCollaborations.sort((a, b) => b.date.getTime() - a.date.getTime());
-    artistGroupCollaborations.sort((a, b) => b.date.getTime() - a.date.getTime());
+    // // Ordenar por fecha (más reciente primero)
+    // artistCollaborations.sort((a, b) => b.date.getTime() - a.date.getTime());
+    // artistGroupCollaborations.sort((a, b) => b.date.getTime() - a.date.getTime());
 
     // Crear respuesta
     const response = new AgencyCollaborationsResponseDto();

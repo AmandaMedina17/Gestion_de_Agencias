@@ -97,7 +97,9 @@ export interface TableProps<T> {
   renderCustomActions?: (item: T) => React.ReactNode;
 }
 
-const GenericTable = <T extends { id: string | number }>({
+const GenericTable = <T extends {
+  [x: string]: any; id: string | number 
+}>({
   data,
   columns,
   title,
@@ -185,6 +187,8 @@ const GenericTable = <T extends { id: string | number }>({
   const currentPage = isControlled ? externalCurrentPage : internalCurrentPage;
   const sortBy = externalSortBy !== undefined ? externalSortBy : internalSortBy;
 
+  
+
   // Actualizar página
   const handlePageChange = (page: number) => {
     if (isControlled) {
@@ -194,25 +198,7 @@ const GenericTable = <T extends { id: string | number }>({
     }
   };
 
-  // Manejar ordenamiento
-  const handleSort = (columnKey: string) => {
-    const column = columns.find((col) => col.key === columnKey);
-    if (!column?.sortable) return;
-
-    let newSortOrder: "asc" | "desc" = "asc";
-
-    if (sortBy === columnKey) {
-      newSortOrder = internalSortOrder === "asc" ? "desc" : "asc";
-    }
-
-    if (onSortChange) {
-      onSortChange(columnKey, newSortOrder);
-    } else {
-      setInternalSortBy(columnKey);
-      setInternalSortOrder(newSortOrder);
-    }
-  };
-
+  
   // Manejar apertura de modal de creación
   const handleOpenCreateForm = () => {
     if (onShowCreateChange) {
@@ -287,42 +273,81 @@ const GenericTable = <T extends { id: string | number }>({
 
   // Ordenar datos
   const sortedData = useMemo(() => {
-    if (!sortBy) return filteredData;
+  if (!sortBy) return filteredData;
 
-    const column = columns.find((col) => col.key === sortBy);
-    if (!column) return filteredData;
+  const column = columns.find((col) => col.key === sortBy);
+  if (!column) return filteredData;
 
-    return [...filteredData].sort((a, b) => {
-      const aValue = a[column.key as keyof T];
-      const bValue = b[column.key as keyof T];
+  return [...filteredData].sort((a, b) => {
+    // Función auxiliar para obtener valores anidados
+    const getNestedValue = (obj: any, path: string) => {
+      return path.split('.').reduce((acc, part) => {
+        if (acc === null || acc === undefined) return null;
+        // Si el objeto tiene un getter (como getPlaceName), úsalo
+        if (typeof acc === 'function') return null;
+        return acc[part];
+      }, obj);
+    };
 
-      if (aValue == null && bValue == null) return 0;
-      if (aValue == null) return 1;
-      if (bValue == null) return -1;
+    let aValue: any;
+    let bValue: any;
 
-      // Comparación según el tipo
-      if (typeof aValue === "string" && typeof bValue === "string") {
-        return internalSortOrder === "asc"
-          ? aValue.localeCompare(bValue)
-          : bValue.localeCompare(aValue);
+    // Si la columna tiene una función render, necesitamos obtener el valor de otra manera
+    if (column.render) {
+      // Para columnas con render, usamos el valor renderizado para ordenar
+      // Esto requiere que tengamos una forma de obtener el valor "real"
+      if (sortBy === "place") {
+        // Caso específico para lugar: obtener el nombre
+        aValue = a.place?.name || "";
+        bValue = b.place?.name || "";
+      } else if (sortBy === "antiquity") {
+        // Caso para antigüedad: usar dateFundation directamente
+        aValue = a.dateFundation;
+        bValue = b.dateFundation;
+      } else {
+        // Para otras columnas con render, intentamos obtener el valor directamente
+        aValue = a[column.key as keyof T];
+        bValue = b[column.key as keyof T];
       }
-
-      if (typeof aValue === "number" && typeof bValue === "number") {
-        return internalSortOrder === "asc" ? aValue - bValue : bValue - aValue;
+    } else {
+      // Para columnas sin render, obtenemos el valor normalmente
+      // Si el key contiene un punto, es un valor anidado
+      if (String(column.key).includes('.')) {
+        aValue = getNestedValue(a, String(column.key));
+        bValue = getNestedValue(b, String(column.key));
+      } else {
+        aValue = a[column.key as keyof T];
+        bValue = b[column.key as keyof T];
       }
+    }
 
-      if (aValue instanceof Date && bValue instanceof Date) {
-        return internalSortOrder === "asc"
-          ? aValue.getTime() - bValue.getTime()
-          : bValue.getTime() - aValue.getTime();
-      }
+    if (aValue == null && bValue == null) return 0;
+    if (aValue == null) return 1;
+    if (bValue == null) return -1;
 
-      // Comparación por defecto
+    // Comparación según el tipo
+    if (typeof aValue === "string" && typeof bValue === "string") {
       return internalSortOrder === "asc"
-        ? String(aValue).localeCompare(String(bValue))
-        : String(bValue).localeCompare(String(aValue));
-    });
-  }, [filteredData, sortBy, internalSortOrder, columns]);
+        ? aValue.localeCompare(bValue)
+        : bValue.localeCompare(aValue);
+    }
+
+    if (typeof aValue === "number" && typeof bValue === "number") {
+      return internalSortOrder === "asc" ? aValue - bValue : bValue - aValue;
+    }
+
+    if (aValue instanceof Date && bValue instanceof Date) {
+      return internalSortOrder === "asc"
+        ? aValue.getTime() - bValue.getTime()
+        : bValue.getTime() - aValue.getTime();
+    }
+
+    // Comparación por defecto
+    return internalSortOrder === "asc"
+      ? String(aValue).localeCompare(String(bValue))
+      : String(bValue).localeCompare(String(aValue));
+  });
+}, [filteredData, sortBy, internalSortOrder, columns]);
 
   // Paginación
   const totalPages = Math.ceil(sortedData.length / itemsPerPage);
@@ -446,45 +471,63 @@ const GenericTable = <T extends { id: string | number }>({
 
   // Renderizar encabezado de columna
   const renderHeaderCell = (column: Column<T>) => {
-    const isSortable = column.sortable;
-    const isSorted = sortBy === column.key;
+  const isSortable = column.sortable;
+  const isSorted = sortBy === column.key;
 
-    return (
-      <th
-        key={String(column.key)}
-        className={`table-header-cell ${isSortable ? "sortable" : ""} ${
-          isSorted ? "active" : ""
-        }`}
-        style={{
-          width: column.width,
-          textAlign: column.align || "center",
-        }}
-        onClick={() => isSortable && handleSort(String(column.key))}
-      >
-        <div className="header-cell-content" style={{
+  return (
+    <th
+      key={String(column.key)}
+      className={`table-header-cell ${isSortable ? "sortable" : ""} ${
+        isSorted ? "active" : ""
+      }`}
+      style={{
+        width: column.width,
+        textAlign: column.align || "center",
+      }}
+      onClick={() => isSortable && handleSort(String(column.key))}
+    >
+      <div className="header-cell-content" style={{
         display: 'flex',
         justifyContent: column.align || 'center',
         alignItems: 'center',
         textAlign: column.align || 'center'
       }}>
-          {column.title}
-          {isSortable && (
-            <span className="sort-indicator">
-              {isSorted ? (
-                internalSortOrder === "asc" ? (
-                  <Icon name="up" size={14} />
-                ) : (
-                  <Icon name="down" size={14} />
-                )
-              ) : (
+        {column.title}
+        {isSortable && (
+          <span className="sort-indicator">
+            {isSorted ? (
+              internalSortOrder === "asc" ? (
                 <Icon name="up" size={14} />
-              )}
-            </span>
-          )}
-        </div>
-      </th>
-    );
-  };
+              ) : (
+                <Icon name="down" size={14} />
+              )
+            ) : (
+              <Icon name="up" size={14} />
+            )}
+          </span>
+        )}
+      </div>
+    </th>
+  );
+};
+
+const handleSort = (columnKey: string) => {
+  const column = columns.find((col) => col.key === columnKey);
+  if (!column?.sortable) return;
+
+  let newSortOrder: "asc" | "desc" = "asc";
+
+  if (sortBy === columnKey) {
+    newSortOrder = internalSortOrder === "asc" ? "desc" : "asc";
+  }
+
+  if (onSortChange) {
+    onSortChange(columnKey, newSortOrder);
+  } else {
+    setInternalSortBy(columnKey);
+    setInternalSortOrder(newSortOrder);
+  }
+};
 
   // Estado vacío por defecto
   const defaultEmptyState = (

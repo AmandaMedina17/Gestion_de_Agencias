@@ -4,6 +4,8 @@ import { ScheduleArtistDto } from '@application/DTOs/schedule-artistDto/schedule
 import { IArtistActivityRepository } from '@domain/Repositories/IArtistActivityRepository';
 import { ActivityResponseDto } from '@application/DTOs/activityDto/response-activity.dto';
 import { ActivityDtoMapper } from '@application/DTOs/dtoMappers/activity.dtoMapper';
+import { Income } from '@domain/Entities/Income';
+import { ArtistIncomeDto } from '@application/DTOs/schedule-artistDto/artist_income.dto';
 
 @Injectable()
 export class ArtistActivityService {
@@ -23,7 +25,10 @@ export class ArtistActivityService {
     return this.activityDtoMapper.toResponseList(activities)
   }
 
-  async confirmAttendance(dto: ScheduleArtistDto): Promise<void> {
-    // Implementar
+  async calculateArtistIncomes(artistIncomeDto: ArtistIncomeDto)
+  : Promise<{ incomes: Income[]; totalIncome: number }> 
+  {
+    return this.artistActivityRepository.calculateArtistIncomes(artistIncomeDto.artistId, artistIncomeDto.start_date, artistIncomeDto.end_date)
   }
+
 }
