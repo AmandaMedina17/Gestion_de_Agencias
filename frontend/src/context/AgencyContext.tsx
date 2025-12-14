@@ -33,7 +33,7 @@ interface AgencyContextType {
   fetchAgencies: () => Promise<void>;
   fetchAgency: (id: string) => Promise<AgencyResponseDto | null>;
   deleteAgency: (id: string) => Promise<void>;
-  updateAgency: (id: string, updateData: { place: string, nameAgency: string, dateFundation: Date }) => Promise<void>;
+  updateAgency: (id: string, updateData: { placeId: string, nameAgency: string, dateFundation: Date }) => Promise<void>;
   fetchAgencyArtists: (agencyId: string) => Promise<ArtistResponseDto[]>;
   fetchAgencyApprentices: (agencyId: string) => Promise<void>;
   fetchArtistsWithGroup: (agencyId: string) => Promise<any[]>;
@@ -143,7 +143,7 @@ export const AgencyProvider: React.FC<AgencyProviderProps> = ({ children }) => {
     }
   };
 
-  const updateAgency = async (id: string, updateData: { place: string, nameAgency: string, dateFundation: Date }) => {
+  const updateAgency = async (id: string, updateData: { placeId: string, nameAgency: string, dateFundation: Date }) => {
     setLoading(true);
     setError(null);
     try {
