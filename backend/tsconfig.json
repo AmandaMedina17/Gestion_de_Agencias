@@ -25,6 +25,6 @@
       "@entities/*": ["src/InfraestructureLayer/database/Entities/*"],
     }
   },
-  //"include": ["src/**/*", "src/seed.ts"],
+  "include": ["src/**/*", "src/seed.ts"],
   "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }
