@@ -50,15 +50,6 @@ export class AlbumController {
             return this.albumService.remove(id);
           }
 
-          @Get('hits/:id')
-          getHits(@Param('id') id: string) {
-            return this.albumService.getAlbumHits(id);
-          }
-          @Get('songs/:id')
-          getSongs(@Param('id') id: string) {
-            return this.albumService.getAllSongs(id);
-          }
-
           @Put('assign-to-artist')
           async assignToArtist(@Body() dto: AssignAlbumToArtistDto) {
             return await this.albumService.assignToArtist(dto);

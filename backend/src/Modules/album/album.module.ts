@@ -35,7 +35,7 @@ import { AssignAlbumToGroupUseCase } from '@application/UseCases/assign-album-to
   imports: [
     TypeOrmModule.forFeature([AlbumEntity]),
     SongBillboardModule,
-    forwardRef(() => AwardModule) 
+    forwardRef(() => AwardModule),
     ArtistModule,
     GroupModule
   ],
