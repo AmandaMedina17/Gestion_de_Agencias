@@ -30,6 +30,8 @@ export interface TableProps<T> {
   defaultSortBy?: string;
   defaultSortOrder?: "asc" | "desc";
 
+  customCreateButton?: React.ReactNode;
+
   // Estados controlados opcionales
   currentPage?: number;
   onPageChange?: (page: number) => void;
@@ -114,6 +116,7 @@ const GenericTable = <T extends { id: string | number }>({
   createForm,
   editForm,
   deleteModal,
+  customCreateButton,
   showCreateForm: externalShowCreateForm,
   onShowCreateChange,
   editingItem: externalEditingItem,
@@ -539,16 +542,19 @@ const GenericTable = <T extends { id: string | number }>({
             </div>
             <div className="header-left">
               {showCreateButton && (onAdd || onShowCreateChange || createForm) && (
-                <button
-                  className="create-button"
-                  onClick={handleOpenCreateForm}
-                  disabled={loading}
-                >
-                  <span className="button-icon">
-                    <Icon name="plus" size={20} />
-                  </span>
-                </button>
-              )}
+                customCreateButton ? (
+                  customCreateButton
+                ) : (
+                  <button
+                    className="create-button"
+                    onClick={handleOpenCreateForm}
+                    disabled={loading}
+                  >
+                    <span className="button-icon">
+                      <Icon name="plus" size={20} />
+                    </span>
+                  </button>
+                ))}
             </div>
 
             <div className="header-right">

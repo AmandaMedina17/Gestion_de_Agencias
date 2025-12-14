@@ -11,19 +11,32 @@ import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AlbumController } from '@presentation/Controllers/album/album.controller';
 import { SongModule } from '../song/song.module';
+import { SongBillboardRepository } from '@infrastructure/database/Repositories/SonBillboardrepository';
+import { SongBillboardEntity } from '@infrastructure/database/Entities/SongBillboardEntity';
+import { SongBillBoardMapper } from '@infrastructure/database/Mappers/SongBillboardMapper';
+import { SongBillboardDtoMapper } from '@application/DTOs/dtoMappers/song.billboard.dtoMapper';
+import { ISongBillboardRepository } from '@domain/Repositories/ISonBillboardRepository';
+import { SongBillboardModule } from '../song_billboard/song_billboard.module';
+import { SongEntity } from '@infrastructure/database/Entities/SongEntity';
+import { SongDtoMapper } from '@application/DTOs/dtoMappers/song.dto.mapper';
+import { BillboardListMapper } from '@infrastructure/database/Mappers/BillboardListMapper';
+import { BillboardListDtoMapper } from '@application/DTOs/dtoMappers/billboardList.dto.mapper';
+import { Song } from '@domain/Entities/Song';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([AlbumEntity]),
+    SongBillboardModule
   ],
   controllers: [AlbumController],
   providers: [ 
     SongMapper,
     AlbumMapper,
+    SongDtoMapper,
     {
       provide: IAlbumRepository,    
       useClass: AlbumRepository 
-    },    
+    },
     AlbumDtoMapper,
     AlbumService
   ],

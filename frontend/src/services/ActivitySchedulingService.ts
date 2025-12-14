@@ -93,17 +93,41 @@ export class ActivitySchedulingService extends BaseService<any, any> {
   }
 
   // Método para obtener actividades de un grupo
-  async getGroupActivities(groupId: string): Promise<any[]> {
-    const res = await fetch(`http://localhost:3000/group-scheduling/${groupId}/activities`, {
+  async getGroupActivities(groupId: string, startDate?: Date, endDate?: Date): Promise<any[]> {
+    // Si no se proporcionan fechas, usar fechas por defecto
+    const defaultStartDate = startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000); // 30 días atrás
+    const defaultEndDate = endDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 días adelante
+
+    const requestBody = {
+      groupId,
+      start_date: defaultStartDate.toISOString(),
+      end_date: defaultEndDate.toISOString()
+    };
+
+    const res = await fetch(`http://localhost:3000/group-scheduling/activities`, {
+      method: "POST",
       headers: { 
+        "Content-Type": "application/json",
         "Authorization": `Bearer ${localStorage.getItem('token') || ''}`
       },
+      body: JSON.stringify(requestBody),
     });
 
     console.log("Fetching group activities for:", groupId);
     
     return this.handleResponse(res);
   }
+
+  // Nuevo método: Obtener TODAS las actividades de un grupo sin filtro de fecha
+  async getAllGroupActivities(groupId: string): Promise<any[]> {
+    // Usar un rango de fechas muy amplio para obtener todo
+    const startDate = new Date('2000-01-01'); // Fecha muy atrás
+    const endDate = new Date('2100-12-31'); // Fecha muy adelante
+
+    return this.getGroupActivities(groupId, startDate, endDate);
+  }
+
+  
 }
 
 export const activitySchedulingService = new ActivitySchedulingService();

@@ -95,14 +95,8 @@ export const ApprenticeEvaluationProvider: React.FC<{ children: ReactNode }> = (
   const updateEvaluation = async (apprenticeId: string, dateId: Date, updateData: UpdateEvaluationDto) => {
     setLoading(true);
     setError(null);
-    console.log("context");
-    console.log(apprenticeId);
-    console.log(dateId);
-    console.log(updateData.evaluation);
 
-    
     try {
-      
       await apprenticeEvaluationService.update(apprenticeId, dateId, updateData);
       await fetchEvaluations(); // Recargar la lista
     } catch (err: any) {

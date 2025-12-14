@@ -27,6 +27,7 @@ import ArtistManagement from './components/Admin/sections/Artist/ArtistManagemen
 import { AwardProvider } from './context/AwardContext';
 import { SongBillboardProvider } from './context/SongBillboardContext';
 import ArtistDashboard from './components/Artist/ArtistDashboard';
+import { CollaborationProvider } from './context/CollaborationContext';
 
 // const PrivateRoute = ({ children, allowedRoles }: { children: React.ReactNode, allowedRoles: string[] }) => {
 //   const { user, isAuthenticated } = useAuth();
@@ -44,6 +45,7 @@ import ArtistDashboard from './components/Artist/ArtistDashboard';
 
 function App() {
   return (
+    <CollaborationProvider>
     <SongBillboardProvider>
     <AwardProvider>
       <ActivitySchedulingProvider>
@@ -103,6 +105,7 @@ function App() {
     </ActivitySchedulingProvider>
    </AwardProvider>
    </SongBillboardProvider>
+   </CollaborationProvider>
   );
 }
 

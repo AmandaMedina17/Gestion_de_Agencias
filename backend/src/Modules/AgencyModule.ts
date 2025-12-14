@@ -1,4 +1,3 @@
-// src/PresentationLayer/Modules/AgencyModule.ts
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AgencyEntity } from "../InfraestructureLayer/database/Entities/AgencyEntity";
@@ -36,10 +35,15 @@ import { ContractRepositoryImpl } from "@infrastructure/database/Repositories/Co
 import { CreateAgencyUseCase } from "@application/UseCases/create_agency.use-case";
 import { PlaceModule } from "./PlaceModule";
 import { UpdateAgencyUseCase } from "@application/UseCases/update_agency.use-case";
+import { GetAgencyCollaborationsUseCase } from '../ApplicationLayer/UseCases/get_agency_collaborations.use-case';
+import { IGroupRepository } from "@domain/Repositories/IGroupRepository";
+import { GroupRepository } from "@infrastructure/database/Repositories/GroupRepository";
+import { GroupEntity } from "@infrastructure/database/Entities/GroupEntity";
+import { RemoveArtistFromAgencyUseCase } from "@application/UseCases/remove_artist_from_agency.use-case";
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([AgencyEntity, ArtistAgencyMembershipEntity, ArtistEntity, ContractEntity]),
+    TypeOrmModule.forFeature([AgencyEntity, ArtistAgencyMembershipEntity, ArtistEntity, ContractEntity, GroupEntity, ArtistGroupMembershipEntity]),
     ArtistModule,
     ApprenticeModule, 
     PlaceModule
@@ -64,6 +68,10 @@ import { UpdateAgencyUseCase } from "@application/UseCases/update_agency.use-cas
       provide: IContractRepository,
       useClass: ContractRepositoryImpl,
     },
+    {
+      provide: IGroupRepository,
+      useClass: GroupRepository,
+    },
     // DTO Mapper
     AgencyDtoMapper,
     ArtistDtoMapper,
@@ -80,6 +88,8 @@ import { UpdateAgencyUseCase } from "@application/UseCases/update_agency.use-cas
     GetAgencyGroupsUseCase,
     RelateArtistToAgencyUseCase,
     GetArtistsWithDebutUseCase,
+    GetAgencyCollaborationsUseCase,
+    RemoveArtistFromAgencyUseCase,
   ],
   exports: [IAgencyRepository, AgencyDtoMapper, AgencyMapper],
 })

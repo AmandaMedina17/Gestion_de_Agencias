@@ -1,6 +1,9 @@
 import ActivitySchedulingView from "./sections/ActivitySchedulingView";
 import AgencyArtistsView from "./sections/AgencyArtists";
+import AgencyArtistsCompleteInfo from "./sections/AgencyArtistsCompleteInfo";
 import AgencyApprenticesView from "./sections/ApprenticesByAgency";
+import CollaborationManagement from "./sections/CollaborationManagement";
+import EvaluationManagement from "./sections/Evaluation/EvaluationsManagement";
 import GroupManagement from "./sections/Group";
 import SuccessManagement from "./sections/Success/SuccessManagement";
 
@@ -9,5 +12,8 @@ export const sectionComponents = {
     active_artists: AgencyArtistsView,
     group_management: GroupManagement,
     activities_management: ActivitySchedulingView,
-    success_management: SuccessManagement
+    success_management: SuccessManagement,
+    collaboration_management: CollaborationManagement,
+    evaluations_management: EvaluationManagement,
+    artists_changes: AgencyArtistsCompleteInfo
 };
