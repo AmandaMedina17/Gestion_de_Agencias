@@ -31,4 +31,9 @@ export class AlbumController {
           remove(@Param('id') id: string) {
             return this.albumService.remove(id);
           }
+
+          @Get('hits/:id')
+          getHits(@Param('id') id: string) {
+            return this.albumService.getAlbumHits(id);
+          }
 }

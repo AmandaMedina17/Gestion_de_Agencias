@@ -1,12 +1,12 @@
 import { ISongBillboardRepository } from "@domain/Repositories/ISonBillboardRepository";
 import { Injectable, NotImplementedException } from "@nestjs/common";
 import { SongBillboardEntity } from "../Entities/SongBillboardEntity";
-import { SongBillBoardMapper } from "../Mappers/SongBillboardMapper";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { BillboardList } from "@domain/Entities/BillboardList";
 import { BaseRepository } from "./BaseRepositoryImpl";
 import { SongBillboard } from "@domain/Entities/SongBillboard";
+import { SongBillBoardMapper } from "../Mappers/SongBillboardMapper";
+
 
 @Injectable()
 export class SongBillboardRepository extends BaseRepository<SongBillboard,SongBillboardEntity> implements ISongBillboardRepository{
@@ -26,7 +26,7 @@ export class SongBillboardRepository extends BaseRepository<SongBillboard,SongBi
     }
 
     async findById(id: string): Promise<SongBillboard | null> {
-        throw new NotImplementedException("SongBilldoard doesn't has an id by itself")
+        throw new NotImplementedException("SongBillboard doesn't has an id by itself")
     }
     async findBySongIdBillboardId(idSong: string, idBillboard: string): Promise<SongBillboard | null> {
         const object = await this.repository.findOne({where :{songId:idSong,billboardListId: idBillboard }, relations : {song : true, billboardList : true}})
