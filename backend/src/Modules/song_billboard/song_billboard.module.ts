@@ -18,6 +18,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SongBillboardController } from '@presentation/Controllers/song_billboard/song_billboard.controller';
 import { SongBillboardDtoMapper } from '@application/DTOs/dtoMappers/song.billboard.dtoMapper';
+import { SongModule } from '../song/song.module';
 
 @Module({
   imports: [
@@ -50,7 +51,7 @@ import { SongBillboardDtoMapper } from '@application/DTOs/dtoMappers/song.billbo
   exports: [
       AddSongToBillboardUseCase,
       ISongBillboardRepository,
-    
+      SongBillboardDtoMapper
   ]
 })
 export class SongBillboardModule {}

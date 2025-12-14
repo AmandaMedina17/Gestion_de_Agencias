@@ -2,7 +2,6 @@ import { AddSongToBillboardDto } from '@application/DTOs/SongBillboardDto/add.so
 import { ResponseSongBillboardDto } from '@application/DTOs/SongBillboardDto/response.songBillboard.dto';
 import { ISongBillboardRepository } from '@domain/Repositories/ISonBillboardRepository';
 import { AddSongToBillboardUseCase } from '@application/UseCases/add_song_billboard_use_case';
-import { SongBillBoardMapper } from '@infrastructure/database/Mappers/SongBillboardMapper';
 import { Injectable } from '@nestjs/common';
 import { SongBillboardDtoMapper } from '@application/DTOs/dtoMappers/song.billboard.dtoMapper';
 
