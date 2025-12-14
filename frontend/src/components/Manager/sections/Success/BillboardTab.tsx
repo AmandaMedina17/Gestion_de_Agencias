@@ -274,9 +274,9 @@ const BillboardTab: React.FC<BillboardTabProps> = ({ onNotification }) => {
     ? records.map((record) => ({
         ...record,
         id: generateCompositeId(record),
-        songName: getSongName(record.songId),
-        billboardName: getBillboardName(record.billBoardId),
-        billboardId: record.billBoardId,
+        songName: getSongName(record.song.id),
+        billboardName: getBillboardName(record.billBoard.id),
+        billboardId: record.billBoard.id,
         position: getRecordPosition(record),
         entryDate: getRecordDate(record),
       }))

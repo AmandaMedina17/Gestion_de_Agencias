@@ -104,6 +104,7 @@ export const CollaborationProvider: React.FC<CollaborationProviderProps> = ({ ch
     try {
       const data = await collaborationService.getArtistGroupCollaborationsByAgency(agencyId);
       setArtistGroupCollaborations(data);
+      console.log(data);
     } catch (err: any) {
       setError(err.message || 'Error al cargar colaboraciones entre artista y grupo');
     } finally {

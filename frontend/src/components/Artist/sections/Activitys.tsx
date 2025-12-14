@@ -142,6 +142,12 @@ const ArtistActivitiesView: React.FC = () => {
       headerName: 'Fecha Programada', 
       width: 200
     },
+    {
+      field: 'type',
+      headerName: 'Tipo',
+      width:200,
+
+    }
   ];
 
   // Si no hay artista asociado
