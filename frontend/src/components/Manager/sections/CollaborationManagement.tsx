@@ -188,7 +188,7 @@ const CollaborationManagement: React.FC = () => {
       required: true,
       options: availableArtists.map(artist => ({
         value: artist.id,
-        label: `${artist.stageName} (ID: ${artist.id})`,
+        label: `${artist.stageName}`,
       })),
       validate: (value) => {
         if (!value) return "Selecciona el primer artista";
@@ -202,7 +202,7 @@ const CollaborationManagement: React.FC = () => {
       required: true,
       options: availableArtists.map(artist => ({
         value: artist.id,
-        label: `${artist.stageName} (ID: ${artist.id})`,
+        label: `${artist.stageName}`,
       })),
       validate: (value, formData) => {
         if (!value) return "Selecciona el segundo artista";
@@ -235,7 +235,7 @@ const CollaborationManagement: React.FC = () => {
       required: true,
       options: availableArtists.map(artist => ({
         value: artist.id,
-        label: `${artist.stageName} (ID: ${artist.id})`,
+        label: `${artist.stageName}`,
       })),
       validate: (value) => {
         if (!value) return "Selecciona un artista";
@@ -411,15 +411,11 @@ const CollaborationManagement: React.FC = () => {
   };
 
   // Formatear fecha
-  const formatDate = (dateString: string | Date) => {
+  const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("es-ES", {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    date.setDate(date.getDate() + 1);
+    return date.toLocaleDateString("es-ES");
   };
-
   // Columnas para colaboraciones artista-artista
   const artistCollabColumns: Column<any>[] = useMemo(() => [
     {
@@ -433,14 +429,7 @@ const CollaborationManagement: React.FC = () => {
           <Typography variant="subtitle1" fontWeight="bold">
             {item.artist1?.stageName || "Artista desconocido"}
           </Typography>
-          {item.artist1?.id && (
-            <Chip 
-              label={`ID: ${item.artist1.id}`} 
-              size="small" 
-              variant="outlined"
-              sx={{ mt: 0.5 }}
-            />
-          )}
+          
         </Box>
       ),
     },
@@ -455,14 +444,7 @@ const CollaborationManagement: React.FC = () => {
           <Typography variant="subtitle1" fontWeight="bold">
             {item.artist2?.stageName || "Artista desconocido"}
           </Typography>
-          {item.artist2?.id && (
-            <Chip 
-              label={`ID: ${item.artist2.id}`} 
-              size="small" 
-              variant="outlined"
-              sx={{ mt: 0.5 }}
-            />
-          )}
+          
         </Box>
       ),
     },
@@ -493,14 +475,7 @@ const CollaborationManagement: React.FC = () => {
           <Typography variant="subtitle1" fontWeight="bold">
             {item.artist?.stageName || "Artista desconocido"}
           </Typography>
-          {item.artist?.id && (
-            <Chip 
-              label={`ID: ${item.artist.id}`} 
-              size="small" 
-              variant="outlined"
-              sx={{ mt: 0.5 }}
-            />
-          )}
+          
         </Box>
       ),
     },
@@ -515,14 +490,7 @@ const CollaborationManagement: React.FC = () => {
           <Typography variant="subtitle1" fontWeight="bold">
             {item.group?.name || "Grupo desconocido"}
           </Typography>
-          {item.group?.id && (
-            <Chip 
-              label={`ID: ${item.group.id}`} 
-              size="small" 
-              variant="outlined"
-              sx={{ mt: 0.5 }}
-            />
-          )}
+          
         </Box>
       ),
     },
@@ -543,15 +511,7 @@ const CollaborationManagement: React.FC = () => {
   // Renderizar acciones para colaboraciones artista-artista
   const renderArtistCollabActions = (item: any) => (
     <Box className="collab-actions">
-      <Tooltip title="Ver detalles">
-        <IconButton
-          size="small"
-          onClick={() => setViewingArtistCollab(item)}
-          color="info"
-        >
-          <Visibility fontSize="small" />
-        </IconButton>
-      </Tooltip>
+      
       <Tooltip title="Editar">
         <IconButton
           size="small"
@@ -576,15 +536,7 @@ const CollaborationManagement: React.FC = () => {
   // Renderizar acciones para colaboraciones artista-grupo
   const renderGroupCollabActions = (item: any) => (
     <Box className="collab-actions">
-      <Tooltip title="Ver detalles">
-        <IconButton
-          size="small"
-          onClick={() => setViewingGroupCollab(item)}
-          color="info"
-        >
-          <Visibility fontSize="small" />
-        </IconButton>
-      </Tooltip>
+      
       <Tooltip title="Editar">
         <IconButton
           size="small"
@@ -624,7 +576,7 @@ const CollaborationManagement: React.FC = () => {
   return (
     <section id="collaboration_management" className="content-section active">
       <Typography variant="h4" gutterBottom>
-        🎭 Gestión de Colaboraciones
+        Gestión de Colaboraciones
       </Typography>
       
       {user?.agency ? (
@@ -709,9 +661,9 @@ const CollaborationManagement: React.FC = () => {
                 onNotificationClose={() => setNotification(null)}
                 showActionsColumn={true}
                 showCreateButton={false}
-                showSearch={true}
+                showSearch={false}
                 showReloadButton={true}
-                renderCustomActions={renderArtistCollabActions}
+                // renderCustomActions={renderArtistCollabActions}
               />
               
               {availableArtists.length <= 1 && (
@@ -763,9 +715,9 @@ const CollaborationManagement: React.FC = () => {
                 onNotificationClose={() => setNotification(null)}
                 showActionsColumn={true}
                 showCreateButton={false}
-                showSearch={true}
+                showSearch={false}
                 showReloadButton={true}
-                renderCustomActions={renderGroupCollabActions}
+                // renderCustomActions={renderGroupCollabActions}
               />
               
               {availableArtists.length === 0 && (

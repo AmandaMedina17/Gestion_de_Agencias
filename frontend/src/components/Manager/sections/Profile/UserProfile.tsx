@@ -48,7 +48,7 @@ const carouselImages = [
     description: "Presentación del grupo en el estadio nacional"
   },
   {
-    src: "./logo.jpg",
+    src: "./bp.jpg",
     alt: "Sesión de fotos del grupo",
     title: "Sesión Fotográfica",
     description: "Nueva sesión de fotos para el álbum"

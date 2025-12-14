@@ -9,13 +9,15 @@ import { ScheduleArtistUseCase } from "@application/UseCases/schedule-artist.use
 import { IArtistActivityRepository } from "@domain/Repositories/IArtistActivityRepository";
 import { ArtistActivityRepository } from "@infrastructure/database/Repositories/ArtistActivityRepository";
 import { ArtistActivityService } from "@application/services/artist-activity.service";
+import { IncomeModule } from "./IncomeModule";
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       ArtistActivityEntity,
       ]), ArtistModule,
-    ActivityModule
+    ActivityModule,
+    IncomeModule
   ],
   controllers: [ArtistActivityController],
   providers: [

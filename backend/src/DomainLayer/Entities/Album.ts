@@ -12,7 +12,9 @@ export class Album implements IUpdatable{
         private releaseDate: Date,
         private mainProducer: string,
         private copiesSold: number,
-        private numberOfTracks : number
+        private numberOfTracks : number,
+        private artistId?: string,
+        private groupId?: string
     ) {
         this.validate();
     }
@@ -133,6 +135,29 @@ export class Album implements IUpdatable{
     public getNumberOfTracks(): number {
         return this.numberOfTracks;
     }
+
+    getArtistId(): string | undefined {
+        return this.artistId;
+    }
+
+    getGroupId(): string | undefined {
+        return this.groupId;
+    }
+
+    assignToArtist(artistId: string): void {
+        if (this.groupId) {
+            throw new Error('Album is already assigned to a group. Cannot assign to an artist.');
+        }
+        this.artistId = artistId;
+    }
+
+    assignToGroup(groupId: string): void {
+        if (this.artistId) {
+            throw new Error('Album is already assigned to an artist. Cannot assign to a group.');
+        }
+        this.groupId = groupId;
+    }
+
 
     //Estor viola el principio de inmutabilidad dejar asi temporalmente, para despues arreglarlo 
     public setMainProducer(producer: string): void {

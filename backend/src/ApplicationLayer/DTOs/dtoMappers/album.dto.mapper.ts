@@ -25,6 +25,8 @@ export class AlbumDtoMapper extends BaseDtoMapper<Album,CreateAlbumDto,ResponseA
             mainProducer: domain.getMainProducer(),
             copiesSold: domain.getCopiesSold(),
             numberOfTracks: domain.getNumberOfTracks(),
+            artistId : domain.getArtistId() ? domain.getArtistId()!.toString() : undefined,
+            groupId : domain.getGroupId() ? domain.getGroupId()!.toString() : undefined,
         };
     }
     

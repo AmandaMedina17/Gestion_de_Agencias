@@ -517,7 +517,7 @@ const GroupManagement: React.FC = () => {
 
       // Agregar el artista al grupo
       await addMemberToGroup({groupId: selectedTraineeForArtist.groupId,
-        artistId: selectedTraineeForArtist.trainee.id,
+        artistId: newArtist.id,
         role: selectedTraineeForArtist.role,
       });
 

@@ -50,6 +50,8 @@ export const ContractProvider: React.FC<ContractProviderProps> = ({ children }) 
     setLoading(true);
     setError(null);
     try {
+      console.log("===================================");
+      console.log(createDto);
       const newContract = await contractService.create(createDto);
       setContracts(prev => [...prev, newContract]);
     } catch (err: any) {

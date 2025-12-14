@@ -26,12 +26,18 @@ import { Award } from '@domain/Entities/Award';
 import { AwardDtoMapper } from '@application/DTOs/dtoMappers/award.dto.mapper';
 import { AwardMapper } from '@infrastructure/database/Mappers/AwardMapper';
 import { AwardModule } from '../award/award.module';
+import { ArtistModule } from '../ArtistModule';
+import { GroupModule } from '../GroupModule';
+import { AssignAlbumToArtistUseCase } from '@application/UseCases/assign-album-to-artist.use-case';
+import { AssignAlbumToGroupUseCase } from '@application/UseCases/assign-album-to-group.use-case';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([AlbumEntity]),
     SongBillboardModule,
     forwardRef(() => AwardModule) 
+    ArtistModule,
+    GroupModule
   ],
   controllers: [AlbumController],
   providers: [ 
@@ -43,7 +49,9 @@ import { AwardModule } from '../award/award.module';
       useClass: AlbumRepository 
     },
     AlbumDtoMapper,
-    AlbumService
+    AlbumService,
+    AssignAlbumToArtistUseCase,
+    AssignAlbumToGroupUseCase
   ],
   exports: [
       IAlbumRepository
