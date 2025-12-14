@@ -7,7 +7,6 @@ import { SongMapper } from "./SongMapper";
 @Injectable()
 export class AlbumMapper implements IMapper<Album,AlbumEntity>{
     
-
     toDomainEntity(dataBaseEntity: AlbumEntity): Album {
         console.log(dataBaseEntity)
         return new Album ( dataBaseEntity.id,dataBaseEntity.title,dataBaseEntity.releaseDate,

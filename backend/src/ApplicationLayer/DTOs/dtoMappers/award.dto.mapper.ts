@@ -1,29 +1,28 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotImplementedException } from "@nestjs/common";
 import { BaseDtoMapper } from "./DtoMapper";
 import { Award } from "@domain/Entities/Award";
 import { CreateAwardDto } from "../AwardDto/create.award.dto";
 import { ResponseAwardDto } from "../AwardDto/response.award.dto";
+import { AlbumDtoMapper } from "./album.dto.mapper";
 
 @Injectable()
 export class AwardDtoMapper extends BaseDtoMapper<Award, CreateAwardDto, ResponseAwardDto>{
-
+    constructor(
+      private readonly albumDtoMapper : AlbumDtoMapper
+    ){
+      super();
+    }
     fromDto(dto: CreateAwardDto): Award { 
-      
-      if(!dto.date)
-        throw new Error("Year of Award is missing");
-
-      if(!dto.name)
-        throw new Error("Name of Award is missing")
-    
-      return Award.create(dto.name,dto.date,dto.albumId!)
+      throw new NotImplementedException("Award creation requires additional logic not handled in DTO mapping.");
     };
   
     toResponse(domain: Award): ResponseAwardDto {
+        console.log(domain);
         return {
             id: domain.getId(),
             name: domain.getName(),
             date: domain.getDate(),
-            albumId : domain.getAlbumId()
+            album : domain.getAlbum() ? this.albumDtoMapper.toResponse(domain.getAlbum()!) : undefined
         };
     }
    

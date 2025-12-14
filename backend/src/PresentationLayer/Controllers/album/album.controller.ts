@@ -18,7 +18,23 @@ export class AlbumController {
           findAll() {
             return this.albumService.findAll();
           }
-        
+          
+
+          @Get('hits/:id')
+          getHits(@Param('id') id: string) {
+            return this.albumService.getAlbumHits(id);
+          }
+
+          @Get('songs/:id')
+          getSongs(@Param('id') id: string) {
+            return this.albumService.getAllSongs(id);
+          }
+
+          @Get('awards/:id')
+          getAwards(@Param('id') id: string) {
+            return this.albumService.getAlbumAwards(id);
+          }
+
           @Get(':id')
           findOne(@Param('id') id: string) {
             return this.albumService.findOne(id);
