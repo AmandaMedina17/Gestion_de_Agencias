@@ -1,9 +1,8 @@
-import { Transform } from 'class-transformer';
-import { IsString, IsNotEmpty, IsUUID, IsDate, IsISO8601 } from 'class-validator';
+import { IsString, IsNotEmpty, IsISO8601 } from 'class-validator';
 
 export class GetGroupCalendaryDto {
   @IsNotEmpty()
-  @IsUUID()
+  @IsString()
   groupId!: string;
 
   @IsNotEmpty()
