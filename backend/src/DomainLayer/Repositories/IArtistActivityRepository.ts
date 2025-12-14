@@ -1,5 +1,5 @@
 import { Activity } from "@domain/Entities/Activity";
-import { Artist } from "@domain/Entities/Artist";
+import { Income } from "@domain/Entities/Income";
 
 export abstract class IArtistActivityRepository {
   
@@ -20,5 +20,9 @@ export abstract class IArtistActivityRepository {
   
   // Cancelar asistencia
   abstract cancelAttendance(artistId: string, activityId: string): Promise<void>;
+
+  // Calcular los ingresos de un artista
+  abstract calculateArtistIncomes(artistId: string, startDate?: Date, endDate?: Date
+    ): Promise<{ incomes: Income[]; totalIncome: number }> 
 
 }

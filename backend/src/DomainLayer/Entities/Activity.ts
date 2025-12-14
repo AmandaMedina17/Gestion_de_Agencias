@@ -90,10 +90,10 @@ export class Activity implements IUpdatable{
     throw new Error("Activity must have at least one date");
   }
 
-  const now = new Date();
-  if (dates.some(date => date < now)) {
-      throw new Error("Activity dates cannot be in the past");
-    }
+  // const now = new Date();
+  // if (dates.some(date => date < now)) {
+  //     throw new Error("Activity dates cannot be in the past");
+  //   }
   }
 
   static create(classification: ActivityClassification, type: ActivityType,
