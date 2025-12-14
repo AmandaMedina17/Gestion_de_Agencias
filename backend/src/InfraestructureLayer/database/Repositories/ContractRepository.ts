@@ -190,7 +190,7 @@ async update(entity: Contract): Promise<Contract> {
   }
 
   private getDefaultRelations(): string[] {
-    return ['agency', 'artist'];
+    return ['agency', 'artist', 'agency.place'];
   }
 
   private async loadFullContract(
