@@ -51,7 +51,7 @@ import { SongModule } from '../song/song.module';
   exports: [
       AddSongToBillboardUseCase,
       ISongBillboardRepository,
-    
+      SongBillboardDtoMapper
   ]
 })
 export class SongBillboardModule {}

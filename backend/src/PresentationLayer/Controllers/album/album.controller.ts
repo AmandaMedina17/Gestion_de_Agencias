@@ -36,4 +36,8 @@ export class AlbumController {
           getHits(@Param('id') id: string) {
             return this.albumService.getAlbumHits(id);
           }
+          @Get('songs/:id')
+          getSongs(@Param('id') id: string) {
+            return this.albumService.getAllSongs(id);
+          }
 }

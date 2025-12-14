@@ -26,15 +26,17 @@ import { Song } from '@domain/Entities/Song';
 @Module({
   imports: [
     TypeOrmModule.forFeature([AlbumEntity]),
+    SongBillboardModule
   ],
   controllers: [AlbumController],
   providers: [ 
     SongMapper,
     AlbumMapper,
+    SongDtoMapper,
     {
       provide: IAlbumRepository,    
       useClass: AlbumRepository 
-    },    
+    },
     AlbumDtoMapper,
     AlbumService
   ],

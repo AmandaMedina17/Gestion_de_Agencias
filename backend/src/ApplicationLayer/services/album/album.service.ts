@@ -9,6 +9,8 @@ import { AlbumDtoMapper } from '@application/DTOs/dtoMappers/album.dto.mapper';
 import { ResponseSongBillboardDto } from '@application/DTOs/SongBillboardDto/response.songBillboard.dto';
 import { SongBillboardDtoMapper } from '@application/DTOs/dtoMappers/song.billboard.dtoMapper';
 import { ISongBillboardRepository } from '@domain/Repositories/ISonBillboardRepository';
+import { SongDtoMapper } from '@application/DTOs/dtoMappers/song.dto.mapper';
+import { ResponseSongDto } from '@application/DTOs/songDto/response.song.dto';
 
 @Injectable()
 export class AlbumService extends BaseService<Album,CreateAlbumDto,ResponseAlbumDto,UpdateAlbumDto>{
@@ -18,7 +20,8 @@ export class AlbumService extends BaseService<Album,CreateAlbumDto,ResponseAlbum
         @Inject(ISongBillboardRepository)
         private readonly songBillboard : ISongBillboardRepository,
         private readonly albumDtoMapper: AlbumDtoMapper,
-        private readonly songBillboardDtoMapper : SongBillboardDtoMapper
+        private readonly songBillboardDtoMapper : SongBillboardDtoMapper,
+        private readonly song : SongDtoMapper
     ) {
         super(albumRepository, albumDtoMapper)
     }
@@ -32,6 +35,11 @@ export class AlbumService extends BaseService<Album,CreateAlbumDto,ResponseAlbum
         );
 
         return this.songBillboardDtoMapper.toResponseList(songsFiltered);
+    }
+
+    async getAllSongs(id: string) : Promise<ResponseSongDto[]> {
+        const songs = await this.albumRepository.getAllSong(id);
+        return this.song.toResponseList(songs);
     }
 }
 
