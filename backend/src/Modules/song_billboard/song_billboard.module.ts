@@ -9,8 +9,9 @@ import { BillboardListEntity } from '@infrastructure/database/Entities/Billboard
 import { SongBillboardEntity } from '@infrastructure/database/Entities/SongBillboardEntity';
 import { SongEntity } from '@infrastructure/database/Entities/SongEntity';
 import { BillboardListMapper } from '@infrastructure/database/Mappers/BillboardListMapper';
-import { SongBillBoardMapper } from '@infrastructure/database/Mappers/SongBillboardMapper';
+import { SongBillBoardMapper } from '../../InfraestructureLayer/database/Mappers/SongBillBoardMapper';
 import { SongMapper } from '@infrastructure/database/Mappers/SongMapper';
+import { BillboardListRepository } from '@infrastructure/database/Repositories/BillboardListRepository';
 import { BillboardListRepository } from '@infrastructure/database/Repositories/BillboardListRepository';
 import { SongBillboardRepository } from '@infrastructure/database/Repositories/SonBillboardrepository';
 import { SongRepository } from '@infrastructure/database/Repositories/SongRepository';

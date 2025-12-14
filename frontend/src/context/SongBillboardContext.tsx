@@ -97,7 +97,7 @@ export const SongBillboardProvider: React.FC<SongBillboardProviderProps> = ({ ch
       await songBillboardService.remove(songId, billboardId);
       // IMPORTANTE: El campo en ResponseSongBillboardDto es "billBoardId" (con B mayúscula)
       setRecords(prev => prev.filter(record => 
-        !(record.songId === songId && record.billBoardId === billboardId)
+        !(record.song.id === songId && record.billBoard.id === billboardId)
       ));
     } catch (err: any) {
       setError(err.message || 'Error al eliminar canción del billboard');
@@ -125,11 +125,11 @@ export const SongBillboardProvider: React.FC<SongBillboardProviderProps> = ({ ch
 
   // Consultas
   const getRecordsBySongId = (songId: string): ResponseSongBillboardDto[] => {
-    return records.filter(record => record.songId === songId);
+    return records.filter(record => record.song.id === songId);
   };
 
   const getRecordsByBillboardId = (billboardId: string): ResponseSongBillboardDto[] => {
-    return records.filter(record => record.billBoardId === billboardId);
+    return records.filter(record => record.billBoard.id === billboardId);
   };
 
   const getTopPositions = (limit: number): ResponseSongBillboardDto[] => {
