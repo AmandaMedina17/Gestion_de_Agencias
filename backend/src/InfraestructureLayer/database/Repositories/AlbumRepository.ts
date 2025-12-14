@@ -1,6 +1,6 @@
 import { Album } from "@domain/Entities/Album";
 import { IAlbumRepository } from "@domain/Repositories/IAlbumRepository";
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { AlbumEntity } from "../Entities/AlbumEntity";
 import { BaseRepository } from "./BaseRepositoryImpl";
@@ -23,6 +23,58 @@ export class AlbumRepository extends BaseRepository<Album,AlbumEntity> implement
         private readonly songMapper : SongMapper
     ) {
         super(repository, mapper);
+    }
+
+    async assignToArtist(albumId: string, artistId: string): Promise<Album> {
+        const albumEntity = await this.repository.findOne({ where: { id: albumId } });
+        
+        if (!albumEntity) {
+            throw new NotFoundException(`Album with ID ${albumId} not found`);
+        }
+
+        if (albumEntity.groupId) {
+            throw new Error('Album is already assigned to a group');
+        }
+
+        albumEntity.artistId = artistId;
+        albumEntity.groupId = undefined;
+
+        const savedEntity = await this.repository.save(albumEntity);
+        return this.mapper.toDomainEntity(savedEntity);
+    }
+    async assignToGroup(albumId: string, groupId: string): Promise<Album> {
+        const albumEntity = await this.repository.findOne({ where: { id: albumId } });
+        
+        if (!albumEntity) {
+            throw new NotFoundException(`Album with ID ${albumId} not found`);
+        }
+
+        if (albumEntity.artistId) {
+            throw new Error('Album is already assigned to an artist');
+        }
+
+        albumEntity.groupId = groupId;
+        albumEntity.artistId = undefined;
+
+        const savedEntity = await this.repository.save(albumEntity);
+        return this.mapper.toDomainEntity(savedEntity);
+    }
+
+    async getAlbumsByArtist(artistId: string): Promise<Album[]> {
+        const entities = await this.repository.find({
+            where: { artistId },
+            relations: { songs: true }
+        });
+
+        return this.mapper.toDomainEntities(entities);
+    }
+    async getAlbumsByGroup(groupId: string): Promise<Album[]> {
+        const entities = await this.repository.find({
+            where: { groupId },
+            relations: { songs: true }
+        });
+
+        return this.mapper.toDomainEntities(entities);
     }
     async getAllSong(id: string): Promise<Song[]> {
         const entity  =  await this.repository.findOne({where : {id}, relations : {

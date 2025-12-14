@@ -1,5 +1,6 @@
+import { Type } from "class-transformer";
 import { ArtistStatus } from "../../../DomainLayer/Enums";
-import { IsEnum, IsNotEmpty, IsString } from "class-validator";
+import { IsDate, IsEnum, IsNotEmpty, IsString } from "class-validator";
 
 export class CreateArtistDto{
     @IsNotEmpty()
@@ -15,6 +16,8 @@ export class CreateArtistDto{
     stageName!: string;
 
     @IsNotEmpty()
+    @Type(() => Date)
+    @IsDate()
     birthday!: Date;
 
     @IsNotEmpty()

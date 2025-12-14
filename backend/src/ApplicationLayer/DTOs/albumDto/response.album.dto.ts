@@ -5,4 +5,6 @@ export class ResponseAlbumDto{
     mainProducer!: string;
     copiesSold!: number;
     numberOfTracks!: number;
+    artistId? :string;
+    groupId? :string;
 }

@@ -22,11 +22,17 @@ import { SongDtoMapper } from '@application/DTOs/dtoMappers/song.dto.mapper';
 import { BillboardListMapper } from '@infrastructure/database/Mappers/BillboardListMapper';
 import { BillboardListDtoMapper } from '@application/DTOs/dtoMappers/billboardList.dto.mapper';
 import { Song } from '@domain/Entities/Song';
+import { ArtistModule } from '../ArtistModule';
+import { GroupModule } from '../GroupModule';
+import { AssignAlbumToArtistUseCase } from '@application/UseCases/assign-album-to-artist.use-case';
+import { AssignAlbumToGroupUseCase } from '@application/UseCases/assign-album-to-group.use-case';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([AlbumEntity]),
-    SongBillboardModule
+    SongBillboardModule,
+    ArtistModule,
+    GroupModule
   ],
   controllers: [AlbumController],
   providers: [ 
@@ -38,7 +44,9 @@ import { Song } from '@domain/Entities/Song';
       useClass: AlbumRepository 
     },
     AlbumDtoMapper,
-    AlbumService
+    AlbumService,
+    AssignAlbumToArtistUseCase,
+    AssignAlbumToGroupUseCase
   ],
   exports: [
       IAlbumRepository
