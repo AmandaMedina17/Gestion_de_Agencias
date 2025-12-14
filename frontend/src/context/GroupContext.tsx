@@ -4,26 +4,24 @@ import { CreateGroupDto } from '../../../backend/src/ApplicationLayer/DTOs/group
 import { GroupResponseDto } from '../../../backend/src/ApplicationLayer/DTOs/groupDto/response-group.dto';
 import { GroupStatus } from '../../../backend/src/DomainLayer/Enums';
 import { AddMemberToGroupDto } from '../../../backend/src/ApplicationLayer/DTOs/membershipDto/add-member-to-group.dto';
+import { LeaveGroupDto } from '../../../backend/src/ApplicationLayer/DTOs/membershipDto/leave-group.dto'; // AÑADIR ESTA IMPORTACIÓN
 import { ResponseMembershipDto } from '../../../backend/src/ApplicationLayer/DTOs/membershipDto/response-membership.dto';
 import { CreateArtistDto } from '../../../backend/src/ApplicationLayer/DTOs/artistDto/create-artist.dto';
 import { ArtistResponseDto } from '../../../backend/src/ApplicationLayer/DTOs/artistDto/response-artist.dto';
 
 interface GroupContextType {
-  // Estado
   groups: GroupResponseDto[];
-  notCreatedGroups: GroupResponseDto[]; // Nuevo estado para grupos no creados
+  notCreatedGroups: GroupResponseDto[];
   loading: boolean;
   error: string | null;
   
-  // Estado para miembros
   currentGroupMembers: ResponseMembershipDto[];
   membersLoading: boolean;
   membersError: string | null;
 
-  // Acciones
   createGroup: (createDto: CreateGroupDto) => Promise<void>;
   fetchGroups: () => Promise<void>;
-  fetchNotCreatedGroups: () => Promise<void>; // Nueva función
+  fetchNotCreatedGroups: () => Promise<void>;
   fetchGroup: (id: string) => Promise<GroupResponseDto | null>;
   deleteGroup: (id: string) => Promise<void>;
   updateGroup: (id: string, updateData: { 
@@ -34,20 +32,14 @@ interface GroupContextType {
     is_created: boolean,
     agencyId: string 
   }) => Promise<void>;
-  activateGroup: (id: string) => Promise<void>; // Nueva función para aceptar grupo
+  activateGroup: (id: string) => Promise<void>;
   clearError: () => void;
 
-  // Acciones para miembros
-  addMemberToGroup: ( addMemberDto: AddMemberToGroupDto) => Promise<ResponseMembershipDto>;
+  addMemberToGroup: (addMemberDto: AddMemberToGroupDto) => Promise<ResponseMembershipDto>;
   getGroupMembers: (groupId: string) => Promise<ArtistResponseDto[]>;
   removeMemberFromGroup: (groupId: string, artistId: string) => Promise<void>;
   
-  // Para crear artista cuando no existe
   createArtistForTrainee: (createArtistDto: CreateArtistDto) => Promise<ArtistResponseDto>;
-}
-
-interface GroupProviderProps {
-  children: ReactNode;
 }
 
 const GroupContext = createContext<GroupContextType | undefined>(undefined);
@@ -60,13 +52,12 @@ export const useGroup = () => {
   return context;
 };
 
-export const GroupProvider: React.FC<GroupProviderProps> = ({ children }) => {
+export const GroupProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [groups, setGroups] = useState<GroupResponseDto[]>([]);
   const [notCreatedGroups, setNotCreatedGroups] = useState<GroupResponseDto[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  // Estados para miembros
   const [currentGroupMembers, setCurrentGroupMembers] = useState<ResponseMembershipDto[]>([]);
   const [membersLoading, setMembersLoading] = useState(false);
   const [membersError, setMembersError] = useState<string | null>(null);
@@ -77,7 +68,6 @@ export const GroupProvider: React.FC<GroupProviderProps> = ({ children }) => {
     try {
       const newGroup = await groupService.create(createDto);
       setGroups(prev => [...prev, newGroup]);
-      // Si el grupo no está creado, también lo agregamos a notCreatedGroups
       if (!newGroup.is_created) {
         setNotCreatedGroups(prev => [...prev, newGroup]);
       }
@@ -95,7 +85,6 @@ export const GroupProvider: React.FC<GroupProviderProps> = ({ children }) => {
     try {
       const data = await groupService.findAll();
       setGroups(data);
-      // Filtrar grupos no creados
       const notCreated = data.filter(group => !group.is_created);
       setNotCreatedGroups(notCreated);
     } catch (err: any) {
@@ -159,17 +148,13 @@ export const GroupProvider: React.FC<GroupProviderProps> = ({ children }) => {
     try {
       const updatedGroup = await groupService.update(id, updateData);
       
-      // Actualizar en grupos generales
       setGroups(prev => prev.map(group => 
         group.id === id ? { ...updatedGroup } : group
       ));
       
-      // Actualizar en grupos no creados
       if (updatedGroup.is_created) {
-        // Si ahora está creado, lo removemos de notCreatedGroups
         setNotCreatedGroups(prev => prev.filter(group => group.id !== id));
       } else {
-        // Si sigue sin crear, lo actualizamos
         setNotCreatedGroups(prev => prev.map(group => 
           group.id === id ? { ...updatedGroup } : group
         ));
@@ -189,12 +174,10 @@ export const GroupProvider: React.FC<GroupProviderProps> = ({ children }) => {
     try {
       const activatedGroup = await groupService.activateGroup(id);
       
-      // Actualizar en grupos generales
       setGroups(prev => prev.map(group => 
         group.id === id ? { ...activatedGroup, is_created: true } : group
       ));
       
-      // Remover de grupos no creados
       setNotCreatedGroups(prev => prev.filter(group => group.id !== id));
       
     } catch (err: any) {
@@ -205,21 +188,25 @@ export const GroupProvider: React.FC<GroupProviderProps> = ({ children }) => {
     }
   };
 
-
   const addMemberToGroup = async (addMemberDto: AddMemberToGroupDto) => {
     setMembersLoading(true);
     setMembersError(null);
     try {
-      const newMembership = await groupService.addMember(addMemberDto.groupId, addMemberDto);
-      // Actualizar la lista de miembros del grupo actual
+      // CORREGIDO: Ahora solo necesita el DTO
+      const newMembership = await groupService.addMember(addMemberDto);
       setCurrentGroupMembers(prev => [...prev, newMembership]);
-      // Actualizar el contador de miembros en la lista de grupos
+      
+      // Actualizar el contador de miembros
       setGroups(prev => prev.map(group => {
         if (group.id === addMemberDto.groupId) {
-          return { ...group, members_num: group.members_num + 1 };
+          return { 
+            ...group, 
+            members_num: (group.members_num || 0) + 1 
+          };
         }
         return group;
       }));
+      
       return newMembership;
     } catch (err: any) {
       setMembersError(err.message || 'Error al agregar miembro al grupo');
@@ -247,16 +234,30 @@ export const GroupProvider: React.FC<GroupProviderProps> = ({ children }) => {
     setMembersLoading(true);
     setMembersError(null);
     try {
-      await groupService.removeMember(groupId, artistId);
+      // CORREGIDO: Crear el DTO y llamar al servicio correctamente
+      const leaveGroupDto: LeaveGroupDto = {
+        groupId,
+        artistId
+      };
+      
+      await groupService.removeMember(leaveGroupDto);
+      
       // Actualizar la lista de miembros
-      setCurrentGroupMembers(prev => prev.filter(member => member.artistId !== artistId));
-      // Actualizar el contador de miembros en la lista de grupos
+      setCurrentGroupMembers(prev => prev.filter(member => 
+        member.artistId !== artistId || member.groupId !== groupId
+      ));
+      
+      // Actualizar el contador de miembros
       setGroups(prev => prev.map(group => {
         if (group.id === groupId) {
-          return { ...group, members_num: Math.max(0, group.members_num - 1) };
+          return { 
+            ...group, 
+            members_num: Math.max(0, (group.members_num || 1) - 1) 
+          };
         }
         return group;
       }));
+      
     } catch (err: any) {
       setMembersError(err.message || 'Error al remover miembro del grupo');
       throw err;

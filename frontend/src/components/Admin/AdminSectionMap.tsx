@@ -6,7 +6,7 @@ import ArtistManagement from "./sections/Artist/ArtistManagement";
 import AwardManagement from "./sections/Award/AwardManagement";
 import BillboardListManagement from "./sections/BillboardList/BillboardManagement";
 import ContractManagement from "./sections/Contract/ContractManagement";
-import EvaluationManagement from "./sections/Evaluation/EvaluationsManagement";
+import EvaluationManagement from "../Manager/sections/Evaluation/EvaluationsManagement";
 import PlaceManagement from "./sections/Place/PlaceManagement";
 import ResponsibleManagement from "./sections/Responsible/ResponsibleManager";
 import SongManagement from "./sections/Song/SongManagement";

@@ -142,68 +142,83 @@ export const AgencyProvider: React.FC<AgencyProviderProps> = ({ children }) => {
   };
 
   const fetchArtistsWithGroup = async (agencyId: string) => {
-  setLoading(true);
-  setError(null);
   try {
+    setLoading(true);
     const response = await agencyService.getActiveArtistsWithGroup(agencyId);
-    
     console.log('=== CONTEXTO: Respuesta del servicio ===');
     console.log('Respuesta completa:', response);
     console.log('Tipo:', typeof response);
     console.log('Es array?', Array.isArray(response));
-    
-    let processedData: any[] = [];
-    
-    // Caso más común: respuesta directa del backend
+
     if (Array.isArray(response)) {
       console.log('Procesando array de respuesta');
       console.log(response);
-      processedData = response.map((item: any, index: number) => {
-        // Si el item tiene la estructura completa
+
+      // CORRECCIÓN: Manejar el caso cuando el elemento es undefined o null
+      const processed = response
+        .filter(item => item && item.length >= 2) // Filtrar elementos válidos
+        .map((item, index) => {
+          // Asegurarse de que item[0] existe antes de acceder a sus propiedades
+          if (Array.isArray(item) && item.length === 2) {
+            const artist = item[0];
+            const group = item[1];
+            
+            // Validar que artist existe
+            if (!artist) {
+              console.warn(`Artista undefined en posición ${index}:`, item);
+              return {
+                id: `unknown-${index}`,
+                artist: {},
+                group: group || null
+              };
+            }
+            
+            return {
+              id: artist.id || `artist-${index}`,
+              artist: artist,
+              group: group || null
+            };
+          }
+          
+          // Si no es array, intentar otra estructura
+          if (item && typeof item === 'object') {
+            const artist = item.artist || item;
+            const group = item.group || null;
+            
+            if (!artist) {
+              return {
+                id: `unknown-${index}`,
+                artist: {},
+                group: group
+              };
+            }
+            
+            return {
+              id: artist.id || `artist-${index}`,
+              artist: artist,
+              group: group
+            };
+          }
+          
+          // Si no coincide con ningún formato, devolver objeto vacío
+          console.warn(`Formato inesperado en posición ${index}:`, item);
           return {
-            id: item.artist.id || `artist-${index}`,
-            artist: item.artist,
-            group: item.group
+            id: `unknown-${index}`,
+            artist: {},
+            group: null
           };
-        
-        
-      });
+        });
+
+      console.log('Artistas procesados:', processed);
+      setArtistsWithGroup(processed);
+      return processed;
+    } else {
+      console.error('La respuesta no es un array:', response);
+      setArtistsWithGroup([]);
+      return [];
     }
-    // Caso: objeto con keys y values
-    else if (response && response.keys && response.values) {
-      console.log('Procesando estructura keys/values');
-      processedData = response.keys.map((artist: any, index: number) => ({
-        id: artist.id || `key-${index}`,
-        artist: artist,
-        group: response.values[index] || null
-      }));
-    }
-    // Caso: objeto simple
-    else if (response && typeof response === 'object') {
-      console.log('Procesando objeto simple');
-      // Intentar extraer datos de diferentes maneras
-      const data = response.data || response.artists || [response];
-      if (Array.isArray(data)) {
-        processedData = data.map((item: any, index: number) => ({
-          id: item.id || `obj-${index}`,
-          artist: item,
-          group: null
-        }));
-      }
-    }
-    
-    console.log('=== DATOS PROCESADOS ===');
-    console.log('Cantidad:', processedData.length);
-    console.log('Primeros 3:', processedData.slice(0, 3));
-    
-    setArtistsWithGroup(processedData);
-    
-    // Devolver los datos procesados
-    return processedData;
-    
-  } catch (err: any) {
+  } catch (err) {
     console.error('Error en fetchArtistsWithGroup:', err);
-    setError(err.message || 'Error al cargar artistas con grupos');
     throw err;
   } finally {
     setLoading(false);

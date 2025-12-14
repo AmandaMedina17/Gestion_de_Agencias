@@ -28,16 +28,16 @@ const ManagerSidebar: React.FC<ManagerSidebarProps> = ({
 
   const menuItems = [
         {   id: 'active_apprentice', 
-            label: ' Aprendices', 
+            label: 'Gestión de Aprendices', 
             tooltip: 'Datos de Aprendices',
         },
         {   id: 'active_artists', 
-            label: ' Artistas', 
+            label: 'Gestión de Artistas', 
             tooltip: 'Datos de Artista',
         },
         {   id: 'group_management', 
-            label: 'Grupos de agencia', 
-            tooltip: 'Detalles de los grupos',
+            label: 'Gestión de Grupos', 
+            tooltip: 'Crear, aceptar, editar y eliminar grupos',
         },
         {   id: 'activities_management', 
             label: 'Gestión de Actividades', 
@@ -51,14 +51,14 @@ const ManagerSidebar: React.FC<ManagerSidebarProps> = ({
             label: 'Gestión de Colaboraciones', 
             tooltip: 'Registrar, modificar y eliminar colaboraciones',
         },
-        // {   id: 'albums_management', 
-        //     label: 'Gestión de Albumes', 
-        //     tooltip: 'Registrar, modificar y eliminar albumes',
-        // },
-        // {   id: 'billboard_management', 
-        //     label: 'Gestión de Listas Billboard', 
-        //     tooltip: 'Registrar, modificar y eliminar listas billboard',
-        // },
+        {   id: 'evaluations_management', 
+            label: 'Gestión de Evaluaciones', 
+            tooltip: 'Registrar, modificar y eliminar evaluaciones de aprendices',
+        },
+        {   id: 'artists_changes', 
+            label: 'Gestión de Artistas Cmabiados', 
+            tooltip: 'Registrar, modificar y eliminar listas billboard',
+        },
         // {   id: 'activities_management', 
         //     label: 'Gestión de Actividades', 
         //     tooltip: 'Registrar, modificar y eliminar actividades',
@@ -119,18 +119,7 @@ const ManagerSidebar: React.FC<ManagerSidebarProps> = ({
         ))}
       </nav>
 
-      {/* Botón de cerrar sesión */}
-      <div className="sidebar-footer">
-        <button className="logout-btn" onClick={() => {
-          // Aquí agregarías la lógica de logout
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          window.location.href = '/login';
-        }}>
-          <span className="logout-icon">🚪</span>
-          <span className="logout-text">Cerrar Sesión</span>
-        </button>
-      </div>
+      
     </div>
   );
 };

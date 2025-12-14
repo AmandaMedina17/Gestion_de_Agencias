@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { ApprenticeEvaluationEntity } from "@infrastructure/database/Entities/ApprenticeEvaluationEntity";
-import { ApprenticeEvaluationController } from "@presentation/Controllers/evaluation.controller";
+import { ApprenticeEvaluationController } from "../PresentationLayer/Controllers/evaluation.controller";
 import { IEvaluationRepository } from "@domain/Repositories/IEvaluationRepository";
 import { EvaluationService } from "@application/services/evaluation.service";
 import { EvaluationRepository } from "@infrastructure/database/Repositories/EvaluationRepository";
