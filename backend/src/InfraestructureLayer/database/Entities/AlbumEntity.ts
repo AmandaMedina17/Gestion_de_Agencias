@@ -26,6 +26,12 @@ export class AlbumEntity {
   @Column()
   copiesSold!: number;
 
+  @Column({ name: "artist_id", nullable: true })
+  artistId?: string;
+
+  @Column({ name: "group_id", nullable: true }) // nullable: true permite álbumes sin grupo
+  groupId?: string;
+
   // Un álbum puede pertenecer a 0 o 1 grupo
   @ManyToOne(() => GroupEntity, (group: GroupEntity) => group.albums, {
     nullable: true, // Permite que sea null (álbum sin grupo)
@@ -33,10 +39,6 @@ export class AlbumEntity {
   })
   @JoinColumn({ name: "group_id" })
   group?: GroupEntity; // Hacer la propiedad opcional
-
-  // Columna para la clave foránea
-  @Column({ name: "group_id", nullable: true }) // nullable: true permite álbumes sin grupo
-  groupId?: string;
 
   // Un álbum puede pertenecer a 0 o 1 artista
   @ManyToOne(() => ArtistEntity, (artist: ArtistEntity) => artist.albums, {
@@ -46,9 +48,7 @@ export class AlbumEntity {
   @JoinColumn({ name: 'artist_id' })
   artist?: ArtistEntity ;
 
-  @Column({ name: "artist_id", nullable: true })
-  artistId!: string;
-
+  
   // Un álbum puede recibir 0 o muchos premios
   @OneToMany(() => AwardEntity, (award: AwardEntity) => award.album)
   awards!: AwardEntity[];
