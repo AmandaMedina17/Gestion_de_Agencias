@@ -305,7 +305,7 @@ const AgencyApprenticesView: React.FC<AgencyApprenticesViewProps> = ({
             </Typography>
             {agencyInfo && (
               <Typography variant="subtitle1" color="text.secondary">
-                {agencyInfo.nameAgency} - {agencyInfo.place}
+                {agencyInfo.nameAgency}
               </Typography>
             )}
           </div>

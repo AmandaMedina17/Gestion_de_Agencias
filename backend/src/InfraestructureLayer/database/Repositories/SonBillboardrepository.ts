@@ -5,7 +5,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { BaseRepository } from "./BaseRepositoryImpl";
 import { SongBillboard } from "@domain/Entities/SongBillboard";
-import { SongBillBoardMapper } from "../Mappers/SongBillboardMapper";
+import { SongBillBoardMapper } from '../Mappers/SongBillBoardMapper';
 
 
 @Injectable()

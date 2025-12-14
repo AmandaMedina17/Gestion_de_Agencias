@@ -12,7 +12,6 @@ import { BillboardListMapper } from '@infrastructure/database/Mappers/BillboardL
 import { SongBillBoardMapper } from '../../InfraestructureLayer/database/Mappers/SongBillBoardMapper';
 import { SongMapper } from '@infrastructure/database/Mappers/SongMapper';
 import { BillboardListRepository } from '@infrastructure/database/Repositories/BillboardListRepository';
-import { BillboardListRepository } from '@infrastructure/database/Repositories/BillboardListRepository';
 import { SongBillboardRepository } from '@infrastructure/database/Repositories/SonBillboardrepository';
 import { SongRepository } from '@infrastructure/database/Repositories/SongRepository';
 import { Module } from '@nestjs/common';
