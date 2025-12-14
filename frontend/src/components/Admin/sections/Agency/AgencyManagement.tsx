@@ -157,7 +157,7 @@ const AgencyManagement: React.FC = () => {
     try {
       await createAgency({
         nameAgency: data.nameAgency,
-        place: data.place,
+        placeId: data.place,
         dateFundation: new Date(data.dateFundation),
       });
 
@@ -177,7 +177,7 @@ const AgencyManagement: React.FC = () => {
     try {
       await updateAgency(id as string, {
         nameAgency: data.nameAgency,
-        place: data.place,
+        placeId: data.place,
         dateFundation: new Date(data.dateFundation),
       });
 
@@ -260,7 +260,7 @@ const AgencyManagement: React.FC = () => {
         <strong>Nombre:</strong> <span>{agency.nameAgency}</span>
       </div>
       <div className="detail-item">
-        <strong>Lugar:</strong> <span>{agency.place}</span>
+        <strong>Lugar:</strong> <span>{agency.place.name}</span>
       </div>
       <div className="detail-item">
         <strong>Fecha de fundación:</strong>{" "}
