@@ -1,4 +1,3 @@
-// src/PresentationLayer/Modules/AgencyModule.ts
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AgencyEntity } from "../InfraestructureLayer/database/Entities/AgencyEntity";
@@ -33,6 +32,9 @@ import { ContractEntity } from "@infrastructure/database/Entities/ContractEntity
 import { ContractMapper } from "@infrastructure/database/Mappers/ContractMapper";
 import { IContractRepository } from "@domain/Repositories/IContractRepository";
 import { ContractRepositoryImpl } from "@infrastructure/database/Repositories/ContractRepository";
+import { CreateAgencyUseCase } from "@application/UseCases/create_agency.use-case";
+import { PlaceModule } from "./PlaceModule";
+import { UpdateAgencyUseCase } from "@application/UseCases/update_agency.use-case";
 import { GetAgencyCollaborationsUseCase } from '../ApplicationLayer/UseCases/get_agency_collaborations.use-case';
 import { IGroupRepository } from "@domain/Repositories/IGroupRepository";
 import { GroupRepository } from "@infrastructure/database/Repositories/GroupRepository";
@@ -44,6 +46,7 @@ import { RemoveArtistFromAgencyUseCase } from "@application/UseCases/remove_arti
     TypeOrmModule.forFeature([AgencyEntity, ArtistAgencyMembershipEntity, ArtistEntity, ContractEntity, GroupEntity, ArtistGroupMembershipEntity]),
     ArtistModule,
     ApprenticeModule, 
+    PlaceModule
   ],
   controllers: [AgencyController],
   providers: [
@@ -52,6 +55,9 @@ import { RemoveArtistFromAgencyUseCase } from "@application/UseCases/remove_arti
     ApprenticeMapper,
     ArtistMapper,
     ContractMapper,
+
+    CreateAgencyUseCase,
+    UpdateAgencyUseCase,
     
     // Repositorio
     {

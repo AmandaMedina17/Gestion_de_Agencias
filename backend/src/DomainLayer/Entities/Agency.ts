@@ -1,11 +1,12 @@
 import { v4 as uuidv4 } from "uuid";
 import { IUpdatable } from '../UpdatableInterface'
 import { UpdateData } from '../UpdateData';
+import { Place } from "./Place";
 
 export class Agency  implements IUpdatable{
   constructor(
     private readonly id: string,
-    private place: string,
+    private place: Place,
     private nameAgency: string,
     private dateFundation: Date
   ) {
@@ -18,14 +19,22 @@ export class Agency  implements IUpdatable{
       }
   }
 
-  private validate_place(place:string): void{
-      if (place === null || place.trim() === "") {
-        throw new Error("Agency place cannot be null or empty");
+  private validate_place(place:Place): void{
+      if (place === null) {
+        throw new Error("Agency place cannot be null");
       }
   }
-  private validate_date(date:Date): void{ //revisar si puede ser posterior a la fecha actual
+
+  private validate_date(date:Date): void{ 
+
       if (date === null) {
         throw new Error("Agency fundation date cannot be null");
+      }
+
+      const today = new Date();
+      
+      if (date > today) {
+        throw new Error('La fecha de fundación no puede ser en el futuro');
       }
     }
 
@@ -57,7 +66,7 @@ export class Agency  implements IUpdatable{
     return this.id;
   }
 
-  public getPlace(): string {
+  public getPlace(): Place {
     return this.place;
   }
 
@@ -69,7 +78,7 @@ export class Agency  implements IUpdatable{
     return this.dateFundation;
   }
 
-  static create(place: string, nameAgency: string, dateFundation: Date) : Agency{
+  static create(place: Place, nameAgency: string, dateFundation: Date) : Agency{
     const id = uuidv4();
     return new Agency(id,place,nameAgency,dateFundation);
   }

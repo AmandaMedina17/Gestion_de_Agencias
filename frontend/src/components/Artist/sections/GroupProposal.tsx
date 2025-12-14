@@ -299,8 +299,7 @@ const GroupProposal: React.FC = () => {
       {userAgency && (
         <div className="agency-info-banner">
           <p>
-            <strong>Agencia Actual:</strong> {userAgency.nameAgency} -{" "}
-            {userAgency.place}
+            <strong>Agencia Actual:</strong> {userAgency.nameAgency}
             <br />
             <small>
               Todos los grupos creados se asociarán automáticamente a esta agencia.

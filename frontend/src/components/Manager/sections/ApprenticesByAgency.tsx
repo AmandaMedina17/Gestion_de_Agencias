@@ -296,7 +296,7 @@ const AgencyApprenticesView: React.FC<AgencyApprenticesViewProps> = ({
   ];
 
   return (
-    <div className="agency-apprentices-view">
+    <div className="agency-apprentices-artist-view">
       <Box sx={{ mb: 3 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <div>
@@ -305,7 +305,7 @@ const AgencyApprenticesView: React.FC<AgencyApprenticesViewProps> = ({
             </Typography>
             {agencyInfo && (
               <Typography variant="subtitle1" color="text.secondary">
-                {agencyInfo.nameAgency} - {agencyInfo.place}
+                {agencyInfo.nameAgency}
               </Typography>
             )}
           </div>
