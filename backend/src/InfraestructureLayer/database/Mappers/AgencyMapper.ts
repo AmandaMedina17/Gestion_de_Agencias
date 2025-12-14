@@ -2,16 +2,23 @@ import { Agency } from "@domain/Entities/Agency";
 import { AgencyEntity } from "../Entities/AgencyEntity";
 import { IMapper } from "./IMapper";
 import { Injectable } from "@nestjs/common";
+import { PlaceMapper } from "./PlaceMapper";
 
 @Injectable()
 export class AgencyMapper extends IMapper<Agency, AgencyEntity> {
+
+  constructor(
+    private readonly placeMapper: PlaceMapper
+  ){
+  super()
+  }
   
   toDomainEntity(dataBaseEntity: AgencyEntity): Agency {
     try {
       // Reconstruir la entidad de dominio
       return new Agency(
         dataBaseEntity.id,
-        dataBaseEntity.place,
+        this.placeMapper.toDomainEntity(dataBaseEntity.place),
         dataBaseEntity.name,
         dataBaseEntity.dateFundation
       );
@@ -26,7 +33,7 @@ export class AgencyMapper extends IMapper<Agency, AgencyEntity> {
     // Mapear propiedades simples
     agencyEntity.id = domainEntity.getId();
     agencyEntity.name = domainEntity.getName();
-    agencyEntity.place = domainEntity.getPlace();
+    agencyEntity.place = this.placeMapper.toDataBaseEntity(domainEntity.getPlace())
     agencyEntity.dateFundation = domainEntity.getDateFundation();
     
     // Las relaciones se manejan en el repositorio

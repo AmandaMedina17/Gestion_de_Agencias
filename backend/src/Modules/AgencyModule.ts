@@ -33,12 +33,16 @@ import { ContractEntity } from "@infrastructure/database/Entities/ContractEntity
 import { ContractMapper } from "@infrastructure/database/Mappers/ContractMapper";
 import { IContractRepository } from "@domain/Repositories/IContractRepository";
 import { ContractRepositoryImpl } from "@infrastructure/database/Repositories/ContractRepository";
+import { CreateAgencyUseCase } from "@application/UseCases/create_agency.use-case";
+import { PlaceModule } from "./PlaceModule";
+import { UpdateAgencyUseCase } from "@application/UseCases/update_agency.use-case";
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([AgencyEntity, ArtistAgencyMembershipEntity, ArtistEntity, ContractEntity]),
     ArtistModule,
     ApprenticeModule, 
+    PlaceModule
   ],
   controllers: [AgencyController],
   providers: [
@@ -47,6 +51,9 @@ import { ContractRepositoryImpl } from "@infrastructure/database/Repositories/Co
     ApprenticeMapper,
     ArtistMapper,
     ContractMapper,
+
+    CreateAgencyUseCase,
+    UpdateAgencyUseCase,
     
     // Repositorio
     {

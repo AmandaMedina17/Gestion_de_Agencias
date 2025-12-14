@@ -4,7 +4,6 @@ import { Agency } from '@domain/Entities/Agency';
 import { CreateAgencyDto} from '../DTOs/agencyDto/create-agency.dto';
 import { AgencyResponseDto } from '@application/DTOs/agencyDto/response-agency.dto';
 import { BaseService } from './base.service';
-import { BaseDtoMapper } from '@application/DTOs/dtoMappers/DtoMapper';
 import { UpdateAgencyDto } from '@application/DTOs/agencyDto/update-agency.dto';
 import { AgencyDtoMapper } from '@application/DTOs/dtoMappers/agency.dtoMapper';
 import { ArtistResponseDto } from '@application/DTOs/artistDto/response-artist.dto';
@@ -24,6 +23,8 @@ import { ContractDtoMapper } from '../DTOs/dtoMappers/contract.dtoMapper';
 import { GetArtistsWithDebutUseCase } from '../UseCases/get_artists_with_debut.use-case';
 import { IContractRepository } from '@domain/Repositories/IContractRepository';
 import { ResponseArtistAgencyDto } from '@application/DTOs/artist_agencyDto/response-artist-agency.dto';
+import { CreateAgencyUseCase } from '@application/UseCases/create_agency.use-case';
+import { UpdateAgencyUseCase } from '@application/UseCases/update_agency.use-case';
 
 @Injectable()
 export class AgencyService extends BaseService<Agency, CreateAgencyDto, AgencyResponseDto, UpdateAgencyDto> {
@@ -44,10 +45,23 @@ export class AgencyService extends BaseService<Agency, CreateAgencyDto, AgencyRe
     private readonly relateArtistToAgencyUseCase: RelateArtistToAgencyUseCase,
     @Inject(IContractRepository)
     private readonly contractRepository: IContractRepository,
+    private readonly create_agency_usecase: CreateAgencyUseCase,
+    private readonly update_agency_usecase: UpdateAgencyUseCase
 
   ) {
     super(agencyRepository, agencyDtoMapper)
   }
+
+  async create(createAgencyDto: CreateAgencyDto): Promise<AgencyResponseDto> {
+      const savedEntity = await this.create_agency_usecase.execute(createAgencyDto)
+      return this.mapper.toResponse(savedEntity)
+  }
+
+  async update(id: string, updateAgencyDto: UpdateAgencyDto): Promise<AgencyResponseDto> {
+      const savedEntity = await this.update_agency_usecase.execute(id, updateAgencyDto)
+      return this.mapper.toResponse(savedEntity)
+  }
+
   async getAgencyArtists(agencyId: string): Promise<ArtistResponseDto[]> {
     const artists =  await this.getAgencyArtistsUseCase.execute(agencyId);
     return this.artistDtoMapper.toResponseList(artists);
