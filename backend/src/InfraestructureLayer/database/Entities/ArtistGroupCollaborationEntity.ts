@@ -12,8 +12,8 @@ export class ArtistGroupCollaborationEntity {
     @PrimaryColumn({ name: 'group_id' })
     groupId!: string;
 
-    @PrimaryColumn({ name: 'date_id' })
-    dateId!: string;
+    @PrimaryColumn({ name: 'date' , type: 'date'})
+    date!: Date;
 
     // Relación con el artista
     @ManyToOne(() => ArtistEntity, (artist: ArtistEntity) => artist.groupCollaborations)
@@ -21,12 +21,12 @@ export class ArtistGroupCollaborationEntity {
     artist!: ArtistEntity;
 
     // Relación con el grupo
-    @ManyToOne(() => GroupEntity, (group: GroupEntity) => group.artistCollaborations)
+    @ManyToOne(() => GroupEntity, (group: GroupEntity) => group.artistCollaborations, {onDelete: 'CASCADE'})
     @JoinColumn({ name: 'group_id' })
     group!: GroupEntity;
 
-    // Relación con la fecha
-    @ManyToOne(() => DateEntity, (date: DateEntity) => date.artistGroupCollaborations)
-    @JoinColumn({ name: 'date_id' })
-    date!: DateEntity;
+    // // Relación con la fecha
+    // @ManyToOne(() => DateEntity, (date: DateEntity) => date.artistGroupCollaborations)
+    // @JoinColumn({ name: 'date_id' })
+    // date!: DateEntity;
 }

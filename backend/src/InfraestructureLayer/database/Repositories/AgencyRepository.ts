@@ -35,6 +35,21 @@ export class AgencyRepositoryImpl
   ) {
     super(repository, mapper);
   }
+
+  async findById(id: string): Promise<Agency | null> {
+      const entity : AgencyEntity | null =  await this.repository.findOne({where : {id}, relations : ['place']});
+      
+      if(!entity)
+        throw new Error("This agency doesn't exist")
+  
+      return this.mapper.toDomainEntity(entity);
+  }
+
+  async findAll(): Promise<Agency[]> {
+      const entities : AgencyEntity [] =  await this.repository.find({relations : ['place']});
+  
+      return this.mapper.toDomainEntities(entities);
+  }
   
   async addArtistToAgency(
     artistId: string, 

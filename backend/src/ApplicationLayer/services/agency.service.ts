@@ -4,7 +4,6 @@ import { Agency } from '@domain/Entities/Agency';
 import { CreateAgencyDto} from '../DTOs/agencyDto/create-agency.dto';
 import { AgencyResponseDto } from '@application/DTOs/agencyDto/response-agency.dto';
 import { BaseService } from './base.service';
-import { BaseDtoMapper } from '@application/DTOs/dtoMappers/DtoMapper';
 import { UpdateAgencyDto } from '@application/DTOs/agencyDto/update-agency.dto';
 import { AgencyDtoMapper } from '@application/DTOs/dtoMappers/agency.dtoMapper';
 import { ArtistResponseDto } from '@application/DTOs/artistDto/response-artist.dto';
@@ -24,6 +23,12 @@ import { ContractDtoMapper } from '../DTOs/dtoMappers/contract.dtoMapper';
 import { GetArtistsWithDebutUseCase } from '../UseCases/get_artists_with_debut.use-case';
 import { IContractRepository } from '@domain/Repositories/IContractRepository';
 import { ResponseArtistAgencyDto } from '@application/DTOs/artist_agencyDto/response-artist-agency.dto';
+import { CreateAgencyUseCase } from '@application/UseCases/create_agency.use-case';
+import { UpdateAgencyUseCase } from '@application/UseCases/update_agency.use-case';
+import { AgencyCollaborationsResponseDto } from '@application/DTOs/agencyCollaborationsDto/response-agency-collaborations.dto';
+import { GetAgencyCollaborationsUseCase } from '../UseCases/get_agency_collaborations.use-case';
+import { RemoveArtistFromAgencyUseCase } from '../UseCases/remove_artist_from_agency.use-case';
+import { CreateEndMembershipDto } from '@application/DTOs/endArtistMembership/create-end-artist-membership.dto';
 
 @Injectable()
 export class AgencyService extends BaseService<Agency, CreateAgencyDto, AgencyResponseDto, UpdateAgencyDto> {
@@ -39,15 +44,30 @@ export class AgencyService extends BaseService<Agency, CreateAgencyDto, AgencyRe
     private readonly getAgencyApprenticesUseCase: GetAgencyApprenticesUseCase,
     private readonly getAgencyGroupsUseCase: GetAgencyGroupsUseCase,
     private readonly getArtistsWithDebutUseCase: GetArtistsWithDebutUseCase,
+    private readonly getAgencyCollaborationsUseCase: GetAgencyCollaborationsUseCase,
+    private readonly removeArtistFromAgencyUseCase: RemoveArtistFromAgencyUseCase,
     @Inject(IArtistRepository)
     private readonly artistRepository: IArtistRepository,
     private readonly relateArtistToAgencyUseCase: RelateArtistToAgencyUseCase,
     @Inject(IContractRepository)
     private readonly contractRepository: IContractRepository,
+    private readonly create_agency_usecase: CreateAgencyUseCase,
+    private readonly update_agency_usecase: UpdateAgencyUseCase
 
   ) {
     super(agencyRepository, agencyDtoMapper)
   }
+
+  async create(createAgencyDto: CreateAgencyDto): Promise<AgencyResponseDto> {
+      const savedEntity = await this.create_agency_usecase.execute(createAgencyDto)
+      return this.mapper.toResponse(savedEntity)
+  }
+
+  async update(id: string, updateAgencyDto: UpdateAgencyDto): Promise<AgencyResponseDto> {
+      const savedEntity = await this.update_agency_usecase.execute(id, updateAgencyDto)
+      return this.mapper.toResponse(savedEntity)
+  }
+
   async getAgencyArtists(agencyId: string): Promise<ArtistResponseDto[]> {
     const artists =  await this.getAgencyArtistsUseCase.execute(agencyId);
     return this.artistDtoMapper.toResponseList(artists);
@@ -88,23 +108,23 @@ export class AgencyService extends BaseService<Agency, CreateAgencyDto, AgencyRe
   }
 
   async getArtistsWithDebutAndActiveContracts(agencyId: string): Promise<ArtistDebutContractResponseDto[]> {
-    // 1. Obtener artistas que han debutado en esta agencia
+    // Obtener artistas que han debutado en esta agencia
     const artistsWithDebut = await this.getArtistsWithDebutUseCase.execute(agencyId);
     
     const result: ArtistDebutContractResponseDto[] = [];
 
     for (const artist of artistsWithDebut) {
-      // 2. Obtener grupos de debut del artista
-      const debutGroups = await this.artistRepository.getArtistDebutGroups(artist.getId());
+      // Obtener grupos de debut del artista
+      const debutGroups = await this.artistRepository.getArtistGroups(artist.getId());
       
-      // 3. Obtener contratos activos del artista con esta agencia
+      // Obtener contratos activos del artista con esta agencia
       const artistContracts = await this.contractRepository.getArtistContracts(artist.getId());
       const activeContracts = artistContracts.filter((contract) => 
         contract.getStatus() === 'ACTIVO' && 
         contract.getAgencyId().getId() === agencyId
       );
 
-      // 4. Solo incluir si tiene contratos activos
+      // Solo incluir si tiene contratos activos
       if (activeContracts.length > 0) {
         result.push({
           artist: this.artistDtoMapper.toResponse(artist),
@@ -117,5 +137,12 @@ export class AgencyService extends BaseService<Agency, CreateAgencyDto, AgencyRe
     }
 
     return result;
+  }
+  async getAgencyCollaborations(agencyId: string): Promise<AgencyCollaborationsResponseDto> {
+    return await this.getAgencyCollaborationsUseCase.execute(agencyId);
+  }
+
+  async removeArtistFromAgency(endMembership: CreateEndMembershipDto){
+    this.removeArtistFromAgencyUseCase.execute(endMembership.agencyId,endMembership.artistId,endMembership.leaveDate);
   }
 }

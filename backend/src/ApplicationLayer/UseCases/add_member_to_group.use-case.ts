@@ -1,8 +1,9 @@
-import { ConflictException, Inject, Injectable } from '@nestjs/common';
+import { Injectable, Inject, ConflictException, NotFoundException } from '@nestjs/common';
 import { IGroupRepository } from '@domain/Repositories/IGroupRepository';
 import { IArtistRepository } from '@domain/Repositories/IArtistRepository';
 import { AddMemberToGroupDto } from '@application/DTOs/membershipDto/add-member-to-group.dto';
 import { ResponseMembershipDto } from '@application/DTOs/membershipDto/response-membership.dto';
+import { IArtistGroupMembershipRepository } from '@domain/Repositories/IArtistGroupMembershipRepository';
 
 @Injectable()
 export class AddMemberToGroupUseCase {
@@ -11,57 +12,63 @@ export class AddMemberToGroupUseCase {
     private readonly groupRepository: IGroupRepository,
     @Inject(IArtistRepository)
     private readonly artistRepository: IArtistRepository,
+    @Inject(IArtistGroupMembershipRepository)
+    private readonly membership_repository: IArtistGroupMembershipRepository
   ) {}
 
-  async execute(groupId: string, addMemberDto: AddMemberToGroupDto): Promise<ResponseMembershipDto> {
+  async execute(addMemberDto: AddMemberToGroupDto): Promise<ResponseMembershipDto> {
 
-    // Validar que el grupo existe
-    const group = await this.groupRepository.findById(groupId);
+    const { groupId,  artistId, role } = addMemberDto;
+
+    // Cargar el grupo con sus miembros actuales
+    const group = await this.groupRepository.findByIdWithMembers(groupId);
     if (!group) {
-      throw new Error(`Grupo con ID ${groupId} no encontrado`);
+      throw new NotFoundException(`Grupo con ID ${groupId} no encontrado`);
     }
 
-    // // Validar que el artista existe
-    // const artist = await this.artistRepository.findById(addMemberDto.artistId);
-    // if (!artist) {
-    //   throw new Error(`Artista con ID ${addMemberDto.artistId} no encontrado`);
-    // }
+    // Verificar que el artista existe
+    const artist = await this.artistRepository.findById(artistId);
+    if (!artist) {
+      throw new NotFoundException(`Artista con ID ${artistId} no encontrado`);
+    }
 
-    //  // Validar que el artista no esté en otro grupo 
-    // const artistGroup = await this.groupRepository.getArtistCurrentGroup(artist.getId())
-    
-    // if (artistGroup) {
-    //   throw new Error(`El artista ya es miembro activo del grupo: ${artistGroup.getName()}`);
-    // }
-
-    const actual_date: Date = new Date();
-
-    // Validar las fechas
-    if (addMemberDto.endDate && addMemberDto.endDate <= actual_date) {
+    // Verificar que el artista no esté en otro grupo activo
+    const currentGroup = await this.artistRepository.getArtistCurrentGroup(artistId);
+    if (currentGroup) {
       throw new ConflictException(
-        'La fecha de finalización debe ser posterior a la fecha actual'
+        `El artista ya es miembro activo del grupo: ${currentGroup.getName()}`
       );
     }
 
-    // Crear la membresía
-    await this.groupRepository.addMember(
-      groupId,
-      addMemberDto.artistId,
-      actual_date,
-      addMemberDto.role,
-      actual_date,
-      addMemberDto.endDate || null
+    // Determinar fecha de inicio
+    const startDate =  new Date();
+
+    // Validar agregación del miembro (Mediante el dominio)
+    const membershipInfo = group.addMember(artist.getId(), role , startDate);
+
+    // Actualizar el grupo 
+    await this.groupRepository.save(group);
+
+    // Guardar la membersía
+    await this.membership_repository.createMembership(
+      membershipInfo.artistId,
+      membershipInfo.groupId,
+      membershipInfo.start_date,
+      membershipInfo.role,
+      membershipInfo.artistDebutDate,
+      membershipInfo.endDate
     );
 
-     //Sacar la membresia de base de datos
     return {
-        artistId: addMemberDto.artistId,
-        groupId: groupId,
-        role: addMemberDto.role,
-        artist_debut_date: actual_date,
-        startDate: actual_date,
-        endDate: addMemberDto.endDate || undefined
-  }
+      artistId: membershipInfo.artistId,
+      groupId: membershipInfo.groupId,
+      role: membershipInfo.role,
+      artist_debut_date: membershipInfo.artistDebutDate,
+      startDate: membershipInfo.start_date,
+      endDate: membershipInfo.endDate
+    };
   }
 }
+
+
 

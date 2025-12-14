@@ -20,6 +20,31 @@ export class GroupActivityRepository implements IGroupActivityRepository {
     private readonly activityMapper: ActivityMapper,
   ) {}
 
+  async getActivitiesByGroupId( groupId: string, start_date: Date, end_date: Date): Promise<Activity[]> {
+
+    // Crear query builder
+    const query = this.repository
+      .createQueryBuilder('groupActivity')
+      .innerJoinAndSelect('groupActivity.activity', 'activity')
+      .innerJoinAndSelect('activity.activityDates', 'activityDate')
+      .leftJoinAndSelect('activity.activityResponsibles', 'activityResponsible')
+      .leftJoinAndSelect('activityResponsible.responsible', 'responsible')
+      .leftJoinAndSelect('activity.activityPlaces', 'activityPlace')
+      .leftJoinAndSelect('activityPlace.place', 'place')
+      .where('groupActivity.groupId = :groupId', { groupId });
+
+    // Agregar condición de fechas
+    query.andWhere('activityDate.date >= :start_date', { start_date });
+    query.andWhere('activityDate.date <= :end_date', { end_date });
+    
+    // Ordenar por fecha
+    query.orderBy('activityDate.date', 'ASC');
+
+    const groupActivities = await query.getMany();
+
+    return groupActivities.map(ga => this.activityMapper.toDomainWithRelations(ga.activity));
+  }
+
   async scheduleGroup(groupId: string, activityId: string): Promise<void> {
     const entity = new GroupActivityEntity();
     entity.groupId = groupId;
@@ -56,7 +81,7 @@ export class GroupActivityRepository implements IGroupActivityRepository {
     return conflicts;
   }
 
-  async getActivitiesByGroup(groupId: string): Promise<Activity[]> {
+  async getAllActivitiesByGroupId(groupId: string): Promise<Activity[]> {
     const groupActivities = await this.repository.find({
       where: { groupId },
       relations: [

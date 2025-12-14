@@ -4,6 +4,7 @@ import { Agency } from "../Entities/Agency";
 import { Album } from "../Entities/Album";
 import { Contract } from "../Entities/Contract";
 import { IRepository } from "./IRepository";
+import { ArtistCollaborationEntity } from "@infrastructure/database/Entities/ArtistCollaborationEntity";
 
 export abstract class IArtistRepository extends IRepository<Artist> {
   abstract findArtistsWithScheduleConflicts(
@@ -11,26 +12,39 @@ export abstract class IArtistRepository extends IRepository<Artist> {
     endDate: Date
   ): Promise<Artist[]>;
 
-  abstract getArtistAgencies(id: string): Promise<Agency[]>;
-
   abstract getArtistAlbums(id: string): Promise<Album[]>;
-
-  // Historial profesional de un artista:
-  abstract getCurrentArtistContracts(id: string): Promise<Contract[]>;
 
   abstract getArtistGroups(id: string): Promise<Group[]>;
 
-  abstract getArtistDebutsInOrders(id: string): Promise<any[]>; //Que hay que devolver??
+  abstract getArtist_ArtistColaborations(id: string): Promise<Array<{
+    artist1: Artist;
+    artist2: Artist;
+    collaborationDate: Date;
+  }>> 
 
-  abstract getArtist_ArtistColaborations(id: string): Promise<Artist[]>;
+  abstract getArtist_GroupsColaborations(id: string): Promise<Array<{
+      artist: Artist;
+      group: Group;
+      collaborationDate: Date;
+    }>>
 
-  abstract getArtist_GroupsColaborations(id: string): Promise<Group[]>;
+  abstract getArtistCurrentGroup(id: string): Promise<Group | null>;
 
-  abstract getArtistCurrentGroup(id: string): Promise<Group>;
+  abstract getArtists_WithAgencyChangesAndGroups(agencyId: string): Promise<Artist[]>;
 
-  abstract getArtists_WithAgencyChangesAndGroups(): Promise<Artist[]>;
+  abstract getArtistLastGroup(id : string) : Promise<Group>
 
   abstract getArtistsWithDebut(agencyId?: string): Promise<Artist[]> ;
 
-  abstract getArtistDebutGroups(artistId: string): Promise<Group[]>;
+  abstract getArtistDebutHistory(agencyId: string): Promise<Array<{
+    group: Group,
+    role: string,
+    debutDate: Date,
+    startDate: Date,
+    endDate: Date | null,
+  }>>
+
+  abstract createArtistCollaboration(artistId1: string, artist2Id: string, date: Date) : Promise<void>;
+
+  abstract createArtistGroupCollaboration(artistId: string, groupId: string, date: Date) : Promise<void>;
 }

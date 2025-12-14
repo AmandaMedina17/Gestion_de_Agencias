@@ -1,23 +1,37 @@
 import { Album } from "@domain/Entities/Album";
 import { IAlbumRepository } from "@domain/Repositories/IAlbumRepository";
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { AlbumEntity } from "../Entities/AlbumEntity";
 import { BaseRepository } from "./BaseRepositoryImpl";
 import { Repository } from "typeorm";
 import { IMapper } from "../Mappers/IMapper";
 import { AlbumMapper } from "../Mappers/AlbumMapper";
+import { Song } from "@domain/Entities/Song";
+import { SongBillboardEntity } from "../Entities/SongBillboardEntity";
+import { SongBillboardRepository } from "./SonBillboardrepository";
+import { SongBillboard } from "@domain/Entities/SongBillboard";
+import { ISongBillboardRepository } from "@domain/Repositories/ISonBillboardRepository";
+import { SongMapper } from "../Mappers/SongMapper";
 
 @Injectable()
 export class AlbumRepository extends BaseRepository<Album,AlbumEntity> implements IAlbumRepository{
     constructor(
         @InjectRepository(AlbumEntity)
         repository: Repository<AlbumEntity>,
-        mapper: AlbumMapper
+        mapper: AlbumMapper,
+        private readonly songMapper : SongMapper
     ) {
         super(repository, mapper);
     }
+    async getAllSong(id: string): Promise<Song[]> {
+        const entity  =  await this.repository.findOne({where : {id}, relations : {
+            songs : true
+        }});
 
+        return this.songMapper.toDomainEntities(entity!.songs);
+    }
+    
     async findByTitle(title: string): Promise<Album> {
         const entity = await this.repository.findOne({ 
             where: { title } 
@@ -46,6 +60,4 @@ export class AlbumRepository extends BaseRepository<Album,AlbumEntity> implement
         }});
         return this.mapper.toDomainEntities(dbEntities);
     }
-
-
 }

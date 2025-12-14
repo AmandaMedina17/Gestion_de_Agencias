@@ -5,11 +5,24 @@ import { Artist } from "@domain/Entities/Artist";
 import { Injectable, Inject } from "@nestjs/common";
 import { BaseService } from "./base.service";
 import { IArtistRepository } from "@domain/Repositories/IArtistRepository";
-// import { GetArtistContractsUseCase } from '../UseCases/get_artist_contracts.use-case';
 import { ContractDtoMapper } from '../DTOs/dtoMappers/contract.dtoMapper';
-import { ContractResponseDto } from "@application/DTOs/contractDto/response-contract.dto";
 import { ArtistDtoMapper } from "@application/DTOs/dtoMappers/artist.dtoMapper";
 import { GetArtistsWithAgencyChangesAndGroupsUseCase } from '@application/UseCases/get_artists_with_agency_changes_and_groups.use-case';
+import { ArtistDebutHistoryWithActivitiesAndContractsResponseDto, DebutHistoryItemResponseDto } from "@application/DTOs/artist_debut_historyDto/response-artist_debut_history.dto";
+import { ActivityDtoMapper } from "@application/DTOs/dtoMappers/activity.dtoMapper";
+import { GroupDtoMapper } from "@application/DTOs/dtoMappers/group.dtoMapper";
+import { ArtistCollaborationResponseDto } from "@application/DTOs/artistCollaborationsDto/response-artist-collaboration.dto";
+import { ArtistGroupCollaborationResponseDto } from "@application/DTOs/artist_groupCollaborationDto/response-artist-group-collaboration.dto";
+import { CreateArtistGroupCollaborationDto } from "@application/DTOs/artist_groupCollaborationDto/create-artist-group-collaboration.dto";
+import { CreateArtistCollaborationDto } from "@application/DTOs/artistCollaborationsDto/create-artist-collaboration.dto";
+import { IGroupRepository } from "@domain/Repositories/IGroupRepository";
+import { GroupRepository } from '../../InfraestructureLayer/database/Repositories/GroupRepository';
+import { CreateArtistCollaborationUseCase } from "@application/UseCases/create_artist_collaboration.use-case";
+import { CreateArtistGroupCollaborationUseCase } from "@application/UseCases/create_artist_group_collaboration.use-case";
+import { CreateArtistUseCase } from "@application/UseCases/create_artist.use-case";
+import { ProfessionalHistoryResponseDto } from "@application/DTOs/professional_historyDto/response-professional-history.dto";
+import { GetProfessionalHistoryUseCase } from "@application/UseCases/get_artist_professional_history.use-case";
+import { GroupResponseDto } from "@application/DTOs/groupDto/response-group.dto";
 
 @Injectable()
 export class ArtistService extends BaseService<Artist, CreateArtistDto, ArtistResponseDto, UpdateArtistDto>{
@@ -17,12 +30,127 @@ export class ArtistService extends BaseService<Artist, CreateArtistDto, ArtistRe
         @Inject(IArtistRepository)
         private readonly artistRepository: IArtistRepository,
         private readonly artistDtoMapper: ArtistDtoMapper,
+        private readonly contractDtoMapper:ContractDtoMapper,
+        private readonly activityDtoMapper: ActivityDtoMapper,
+        private readonly groupDtoMapper: GroupDtoMapper,
+        @Inject(IGroupRepository)
+        private readonly groupRepository: IGroupRepository,
         private readonly getArtistsWithAgencyChangesAndGroupsUseCase : GetArtistsWithAgencyChangesAndGroupsUseCase,
+        private readonly createArtistCollaborationUseCase: CreateArtistCollaborationUseCase,
+        private readonly createArtistGroupCollaborationUseCase: CreateArtistGroupCollaborationUseCase,
+        private readonly createArtistUseCase : CreateArtistUseCase,
+        private readonly getProfessionalHistoryUseCase: GetProfessionalHistoryUseCase,
     ){
         super(artistRepository, artistDtoMapper)
     }
-    async getArtistsWithAgencyChangesAndGroups() : Promise<ArtistResponseDto[]>{
-        const artists = await this.getArtistsWithAgencyChangesAndGroupsUseCase.execute();
-        return this.artistDtoMapper.toResponseList(artists);
+
+    async create(createDto: CreateArtistDto): Promise<ArtistResponseDto> {
+        const artist = await this.createArtistUseCase.execute(createDto);
+        return this.artistDtoMapper.toResponse(artist);
+    }
+    async getArtistsWithAgencyChangesAndGroups(agencyId: string): Promise<ArtistDebutHistoryWithActivitiesAndContractsResponseDto[]> {
+        const artistsData = await this.getArtistsWithAgencyChangesAndGroupsUseCase.execute(agencyId);
+        
+        return artistsData.map(data => {
+            const artistDto = this.artistDtoMapper.toResponse(data.artist);
+            const contractDtos = data.contracts.map(contract => 
+                this.contractDtoMapper.toResponse(contract)
+            );
+            const activityDtos = data.activities.map(activity => 
+                this.activityDtoMapper.toResponse(activity)
+            );
+            const debutHistoryDtos: DebutHistoryItemResponseDto[] = data.debutHistory.map(historyItem => ({
+                group: this.groupDtoMapper.toResponse(historyItem.group),
+                role: historyItem.role,
+                debutDate: historyItem.debutDate,
+                startDate: historyItem.startDate,
+                endDate: historyItem.endDate,
+            }));
+
+            return {
+                artist: artistDto,
+                contracts: contractDtos,
+                activities: activityDtos,
+                debutHistory: debutHistoryDtos,
+            };
+        });
+    }
+
+    async getArtist_ArtistCollaborations(artistId: string) : Promise<ArtistCollaborationResponseDto[]>{
+        const collaborations = await this.artistRepository.getArtist_ArtistColaborations(artistId);
+        
+        const response: ArtistCollaborationResponseDto[] = [];
+        
+        for (const coll of collaborations) {
+            const artist1Response = this.artistDtoMapper.toResponse(coll.artist1);
+            const artist2Response = this.artistDtoMapper.toResponse(coll.artist2);
+            
+            const collaborationResponse = new ArtistCollaborationResponseDto();
+            collaborationResponse.artist1 = artist1Response;
+            collaborationResponse.artist2 = artist2Response;
+            collaborationResponse.date = coll.collaborationDate;
+            
+            response.push(collaborationResponse);
+        }
+        return response;
+    }
+
+    async getArtist_GroupCollaborations(artistId: string) : Promise<ArtistGroupCollaborationResponseDto[]>{
+        const collaborations = await this.artistRepository.getArtist_GroupsColaborations(artistId);
+        
+        const response: ArtistGroupCollaborationResponseDto[] = [];
+        
+        for (const coll of collaborations) {
+            const artistResponse = this.artistDtoMapper.toResponse(coll.artist);
+            const groupResponse = this.groupDtoMapper.toResponse(coll.group);
+            
+            const collaborationResponse = new ArtistGroupCollaborationResponseDto();
+            collaborationResponse.artist = artistResponse;
+            collaborationResponse.group = groupResponse;
+            collaborationResponse.date = coll.collaborationDate;
+            
+            response.push(collaborationResponse);
+        }
+
+        return response;
+    }
+
+    async createArtistCollaboration(createArtistCollaborationDto: CreateArtistCollaborationDto) {
+        const {artist1, artist2, date} = await this.createArtistCollaborationUseCase.execute(createArtistCollaborationDto)
+        const artist1Dto = this.artistDtoMapper.toResponse(artist1);
+        const artist2Dto = this.artistDtoMapper.toResponse(artist2);
+        const response = new ArtistCollaborationResponseDto();
+        response.artist1 = artist1Dto;
+        response.artist2 = artist2Dto;
+        response.date = date;
+        return response;
+    }
+
+  async createArtistGroupCollaboration(createArtistGroupCollaborationDto: CreateArtistGroupCollaborationDto) {
+    const { artist, group, date } = await this.createArtistGroupCollaborationUseCase.execute(createArtistGroupCollaborationDto);
+    
+    // Mapear a DTOs de respuesta si es necesario
+    const artistDto = this.artistDtoMapper.toResponse(artist);
+    const groupDto = this.groupDtoMapper.toResponse(group);
+    
+    const response = new ArtistGroupCollaborationResponseDto();
+    response.artist = artistDto;
+    response.group = groupDto;
+    response.date = date;
+    return response;
+  }
+
+    async getProfessionalHistory(artistId: string): Promise<ProfessionalHistoryResponseDto> {
+        return await this.getProfessionalHistoryUseCase.execute(artistId);
+    }
+
+    async getArtistGroups(artistId: string): Promise<GroupResponseDto[]>{
+        const artist = await this.artistRepository.findById(artistId);
+        
+        if(!artist){
+            throw new Error("Artist not found");
+        }
+        const groups = await this.artistRepository.getArtistGroups(artistId);
+        return groups.map(group => this.groupDtoMapper.toResponse(group));  
     }
 }

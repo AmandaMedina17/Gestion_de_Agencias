@@ -6,7 +6,9 @@ export abstract class IGroupActivityRepository {
   
   abstract isGroupScheduled(groupId: string, activityId: string): Promise<boolean>;
   
-  abstract getActivitiesByGroup(groupId: string): Promise<Activity[]>;
+  abstract getActivitiesByGroupId(groupId: string, start_date: Date, end_date: Date): Promise<Activity[]>;
+
+  abstract getAllActivitiesByGroupId(groupId: string): Promise<Activity[]>
 
   abstract checkGroupMembersConflicts(groupId: string, activityId: string): Promise<Artist[]>; 
 }

@@ -25,7 +25,6 @@ export class SongBillboardEntity {
     // Relación con BillboardListEntity
     @ManyToOne(() => BillboardListEntity, (billboardList: BillboardListEntity) => billboardList.songBillboards,
     {onDelete : 'CASCADE'})
-
     @JoinColumn({ name: 'billboard_list_id' })
     billboardList!: BillboardListEntity;
 }

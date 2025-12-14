@@ -7,7 +7,6 @@ import { BaseService } from './base.service';
 import { BaseDtoMapper } from '@application/DTOs/dtoMappers/DtoMapper';
 import { UpdateContractDto } from '@application/DTOs/contractDto/update-contract.dto';
 import { CreateContractUseCase } from '@application/UseCases/create_contract.uso-case';
-import { UpdateContractStatusUseCase } from '@application/UseCases/update_contract_status.use-case';
 import { ContractStatus } from '@domain/Enums';
 import { UpdateContractUseCase } from '@application/UseCases/update_contract.use-case';
 import { ContractDtoMapper } from '@application/DTOs/dtoMappers/contract.dtoMapper';
@@ -20,7 +19,6 @@ export class ContractService extends BaseService<Contract, CreateContractDto, Co
     private readonly contractRepository: IContractRepository,
     private readonly contractDtoMapper: ContractDtoMapper,
     private readonly createContractUseCase: CreateContractUseCase,
-    private readonly updateContractStatusUseCase: UpdateContractStatusUseCase,
     private readonly updateContractUseCase: UpdateContractUseCase,
     private readonly getArtistContractsUseCase : GetArtistContractsUseCase
   ) {
@@ -28,10 +26,6 @@ export class ContractService extends BaseService<Contract, CreateContractDto, Co
   }
   async create(createContractDto: CreateContractDto): Promise<ContractResponseDto> {
     const contract = await this.createContractUseCase.execute(createContractDto);
-    return this.contractDtoMapper.toResponse(contract);
-  }
-  async updateStatus(contractId: string, status: ContractStatus): Promise<ContractResponseDto> {
-    const contract = await this.updateContractStatusUseCase.execute(contractId, status);
     return this.contractDtoMapper.toResponse(contract);
   }
   async update(id: string, updateContractDto: UpdateContractDto): Promise<ContractResponseDto> {
