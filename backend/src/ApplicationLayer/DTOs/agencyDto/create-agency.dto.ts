@@ -1,9 +1,10 @@
-import { IsDate, IsNotEmpty, IsString } from "class-validator";
+import { IsDate, IsNotEmpty, IsString, IsUUID } from "class-validator";
 import { Transform } from 'class-transformer';
+
 export class CreateAgencyDto{
     @IsNotEmpty()
-    @IsString()
-    place!: string;
+    @IsUUID()
+    placeId!: string;
     
     @IsNotEmpty()
     @IsString()
@@ -14,6 +15,4 @@ export class CreateAgencyDto{
     @Transform(({ value }) => new Date(value)) //Convierte string a Date automáticamente
     dateFundation!: Date;
 
-    
-    
 }
