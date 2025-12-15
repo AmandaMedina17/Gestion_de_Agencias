@@ -42,6 +42,11 @@ export class ArtistController {
   getArtistsWithAgencyChangesAndGroups(@Param('agencyId') agencyId: string){
     return this.artistService.getArtistsWithAgencyChangesAndGroups(agencyId);
   }
+
+  @Get(':id/main-hits')
+  async getMainHits(@Param('id') id: string) {
+    return await this.artistService.getArtistMainHits(id);
+  }
   
   @Get(':id')
   findOne(@Param('id') id: string) {

@@ -31,13 +31,14 @@ import { GroupModule } from '../GroupModule';
 import { AssignAlbumToArtistUseCase } from '@application/UseCases/assign-album-to-artist.use-case';
 import { AssignAlbumToGroupUseCase } from '@application/UseCases/assign-album-to-group.use-case';
 
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([AlbumEntity]),
     SongBillboardModule,
     forwardRef(() => AwardModule),
-    ArtistModule,
-    GroupModule
+    forwardRef(() =>ArtistModule),
+    forwardRef(() =>GroupModule),
   ],
   controllers: [AlbumController],
   providers: [ 
@@ -54,7 +55,9 @@ import { AssignAlbumToGroupUseCase } from '@application/UseCases/assign-album-to
     AssignAlbumToGroupUseCase
   ],
   exports: [
-      IAlbumRepository
+      IAlbumRepository,
+      AlbumMapper,
+      AlbumService
   ]
 })
 export class AlbumModule {}
