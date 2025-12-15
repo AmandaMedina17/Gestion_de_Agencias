@@ -5,8 +5,6 @@ import { useAgency } from '../../context/AgencyContext';
 import ManagerSidebar from './ManagerSidebar';
 import '../../components/Manager/ManagerDashboard.css';
 import { AgencyResponseDto } from '../../../../backend/src/ApplicationLayer/DTOs/agencyDto/response-agency.dto';
-import { ArtistStatus } from '../Admin/sections/Artist/ArtistManagement';
-import { ApprenticeStatus } from '../Admin/sections/Apprentice/ApprenticesManagement';
 import { sectionComponents } from './ManagerSectionMap';
 import '../Admin/AdminDashboard.css';
 import ManagerProfile from './sections/Profile/UserProfile'; // Asegúrate de que la ruta sea correcta

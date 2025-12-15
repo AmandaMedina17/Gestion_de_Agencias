@@ -1,0 +1,762 @@
+/* Variables de colores */
+:root {
+  --primary-color: #3b82f6;
+  --primary-light: #60a5fa;
+  --primary-dark: #2563eb;
+  --accent-color: #8b5cf6;
+  --accent-light: #a78bfa;
+  --secondary-color: #f3f4f6;
+  --secondary-foreground: #374151;
+  --card-bg: #ffffff;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+  --text-muted: #9ca3af;
+  --border-color: #e5e7eb;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+}
+
+/* Estilos base */
+* {
+  font-family: Arial;
+  font-weight: normal;
+}
+
+.manager-profile-container {
+  max-width: 72rem;
+  margin-left: auto;
+  margin-right: auto;
+  /* padding: 2rem 1rem; */
+}
+
+@media (min-width: 768px) {
+  .manager-profile-container {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+}
+
+/* Header */
+.manager-profile-header {
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.manager-profile-title {
+  font-size: 2.25rem;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+@media (min-width: 768px) {
+  .manager-profile-title {
+    font-size: 3rem;
+  }
+}
+
+.manager-profile-refresh-btn {
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
+  background-color: var(--primary-color);
+  color: white;
+  border-radius: 0.375rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.manager-profile-refresh-btn:hover {
+  background-color: var(--primary-dark);
+}
+
+.manager-profile-refresh-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Card Principal */
+.manager-profile-main-card {
+  background-color: var(--card-bg);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow-lg);
+  transition: box-shadow 0.3s;
+}
+
+.manager-profile-main-card:hover {
+  box-shadow: var(--shadow-xl);
+}
+
+@media (min-width: 768px) {
+  .manager-profile-main-card {
+    padding: 2rem;
+  }
+}
+
+.manager-profile-main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .manager-profile-main-content {
+    flex-direction: row;
+    gap: 2rem;
+  }
+}
+
+/* Avatar */
+.manager-profile-avatar-container {
+  flex-shrink: 0;
+}
+
+.manager-profile-avatar {
+  width: 6rem;
+  height: 6rem;
+  border: 4px solid rgba(59, 130, 246, 0.1);
+  box-shadow: var(--shadow-md);
+}
+
+@media (min-width: 768px) {
+  .manager-profile-avatar {
+    width: 8rem;
+    height: 8rem;
+  }
+}
+
+.manager-profile-avatar-fallback {
+  font-size: 1.5rem;
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+  color: white;
+}
+
+@media (min-width: 768px) {
+  .manager-profile-avatar-fallback {
+    font-size: 2rem;
+  }
+}
+
+/* Información del Manager */
+.manager-profile-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.manager-profile-name-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.manager-profile-name {
+  font-size: 1.875rem;
+  letter-spacing: -0.025em;
+  margin-bottom: 0.25rem;
+}
+
+@media (min-width: 768px) {
+  .manager-profile-name {
+    font-size: 2.25rem;
+  }
+}
+
+.manager-profile-email {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-muted);
+}
+
+.manager-profile-icon-small {
+  width: 1rem;
+  height: 1rem;
+}
+
+.manager-profile-email-text {
+  font-size: 0.875rem;
+}
+
+/* Grid de detalles */
+.manager-profile-details-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .manager-profile-details-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .manager-profile-details-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.manager-profile-detail-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background-color: rgba(243, 244, 246, 0.5);
+  transition: background-color 0.2s;
+}
+
+.manager-profile-detail-item:hover {
+  background-color: var(--secondary-color);
+}
+
+.manager-profile-detail-icon {
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+}
+
+.manager-profile-detail-icon-svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.role-icon {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: var(--primary-color);
+}
+
+.agency-icon {
+  background-color: rgba(139, 92, 246, 0.1);
+  color: var(--accent-color);
+}
+
+.date-icon {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: var(--primary-color);
+}
+
+.manager-profile-detail-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.manager-profile-detail-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.manager-profile-detail-value {
+  font-size: 0.875rem;
+}
+
+/* Detalles de la Agencia */
+.manager-profile-agency-details {
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.manager-profile-agency-title {
+  font-size: 1.125rem;
+  margin-bottom: 0.75rem;
+}
+
+.manager-profile-agency-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .manager-profile-agency-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.manager-profile-agency-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.manager-profile-agency-label {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.manager-profile-agency-value {
+  /* No bold */
+}
+
+/* Grid de Estadísticas */
+.manager-profile-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 768px) {
+  .manager-profile-stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.manager-profile-stat-card {
+  background-color: var(--card-bg);
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow-md);
+  transition: box-shadow 0.2s;
+}
+
+.manager-profile-stat-card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.manager-profile-stat-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.manager-profile-stat-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.manager-profile-stat-label {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.manager-profile-stat-value {
+  font-size: 1.875rem;
+}
+
+.manager-profile-stat-loading {
+  height: 2rem;
+  width: 4rem;
+  background-color: #d1d5db;
+  border-radius: 0.25rem;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.manager-profile-stat-icon {
+  padding: 0.75rem;
+  border-radius: 9999px;
+}
+
+.manager-profile-stat-icon-svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.artists-icon {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: var(--primary-color);
+}
+
+.apprentices-icon {
+  background-color: rgba(139, 92, 246, 0.1);
+  color: var(--accent-color);
+}
+
+.groups-icon {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: var(--primary-color);
+}
+
+/* Galería */
+.manager-profile-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.manager-profile-gallery-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.manager-profile-gallery-title {
+  font-size: 1.5rem;
+}
+
+.manager-profile-gallery-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.manager-profile-autoplay-btn {
+  font-size: 0.875rem;
+  padding: 0.25rem 0.75rem;
+  background-color: var(--secondary-color);
+  color: var(--secondary-foreground);
+  border-radius: 0.375rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.manager-profile-autoplay-btn:hover {
+  background-color: rgba(243, 244, 246, 0);
+}
+
+/* NUEVO CARRUSEL CON IMÁGENES PEQUEÑAS Y SEPARADAS */
+.manager-profile-carousel-container {
+  border-radius: 0.75rem;
+  overflow: hidden;
+  /* box-shadow: var(--shadow-lg); */
+  /* background-color: var(--card-bg); */
+  position: relative;
+  height: 280px;
+  padding: 1.5rem 0;
+}
+
+@media (min-width: 768px) {
+  .manager-profile-carousel-container {
+    height: 320px;
+  }
+}
+
+/* Contenedor del carrusel */
+.manager-profile-carousel-track {
+  display: flex;
+  gap: 1.5rem;
+  height: 100%;
+  animation: slideLeft 60s linear infinite;
+  align-items: center;
+  padding: 0 2rem;
+}
+
+/* Pausar animación al pasar el mouse */
+.manager-profile-carousel-track:hover {
+  animation-play-state: paused;
+}
+
+/* Cada slide del carrusel (rectángulo con imagen) */
+.manager-profile-carousel-slide {
+  flex: 0 0 auto;
+  width: 220px;
+  height: 180px;
+  background-color: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  border: 1px solid var(--border-color);
+}
+
+.manager-profile-carousel-slide:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Imagen dentro de cada slide */
+.manager-profile-carousel-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease;
+}
+
+.manager-profile-carousel-slide:hover .manager-profile-carousel-image {
+  transform: scale(1.05);
+}
+
+/* Overlay de información (ahora en tarjeta separada) */
+.manager-profile-carousel-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+  padding: 1rem;
+  color: white;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+
+.manager-profile-carousel-slide:hover .manager-profile-carousel-overlay {
+  transform: translateY(0);
+}
+
+.manager-profile-carousel-title {
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+  font-weight: 500;
+}
+
+.manager-profile-carousel-description {
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+
+/* Animación del carrusel - movimiento continuo hacia la izquierda */
+@keyframes slideLeft {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-220px * 6 - 1.5rem * 6)); /* 6 imágenes con sus gaps */
+  }
+}
+
+/* Botones de navegación */
+.manager-profile-carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(59, 130, 246, 0.9);
+  color: white;
+  padding: 0.75rem;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.manager-profile-carousel-btn:hover {
+  background-color: var(--primary-color);
+}
+
+.manager-profile-carousel-btn-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.prev-btn {
+  left: 1rem;
+}
+
+.next-btn {
+  right: 1rem;
+}
+
+/* Indicadores de imágenes */
+.manager-profile-carousel-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background-color: var(--card-bg);
+  border-top: 1px solid var(--border-color);
+}
+
+.manager-profile-carousel-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  background-color: #d1d5db;
+}
+
+.manager-profile-carousel-dot:hover {
+  background-color: #9ca3af;
+}
+
+.manager-profile-carousel-dot.active {
+  background-color: var(--primary-color);
+  transform: scale(1.25);
+}
+
+/* Miniaturas */
+.manager-profile-carousel-thumbnails {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.5rem;
+  padding: 1rem;
+  background-color: var(--card-bg);
+  border-top: 1px solid var(--border-color);
+}
+
+.manager-profile-carousel-thumbnail {
+  position: relative;
+  height: 4rem;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  padding: 0;
+  background: none;
+}
+
+.manager-profile-carousel-thumbnail:hover {
+  border-color: var(--border-color);
+}
+
+.manager-profile-carousel-thumbnail.active {
+  border-color: var(--primary-color);
+}
+
+.manager-profile-thumbnail-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.manager-profile-thumbnail-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(59, 130, 246, 0.2);
+}
+
+/* Contador */
+.manager-profile-carousel-counter {
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+}
+
+/* Highlights */
+.manager-profile-highlights {
+  background: linear-gradient(to right, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05));
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+}
+
+.manager-profile-highlights-content {
+  text-align: center;
+}
+
+.manager-profile-highlights-title {
+  font-size: 1.125rem;
+  margin-bottom: 0.5rem;
+}
+
+.manager-profile-highlights-description {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+/* Responsive adicional */
+@media (max-width: 640px) {
+  .manager-profile-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  .manager-profile-carousel-thumbnails {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .manager-profile-carousel-container {
+    height: 240px;
+    padding: 1rem 0;
+  }
+  
+  .manager-profile-carousel-slide {
+    width: 180px;
+    height: 140px;
+  }
+  
+  @keyframes slideLeft {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(calc(-180px * 6 - 1.5rem * 6));
+    }
+  }
+  
+  .manager-profile-carousel-overlay {
+    padding: 0.75rem;
+  }
+  
+  .manager-profile-carousel-title {
+    font-size: 0.75rem;
+  }
+  
+  .manager-profile-carousel-description {
+    font-size: 0.65rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .manager-profile-details-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .manager-profile-stats-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .manager-profile-carousel-btn {
+    padding: 0.5rem;
+  }
+  
+  .manager-profile-carousel-btn-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
+/* Estados de hover y focus */
+button:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Transiciones suaves */
+.manager-profile-stat-card,
+.manager-profile-main-card,
+.manager-profile-carousel-thumbnail,
+.manager-profile-carousel-slide {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Mejoras de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  .manager-profile-carousel-track {
+    animation: none;
+  }
+  
+  .manager-profile-stat-loading {
+    animation: none;
+  }
+  
+  .manager-profile-carousel-slide:hover {
+    transform: none;
+  }
+  
+  .manager-profile-carousel-slide:hover .manager-profile-carousel-image {
+    transform: none;
+  }
+  
+  .manager-profile-carousel-slide:hover .manager-profile-carousel-overlay {
+    transform: translateY(100%);
+  }
+}

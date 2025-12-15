@@ -111,7 +111,7 @@ const placeholderImages = [
   }
 ];
 
-export default function ManagerProfile({ manager, agencyDetails }: ManagerProfileProps) {
+export default function ArtistProfile({ manager, agencyDetails }: ManagerProfileProps) {
   const [stats, setStats] = useState<Stats>({
     artists: 0,
     apprentices: 0,
