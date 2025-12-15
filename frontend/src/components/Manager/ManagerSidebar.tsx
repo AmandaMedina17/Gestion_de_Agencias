@@ -56,7 +56,7 @@ const ManagerSidebar: React.FC<ManagerSidebarProps> = ({
             tooltip: 'Registrar, modificar y eliminar evaluaciones de aprendices',
         },
         {   id: 'artists_changes', 
-            label: 'Gestión de Artistas Cmabiados', 
+            label: 'Gestión de Artistas Cambiados', 
             tooltip: 'Registrar, modificar y eliminar listas billboard',
         },
         {   id: 'calendar_group', 

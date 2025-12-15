@@ -1,4 +1,3 @@
-// AgencyArtistsCompleteInfo.tsx - VERSIÓN FINAL CORREGIDA
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import { useArtist } from '../../../context/ArtistContext';
@@ -189,7 +188,6 @@ const AgencyArtistsCompleteInfo: React.FC = () => {
           </Button>
         </Box>
 
-        {/* Estadísticas - USANDO BOX EN LUGAR DE GRID */}
         <Box sx={{ 
           display: 'flex', 
           gap: 2, 
@@ -251,11 +249,7 @@ const AgencyArtistsCompleteInfo: React.FC = () => {
             color="primary"
             variant="outlined"
           />
-          <Chip
-            icon={<BusinessIcon />}
-            label={`Agencia: ${user?.agency || 'Tu agencia'}`}
-            variant="outlined"
-          />
+          
         </Box>
       </Paper>
 
@@ -517,9 +511,7 @@ const AgencyArtistsCompleteInfo: React.FC = () => {
                                         <Typography variant="body2">
                                           <strong>Fecha:</strong> {formatDate(debut.debutDate)}
                                         </Typography>
-                                        <Typography variant="body2">
-                                          <strong>Grupo:</strong> {debut.groupName || debut.groupId || 'N/A'}
-                                        </Typography>
+                                        
                                       </Box>
                                       {debut.description && (
                                         <Typography variant="body2">
@@ -597,20 +589,8 @@ const AgencyArtistsCompleteInfo: React.FC = () => {
                                     secondary={formatDate(artist.transitionDate)}
                                   />
                                 </ListItem>
-                                <Divider />
-                                <ListItem>
-                                  <ListItemText
-                                    primary="ID de Aprendiz"
-                                    secondary={artist.apprenticeId || 'No disponible'}
-                                  />
-                                </ListItem>
-                                <Divider />
-                                <ListItem>
-                                  <ListItemText
-                                    primary="Grupo Actual"
-                                    secondary={artist.apprenticeId || 'Sin grupo asignado'}
-                                  />
-                                </ListItem>
+                                
+                                
                               </List>
                             </Paper>
                           </Box>

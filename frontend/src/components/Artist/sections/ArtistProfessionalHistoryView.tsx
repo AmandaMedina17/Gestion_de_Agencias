@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import { useArtist } from '../../../context/ArtistContext';
 import Box from '@mui/material/Box';
@@ -24,6 +24,18 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
+import Snackbar from '@mui/material/Snackbar';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import './ProfessionalHistory.css';
@@ -38,7 +50,25 @@ import EventIcon from '@mui/icons-material/Event';
 import StarIcon from '@mui/icons-material/Star';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import AssignmentIcon from '@mui/icons-material/Assignment';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import DownloadIcon from '@mui/icons-material/Download';
+import CloseIcon from '@mui/icons-material/Close';
+import CheckIcon from '@mui/icons-material/Check';
 import { ContractStatus } from '../../Admin/sections/Contract/ContractManagement';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+
+// Opciones de exportación
+interface ExportOptions {
+  includeSummary: boolean;
+  includeTimeline: boolean;
+  includeContracts: boolean;
+  includeGroupCollaborations: boolean;
+  includeDebuts: boolean;
+  includeArtistCollaborations: boolean;
+  includeActivities: boolean;
+  fileName: string;
+}
 
 const ArtistProfessionalHistoryView: React.FC = () => {
   const { user } = useAuth();
@@ -53,7 +83,31 @@ const ArtistProfessionalHistoryView: React.FC = () => {
   const [notification, setNotification] = useState<{
     type: 'success' | 'error' | 'info' | 'warning';
     message: string;
+    open: boolean;
   } | null>(null);
+  
+  const [exportDialogOpen, setExportDialogOpen] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [exportOptions, setExportOptions] = useState<ExportOptions>({
+    includeSummary: true,
+    includeTimeline: true,
+    includeContracts: true,
+    includeGroupCollaborations: true,
+    includeDebuts: true,
+    includeArtistCollaborations: true,
+    includeActivities: true,
+    fileName: "historial-profesional-artista"
+  });
+
+  // Referencias para capturar elementos para el PDF
+  const reportRef = useRef<HTMLDivElement>(null);
+  const summaryRef = useRef<HTMLDivElement>(null);
+  const timelineRef = useRef<HTMLDivElement>(null);
+  const contractsRef = useRef<HTMLDivElement>(null);
+  const groupCollabsRef = useRef<HTMLDivElement>(null);
+  const debutsRef = useRef<HTMLDivElement>(null);
+  const artistCollabsRef = useRef<HTMLDivElement>(null);
+  const activitiesRef = useRef<HTMLDivElement>(null);
 
   const artistId = user?.artist;
 
@@ -62,18 +116,24 @@ const ArtistProfessionalHistoryView: React.FC = () => {
     if (!artistId) {
       setNotification({
         type: 'error',
-        message: 'No se pudo identificar al artista'
+        message: 'No se pudo identificar al artista',
+        open: true
       });
       return;
     }
 
     try {
       await fetchProfessionalHistory(artistId);
-      setNotification(null);
+      setNotification({
+        type: 'success',
+        message: 'Historial cargado exitosamente',
+        open: true
+      });
     } catch (err: any) {
       setNotification({
         type: 'error',
-        message: err.message || 'Error al cargar el historial'
+        message: err.message || 'Error al cargar el historial',
+        open: true
       });
     }
   };
@@ -91,6 +151,11 @@ const ArtistProfessionalHistoryView: React.FC = () => {
     } catch {
       return 'Fecha inválida';
     }
+  };
+
+  // Formatear fecha para nombre de archivo
+  const formatFileNameDate = (date: Date) => {
+    return format(date, 'yyyy-MM-dd');
   };
 
   // Construir timeline combinando eventos de diferentes fuentes
@@ -230,6 +295,299 @@ const ArtistProfessionalHistoryView: React.FC = () => {
     clearProfessionalHistoryError();
   };
 
+  // Funciones para exportar a PDF
+  const handleOpenExportDialog = () => {
+    if (!professionalHistory) {
+      setNotification({
+        type: 'error',
+        message: 'No hay datos para exportar',
+        open: true
+      });
+      return;
+    }
+    
+    const artistName = professionalHistory.artist?.stageName?.replace(/\s+/g, '-').toLowerCase() || 'artista';
+    const fileName = `historial-profesional-${artistName}-${formatFileNameDate(new Date())}`;
+    setExportOptions({
+      ...exportOptions,
+      fileName
+    });
+    setExportDialogOpen(true);
+  };
+
+  const handleCloseExportDialog = () => {
+    setExportDialogOpen(false);
+  };
+
+  const handleExportPDF = async () => {
+    setExporting(true);
+    handleCloseExportDialog();
+    
+    try {
+      setNotification({
+        type: 'info',
+        message: 'Generando PDF... Esto puede tomar unos segundos.',
+        open: true
+      });
+      
+      const elementsToCapture: { element: HTMLElement | null; title: string }[] = [];
+      
+      // Agregar elementos según las opciones seleccionadas
+      if (exportOptions.includeSummary && summaryRef.current) {
+        elementsToCapture.push({ element: summaryRef.current, title: "Resumen del Artista" });
+      }
+      
+      if (exportOptions.includeTimeline && timelineRef.current) {
+        elementsToCapture.push({ element: timelineRef.current, title: "Línea de Tiempo Profesional" });
+      }
+      
+      if (exportOptions.includeContracts && contractsRef.current) {
+        elementsToCapture.push({ element: contractsRef.current, title: "Contratos Activos" });
+      }
+      
+      if (exportOptions.includeGroupCollaborations && groupCollabsRef.current) {
+        elementsToCapture.push({ element: groupCollabsRef.current, title: "Colaboraciones con Grupos" });
+      }
+      
+      if (exportOptions.includeDebuts && debutsRef.current) {
+        elementsToCapture.push({ element: debutsRef.current, title: "Historial de Debuts" });
+      }
+      
+      if (exportOptions.includeArtistCollaborations && artistCollabsRef.current) {
+        elementsToCapture.push({ element: artistCollabsRef.current, title: "Colaboraciones con Artistas" });
+      }
+      
+      if (exportOptions.includeActivities && activitiesRef.current) {
+        elementsToCapture.push({ element: activitiesRef.current, title: "Actividades" });
+      }
+      
+      if (elementsToCapture.length === 0) {
+        setNotification({
+          type: 'error',
+          message: 'Selecciona al menos una sección para exportar',
+          open: true
+        });
+        setExporting(false);
+        return;
+      }
+      
+      // Crear un nuevo documento PDF
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 15;
+      const contentWidth = pageWidth - 2 * margin;
+      
+      let yPos = margin;
+      
+      // =========== CABECERA DEL REPORTE ===========
+      pdf.setFontSize(20);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("Historial Profesional del Artista", pageWidth / 2, yPos, { align: "center" });
+      yPos += 10;
+      
+      pdf.setFontSize(12);
+      pdf.setFont("helvetica", "normal");
+      pdf.text(`Artista: ${professionalHistory?.artist?.stageName || 'Sin nombre artístico'}`, margin, yPos);
+      yPos += 6;
+      pdf.text(`Estado: ${professionalHistory?.artist?.status || 'Desconocido'}`, margin, yPos);
+      yPos += 6;
+      pdf.text(`Fecha de nacimiento: ${formatDate(professionalHistory?.artist?.birthday)}`, margin, yPos);
+      yPos += 6;
+      pdf.text(`Generado: ${new Date().toLocaleDateString('es-ES')}`, margin, yPos);
+      yPos += 15;
+      
+      // Función para verificar si hay espacio suficiente
+      const checkSpace = (neededHeight: number): boolean => {
+        return (yPos + neededHeight) < (pageHeight - margin - 20); // -20 para el pie de página
+      };
+      
+      // Función para agregar nueva página si es necesario
+      const addPageIfNeeded = (neededHeight: number) => {
+        if (!checkSpace(neededHeight)) {
+          pdf.addPage();
+          yPos = margin;
+          return true;
+        }
+        return false;
+      };
+      
+      // =========== CAPTURAR CADA ELEMENTO ===========
+      for (let i = 0; i < elementsToCapture.length; i++) {
+        const { element, title } = elementsToCapture[i];
+        
+        if (!element) continue;
+        
+        // Agregar título de sección
+        addPageIfNeeded(15);
+        pdf.setFontSize(16);
+        pdf.setFont("helvetica", "bold");
+        pdf.text(title, margin, yPos);
+        yPos += 8;
+        
+        // Capturar el elemento como imagen
+        const canvas = await html2canvas(element, {
+          scale: 1.2,
+          useCORS: true,
+          backgroundColor: '#ffffff',
+          logging: false,
+        });
+        
+        const imgData = canvas.toDataURL('image/png');
+        const imgWidth = contentWidth;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        // Verificar espacio y agregar imagen
+        addPageIfNeeded(imgHeight);
+        pdf.addImage(imgData, 'PNG', margin, yPos, imgWidth, imgHeight);
+        yPos += imgHeight + 10;
+      }
+      
+      // =========== RESUMEN FINAL ===========
+      addPageIfNeeded(60);
+      pdf.setFontSize(14);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("Resumen General", margin, yPos);
+      yPos += 10;
+      
+      pdf.setFontSize(11);
+      pdf.setFont("helvetica", "normal");
+      
+      const stats = calculateStatistics();
+      const summaryText = [
+        `Total de debuts: ${stats?.totalDebuts || 0}`,
+        `Total de contratos: ${stats?.totalContracts || 0}`,
+        `Colaboraciones con artistas: ${stats?.artistCollaborationsCount || 0}`,
+        `Colaboraciones con grupos: ${stats?.groupCollaborationsCount || 0}`,
+        `Actividades realizadas: ${stats?.totalActivities || 0}`,
+        `Este historial profesional fue generado el ${new Date().toLocaleDateString('es-ES', { 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric',
+          weekday: 'long'
+        })}.`
+      ];
+      
+      summaryText.forEach((line, index) => {
+        const lines = pdf.splitTextToSize(line, contentWidth);
+        addPageIfNeeded(lines.length * 5);
+        pdf.text(lines, margin, yPos);
+        yPos += lines.length * 5 + 4;
+      });
+      
+      // =========== PIE DE PÁGINA EN TODAS LAS PÁGINAS ===========
+      const totalPages = pdf.getNumberOfPages();
+      for (let i = 1; i <= totalPages; i++) {
+        pdf.setPage(i);
+        pdf.setFontSize(8);
+        pdf.setFont("helvetica", "normal");
+        pdf.text(
+          `Página ${i} de ${totalPages} | Historial Profesional | ${new Date().toLocaleDateString('es-ES')}`,
+          pageWidth / 2,
+          pageHeight - 10,
+          { align: "center" }
+        );
+        
+        // Agregar línea separadora
+        pdf.setDrawColor(200, 200, 200);
+        pdf.line(margin, pageHeight - 15, pageWidth - margin, pageHeight - 15);
+      }
+      
+      // Guardar el PDF
+      pdf.save(`${exportOptions.fileName}.pdf`);
+      
+      setNotification({
+        type: 'success',
+        message: 'PDF exportado exitosamente',
+        open: true
+      });
+    } catch (error) {
+      console.error("Error al exportar PDF:", error);
+      setNotification({
+        type: 'error',
+        message: 'Error al generar el PDF. Por favor, intenta de nuevo.',
+        open: true
+      });
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  // Función para exportar todo el reporte como imagen
+  const handleExportFullReport = async () => {
+    setExporting(true);
+    
+    try {
+      setNotification({
+        type: 'info',
+        message: 'Generando reporte completo...',
+        open: true
+      });
+      
+      if (!reportRef.current) {
+        setNotification({
+          type: 'error',
+          message: 'No se pudo capturar el reporte',
+          open: true
+        });
+        setExporting(false);
+        return;
+      }
+      
+      // Capturar todo el reporte
+      const canvas = await html2canvas(reportRef.current, {
+        scale: 1.5,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const margin = 10;
+      const contentWidth = pageWidth - 2 * margin;
+      
+      // Calcular dimensiones
+      const imgWidth = contentWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      // Agregar título
+      pdf.setFontSize(18);
+      pdf.setFont("helvetica", "bold");
+      pdf.text("Historial Profesional - Reporte Completo", pageWidth / 2, margin, { align: "center" });
+      
+      // Agregar información básica
+      pdf.setFontSize(11);
+      pdf.setFont("helvetica", "normal");
+      pdf.text(`Artista: ${professionalHistory?.artist?.stageName || 'Sin nombre'}`, margin, margin + 15);
+      pdf.text(`Generado: ${new Date().toLocaleDateString('es-ES')}`, margin, margin + 22);
+      
+      // Agregar imagen
+      pdf.addImage(imgData, 'PNG', margin, margin + 30, imgWidth, imgHeight);
+      
+      // Guardar
+      const artistName = professionalHistory?.artist?.stageName?.replace(/\s+/g, '-') || 'artista';
+      const fileName = `historial-completo-${artistName}-${formatFileNameDate(new Date())}.pdf`;
+      pdf.save(fileName);
+      
+      setNotification({
+        type: 'success',
+        message: 'Reporte completo exportado exitosamente',
+        open: true
+      });
+    } catch (error) {
+      console.error("Error al exportar reporte completo:", error);
+      setNotification({
+        type: 'error',
+        message: 'Error al generar el reporte completo',
+        open: true
+      });
+    } finally {
+      setExporting(false);
+    }
+  };
+
   if (!artistId) {
     return (
       <Alert severity="warning" sx={{ mt: 2 }}>
@@ -268,7 +626,24 @@ const ArtistProfessionalHistoryView: React.FC = () => {
   const statistics = calculateStatistics();
 
   return (
-    <div className="artist-professional-history-view">
+    <div className="artist-professional-history-view" ref={reportRef}>
+      {/* Snackbar para notificaciones */}
+      <Snackbar
+        open={!!notification?.open}
+        autoHideDuration={5000}
+        onClose={() => setNotification(null)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert 
+          onClose={() => setNotification(null)} 
+          severity={notification?.type} 
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          {notification?.message}
+        </Alert>
+      </Snackbar>
+
       <Box sx={{ mb: 3 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <Box>
@@ -280,33 +655,56 @@ const ArtistProfessionalHistoryView: React.FC = () => {
             </Typography>
           </Box>
           
-          <Button
-            startIcon={<RefreshIcon />}
-            onClick={loadHistory}
-            disabled={professionalHistoryLoading}
-            variant="outlined"
-            size="small"
-          >
-            Actualizar
-          </Button>
+          <Box display="flex" gap={1}>
+            <Tooltip title="Actualizar historial">
+              <Button
+                startIcon={<RefreshIcon />}
+                onClick={loadHistory}
+                disabled={professionalHistoryLoading || exporting}
+                variant="outlined"
+                size="small"
+              >
+                Actualizar
+              </Button>
+            </Tooltip>
+            
+            {professionalHistory && (
+              <>
+                <Tooltip title="Exportar a PDF">
+                  <Button
+                    startIcon={exporting ? <CircularProgress size={20} /> : <PictureAsPdfIcon />}
+                    onClick={handleOpenExportDialog}
+                    disabled={exporting || !professionalHistory}
+                    variant="contained"
+                    size="small"
+                    color="primary"
+                  >
+                    PDF
+                  </Button>
+                </Tooltip>
+                
+                <Tooltip title="Exportar reporte completo">
+                  <Button
+                    startIcon={<DownloadIcon />}
+                    onClick={handleExportFullReport}
+                    disabled={exporting || !professionalHistory}
+                    variant="outlined"
+                    size="small"
+                    color="secondary"
+                  >
+                    Completo
+                  </Button>
+                </Tooltip>
+              </>
+            )}
+          </Box>
         </Box>
       </Box>
-
-      {/* Notificación */}
-      {notification && (
-        <Alert 
-          severity={notification.type} 
-          onClose={handleCloseNotification}
-          sx={{ mb: 2 }}
-        >
-          {notification.message}
-        </Alert>
-      )}
 
       {professionalHistory ? (
         <>
           {/* Información del artista */}
-          <Card sx={{ mb: 3 }}>
+          <Card ref={summaryRef} sx={{ mb: 3 }}>
             <CardContent>
               <Box display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={3}>
                 <Box display="flex" alignItems="center" gap={2} sx={{ width: { xs: '100%', md: '33%' } }}>
@@ -413,7 +811,7 @@ const ArtistProfessionalHistoryView: React.FC = () => {
           </Card>
 
           {/* Línea de tiempo */}
-          <Card sx={{ mb: 3 }}>
+          <Card ref={timelineRef} sx={{ mb: 3 }}>
             <CardContent>
               <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <TrendingUpIcon /> Línea de Tiempo Profesional
@@ -463,7 +861,7 @@ const ArtistProfessionalHistoryView: React.FC = () => {
 
           {/* Contratos Activos */}
           {professionalHistory.activeContracts && professionalHistory.activeContracts.length > 0 && (
-            <Card sx={{ mb: 3 }}>
+            <Card ref={contractsRef} sx={{ mb: 3 }}>
               <CardContent>
                 <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <DescriptionIcon /> Contratos Activos
@@ -507,7 +905,7 @@ const ArtistProfessionalHistoryView: React.FC = () => {
 
           {/* Colaboraciones con Grupos */}
           {professionalHistory.groupCollaborations && professionalHistory.groupCollaborations.length > 0 && (
-            <Card sx={{ mb: 3 }}>
+            <Card ref={groupCollabsRef} sx={{ mb: 3 }}>
               <CardContent>
                 <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <GroupsIcon /> Colaboraciones con Grupos
@@ -538,7 +936,7 @@ const ArtistProfessionalHistoryView: React.FC = () => {
 
           {/* Historial de Debuts */}
           {professionalHistory.debutHistory && professionalHistory.debutHistory.length > 0 && (
-            <Card sx={{ mb: 3 }}>
+            <Card ref={debutsRef} sx={{ mb: 3 }}>
               <CardContent>
                 <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <StarIcon /> Historial de Debuts
@@ -580,7 +978,7 @@ const ArtistProfessionalHistoryView: React.FC = () => {
 
           {/* Colaboraciones con Artistas */}
           {professionalHistory.artistCollaborations && professionalHistory.artistCollaborations.length > 0 && (
-            <Card sx={{ mb: 3 }}>
+            <Card ref={artistCollabsRef} sx={{ mb: 3 }}>
               <CardContent>
                 <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <HandshakeIcon /> Colaboraciones con Artistas
@@ -611,7 +1009,7 @@ const ArtistProfessionalHistoryView: React.FC = () => {
 
           {/* Actividades */}
           {professionalHistory.activities && professionalHistory.activities.length > 0 && (
-            <Card>
+            <Card ref={activitiesRef}>
               <CardContent>
                 <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <AssignmentIcon /> Actividades
@@ -665,7 +1063,181 @@ const ArtistProfessionalHistoryView: React.FC = () => {
         </Alert>
       )}
 
-      
+      {/* Diálogo de opciones de exportación */}
+      <Dialog open={exportDialogOpen} onClose={handleCloseExportDialog} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <Typography variant="h6">
+              <PictureAsPdfIcon sx={{ mr: 1, verticalAlign: "middle" }} />
+              Exportar Historial a PDF
+            </Typography>
+            <IconButton onClick={handleCloseExportDialog} size="small">
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            Selecciona las secciones que deseas incluir en el reporte PDF:
+          </Typography>
+          
+          <List>
+            <ListItem>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={exportOptions.includeSummary}
+                    onChange={(e) => setExportOptions({...exportOptions, includeSummary: e.target.checked})}
+                  />
+                }
+                label={
+                  <Box>
+                    <Typography variant="body1">Resumen del Artista</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Información básica y estadísticas
+                    </Typography>
+                  </Box>
+                }
+              />
+            </ListItem>
+            
+            <ListItem>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={exportOptions.includeTimeline}
+                    onChange={(e) => setExportOptions({...exportOptions, includeTimeline: e.target.checked})}
+                  />
+                }
+                label={
+                  <Box>
+                    <Typography variant="body1">Línea de Tiempo</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Cronología de eventos profesionales
+                    </Typography>
+                  </Box>
+                }
+              />
+            </ListItem>
+            
+            <ListItem>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={exportOptions.includeContracts}
+                    onChange={(e) => setExportOptions({...exportOptions, includeContracts: e.target.checked})}
+                  />
+                }
+                label={
+                  <Box>
+                    <Typography variant="body1">Contratos Activos</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Detalles de contratos vigentes
+                    </Typography>
+                  </Box>
+                }
+              />
+            </ListItem>
+            
+            <ListItem>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={exportOptions.includeGroupCollaborations}
+                    onChange={(e) => setExportOptions({...exportOptions, includeGroupCollaborations: e.target.checked})}
+                  />
+                }
+                label={
+                  <Box>
+                    <Typography variant="body1">Colaboraciones con Grupos</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Trabajos realizados con grupos
+                    </Typography>
+                  </Box>
+                }
+              />
+            </ListItem>
+            
+            <ListItem>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={exportOptions.includeDebuts}
+                    onChange={(e) => setExportOptions({...exportOptions, includeDebuts: e.target.checked})}
+                  />
+                }
+                label={
+                  <Box>
+                    <Typography variant="body1">Historial de Debuts</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Primeras apariciones y roles
+                    </Typography>
+                  </Box>
+                }
+              />
+            </ListItem>
+            
+            <ListItem>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={exportOptions.includeArtistCollaborations}
+                    onChange={(e) => setExportOptions({...exportOptions, includeArtistCollaborations: e.target.checked})}
+                  />
+                }
+                label={
+                  <Box>
+                    <Typography variant="body1">Colaboraciones con Artistas</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Proyectos con otros artistas
+                    </Typography>
+                  </Box>
+                }
+              />
+            </ListItem>
+            
+            <ListItem>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={exportOptions.includeActivities}
+                    onChange={(e) => setExportOptions({...exportOptions, includeActivities: e.target.checked})}
+                  />
+                }
+                label={
+                  <Box>
+                    <Typography variant="body1">Actividades</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Eventos y actividades realizadas
+                    </Typography>
+                  </Box>
+                }
+              />
+            </ListItem>
+          </List>
+          
+          <Box sx={{ mt: 2, p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
+            <Typography variant="body2" color="text.secondary">
+              <strong>Nota:</strong> El proceso de exportación puede tardar unos segundos dependiendo de la cantidad de datos seleccionados.
+            </Typography>
+          </Box>
+        </DialogContent>
+        
+        <DialogActions sx={{ p: 3 }}>
+          <Button onClick={handleCloseExportDialog} color="inherit">
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleExportPDF}
+            variant="contained"
+            startIcon={<CheckIcon />}
+            disabled={exporting}
+          >
+            {exporting ? 'Generando PDF...' : 'Generar PDF'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
