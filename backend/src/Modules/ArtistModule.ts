@@ -63,11 +63,10 @@ import { ApprenticeMapper } from "@infrastructure/database/Mappers/ApprenticeMap
   imports: [TypeOrmModule.forFeature([ArtistEntity,ContractEntity, ArtistGroupMembershipEntity, ActivityEntity,ArtistActivityEntity,AgencyEntity, ArtistCollaborationEntity,ArtistGroupCollaborationEntity, GroupEntity, Agency, ArtistAgencyMembershipEntity]), 
   ApprenticeModule,
   IncomeModule,
-  forwardRef((() => AlbumModule))
-],
+  forwardRef((() => AlbumModule)),
   PlaceModule,
   ResponsibleModule
-  ],
+],
   controllers: [ArtistController],
   providers: [
     ArtistMapper,

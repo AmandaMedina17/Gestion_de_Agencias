@@ -57,7 +57,7 @@ import { AssignAlbumToGroupUseCase } from '@application/UseCases/assign-album-to
   exports: [
       IAlbumRepository,
       AlbumMapper,
-      AlbumService
+      AlbumService,
       AlbumDtoMapper
   ]
 })
