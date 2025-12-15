@@ -20,7 +20,7 @@
 
 /* Estilos base */
 * {
-  font-family: Arial, sans-serif;
+  font-family: Arial;
   font-weight: normal;
 }
 
@@ -28,7 +28,7 @@
   max-width: 72rem;
   margin-left: auto;
   margin-right: auto;
-  padding: 2rem 1rem;
+  /* padding: 2rem 1rem; */
 }
 
 @media (min-width: 768px) {

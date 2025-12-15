@@ -78,6 +78,8 @@ export class ActivitySchedulingService extends BaseService<any, any> {
     return this.handleResponse(res);
   }
 
+  //metodo para obtener los ingresos
+
   // Método para programar actividad a un grupo
   async scheduleGroup(scheduleGroupDto: ScheduleGroupDto): Promise<any> {
     const res = await fetch(`http://localhost:3000/group-scheduling/schedule`, {
