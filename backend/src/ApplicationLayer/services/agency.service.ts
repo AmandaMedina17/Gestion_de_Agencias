@@ -138,6 +138,7 @@ export class AgencyService extends BaseService<Agency, CreateAgencyDto, AgencyRe
 
     return result;
   }
+  
   async getAgencyCollaborations(agencyId: string): Promise<AgencyCollaborationsResponseDto> {
     return await this.getAgencyCollaborationsUseCase.execute(agencyId);
   }

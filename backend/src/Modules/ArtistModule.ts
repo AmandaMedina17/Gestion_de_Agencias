@@ -41,11 +41,16 @@ import { CreateArtistUseCase } from "@application/UseCases/create_artist.use-cas
 import { ApprenticeModule } from "./ApprenticeModule";
 import { GetProfessionalHistoryUseCase } from "@application/UseCases/get_artist_professional_history.use-case";
 import { IncomeModule } from "./IncomeModule";
+import { PlaceModule } from "./PlaceModule";
+import { ResponsibleModule } from "./ResponsibleModule";
 
 @Module({
   imports: [TypeOrmModule.forFeature([ArtistEntity,ContractEntity, ArtistGroupMembershipEntity, ActivityEntity,ArtistActivityEntity,AgencyEntity, ArtistCollaborationEntity,ArtistGroupCollaborationEntity, GroupEntity]), 
   ApprenticeModule,
-  IncomeModule],
+  IncomeModule,
+  PlaceModule,
+  ResponsibleModule
+  ],
   controllers: [ArtistController],
   providers: [
     ArtistMapper,
@@ -55,14 +60,10 @@ import { IncomeModule } from "./IncomeModule";
     ContractMapper,
     AgencyMapper,
     ActivityMapper,
-    ResponsibleMapper,
-    PlaceMapper,
     ContractDtoMapper,
     ActivityDtoMapper,
     GroupDtoMapper,
     AgencyDtoMapper,
-    ResponsibleDtoMapper,
-    PlaceDtoMapper,
     {
       provide: IArtistRepository,
       useClass: ArtistRepository,
