@@ -17,17 +17,19 @@ import { LeaveGroupUseCase } from '@application/UseCases/leave-group.use-case';
 import { IArtistGroupMembershipRepository } from '@domain/Repositories/IArtistGroupMembershipRepository';
 import { ArtistGroupMembershipRepository } from '@infrastructure/database/Repositories/ArtistGroupMembershipRepository';
 import { ActiveGroupUseCase } from '@application/UseCases/activate_group.use-case';
+import { GroupActivityEntity } from '@infrastructure/database/Entities/GroupActivity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([GroupEntity, ArtistGroupMembershipEntity]),
+    TypeOrmModule.forFeature([GroupEntity, ArtistGroupMembershipEntity, GroupActivityEntity]),
     AgencyModule,
-    ArtistModule
+    ArtistModule,
   ],
   controllers: [GroupController],
   providers: [
     GroupService,
     GroupMapper,
+    //ActivityMapper,
     GroupDtoMapper,
     {
       provide: IGroupRepository,    

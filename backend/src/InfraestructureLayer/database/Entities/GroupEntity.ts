@@ -41,8 +41,8 @@ export class GroupEntity {
   @Column()
   concept!: string;
 
-  // @Column()
-  // visualconcept!: string;
+  @Column({ name: "visualconcept", type: "varchar", nullable: true })
+  visualconcept!: string | null;
 
   @Column({ name: "agency_id" })
   agencyId!: string; 
@@ -77,7 +77,7 @@ export class GroupEntity {
   proposedByArtist?: ArtistEntity ;
 
   @Column({ name: "proposed_by_artist_id", nullable: true })
-  proposedByArtistId!: string;
+  proposedByArtistId?: string | null = null;
 
   // Relación con las membresías de artistas
   @OneToMany(

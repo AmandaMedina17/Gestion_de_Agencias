@@ -64,6 +64,7 @@ extends BaseService<Group, CreateGroupDto, GroupResponseDto , UpdateGroupDto> {
   }
 
   async activateGroup(groupId: string){
-    const activatedGroup = this.activate_group_usecase.execute(groupId);
+    const activatedGroup = await this.activate_group_usecase.execute(groupId);
+    return this.groupDtoMapper.toResponse(activatedGroup);
   }
 }

@@ -19,6 +19,7 @@ import { GroupModule } from './GroupModule';
 import { ArtistActivityModule } from './ArtistActivityModule';
 import { GroupActivityModule } from './GroupActivityModule';
 import { SongBillboardModule } from './song_billboard/song_billboard.module';
+import { GroupDebutModule } from './GroupDebutModule';
 
 @Module({
   imports: [
@@ -39,7 +40,8 @@ import { SongBillboardModule } from './song_billboard/song_billboard.module';
     GroupModule,
     ArtistActivityModule,
     GroupActivityModule,
-    SongBillboardModule
+    SongBillboardModule,
+    GroupDebutModule,
   ],
   controllers: [AppController],
   providers: [AppService],
