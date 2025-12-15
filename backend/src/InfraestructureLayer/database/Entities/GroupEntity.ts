@@ -41,6 +41,9 @@ export class GroupEntity {
   @Column()
   concept!: string;
 
+  @Column()
+  hasDebuted!: boolean;
+
   @Column({ name: "visualconcept", type: "varchar", nullable: true })
   visualconcept!: string | null;
 

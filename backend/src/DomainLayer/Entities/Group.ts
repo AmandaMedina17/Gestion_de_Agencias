@@ -16,6 +16,7 @@ export class Group implements IUpdatable {
     private is_created: boolean,
     private agencyId: string,
     private num_members: number = 0,
+    private hasDebuted: boolean = false,
     private visualConcept: string | null = null,
     private proposedByArtistId: string | null = null,
     members?: string[],
@@ -120,9 +121,9 @@ export class Group implements IUpdatable {
   }
 
   static create( name: string, status: GroupStatus, debut_date: Date, 
-    concept: string, is_created: boolean, agencyId: string, numberOfMember: number = 0, visualConcept: string | null = null, proposedByArtistId: string | null = null) : Group {
+    concept: string, is_created: boolean, agencyId: string, numberOfMember: number = 0, hasDebuted: boolean = false, visualConcept: string | null = null, proposedByArtistId: string | null = null) : Group {
     const id = uuidv4();
-    return new Group(id, name, status, debut_date, concept, is_created, agencyId,numberOfMember,visualConcept,proposedByArtistId);
+    return new Group(id, name, status, debut_date, concept, is_created, agencyId,numberOfMember,hasDebuted, visualConcept,proposedByArtistId);
   }
 
   // Método para agregar un miembro (con rol y fecha de inicio)
@@ -189,9 +190,17 @@ export class Group implements IUpdatable {
   public setVisualConcept(visualConcept: string){
     this.visualConcept = visualConcept;
   }
+
+  public setDebuted(){
+    this.hasDebuted = true;
+  }
   // Getters
   public getMembersIds(): string[] {
     return [...this._members];
+  }
+
+  public getHasDebuted(){
+    return this.hasDebuted;
   }
 
   public isMemberActive(artistId: string): boolean {
