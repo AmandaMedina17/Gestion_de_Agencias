@@ -8,9 +8,6 @@ import { ArtistGroupMembershipEntity } from "./ArtistGroupMembershipEntity";
 import { ArtistCollaborationEntity } from "./ArtistCollaborationEntity";
 import { ArtistGroupCollaborationEntity } from "./ArtistGroupCollaborationEntity";
 import { ArtistAgencyMembershipEntity } from "./ArtistAgencyMembershipEntity";
-import { ActivityDateEntity } from "./ActivityDateEntity";
-import { ActivityResponsibleEntity } from "./ActivityResponsibleEntity";
-import { ActivityPlaceEntity } from "./ActivityPlaceEntity";
 
 @Entity({ name: "artist" })
 export class ArtistEntity{
@@ -82,28 +79,6 @@ export class ArtistEntity{
     (membership: ArtistAgencyMembershipEntity) => membership.artist
   )
   agencyMemberships!: ArtistAgencyMembershipEntity[];
-
-  //Una actividad puede realizarse en cero o muchas fechas
-  @OneToMany(
-    () => ActivityDateEntity,
-    (activityDate: ActivityDateEntity) => activityDate.activity
-  )
-  activityDates!: ActivityDateEntity[];
-
-  // Una actividad puede tener cero o muchos responsables
-  @OneToMany(
-    () => ActivityResponsibleEntity,
-    (activityResponsible: ActivityResponsibleEntity) =>
-      activityResponsible.activity
-  )
-  activityResponsibles!: ActivityResponsibleEntity[];
-
-  // Una actividad puede realizarse en cero o muchos lugares
-  @OneToMany(
-    () => ActivityPlaceEntity,
-    (activityPlace: ActivityPlaceEntity) => activityPlace.activity
-  )
-  activityPlaces!: ActivityPlaceEntity[];
 
   @OneToOne(() => ApprenticeEntity, (artist) => artist.artistId) //en una agencia pueden haber muchos aprendices
   @JoinColumn({ name: "apprentice_id" })

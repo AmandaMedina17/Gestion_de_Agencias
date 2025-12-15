@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, EntityManager } from 'typeorm';
 import { IArtistActivityRepository } from '@domain/Repositories/IArtistActivityRepository';
@@ -55,14 +55,6 @@ export class ArtistActivityRepository implements IArtistActivityRepository {
         .then(results => results.map(r => r.activity));
 
     return this.activityMapper.toDomainEntities(conflicts)
-  }
-
-  async confirmAttendance(artistId: string, activityId: string): Promise<void> {
-    
-  }
-
-  cancelAttendance(artistId: string, activityId: string): Promise<void> {
-    throw new Error('Method not implemented.');
   }
 
   async getActivitiesByArtist(artistId: string): Promise<Activity[]> {
@@ -188,6 +180,36 @@ export class ArtistActivityRepository implements IArtistActivityRepository {
     }
 
     return { incomes, totalIncome };
+  }
+
+  async confirmAttendance(artistId: string, activityId: string): Promise<void> {
+    const attendance = await this.repository.findOne({
+      where: { artistId, activityId }
+    });
+
+    if (!attendance) {
+      throw new NotFoundException(
+        `No se encontró la asistencia del artista ${artistId} a la actividad ${activityId}`
+      );
+    }
+
+    attendance.confirmation = true;
+    await this.repository.save(attendance);
+  }
+
+  async cancelAttendance(artistId: string, activityId: string): Promise<void> {
+    const attendance = await this.repository.findOne({
+      where: { artistId, activityId }
+    });
+
+    if (!attendance) {
+      throw new NotFoundException(
+        `No se encontró la asistencia del artista ${artistId} a la actividad ${activityId}`
+      );
+    }
+
+    attendance.confirmation = false;
+    await this.repository.save(attendance);
   }
     
 }

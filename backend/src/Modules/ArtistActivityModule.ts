@@ -10,14 +10,21 @@ import { IArtistActivityRepository } from "@domain/Repositories/IArtistActivityR
 import { ArtistActivityRepository } from "@infrastructure/database/Repositories/ArtistActivityRepository";
 import { ArtistActivityService } from "@application/services/artist-activity.service";
 import { IncomeModule } from "./IncomeModule";
+import { ConfirmAttendanceUseCase } from '../ApplicationLayer/UseCases/confirm_attendance.use-case';
+import { GroupActivityModule } from "./GroupActivityModule";
+import { IGroupActivityRepository } from "@domain/Repositories/IGroupActivityRepository";
+import { GroupActivityRepository } from "@infrastructure/database/Repositories/GroupActivityRepository";
+import { GroupActivityEntity } from "@infrastructure/database/Entities/GroupActivity";
+import { GroupModule } from "./GroupModule";
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
-      ArtistActivityEntity,
+      ArtistActivityEntity, GroupActivityEntity,
       ]), ArtistModule,
     ActivityModule,
-    IncomeModule
+    IncomeModule,
+    GroupModule,
   ],
   controllers: [ArtistActivityController],
   providers: [
@@ -26,7 +33,12 @@ import { IncomeModule } from "./IncomeModule";
     {
       provide: IArtistActivityRepository,
       useClass: ArtistActivityRepository
-    }
+    },
+    {
+      provide: IGroupActivityRepository,
+      useClass: GroupActivityRepository
+    },
+    ConfirmAttendanceUseCase,
   ],
   exports: [
     IArtistActivityRepository
