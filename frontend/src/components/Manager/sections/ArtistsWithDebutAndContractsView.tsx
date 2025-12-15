@@ -15,9 +15,62 @@ import GroupIcon from '@mui/icons-material/Group';
 import DescriptionIcon from '@mui/icons-material/Description';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-// import './ArtistsWithDebutAndContractsView.css';
 
-// Interfaces para los datos
+// Interfaces para los datos basadas en la respuesta de la API
+interface ApiArtist {
+  id: string;
+  transitionDate: string;
+  status: string;
+  stageName: string;
+  birthday: string;
+  apprenticeId: string;
+  fullName?: string; // Nota: no aparece en la respuesta, podrías necesitar ajustar esto
+  nationality?: string; // Nota: no aparece en la respuesta
+  gender?: string; // Nota: no aparece en la respuesta
+}
+
+interface ApiGroup {
+  id: string;
+  name: string;
+  status: string;
+  debut_date: string;
+  members_num: number;
+  concept: string;
+  is_created: boolean;
+  agencyID: string;
+  fandomName?: string; // Nota: no aparece en la respuesta
+}
+
+interface ApiAgency {
+  id: string;
+  place: {
+    id: string;
+    name: string;
+  };
+  nameAgency: string;
+  dateFundation: string;
+}
+
+interface ApiContract {
+  id: string;
+  startDate: string;
+  endDate: string | null;
+  agency: ApiAgency;
+  artist: ApiArtist;
+  distributionPercentage: number;
+  status: string;
+  conditions: string;
+  type?: string; // Nota: no aparece en la respuesta
+  details?: string; // Nota: no aparece en la respuesta
+}
+
+interface ApiResponseItem {
+  artist: ApiArtist;
+  debutGroups: ApiGroup[];
+  activeContracts: ApiContract[];
+}
+
+// Interfaces para el componente
 interface ContractData {
   id: string;
   startDate: Date | string;
@@ -46,7 +99,7 @@ interface ArtistWithDebutAndContracts {
     gender: string;
   };
   group: GroupData | null;
-  contract: ContractData;
+  contract: ContractData | null;
   debutCount: number;
   lastDebutDate: Date | string;
 }
@@ -69,6 +122,55 @@ const ArtistsWithDebutAndContractsView: React.FC = () => {
 
   const agencyId = user?.agency;
 
+  // Función para transformar los datos de la API al formato esperado por el componente
+  const transformApiData = (apiData: ApiResponseItem[]): ArtistWithDebutAndContracts[] => {
+    return apiData.map(item => {
+      // Obtener el primer grupo (si existe)
+      const firstGroup = item.debutGroups.length > 0 ? item.debutGroups[0] : null;
+      
+      // Obtener el primer contrato activo (si existe)
+      const firstContract = item.activeContracts.length > 0 ? item.activeContracts[0] : null;
+      
+      // Encontrar la fecha de debut más reciente
+      const lastDebutDate = item.debutGroups.length > 0 
+        ? item.debutGroups.reduce((latest, group) => {
+            const groupDate = new Date(group.debut_date);
+            const latestDate = new Date(latest);
+            return groupDate > latestDate ? group.debut_date : latest;
+          }, item.debutGroups[0].debut_date)
+        : new Date().toISOString(); // Fallback si no hay grupos
+
+      return {
+        id: item.artist.id,
+        artist: {
+          id: item.artist.id,
+          fullName: item.artist.stageName, // Usar stageName como fallback para fullName
+          stageName: item.artist.stageName,
+          birthDate: item.artist.birthday,
+          nationality: 'No especificada', // Valor por defecto ya que no viene en la API
+          gender: 'No especificado' // Valor por defecto ya que no viene en la API
+        },
+        group: firstGroup ? {
+          id: firstGroup.id,
+          name: firstGroup.name,
+          debutDate: firstGroup.debut_date,
+          fandomName: firstGroup.fandomName,
+          status: firstGroup.status
+        } : null,
+        contract: firstContract ? {
+          id: firstContract.id,
+          startDate: firstContract.startDate,
+          endDate: firstContract.endDate,
+          status: firstContract.status,
+          type: 'Contrato Principal', // Valor por defecto ya que no viene en la API
+          details: firstContract.conditions
+        } : null,
+        debutCount: item.debutGroups.length,
+        lastDebutDate: lastDebutDate
+      };
+    });
+  };
+
   // Cargar artistas con debut y contratos
   const fetchData = async () => {
     if (!agencyId) {
@@ -80,10 +182,11 @@ const ArtistsWithDebutAndContractsView: React.FC = () => {
     }
 
     try {
-      const data = await fetchArtistsWithDebutAndContracts(agencyId);
-      setArtistsData(data);
+      const apiData = await fetchArtistsWithDebutAndContracts(agencyId);
+      const transformedData = transformApiData(apiData);
+      setArtistsData(transformedData);
       
-      if (data.length === 0) {
+      if (transformedData.length === 0) {
         setNotification({
           type: 'info',
           title: 'Sin datos',
@@ -105,19 +208,10 @@ const ArtistsWithDebutAndContractsView: React.FC = () => {
     }
   }, [agencyId]);
 
-  const formatDate = (date: Date | string) => {
+  const formatDate = (date: Date | string | null | undefined) => {
     if (!date) return 'N/A';
     try {
       return format(new Date(date), 'dd/MM/yyyy', { locale: es });
-    } catch {
-      return 'Fecha inválida';
-    }
-  };
-
-  const formatDateTime = (date: Date | string) => {
-    if (!date) return 'N/A';
-    try {
-      return format(new Date(date), "dd/MM/yyyy HH:mm", { locale: es });
     } catch {
       return 'Fecha inválida';
     }
@@ -140,8 +234,9 @@ const ArtistsWithDebutAndContractsView: React.FC = () => {
     }
   };
 
-  const getContractStatusColor = (status: string) => {
-    switch (status?.toUpperCase()) {
+  const getContractStatusColor = (status: string | null | undefined) => {
+    if (!status) return 'default';
+    switch (status.toUpperCase()) {
       case 'ACTIVE':
       case 'ACTIVO':
         return 'success';
@@ -156,8 +251,9 @@ const ArtistsWithDebutAndContractsView: React.FC = () => {
     }
   };
 
-  const getContractStatusText = (status: string) => {
-    switch (status?.toUpperCase()) {
+  const getContractStatusText = (status: string | null | undefined) => {
+    if (!status) return 'Sin contrato';
+    switch (status.toUpperCase()) {
       case 'ACTIVE':
       case 'ACTIVO':
         return 'Activo';
@@ -172,8 +268,9 @@ const ArtistsWithDebutAndContractsView: React.FC = () => {
     }
   };
 
-  const getGroupStatusColor = (status: string) => {
-    switch (status?.toUpperCase()) {
+  const getGroupStatusColor = (status: string | null | undefined) => {
+    if (!status) return 'default';
+    switch (status.toUpperCase()) {
       case 'ACTIVE':
       case 'ACTIVO':
         return 'success';
@@ -188,8 +285,9 @@ const ArtistsWithDebutAndContractsView: React.FC = () => {
     }
   };
 
-  const getGroupStatusText = (status: string) => {
-    switch (status?.toUpperCase()) {
+  const getGroupStatusText = (status: string | null | undefined) => {
+    if (!status) return 'N/A';
+    switch (status.toUpperCase()) {
       case 'ACTIVE':
       case 'ACTIVO':
         return 'Activo';
@@ -204,13 +302,14 @@ const ArtistsWithDebutAndContractsView: React.FC = () => {
     }
   };
 
-  // Definir columnas de la tabla
+  // Definir columnas de la tabla con verificaciones de seguridad
   const getColumns = (): Column<ArtistWithDebutAndContracts>[] => [
     {
       key: 'artist.stageName',
       title: 'Nombre Artístico',
       sortable: true,
       width: '180px',
+      align: 'center',
       render: (item) => (
         <div className="artist-name-cell">
           <Box display="flex" alignItems="center" gap={1}>
@@ -241,28 +340,18 @@ const ArtistsWithDebutAndContractsView: React.FC = () => {
         </Box>
       ),
     },
-    {
-      key: 'artist.nationality',
-      title: 'Nacionalidad',
-      sortable: true,
-      width: '120px',
-      render: (item) => (
-        <Typography variant="body2">
-          {item.artist.nationality}
-        </Typography>
-      ),
-    },
+    
     {
       key: 'group.name',
       title: 'Grupo',
       sortable: true,
-      width: '150px',
+      width: '50px',
+      align: 'center',
       render: (item) => (
         <Box display="flex" alignItems="center" gap={1}>
-          <GroupIcon fontSize="small" color={item.group ? "secondary" : "disabled"} />
           <Box>
             <Typography variant="body2" fontWeight={item.group ? "medium" : "regular"}>
-              {item.group?.name || 'Sin grupo'}
+              { item.group?.name || 'Sin grupo'}
             </Typography>
             {item.group && item.group.fandomName && (
               <Typography variant="caption" color="text.secondary">
@@ -305,7 +394,7 @@ const ArtistsWithDebutAndContractsView: React.FC = () => {
         <Box display="flex" alignItems="center" justifyContent="center" gap={0.5}>
           <CalendarTodayIcon fontSize="small" color="action" />
           <Typography variant="body2">
-            {formatDate(item.contract.startDate)}
+            {item.contract ? formatDate(item.contract.startDate) : 'N/A'}
           </Typography>
         </Box>
       ),
@@ -320,7 +409,7 @@ const ArtistsWithDebutAndContractsView: React.FC = () => {
         <Box display="flex" alignItems="center" justifyContent="center" gap={0.5}>
           <CalendarTodayIcon fontSize="small" color="action" />
           <Typography variant="body2">
-            {item.contract.endDate ? formatDate(item.contract.endDate) : 'Indefinido'}
+            {item.contract?.endDate ? formatDate(item.contract.endDate) : 'Indefinido'}
           </Typography>
         </Box>
       ),
@@ -333,41 +422,15 @@ const ArtistsWithDebutAndContractsView: React.FC = () => {
       align: 'center',
       render: (item) => (
         <Chip
-          label={getContractStatusText(item.contract.status)}
-          color={getContractStatusColor(item.contract.status) as any}
+          label={getContractStatusText(item.contract?.status)}
+          color={getContractStatusColor(item.contract?.status) as any}
           size="small"
           variant="filled"
           sx={{ fontWeight: 600 }}
         />
       ),
     },
-    {
-      key: 'debutCount',
-      title: 'Debuts',
-      sortable: true,
-      width: '90px',
-      align: 'center',
-      render: (item) => (
-        <Box display="flex" alignItems="center" justifyContent="center" gap={0.5}>
-          <DescriptionIcon fontSize="small" color="primary" />
-          <Typography variant="body1" fontWeight="bold" color="primary">
-            {item.debutCount}
-          </Typography>
-        </Box>
-      ),
-    },
-    {
-      key: 'lastDebutDate',
-      title: 'Último Debut',
-      sortable: true,
-      width: '130px',
-      align: 'center',
-      render: (item) => (
-        <Typography variant="body2">
-          {formatDate(item.lastDebutDate)}
-        </Typography>
-      ),
-    },
+   
   ];
 
   const handleNotificationClose = () => {
@@ -383,12 +446,17 @@ const ArtistsWithDebutAndContractsView: React.FC = () => {
     );
   }
 
-  // Calcular estadísticas
+  // Calcular estadísticas CON VERIFICACIONES DE SEGURIDAD
   const totalArtists = artistsData.length;
-  const activeContracts = artistsData.filter(item => 
-    item.contract.status?.toUpperCase() === 'ACTIVE' || 
-    item.contract.status?.toUpperCase() === 'ACTIVO'
-  ).length;
+  
+  // Verificar que contract existe antes de acceder a status
+  const activeContracts = artistsData.filter(item => {
+    const contract = item.contract;
+    if (!contract || !contract.status) return false;
+    const status = contract.status.toUpperCase();
+    return status === 'ACTIVE' || status === 'ACTIVO';
+  }).length;
+  
   const artistsWithGroup = artistsData.filter(item => item.group !== null).length;
   const totalDebuts = artistsData.reduce((sum, item) => sum + item.debutCount, 0);
 
@@ -398,10 +466,10 @@ const ArtistsWithDebutAndContractsView: React.FC = () => {
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <div>
             <Typography variant="h5" component="h2" gutterBottom fontWeight="bold">
-              Artistas con Debut y Contratos Activos
+              Artistas con Debut y Contratos
             </Typography>
             <Typography variant="subtitle1" color="text.secondary">
-              Artistas que han participado en al menos un debut y actualmente tienen contratos activos
+              Artistas que han participado en al menos un debut y tienen contratos registrados
             </Typography>
           </div>
           
@@ -455,17 +523,7 @@ const ArtistsWithDebutAndContractsView: React.FC = () => {
                   {totalArtists > 0 ? ((artistsWithGroup / totalArtists) * 100).toFixed(0) : 0}%
                 </Typography>
               </div>
-              <div className="stat-card" style={{ borderLeft: '4px solid #9c27b0' }}>
-                <Typography variant="body2" color="text.secondary">
-                  Total Debuts
-                </Typography>
-                <Typography variant="h5" className="stat-value" style={{ color: '#9c27b0' }}>
-                  {totalDebuts}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Promedio: {(totalArtists > 0 ? (totalDebuts / totalArtists).toFixed(1) : 0)}
-                </Typography>
-              </div>
+              
             </Box>
           </Box>
         )}
@@ -498,7 +556,7 @@ const ArtistsWithDebutAndContractsView: React.FC = () => {
               No se encontraron artistas
             </Typography>
             <Typography variant="body2" color="text.secondary" paragraph>
-              No hay artistas que hayan participado en al menos un debut y tengan contratos activos en este momento.
+              No hay artistas que hayan participado en al menos un debut y tengan contratos registrados en este momento.
             </Typography>
             <Button
               startIcon={<RefreshIcon />}
@@ -514,18 +572,13 @@ const ArtistsWithDebutAndContractsView: React.FC = () => {
         loadingComponent={
           <Box sx={{ textAlign: 'center', py: 4 }}>
             <Typography variant="body2" color="text.secondary">
-              Cargando artistas con debut y contratos activos...
+              Cargando artistas con debut y contratos...
             </Typography>
           </Box>
         }
       />
 
-      <Box sx={{ mt: 3, pt: 2, borderTop: 1, borderColor: 'divider' }}>
-        <Typography variant="caption" color="text.secondary">
-          Mostrando {artistsData.length} artistas con debut y contratos activos
-          {artistsData.length > 0 && ` • Última actualización: ${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`}
-        </Typography>
-      </Box>
+      
     </div>
   );
 };

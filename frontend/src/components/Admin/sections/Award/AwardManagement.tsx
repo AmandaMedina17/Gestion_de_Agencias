@@ -227,12 +227,12 @@ const AwardManagement: React.FC = () => {
       width: "25%",
       align: "center",
       render: (item) => {
-        if (item.albumId) {
+        if (item.album) {
           return (
             <span className="album-id">
-              {item.albumId.length > 20
-                ? `${item.albumId.substring(0, 20)}...`
-                : item.albumId}
+              {item.album.id.length > 20
+                ? `${item.album.id.substring(0, 20)}...`
+                : item.album.id}
             </span>
           );
         }
@@ -255,8 +255,8 @@ const AwardManagement: React.FC = () => {
       </div>
       <div className="detail-item">
         <strong>ID del Álbum:</strong>
-        <span className={award.albumId ? "album-id-detail" : "no-album-detail"}>
-          {award.albumId || "No asociado a ningún álbum"}
+        <span className={award.album ? "album-id-detail" : "no-album-detail"}>
+          {award.album?.id || "No asociado a ningún álbum"}
         </span>
       </div>
       <div className="detail-item">
@@ -308,7 +308,7 @@ const AwardManagement: React.FC = () => {
           initialData={{
             name: editingAward.name,
             date: editingAward.date.toString().split("T")[0],
-            albumId: editingAward.albumId || "",
+            albumId: editingAward.album?.id || "",
           }}
           itemId={editingAward.id}
           onSubmit={handleUpdate}
