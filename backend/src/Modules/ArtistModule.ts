@@ -51,32 +51,43 @@ import { AlbumRepository } from "@infrastructure/database/Repositories/AlbumRepo
 import { AlbumEntity } from "@infrastructure/database/Entities/AlbumEntity";
 import { SongEntity } from "@infrastructure/database/Entities/SongEntity";
 import { AwardEntity } from "@infrastructure/database/Entities/AwardEntity";
+import { PlaceModule } from "./PlaceModule";
+import { ResponsibleModule } from "./ResponsibleModule";
+import { IAgencyRepository } from "@domain/Repositories/IAgencyRepository";
+import { AgencyRepositoryImpl } from "@infrastructure/database/Repositories/AgencyRepository";
+import { Agency } from "@domain/Entities/Agency";
+import { ArtistAgencyMembershipEntity } from "@infrastructure/database/Entities/ArtistAgencyMembershipEntity";
+import { ApprenticeMapper } from "@infrastructure/database/Mappers/ApprenticeMapper";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ArtistEntity,ContractEntity, ArtistGroupMembershipEntity, ActivityEntity,ArtistActivityEntity,AgencyEntity, ArtistCollaborationEntity,ArtistGroupCollaborationEntity, GroupEntity]), 
+  imports: [TypeOrmModule.forFeature([ArtistEntity,ContractEntity, ArtistGroupMembershipEntity, ActivityEntity,ArtistActivityEntity,AgencyEntity, ArtistCollaborationEntity,ArtistGroupCollaborationEntity, GroupEntity, Agency, ArtistAgencyMembershipEntity]), 
   ApprenticeModule,
   IncomeModule,
   forwardRef((() => AlbumModule))
 ],
+  PlaceModule,
+  ResponsibleModule
+  ],
   controllers: [ArtistController],
   providers: [
     ArtistMapper,
     ArtistDtoMapper,
+    ApprenticeMapper,
     GroupMapper,
     ContractMapper,
     AgencyMapper,
     ActivityMapper,
-    ResponsibleMapper,
-    PlaceMapper,
     ContractDtoMapper,
     ActivityDtoMapper,
     GroupDtoMapper,
     AgencyDtoMapper,
-    ResponsibleDtoMapper,
-    PlaceDtoMapper,
     {
       provide: IArtistRepository,
       useClass: ArtistRepository,
+    },
+    {
+      provide: IAgencyRepository,
+      useClass: AgencyRepositoryImpl,
     },
     {
       provide: IGroupRepository,

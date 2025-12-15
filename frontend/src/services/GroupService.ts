@@ -59,7 +59,7 @@ export class GroupService extends BaseService<CreateGroupDto, GroupResponseDto> 
   // CORREGIDO: Ahora recibe un LeaveGroupDto
   async removeMember(leaveGroupDto: LeaveGroupDto): Promise<void> {
     const res = await fetch(`http://localhost:3000/groups/removeMember`, {
-      method: "POST",  // El controlador usa POST, no DELETE
+      method: "DELETE",  // El controlador usa POST, no DELETE
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(leaveGroupDto),  // Enviar el DTO en el body
     });

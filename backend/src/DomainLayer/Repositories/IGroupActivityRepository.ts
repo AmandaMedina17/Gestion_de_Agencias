@@ -11,4 +11,8 @@ export abstract class IGroupActivityRepository {
   abstract getAllActivitiesByGroupId(groupId: string): Promise<Activity[]>
 
   abstract checkGroupMembersConflicts(groupId: string, activityId: string): Promise<Artist[]>; 
+
+  abstract confirmAttendance(artistId: string, activityId: string): Promise<void>;
+  
+  abstract cancelAttendance(artistId: string, activityId: string): Promise<void>;
 }

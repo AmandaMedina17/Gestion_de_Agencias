@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { IGroupActivityRepository } from '@domain/Repositories/IGroupActivityRepository';
@@ -96,4 +96,33 @@ export class GroupActivityRepository implements IGroupActivityRepository {
 
     return groupActivities.map(ga => this.activityMapper.toDomainWithRelations(ga.activity));
   }
+  async confirmAttendance(groupId: string, activityId: string): Promise<void> {
+      const attendance = await this.repository.findOne({
+        where: { groupId, activityId }
+      });
+  
+      if (!attendance) {
+        throw new NotFoundException(
+          `No se encontró la asistencia del grupo ${groupId} a la actividad ${activityId}`
+        );
+      }
+  
+      attendance.confirmation = attendance.confirmation && true;
+      await this.repository.save(attendance);
+    }
+  
+    async cancelAttendance(groupId: string, activityId: string): Promise<void> {
+      const attendance = await this.repository.findOne({
+        where: { groupId, activityId }
+      });
+  
+      if (!attendance) {
+        throw new NotFoundException(
+          `No se encontró la asistencia del grupo ${groupId} a la actividad ${activityId}`
+        );
+      }
+  
+      attendance.confirmation = false;
+      await this.repository.save(attendance);
+    }
 }

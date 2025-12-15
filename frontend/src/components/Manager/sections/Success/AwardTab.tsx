@@ -190,7 +190,7 @@ const AwardTab: React.FC<AwardTabProps> = ({ onNotification }) => {
       sortable: true,
       width: "25%",
       render: (item) => {
-        const albumName = getAlbumName(item.albumId);
+        const albumName = getAlbumName(item.album?.id);
         return (
           <Box textAlign="center">
             {albumName ? (
@@ -226,9 +226,9 @@ const AwardTab: React.FC<AwardTabProps> = ({ onNotification }) => {
             color="primary"
             onClick={() => setAssigningAward(item)}
             startIcon={<AttachFile />}
-            disabled={!!item.albumId}
+            disabled={!!item.album?.id}
           >
-            {item.albumId ? "Asignado" : "Asignar"}
+            {item.album?.id ? "Asignado" : "Asignar"}
           </Button>
         </Box>
       ),
@@ -313,9 +313,9 @@ const AwardTab: React.FC<AwardTabProps> = ({ onNotification }) => {
               <div className="current-assignment">
                 <p>
                   <strong>Asignación actual:</strong>{" "}
-                  {assigningAward.albumId ? (
+                  {assigningAward.album?.id ? (
                     <span className="album-id-current">
-                      {getAlbumName(assigningAward.albumId)}
+                      {getAlbumName(assigningAward.album.id)}
                     </span>
                   ) : (
                     <span className="no-album-current">No asignado</span>

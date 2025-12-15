@@ -24,7 +24,7 @@ import { GroupActivityEntity } from '@infrastructure/database/Entities/GroupActi
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([GroupEntity, ArtistGroupMembershipEntity]),
+    TypeOrmModule.forFeature([GroupEntity, ArtistGroupMembershipEntity,GroupActivityEntity]),
     forwardRef(() => AgencyModule),
     forwardRef(() => AlbumModule),
     forwardRef(() => ArtistModule),
@@ -33,6 +33,7 @@ import { GroupActivityEntity } from '@infrastructure/database/Entities/GroupActi
   providers: [
     GroupService,
     GroupMapper,
+    //ActivityMapper,
     GroupDtoMapper,
     AlbumMapper,
     {

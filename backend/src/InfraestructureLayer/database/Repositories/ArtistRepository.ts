@@ -218,25 +218,18 @@ export class ArtistRepository
   }
 
    async getArtists_WithAgencyChangesAndGroups(agencyId: string): Promise<Artist[]> {
-    // 1. Obtener artistas con membresías activas en la agencia
     const query = this.repository
       .createQueryBuilder('artist')
       .innerJoin('artist.agencyMemberships', 'agency_membership')
-      .where('agency_membership.agencyId = :agencyId', { agencyId })
-      .andWhere('(agency_membership.endDate IS NULL OR agency_membership.endDate > CURRENT_DATE)')
-      .groupBy('artist.id')
-      .having('COUNT(DISTINCT agency_membership.agencyId) >= 2') // Al menos 2 agencias diferentes
-      .andHaving('COUNT(DISTINCT gm.groupId) > 1'); // Más de un grupo
-
-    // Añadir join para contar grupos
-    query
       .leftJoin('artist.groupMemberships', 'gm')
-      .groupBy('artist.id');
-
-    // Ejecutar la consulta
-    const artistEntities = await query.getMany();
-    return this.mapper.toDomainEntities(artistEntities);
-  }
+      //.where('(agency_membership.endDate IS NULL OR agency_membership.endDate > CURRENT_DATE)')
+      .groupBy('artist.id')
+      .having('COUNT(DISTINCT agency_membership.agencyId) >= 3') // Al menos 3 agencias distintas
+      .andHaving('COUNT(DISTINCT gm.groupId) > 1'); // Más de un grupo
+        
+      // Ejecutar la consulta
+      const artistEntities = await query.getMany();
+      return this.mapper.toDomainEntities(artistEntities);}
     async findArtistsWithScheduleConflicts(startDate: Date, endDate: Date): Promise<Artist[]> {
         const artistEntities = await this.repository
         .createQueryBuilder('artist')

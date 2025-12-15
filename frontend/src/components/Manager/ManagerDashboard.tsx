@@ -58,7 +58,7 @@ const ManagerDashboard: React.FC = () => {
     if (!agencyId || !agencies.length) return "No asignada";
     
     const agency = agencies.find(a => a.id === agencyId);
-    return agency ? `${agency.nameAgency} - ${agency.place}` : "No encontrada";
+    return agency ? `${agency.nameAgency} - ${agency.place.name}` : "No encontrada";
   };
 
   const getAgencyDetails = (agencyId: string) => {
@@ -76,6 +76,7 @@ const ManagerDashboard: React.FC = () => {
   // Actualizar datos cuando se carguen las agencias, artistas y aprendices
   useEffect(() => {
     if (user?.agency && agencies.length > 0) {
+      console.log(user.agency);
       const agencyName = getAgencyNameById(user.agency);
       const agencyDetails = getAgencyDetails(user.agency);
       setAgencyName(agencyName);
