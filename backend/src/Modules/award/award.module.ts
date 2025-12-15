@@ -20,28 +20,28 @@ import { AwardController } from '@presentation/Controllers/award/award.controlle
 import { AlbumModule } from '../album/album.module';
 
 @Module({
-    imports: [
-      TypeOrmModule.forFeature([AwardEntity]),
-      forwardRef(() => AlbumModule) //esto lo agregue
-    ],
+  imports: [
+    TypeOrmModule.forFeature([AwardEntity]),
+    forwardRef(() => AlbumModule) //esto lo agregue
+  ],
+  
+  controllers: [AwardController],
+  providers: [
+    AwardMapper,
+    AlbumMapper,
+    AlbumDtoMapper,
+    {
+      provide:IAwardRepository,    
+      useClass: AwardRepository
+    },
+    AwardDtoMapper,
+    AwardService,
     
-    controllers: [AwardController],
-    providers: [
+  ],
+  exports: [
+      IAwardRepository,
       AwardMapper,
-      AlbumMapper,
-      AlbumDtoMapper,
-      {
-        provide:IAwardRepository,    
-        useClass: AwardRepository
-      },
-      AwardDtoMapper,
-      AwardService,
-      
-    ],
-    exports: [
-        IAwardRepository,
-        AwardMapper,
-        AwardDtoMapper
-    ]
-  })
-  export class AwardModule {}
+      AwardDtoMapper
+  ]
+})
+export class AwardModule {}

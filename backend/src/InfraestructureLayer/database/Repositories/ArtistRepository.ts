@@ -36,9 +36,21 @@ export class ArtistRepository
   ) {
     super(repository, mapper);
   }
-  getArtistLastGroup(id: string): Promise<Group> {
-    throw new Error('Method not implemented.');
-  }
+
+  async getArtistLastGroup(id: string): Promise<Group> {
+    const membership = await this.membershipRepository
+        .createQueryBuilder('membership')
+        .leftJoinAndSelect('membership.group', 'group')
+        .where('membership.artistId = :id', { id })
+        .orderBy('membership.startDate', 'DESC')
+        .getOne();
+
+    if (!membership || !membership.group) {
+        throw new Error('Artist has no group memberships');
+    }
+
+    return this.groupMapper.toDomainEntity(membership.group);
+}
   
 
   async createArtistCollaboration(artist1Id: string, artist2Id: string, date: Date): Promise<void> {

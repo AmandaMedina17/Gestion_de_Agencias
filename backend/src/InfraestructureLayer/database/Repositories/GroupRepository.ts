@@ -11,6 +11,7 @@ import { Artist } from "@domain/Entities/Artist";
 import { IArtistRepository } from "@domain/Repositories/IArtistRepository";
 import { ArtistGroupMembershipEntity } from "../Entities/ArtistGroupMembershipEntity";
 import { ArtistMapper } from "../Mappers/ArtistMapper";
+import { AlbumMapper } from "../Mappers/AlbumMapper";
 
 @Injectable()
 export class GroupRepository extends BaseRepository<Group,GroupEntity> 
@@ -20,6 +21,7 @@ implements IGroupRepository{
     repository: Repository<GroupEntity>,
     private readonly groupMapper: GroupMapper,
     private readonly artistRepository: IArtistRepository,
+    private readonly albumMapper: AlbumMapper,
 
     @InjectDataSource()
     private readonly dataSource: DataSource,
@@ -98,7 +100,20 @@ implements IGroupRepository{
         throw new Error("Method not implemented.");
     }
 
-    getGroupAlbums(id: string): Promise<Album[]> {
-        throw new Error("Method not implemented.");
+    async getGroupAlbums(id: string): Promise<Album[]> {
+        const groupEntity = await this.repository.findOne({
+          where: { id },
+          relations: {albums: true}
+        });
+
+        if (!groupEntity) {
+            throw new Error(`Group with id ${id} not found`);
+        }
+
+        if (!groupEntity.albums || groupEntity.albums.length === 0) {
+            return [];
+        }
+
+        return this.albumMapper.toDomainEntities(groupEntity.albums);
     }
 }
