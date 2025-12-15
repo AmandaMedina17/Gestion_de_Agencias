@@ -1,3 +1,4 @@
+// src/services/BaseService.ts
 export class BaseService<CreateDto, ResponseDto> {
   constructor(private baseUrl: string) {}
 
@@ -60,7 +61,20 @@ export class BaseService<CreateDto, ResponseDto> {
     return res.json();
   }
 
-  // NUEVO MÉTODO: patchCustom para peticiones PATCH a endpoints personalizados
+  async putCustom<T>(endpoint: string, data: any): Promise<T> {
+    const res = await fetch(`${this.baseUrl}/${endpoint}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || `Error: ${res.status}`);
+    }
+    return res.json();
+  }
+
   async patchCustom<T>(endpoint: string, data: any): Promise<T> {
     const res = await fetch(`${this.baseUrl}/${endpoint}`, {
       method: "PATCH",
@@ -74,6 +88,4 @@ export class BaseService<CreateDto, ResponseDto> {
     }
     return res.json();
   }
-
-  
 }

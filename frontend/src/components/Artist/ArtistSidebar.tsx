@@ -66,6 +66,10 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
             label: 'Proposición de Grupos', 
             tooltip: '',
         },
+        {   id: 'professional_history', 
+            label: 'Historial Profesional', 
+            tooltip: '',
+        },
     ];
 
     const handleItemClick = (itemId: string) => {

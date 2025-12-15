@@ -7,6 +7,8 @@ export class GroupResponseDto{
     debut_date!: Date;
     members_num!: number;
     concept!: string;
+    visualconcept! : string | null;
     is_created!: boolean;
     agencyID!: string;
+    hasDebuted!: boolean;
 }

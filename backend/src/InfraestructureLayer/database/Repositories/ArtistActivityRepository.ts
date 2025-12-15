@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, EntityManager } from 'typeorm';
 import { IArtistActivityRepository } from '@domain/Repositories/IArtistActivityRepository';
@@ -37,33 +37,46 @@ export class ArtistActivityRepository implements IArtistActivityRepository {
   }
 
   async checkScheduleConflicts(artistId: string, activityId: string): Promise<Activity[]> {
-    const conflicts =  await this.repository
-        .createQueryBuilder('artistActivity')
-        .innerJoinAndSelect('artistActivity.activity', 'conflictActivity')
-        .innerJoin('conflictActivity.activityDates', 'conflictDates')
-        .innerJoin(
-        ActivityDateEntity,
-        'newDates',
-        'newDates.activity_id = :activityId',
-        { activityId }
-        )
-        .where('artistActivity.artist_id = :artistId', { artistId })
-        .andWhere('artistActivity.activity_id != :activityId', { activityId })
+
+  const conflicts = await this.repository
+    .createQueryBuilder('artistActivity')
+    .innerJoinAndSelect('artistActivity.activity', 'conflictActivity')
+    .innerJoin('conflictActivity.activityDates', 'conflictDates')
+    .where('artistActivity.artist_id = :artistId', { artistId })
+    .andWhere('artistActivity.activity_id != :activityId', { activityId })
+    .andWhere(qb => {
+      const subQuery = qb.subQuery()
+        .select('1')
+        .from(ActivityDateEntity, 'newDates')
+        .where('newDates.activity_id = :activityId')
         .andWhere('DATE(newDates.date) = DATE(conflictDates.date)')
-        .select('conflictActivity')
-        .getMany()
-        .then(results => results.map(r => r.activity));
+        .getQuery();
 
-    return this.activityMapper.toDomainEntities(conflicts)
-  }
+      return `EXISTS ${subQuery}`;
+    })
+    .setParameter('activityId', activityId)
+    .getMany();
 
-  async confirmAttendance(artistId: string, activityId: string): Promise<void> {
-    
-  }
+     const activitiesWithRelations = await Promise.all(
+      conflicts.map(async (artist_activity: ArtistActivityEntity) => {
+        return await this.repository.manager.findOne(ActivityEntity, {
+          where: { id: artist_activity.activity.id },
+          relations: [
+            'activityDates',
+            'activityResponsibles',
+            'activityResponsibles.responsible',
+            'activityPlaces',
+            'activityPlaces.place',
+          ]
+        });
+      })
+    );
 
-  cancelAttendance(artistId: string, activityId: string): Promise<void> {
-    throw new Error('Method not implemented.');
-  }
+ return activitiesWithRelations
+      .filter(a => a !== null)
+      .map(a => this.activityMapper.toDomainWithRelations(a));
+}
+
 
   async getActivitiesByArtist(artistId: string): Promise<Activity[]> {
   
@@ -188,6 +201,36 @@ export class ArtistActivityRepository implements IArtistActivityRepository {
     }
 
     return { incomes, totalIncome };
+  }
+
+  async confirmAttendance(artistId: string, activityId: string): Promise<void> {
+    const attendance = await this.repository.findOne({
+      where: { artistId, activityId }
+    });
+
+    if (!attendance) {
+      throw new NotFoundException(
+        `No se encontró la asistencia del artista ${artistId} a la actividad ${activityId}`
+      );
+    }
+
+    attendance.confirmation = true;
+    await this.repository.save(attendance);
+  }
+
+  async cancelAttendance(artistId: string, activityId: string): Promise<void> {
+    const attendance = await this.repository.findOne({
+      where: { artistId, activityId }
+    });
+
+    if (!attendance) {
+      throw new NotFoundException(
+        `No se encontró la asistencia del artista ${artistId} a la actividad ${activityId}`
+      );
+    }
+
+    attendance.confirmation = false;
+    await this.repository.save(attendance);
   }
     
 }

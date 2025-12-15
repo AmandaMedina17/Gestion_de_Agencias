@@ -16,8 +16,11 @@ export class Group implements IUpdatable {
     private is_created: boolean,
     private agencyId: string,
     private num_members: number = 0,
+    private hasDebuted: boolean = false,
+    private visualConcept: string | null = null,
+    private proposedByArtistId: string | null = null,
     members?: string[],
-    // private proposedByArtistId?: string
+    
   ) {
     if (members) {
       this._members = members;
@@ -52,7 +55,6 @@ export class Group implements IUpdatable {
     if (updateDto.agencyId) {
       this.agencyId = updateDto.agency_id
     }
-
   }
 
   private updateStatus(newStatus: GroupStatus): void {
@@ -119,9 +121,9 @@ export class Group implements IUpdatable {
   }
 
   static create( name: string, status: GroupStatus, debut_date: Date, 
-    concept: string, is_created: boolean, agencyId: string) : Group {
+    concept: string, is_created: boolean, agencyId: string, numberOfMember: number = 0, hasDebuted: boolean = false, visualConcept: string | null = null, proposedByArtistId: string | null = null) : Group {
     const id = uuidv4();
-    return new Group(id, name, status, debut_date, concept, is_created, agencyId);
+    return new Group(id, name, status, debut_date, concept, is_created, agencyId,numberOfMember,hasDebuted, visualConcept,proposedByArtistId);
   }
 
   // Método para agregar un miembro (con rol y fecha de inicio)
@@ -184,19 +186,30 @@ export class Group implements IUpdatable {
   public set_created(){
     this.is_created = true;
   }
+  
+  public setVisualConcept(visualConcept: string){
+    this.visualConcept = visualConcept;
+  }
 
+  public setDebuted(){
+    this.hasDebuted = true;
+  }
   // Getters
   public getMembersIds(): string[] {
     return [...this._members];
+  }
+
+  public getHasDebuted(){
+    return this.hasDebuted;
   }
 
   public isMemberActive(artistId: string): boolean {
     return this._members.some(m => m === artistId);
   }
 
-  // public getProposedByArtistId(): string | undefined {
-  //   return this.proposedByArtistId;
-  // }
+  public getProposedByArtistId(): string | null {
+    return this.proposedByArtistId;
+  }
 
   public getId(): string {
     return this.id;
@@ -220,6 +233,10 @@ export class Group implements IUpdatable {
 
   public getConcept(): string {
     return this.concept;
+  }
+
+  public getVisualConcept(): string | null {
+    return this.visualConcept;
   }
 
   public getAgency(): string {

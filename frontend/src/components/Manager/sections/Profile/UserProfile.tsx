@@ -54,25 +54,25 @@ const carouselImages = [
     description: "Nueva sesión de fotos para el álbum"
   },
   {
-    src: "./logo.jpg",
+    src: "./straykids.jpg",
     alt: "Entrenamiento en estudio",
     title: "Entrenamiento",
     description: "Sesión de entrenamiento en el estudio principal"
   },
   {
-    src: "./logo.jpg",
+    src: "./bts.jpg",
     alt: "Premiación anual",
     title: "Premios Anuales",
     description: "Ceremonia de premiación de la agencia"
   },
   {
-    src: "./logo.jpg",
+    src: "./olas.jpg",
     alt: "Firma de autógrafos",
     title: "Firma de Autógrafos",
     description: "Evento de firma de autógrafos con fans"
   },
   {
-    src: "./logo.jpg",
+    src: "./oficina.jpg",
     alt: "Grabación en estudio",
     title: "Grabación en Estudio",
     description: "Sesión de grabación del nuevo álbum"
@@ -269,7 +269,7 @@ export default function ManagerProfile({ manager, agencyDetails }: ManagerProfil
     <div className="manager-profile-container">
       {/* Header con gradiente sutil */}
       <div className="manager-profile-header">
-        <h1 className="manager-profile-title">Bienvenido, {manager.name}</h1>
+        <h1 className="manager-profile-title">Bienvenido</h1>
       </div>
 
       {/* Card Principal del Perfil */}

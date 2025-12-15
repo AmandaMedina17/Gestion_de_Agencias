@@ -20,8 +20,8 @@ export class GroupController {
   ) {
     return this.groupService.addMember(addMemberDto);
   }
-
-  @Post('removeMember')
+  
+  @Delete('removeMember')
   removeMember(
     @Body(ValidationPipe) removeMemberDto: LeaveGroupDto,
   ) {
