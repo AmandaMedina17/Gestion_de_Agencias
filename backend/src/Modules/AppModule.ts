@@ -20,6 +20,7 @@ import { ArtistActivityModule } from './ArtistActivityModule';
 import { GroupActivityModule } from './GroupActivityModule';
 import { SongBillboardModule } from './song_billboard/song_billboard.module';
 import { ApprenticeEvaluationModule } from './ApprenticeEvaluationModule';
+import { ArtistHistoryModule } from './ArtistHistoryModule';
 
 @Module({
   imports: [
@@ -41,7 +42,8 @@ import { ApprenticeEvaluationModule } from './ApprenticeEvaluationModule';
     ArtistActivityModule,
     GroupActivityModule,
     SongBillboardModule,
-    ApprenticeEvaluationModule
+    ApprenticeEvaluationModule,
+    ArtistHistoryModule
   ],
   controllers: [AppController],
   providers: [AppService],
