@@ -136,7 +136,7 @@ export const AwardProvider: React.FC<AwardProviderProps> = ({ children }) => {
   };
 
   const getAwardsByAlbumId = (albumId: string): ResponseAwardDto[] => {
-    return awards.filter(award => award.albumId === albumId);
+    return awards.filter(award => award.album?.id === albumId);
   };
 
   const clearError = () => setError(null);

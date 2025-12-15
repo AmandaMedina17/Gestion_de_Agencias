@@ -2,10 +2,17 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { albumService } from '../services/AlbumService';
 import { CreateAlbumDto } from '../../../backend/src/ApplicationLayer/DTOs/albumDto/create.album.dto';
 import { ResponseAlbumDto } from '../../../backend/src/ApplicationLayer/DTOs/albumDto/response.album.dto';
+import { AssignAlbumToArtistDto } from '../../../backend/src/ApplicationLayer/DTOs/albumDto/assign-album-to-artist.dto';
+import { AssignAlbumToGroupDto } from '../../../backend/src/ApplicationLayer/DTOs/albumDto/assign-album-to-group.dto';
 
 interface AlbumContextType {
   // Estado
   albums: ResponseAlbumDto[];
+  albumSongs: any[];
+  albumHits: any[];
+  albumAwards: any[];
+  artistAlbums: ResponseAlbumDto[];
+  groupAlbums: ResponseAlbumDto[];
   loading: boolean;
   error: string | null;
 
@@ -20,6 +27,13 @@ interface AlbumContextType {
     mainProducer: string;
     copiesSold: number;
   }) => Promise<void>;
+  assignAlbumToArtist: (dto: AssignAlbumToArtistDto) => Promise<void>;
+  assignAlbumToGroup: (dto: AssignAlbumToGroupDto) => Promise<void>;
+  fetchAlbumsByArtist: (artistId: string) => Promise<void>;
+  fetchAlbumsByGroup: (groupId: string) => Promise<void>;
+  fetchAlbumSongs: (albumId: string) => Promise<void>;
+  fetchAlbumHits: (albumId: string) => Promise<void>;
+  fetchAlbumAwards: (albumId: string) => Promise<void>;
   clearError: () => void;
 }
 
@@ -39,6 +53,11 @@ export const useAlbum = () => {
 
 export const AlbumProvider: React.FC<AlbumProviderProps> = ({ children }) => {
   const [albums, setAlbums] = useState<ResponseAlbumDto[]>([]);
+  const [albumSongs, setAlbumSongs] = useState<any[]>([]);
+  const [albumHits, setAlbumHits] = useState<any[]>([]);
+  const [albumAwards, setAlbumAwards] = useState<any[]>([]);
+  const [artistAlbums, setArtistAlbums] = useState<ResponseAlbumDto[]>([]);
+  const [groupAlbums, setGroupAlbums] = useState<ResponseAlbumDto[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -115,11 +134,109 @@ export const AlbumProvider: React.FC<AlbumProviderProps> = ({ children }) => {
     }
   };
 
+  const assignAlbumToArtist = async (dto: AssignAlbumToArtistDto) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await albumService.assignToArtist(dto);
+      await fetchAlbums(); // Recargar la lista
+    } catch (err: any) {
+      setError(err.message || 'Error al asignar álbum al artista');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const assignAlbumToGroup = async (dto: AssignAlbumToGroupDto) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await albumService.assignToGroup(dto);
+      await fetchAlbums(); // Recargar la lista
+    } catch (err: any) {
+      setError(err.message || 'Error al asignar álbum al grupo');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAlbumsByArtist = async (artistId: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await albumService.getAlbumsByArtist(artistId);
+      setArtistAlbums(data);
+    } catch (err: any) {
+      setError(err.message || 'Error al cargar álbumes del artista');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAlbumsByGroup = async (groupId: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await albumService.getAlbumsByGroup(groupId);
+      setGroupAlbums(data);
+    } catch (err: any) {
+      setError(err.message || 'Error al cargar álbumes del grupo');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAlbumSongs = async (albumId: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await albumService.getAlbumSongs(albumId);
+      setAlbumSongs(data);
+    } catch (err: any) {
+      setError(err.message || 'Error al cargar canciones del álbum');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAlbumHits = async (albumId: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await albumService.getAlbumHits(albumId);
+      setAlbumHits(data);
+    } catch (err: any) {
+      setError(err.message || 'Error al cargar hits del álbum');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchAlbumAwards = async (albumId: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await albumService.getAlbumAwards(albumId);
+      setAlbumAwards(data);
+    } catch (err: any) {
+      setError(err.message || 'Error al cargar premios del álbum');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const clearError = () => setError(null);
 
   return (
     <AlbumContext.Provider value={{
       albums,
+      albumSongs,
+      albumHits,
+      albumAwards,
+      artistAlbums,
+      groupAlbums,
       loading,
       error,
       createAlbum,
@@ -127,6 +244,13 @@ export const AlbumProvider: React.FC<AlbumProviderProps> = ({ children }) => {
       fetchAlbum,
       deleteAlbum,
       updateAlbum,
+      assignAlbumToArtist,
+      assignAlbumToGroup,
+      fetchAlbumsByArtist,
+      fetchAlbumsByGroup,
+      fetchAlbumSongs,
+      fetchAlbumHits,
+      fetchAlbumAwards,
       clearError,
     }}>
       {children}
