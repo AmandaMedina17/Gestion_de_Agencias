@@ -14,7 +14,7 @@ export class CreateGroupDebutDto {
     @IsNotEmpty()
     activities!: string[];
 
-    @IsOptional()
+    @IsNotEmpty()
     @IsString()
     albumId!: string;
 

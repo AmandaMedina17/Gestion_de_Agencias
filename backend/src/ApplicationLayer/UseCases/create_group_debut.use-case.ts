@@ -6,6 +6,8 @@ import { IGroupActivityRepository } from "@domain/Repositories/IGroupActivityRep
 import { IActivityRepository } from "@domain/Repositories/IActivityRepository";
 import { ActivityType } from "@domain/Enums";
 import { Activity } from "@domain/Entities/Activity";
+import { IAlbumRepository } from "@domain/Repositories/IAlbumRepository";
+import { Album } from "@domain/Entities/Album";
 
 @Injectable()
 export class CreateGroupDebutUseCase {
@@ -16,10 +18,12 @@ export class CreateGroupDebutUseCase {
     private readonly groupActivityRepository: IGroupActivityRepository,
     @Inject(IActivityRepository)
     private readonly activityRepository: IActivityRepository,
+    @Inject(IAlbumRepository)
+    private readonly albumRepository: IAlbumRepository,
   ) {}
 
-  async execute(createGroupDebutDto: CreateGroupDebutDto): Promise<{domainActivities: Activity[],group: Group}> {
-    const { groupId, activities, visualConcept } = createGroupDebutDto;
+  async execute(createGroupDebutDto: CreateGroupDebutDto): Promise<{domainActivities: Activity[],group: Group, album: Album}> {
+    const { groupId, activities, albumId, visualConcept } = createGroupDebutDto;
 
     //Verificar que el grupo existe
     const group = await this.groupRepository.findById(groupId);
@@ -32,6 +36,14 @@ export class CreateGroupDebutUseCase {
     if (members.length === 0) {
       throw new ConflictException(`El grupo no tiene miembros. No puede debutar sin miembros.`);
     }
+
+    const album = await this.albumRepository.findById(albumId);
+    if (!album) {
+        throw new NotFoundException(`Album con ${albumId} no encontrado`);
+    }
+
+    // Relacionar album con grupo
+    this.albumRepository.assignToGroup(albumId, groupId);
 
     for (const activityId of activities) {
       const activity = await this.activityRepository.findById(activityId);
@@ -68,7 +80,7 @@ export class CreateGroupDebutUseCase {
     //Actualizar el estado del grupo en la base de datos
     await this.groupRepository.save(group);
     
-    return {domainActivities: activitiesDomain, group: group}
+    return {domainActivities: activitiesDomain, group: group, album: album}
     }
 }
    

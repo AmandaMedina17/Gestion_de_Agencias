@@ -20,6 +20,7 @@ import { ArtistModule } from './ArtistModule';
 import { ArtistGroupMembershipEntity } from '@infrastructure/database/Entities/ArtistGroupMembershipEntity';
 import { GroupDebutService } from '@application/services/group_debut.service';
 import { CreateGroupDebutDto } from '@application/DTOs/group_debutDto/create-group-debut.dto';
+import { AlbumModule } from './album/album.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { CreateGroupDebutDto } from '@application/DTOs/group_debutDto/create-gro
     GroupModule,
     ArtistModule,
     GroupActivityModule,
+    AlbumModule,
   ],
   controllers: [GroupDebutController],
   providers: [

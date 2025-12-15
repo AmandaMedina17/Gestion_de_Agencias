@@ -6,6 +6,7 @@ import { GroupDebutResponseDto } from "@application/DTOs/group_debutDto/response
 import { CreateGroupDebutUseCase } from "@application/UseCases/create_group_debut.use-case";
 import { IGroupRepository } from "@domain/Repositories/IGroupRepository";
 import { Inject, Injectable } from "@nestjs/common";
+import { AlbumDtoMapper } from '../DTOs/dtoMappers/album.dto.mapper';
 
 
 @Injectable()
@@ -15,17 +16,18 @@ export class GroupDebutService{
     private readonly groupRepository: IGroupRepository,
     private readonly groupDtoMapper: GroupDtoMapper,
     private readonly createGroupDebutUseCase: CreateGroupDebutUseCase,
-    private readonly artistDtoMapper: ArtistDtoMapper,
     private readonly activityDtoMapper: ActivityDtoMapper,
-    private readonly createGroupDebutDto: CreateGroupDebutDto,
+    private readonly albumDtoMapper: AlbumDtoMapper,
   ) {}
   async createGroupDebut(createGroupDebutDto: CreateGroupDebutDto): Promise<GroupDebutResponseDto> {
-    const {domainActivities, group} = await this.createGroupDebutUseCase.execute(createGroupDebutDto);
+    const {domainActivities, group, album} = await this.createGroupDebutUseCase.execute(createGroupDebutDto);
     const activities = this.activityDtoMapper.toResponseList(domainActivities);
     const groupDto = this.groupDtoMapper.toResponse(group);
+    const albumDto = this.albumDtoMapper.toResponse(album);
     const response = new GroupDebutResponseDto();
     response.activities = activities;
     response.group = groupDto;
+    response.album = albumDto;
     return response;
     }
 }

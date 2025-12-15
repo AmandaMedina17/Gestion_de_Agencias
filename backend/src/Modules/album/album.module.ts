@@ -54,7 +54,7 @@ import { AssignAlbumToGroupUseCase } from '@application/UseCases/assign-album-to
     AssignAlbumToGroupUseCase
   ],
   exports: [
-      IAlbumRepository
+      IAlbumRepository, AlbumDtoMapper
   ]
 })
 export class AlbumModule {}
