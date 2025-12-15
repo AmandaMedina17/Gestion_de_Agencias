@@ -19,7 +19,8 @@ export class GroupDtoMapper extends BaseDtoMapper<Group, CreateGroupDto, GroupRe
             visualconcept: domain.getVisualConcept(),
             concept: domain.getConcept(),
             is_created: domain.isCreated(),
-            agencyID: domain.getAgency()
+            agencyID: domain.getAgency(),
+            hasDebuted: domain.getHasDebuted()
         }
     }
 }

@@ -40,4 +40,8 @@ export class CreateGroupDto {
     @IsOptional()
     @IsString()
     proposedByArtistId?: string; 
+
+    @IsOptional()
+    @IsBoolean()
+    hasDebuted?: boolean = false; 
 }

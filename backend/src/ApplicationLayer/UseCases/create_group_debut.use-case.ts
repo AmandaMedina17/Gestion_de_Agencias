@@ -31,6 +31,13 @@ export class CreateGroupDebutUseCase {
       throw new NotFoundException(`Grupo con ID ${groupId} no encontrado`);
     }
 
+    if(group.getHasDebuted()){
+      throw new ConflictException('El grupo ya ha debutado');
+    }
+
+    if(!group.isCreated()){
+      throw new ConflictException('El grupo aun no se ha creado, no puede debutar');
+    }
     // Verificar que haya miembros en el grupo
     const members = await this.groupRepository.getGroupMembers(groupId);
     if (members.length === 0) {
@@ -76,6 +83,7 @@ export class CreateGroupDebutUseCase {
     }
 
     group.setVisualConcept(visualConcept);
+    group.setDebuted();
 
     //Actualizar el estado del grupo en la base de datos
     await this.groupRepository.save(group);

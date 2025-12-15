@@ -10,4 +10,5 @@ export class GroupResponseDto{
     visualconcept! : string | null;
     is_created!: boolean;
     agencyID!: string;
+    hasDebuted!: boolean;
 }
