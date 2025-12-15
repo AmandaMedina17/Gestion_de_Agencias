@@ -332,13 +332,8 @@ const AgencyApprenticesView: React.FC<AgencyApprenticesViewProps> = ({
                 <Typography variant="body2" color="text.secondary">
                   Total Aprendices
                 </Typography>
-                <Typography variant="h5" className="stat-value">
+                <Typography variant="h5" className="stat-value-total">
                   {apprentices.length}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  Promedio edad: {apprentices.length > 0 
-                    ? (apprentices.reduce((sum, a) => sum + a.age, 0) / apprentices.length).toFixed(1)
-                    : 0} años
                 </Typography>
               </div>
               {statsByStatus.map((stat, index) => (
@@ -425,13 +420,7 @@ const AgencyApprenticesView: React.FC<AgencyApprenticesViewProps> = ({
         ) : undefined}
       />
 
-      <Box sx={{ mt: 3, pt: 2, borderTop: 1, borderColor: 'divider' }}>
-        <Typography variant="caption" color="text.secondary">
-          Mostrando {apprentices.length} aprendices de tu agencia asignada
-          {agencyInfo && ` • ${agencyInfo.nameAgency} (${agencyInfo.place})`}
-          {apprentices.length > 0 && ` • Última actualización: ${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`}
-        </Typography>
-      </Box>
+      
     </div>
   );
 };
