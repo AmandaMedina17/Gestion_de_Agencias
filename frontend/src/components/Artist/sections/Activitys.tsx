@@ -95,11 +95,15 @@ const ArtistActivitiesView: React.FC = () => {
   };
 
   // Formatear fechas para la tabla
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    date.setDate(date.getDate() + 1);
-    return date.toLocaleDateString("es-ES");
-  };
+  const formatDate = (dateString: string | Date) => {
+    if (!dateString) return "N/A"
+    const date = new Date(dateString)
+    return date.toLocaleDateString("es-ES", {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+  }
 
   // Obtener información detallada de la actividad
   const getActivityDetails = (activityId: string) => {
@@ -109,19 +113,31 @@ const ArtistActivitiesView: React.FC = () => {
 
   // Preparar datos para la tabla
   const prepareActivities = () => {
-    if (!artistActivities.length) return [];
+  if (!artistActivities.length) return [];
+  
+  return (artistActivities as ActivityResponseDto[]).map(item => {
+    const activityDetails = getActivityDetails(item.id);
     
-    return (artistActivities as ActivityResponseDto[]).map(item => {
-      const activityDetails = getActivityDetails(item.id);
-      return {
-        ...item,
-        id: item.id || Math.random().toString(),
-        activityType: activityDetails?.type || item.type || 'N/A',
-        classification: activityDetails?.classification || item.classification || 'N/A',
-        formattedDate: item.dates ? formatDate(item.dates.toString()) : 'No programada',
-      };
-    });
-  };
+    // CORRECCIÓN: Manejar dates como array
+    let formattedDate = 'No programada';
+    if (item.dates && Array.isArray(item.dates) && item.dates.length > 0) {
+      // Tomar la primera fecha del array y formatearla
+      const firstDate = item.dates[0];
+      formattedDate = formatDate(firstDate);
+    } else if (item.dates && !Array.isArray(item.dates)) {
+      // Si dates no es array, intentar formatearlo directamente
+      formattedDate = formatDate(item.dates);
+    }
+    
+    return {
+      ...item,
+      id: item.id || Math.random().toString(),
+      activityType: activityDetails?.type || item.type || 'N/A',
+      classification: activityDetails?.classification || item.classification || 'N/A',
+      formattedDate: formattedDate,
+    };
+  });
+};
 
   // Columnas para la tabla de actividades
   const activityColumns: GridColDef[] = [
