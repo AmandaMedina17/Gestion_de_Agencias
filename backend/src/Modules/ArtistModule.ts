@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { forwardRef, Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { ArtistEntity } from "@infrastructure/database/Entities/ArtistEntity";
 import { ArtistMapper } from "@infrastructure/database/Mappers/ArtistMapper";
@@ -41,22 +41,38 @@ import { CreateArtistUseCase } from "@application/UseCases/create_artist.use-cas
 import { ApprenticeModule } from "./ApprenticeModule";
 import { GetProfessionalHistoryUseCase } from "@application/UseCases/get_artist_professional_history.use-case";
 import { IncomeModule } from "./IncomeModule";
+import { GetArtistContractsUseCase } from "@application/UseCases/get_artist_contracts.use-case";
+import { GetArtistMainHitsUseCase } from "@application/UseCases/get_artist_main-hits.use-case";
+import { AlbumModule } from "./album/album.module";
+import { AwardModule } from "./award/award.module";
+import { AlbumService } from "@application/services/album/album.service";
+import { IAlbumRepository } from "@domain/Repositories/IAlbumRepository";
+import { AlbumRepository } from "@infrastructure/database/Repositories/AlbumRepository";
+import { AlbumEntity } from "@infrastructure/database/Entities/AlbumEntity";
+import { SongEntity } from "@infrastructure/database/Entities/SongEntity";
+import { AwardEntity } from "@infrastructure/database/Entities/AwardEntity";
 import { PlaceModule } from "./PlaceModule";
 import { ResponsibleModule } from "./ResponsibleModule";
+import { IAgencyRepository } from "@domain/Repositories/IAgencyRepository";
+import { AgencyRepositoryImpl } from "@infrastructure/database/Repositories/AgencyRepository";
+import { Agency } from "@domain/Entities/Agency";
+import { ArtistAgencyMembershipEntity } from "@infrastructure/database/Entities/ArtistAgencyMembershipEntity";
+import { ApprenticeMapper } from "@infrastructure/database/Mappers/ApprenticeMapper";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ArtistEntity,ContractEntity, ArtistGroupMembershipEntity, ActivityEntity,ArtistActivityEntity,AgencyEntity, ArtistCollaborationEntity,ArtistGroupCollaborationEntity, GroupEntity]), 
+  imports: [TypeOrmModule.forFeature([ArtistEntity,ContractEntity, ArtistGroupMembershipEntity, ActivityEntity,ArtistActivityEntity,AgencyEntity, ArtistCollaborationEntity,ArtistGroupCollaborationEntity, GroupEntity, Agency, ArtistAgencyMembershipEntity]), 
   ApprenticeModule,
   IncomeModule,
+  forwardRef((() => AlbumModule)),
   PlaceModule,
   ResponsibleModule
-  ],
+],
   controllers: [ArtistController],
   providers: [
     ArtistMapper,
     ArtistDtoMapper,
+    ApprenticeMapper,
     GroupMapper,
-    AlbumMapper,
     ContractMapper,
     AgencyMapper,
     ActivityMapper,
@@ -67,6 +83,10 @@ import { ResponsibleModule } from "./ResponsibleModule";
     {
       provide: IArtistRepository,
       useClass: ArtistRepository,
+    },
+    {
+      provide: IAgencyRepository,
+      useClass: AgencyRepositoryImpl,
     },
     {
       provide: IGroupRepository,
@@ -80,12 +100,14 @@ import { ResponsibleModule } from "./ResponsibleModule";
       provide: IArtistActivityRepository,
       useClass: ArtistActivityRepository,
     },
+  
     ArtistService,
     GetArtistsWithAgencyChangesAndGroupsUseCase,
     CreateArtistCollaborationUseCase,
     CreateArtistGroupCollaborationUseCase,
     CreateArtistUseCase,
     GetProfessionalHistoryUseCase,
+    GetArtistMainHitsUseCase
   ],
   exports: [IArtistRepository, ArtistDtoMapper, ArtistMapper],
 })

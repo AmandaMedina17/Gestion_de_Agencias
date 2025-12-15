@@ -23,6 +23,8 @@ import { CreateArtistUseCase } from "@application/UseCases/create_artist.use-cas
 import { ProfessionalHistoryResponseDto } from "@application/DTOs/professional_historyDto/response-professional-history.dto";
 import { GetProfessionalHistoryUseCase } from "@application/UseCases/get_artist_professional_history.use-case";
 import { GroupResponseDto } from "@application/DTOs/groupDto/response-group.dto";
+import { GetArtistMainHitsUseCase } from "@application/UseCases/get_artist_main-hits.use-case";
+import { ArtistMainHitsDTO } from "@application/DTOs/artistMainHitsDto/ArtistMainHitsDTO";
 
 @Injectable()
 export class ArtistService extends BaseService<Artist, CreateArtistDto, ArtistResponseDto, UpdateArtistDto>{
@@ -40,6 +42,7 @@ export class ArtistService extends BaseService<Artist, CreateArtistDto, ArtistRe
         private readonly createArtistGroupCollaborationUseCase: CreateArtistGroupCollaborationUseCase,
         private readonly createArtistUseCase : CreateArtistUseCase,
         private readonly getProfessionalHistoryUseCase: GetProfessionalHistoryUseCase,
+        private readonly getArtistMainHitsUseCase : GetArtistMainHitsUseCase
     ){
         super(artistRepository, artistDtoMapper)
     }
@@ -152,5 +155,9 @@ export class ArtistService extends BaseService<Artist, CreateArtistDto, ArtistRe
         }
         const groups = await this.artistRepository.getArtistGroups(artistId);
         return groups.map(group => this.groupDtoMapper.toResponse(group));  
+    }
+
+    async getArtistMainHits(artistId :string) : Promise<ArtistMainHitsDTO>{
+        return this.getArtistMainHitsUseCase.execute(artistId);
     }
 }

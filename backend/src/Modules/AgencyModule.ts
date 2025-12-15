@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { forwardRef, Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { AgencyEntity } from "../InfraestructureLayer/database/Entities/AgencyEntity";
 import { IMapper } from "../InfraestructureLayer/database/Mappers/IMapper";
@@ -40,11 +40,13 @@ import { IGroupRepository } from "@domain/Repositories/IGroupRepository";
 import { GroupRepository } from "@infrastructure/database/Repositories/GroupRepository";
 import { GroupEntity } from "@infrastructure/database/Entities/GroupEntity";
 import { RemoveArtistFromAgencyUseCase } from "@application/UseCases/remove_artist_from_agency.use-case";
-
+import { AlbumModule } from "./album/album.module";
+//AgencyModule
 @Module({
   imports: [
     TypeOrmModule.forFeature([AgencyEntity, ArtistAgencyMembershipEntity, ArtistEntity, ContractEntity, GroupEntity, ArtistGroupMembershipEntity]),
-    ArtistModule,
+    forwardRef(() => ArtistModule),
+    forwardRef(() => AlbumModule),
     ApprenticeModule, 
     PlaceModule
   ],

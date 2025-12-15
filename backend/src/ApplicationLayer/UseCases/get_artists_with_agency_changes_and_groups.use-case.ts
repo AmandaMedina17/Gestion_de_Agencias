@@ -8,6 +8,7 @@ import { IArtistActivityRepository } from '@domain/Repositories/IArtistActivityR
 import { Contract } from '@domain/Entities/Contract';
 import { Activity } from '@domain/Entities/Activity';
 import { Group } from '@domain/Entities/Group';
+import { IAgencyRepository } from '@domain/Repositories/IAgencyRepository';
 
 @Injectable()
 export class GetArtistsWithAgencyChangesAndGroupsUseCase {
@@ -19,6 +20,8 @@ export class GetArtistsWithAgencyChangesAndGroupsUseCase {
     private readonly contractRepository: IContractRepository,
     @Inject(IArtistActivityRepository)
     private readonly artistActivityRepository: IArtistActivityRepository,
+    @Inject(IAgencyRepository)
+    private readonly agencyRepository: IAgencyRepository,
   
   ) {}
 
@@ -36,25 +39,34 @@ export class GetArtistsWithAgencyChangesAndGroupsUseCase {
   }>> {
     //Obtener artistas que cumplan los criterios
     const artists = await this.artistRepository.getArtists_WithAgencyChangesAndGroups(agencyId);
-  
+
+    const artistAgencies = await this.agencyRepository.getAgencyArtists(agencyId);
+    
+    // Crear un Map para búsqueda eficiente
+    const agencyArtistMap = new Map();
+    artistAgencies.forEach(artist => {
+      agencyArtistMap.set(artist.getId(), artist);
+    });
     const result = []
 
     for(const artist of artists){
-      // Obtener contratos del artista
-      const contracts = await this.contractRepository.getArtistContracts(artist.getId());
+       if (agencyArtistMap.has(artist.getId())) {
+          // Obtener contratos del artista
+          const contracts = await this.contractRepository.getArtistContracts(artist.getId());
 
-      // Obtener actividades del artista 
-      const activities = await this.artistActivityRepository.getActivitiesByArtist(artist.getId());
+          // Obtener actividades del artista 
+          const activities = await this.artistActivityRepository.getActivitiesByArtist(artist.getId());
 
-      // Obtener historial de debuts
-      const debutHistory = await this.artistRepository.getArtistDebutHistory(artist.getId());
+          // Obtener historial de debuts
+          const debutHistory = await this.artistRepository.getArtistDebutHistory(artist.getId());
 
-      result.push({
-        artist,
-        contracts,
-        activities,
-        debutHistory
-      })
+          result.push({
+            artist,
+            contracts,
+            activities,
+            debutHistory
+          })
+        }
     }
     return result;
   }

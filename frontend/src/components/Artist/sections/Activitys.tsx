@@ -264,34 +264,7 @@ const ArtistActivitiesView: React.FC = () => {
           </Box>
         )}
 
-        {/* Resumen estadístico */}
-        {artistActivities.length > 0 && (
-          <Box sx={{ mt: 3, p: 2, backgroundColor: '#f9f9f9', borderRadius: 1 }}>
-            <Typography variant="subtitle1" gutterBottom>
-              Resumen
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
-              <Box>
-                <Typography variant="caption" color="textSecondary">
-                  Próxima Actividad
-                </Typography>
-                
-              </Box>
-              <Box>
-                <Typography variant="caption" color="textSecondary">
-                  Actividades Pendientes
-                </Typography>
-                
-              </Box>
-              <Box>
-                <Typography variant="caption" color="textSecondary">
-                  Actividades Completadas
-                </Typography>
-               
-              </Box>
-            </Box>
-          </Box>
-        )}
+        
       </Paper>
     </Box>
   );

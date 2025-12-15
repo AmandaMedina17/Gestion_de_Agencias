@@ -44,7 +44,7 @@ import { ArtistHistoryModule } from './ArtistHistoryModule';
     GroupActivityModule,
     SongBillboardModule,
     ApprenticeEvaluationModule,
-    ArtistHistoryModule
+    ArtistHistoryModule,
     GroupDebutModule,
     ApprenticeEvaluationModule
   ],

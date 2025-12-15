@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { GroupService } from '@application/services/group.service';
 import { GroupController } from '../PresentationLayer/Controllers/group.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -17,13 +17,17 @@ import { LeaveGroupUseCase } from '@application/UseCases/leave-group.use-case';
 import { IArtistGroupMembershipRepository } from '@domain/Repositories/IArtistGroupMembershipRepository';
 import { ArtistGroupMembershipRepository } from '@infrastructure/database/Repositories/ArtistGroupMembershipRepository';
 import { ActiveGroupUseCase } from '@application/UseCases/activate_group.use-case';
+import { AlbumMapper } from '@infrastructure/database/Mappers/AlbumMapper';
+import { AlbumModule } from './album/album.module';
 import { GroupActivityEntity } from '@infrastructure/database/Entities/GroupActivity';
+
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([GroupEntity, ArtistGroupMembershipEntity, GroupActivityEntity]),
-    AgencyModule,
-    ArtistModule,
+    TypeOrmModule.forFeature([GroupEntity, ArtistGroupMembershipEntity,GroupActivityEntity]),
+    forwardRef(() => AgencyModule),
+    forwardRef(() => AlbumModule),
+    forwardRef(() => ArtistModule),
   ],
   controllers: [GroupController],
   providers: [
@@ -31,6 +35,7 @@ import { GroupActivityEntity } from '@infrastructure/database/Entities/GroupActi
     GroupMapper,
     //ActivityMapper,
     GroupDtoMapper,
+    AlbumMapper,
     {
       provide: IGroupRepository,    
       useClass: GroupRepository
@@ -49,7 +54,7 @@ import { GroupActivityEntity } from '@infrastructure/database/Entities/GroupActi
     IGroupRepository,
     GroupDtoMapper,
     GroupMapper,
-    IArtistGroupMembershipRepository]
+    IArtistGroupMembershipRepository,
+  ]
 })
 export class GroupModule {}
-

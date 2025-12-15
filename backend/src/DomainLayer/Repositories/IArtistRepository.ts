@@ -16,6 +16,8 @@ export abstract class IArtistRepository extends IRepository<Artist> {
 
   abstract getArtistGroups(id: string): Promise<Group[]>;
 
+  // Removed duplicate declaration of getArtistLastGroup
+
   abstract getArtist_ArtistColaborations(id: string): Promise<Array<{
     artist1: Artist;
     artist2: Artist;
