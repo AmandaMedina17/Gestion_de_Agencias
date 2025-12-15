@@ -37,25 +37,46 @@ export class ArtistActivityRepository implements IArtistActivityRepository {
   }
 
   async checkScheduleConflicts(artistId: string, activityId: string): Promise<Activity[]> {
-    const conflicts =  await this.repository
-        .createQueryBuilder('artistActivity')
-        .innerJoinAndSelect('artistActivity.activity', 'conflictActivity')
-        .innerJoin('conflictActivity.activityDates', 'conflictDates')
-        .innerJoin(
-        ActivityDateEntity,
-        'newDates',
-        'newDates.activity_id = :activityId',
-        { activityId }
-        )
-        .where('artistActivity.artist_id = :artistId', { artistId })
-        .andWhere('artistActivity.activity_id != :activityId', { activityId })
-        .andWhere('DATE(newDates.date) = DATE(conflictDates.date)')
-        .select('conflictActivity')
-        .getMany()
-        .then(results => results.map(r => r.activity));
 
-    return this.activityMapper.toDomainEntities(conflicts)
-  }
+  const conflicts = await this.repository
+    .createQueryBuilder('artistActivity')
+    .innerJoinAndSelect('artistActivity.activity', 'conflictActivity')
+    .innerJoin('conflictActivity.activityDates', 'conflictDates')
+    .where('artistActivity.artist_id = :artistId', { artistId })
+    .andWhere('artistActivity.activity_id != :activityId', { activityId })
+    .andWhere(qb => {
+      const subQuery = qb.subQuery()
+        .select('1')
+        .from(ActivityDateEntity, 'newDates')
+        .where('newDates.activity_id = :activityId')
+        .andWhere('DATE(newDates.date) = DATE(conflictDates.date)')
+        .getQuery();
+
+      return `EXISTS ${subQuery}`;
+    })
+    .setParameter('activityId', activityId)
+    .getMany();
+
+     const activitiesWithRelations = await Promise.all(
+      conflicts.map(async (artist_activity: ArtistActivityEntity) => {
+        return await this.repository.manager.findOne(ActivityEntity, {
+          where: { id: artist_activity.activity.id },
+          relations: [
+            'activityDates',
+            'activityResponsibles',
+            'activityResponsibles.responsible',
+            'activityPlaces',
+            'activityPlaces.place',
+          ]
+        });
+      })
+    );
+
+ return activitiesWithRelations
+      .filter(a => a !== null)
+      .map(a => this.activityMapper.toDomainWithRelations(a));
+}
+
 
   async getActivitiesByArtist(artistId: string): Promise<Activity[]> {
   
