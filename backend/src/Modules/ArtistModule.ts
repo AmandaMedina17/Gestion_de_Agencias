@@ -43,9 +43,14 @@ import { GetProfessionalHistoryUseCase } from "@application/UseCases/get_artist_
 import { IncomeModule } from "./IncomeModule";
 import { PlaceModule } from "./PlaceModule";
 import { ResponsibleModule } from "./ResponsibleModule";
+import { IAgencyRepository } from "@domain/Repositories/IAgencyRepository";
+import { AgencyRepositoryImpl } from "@infrastructure/database/Repositories/AgencyRepository";
+import { Agency } from "@domain/Entities/Agency";
+import { ArtistAgencyMembershipEntity } from "@infrastructure/database/Entities/ArtistAgencyMembershipEntity";
+import { ApprenticeMapper } from "@infrastructure/database/Mappers/ApprenticeMapper";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ArtistEntity,ContractEntity, ArtistGroupMembershipEntity, ActivityEntity,ArtistActivityEntity,AgencyEntity, ArtistCollaborationEntity,ArtistGroupCollaborationEntity, GroupEntity]), 
+  imports: [TypeOrmModule.forFeature([ArtistEntity,ContractEntity, ArtistGroupMembershipEntity, ActivityEntity,ArtistActivityEntity,AgencyEntity, ArtistCollaborationEntity,ArtistGroupCollaborationEntity, GroupEntity, Agency, ArtistAgencyMembershipEntity]), 
   ApprenticeModule,
   IncomeModule,
   PlaceModule,
@@ -55,6 +60,7 @@ import { ResponsibleModule } from "./ResponsibleModule";
   providers: [
     ArtistMapper,
     ArtistDtoMapper,
+    ApprenticeMapper,
     GroupMapper,
     AlbumMapper,
     ContractMapper,
@@ -67,6 +73,10 @@ import { ResponsibleModule } from "./ResponsibleModule";
     {
       provide: IArtistRepository,
       useClass: ArtistRepository,
+    },
+    {
+      provide: IAgencyRepository,
+      useClass: AgencyRepositoryImpl,
     },
     {
       provide: IGroupRepository,
